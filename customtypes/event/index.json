@@ -1,0 +1,83 @@
+{
+  "id": "event",
+  "json": {
+    "Main": {
+      "uid": {
+        "type": "UID",
+        "config": {
+          "label": "UID",
+          "placeholder": ""
+        }
+      },
+      "title": {
+        "type": "Text",
+        "config": {
+          "label": "Title",
+          "placeholder": ""
+        }
+      },
+      "start_datetime": {
+        "type": "Date",
+        "config": {
+          "label": "Start Date & Time",
+          "placeholder": ""
+        }
+      },
+      "end_datetime": {
+        "type": "Date",
+        "config": {
+          "label": "End Date & Time",
+          "placeholder": ""
+        }
+      },
+      "event_type": {
+        "type": "Select",
+        "config": {
+          "label": "Event Type",
+          "placeholder": "",
+          "options": [
+            "Live Music",
+            "Trivia",
+            "Workshop",
+            "Opening",
+            "Talk",
+            "Market"
+          ]
+        }
+      },
+      "description": {
+        "type": "StructuredText",
+        "config": {
+          "label": "Description",
+          "placeholder": "",
+          "allowTargetBlank": true,
+          "multi": "paragraph,preformatted,heading1,heading2,heading3,heading4,heading5,heading6,strong,em,hyperlink,image,embed,list-item,o-list-item,rtl"
+        }
+      },
+      "location": {
+        "type": "Link",
+        "config": {
+          "label": "Location",
+          "select": "document",
+          "repeat": false,
+          "customtypes": [
+            {
+              "id": "location",
+              "fields": [
+                "name",
+                "description",
+                "address",
+                "website",
+                "category"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "label": "Event",
+  "repeatable": true,
+  "status": true,
+  "format": "custom"
+}
