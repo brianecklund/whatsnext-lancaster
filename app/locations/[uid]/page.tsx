@@ -1,15 +1,17 @@
 import { createClient, prismic } from "@/prismicio";
 import { format, parseISO } from "date-fns";
 
-type PageProps = {
-  params: { uid: string };
-};
-
 export const dynamic = "force-dynamic";
 
+type PageProps = {
+  params: Promise<{ uid: string }>;
+};
+
 export default async function LocationPage({ params }: PageProps) {
+  const { uid } = await params;
+
   const client = createClient();
-  const location = await client.getByUID("location", params.uid);
+  const location = await client.getByUID("location", uid);
 
   const eventDocs = await client.getAllByType("event", {
     filters: [prismic.filter.at("my.event.location", location.id)],
@@ -20,7 +22,6 @@ export default async function LocationPage({ params }: PageProps) {
   const descText =
     typeof desc === "string" ? desc : Array.isArray(desc) ? prismic.asText(desc) : null;
 
-  // ✅ Safe Prismic link handling (no `.url` access)
   const websiteUrl = prismic.asLink(location.data?.website);
 
   return (
