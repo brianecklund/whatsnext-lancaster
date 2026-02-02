@@ -1,6 +1,7 @@
 import { createClient, prismic } from "@/prismicio";
 import HomeSplitClient from "./HomeSplitClient";
 import type { EventLite } from "@/lib/types";
+import type { RichTextField } from "@prismicio/client";
 
 export const dynamic = "force-dynamic";
 
@@ -9,7 +10,13 @@ export default async function HomePage() {
 
   const docs = await client.getAllByType("event", {
     orderings: [{ field: "my.event.start_datetime", direction: "asc" }],
-    fetchLinks: ["location.name", "location.address", "location.category", "location.website", "location.description"]
+    fetchLinks: [
+      "location.name",
+      "location.address",
+      "location.category",
+      "location.website",
+      "location.description",
+    ],
   });
 
   const events: EventLite[] = docs
@@ -17,12 +24,25 @@ export default async function HomePage() {
       const loc = doc.data?.location;
       const locData = loc?.data;
 
+      // ✅ Safe event description handling (guards empty arrays)
       const desc = doc.data?.description;
       const descText =
         typeof desc === "string"
           ? desc
-          : Array.isArray(desc)
-          ? prismic.asText(desc)
+          : Array.isArray(desc) && desc.length > 0
+          ? prismic.asText(desc as RichTextField)
+          : null;
+
+      // ✅ Safe location website handling (no `.url` access)
+      const websiteUrl = prismic.asLink(locData?.website);
+
+      // ✅ Safe location description handling (guards empty arrays)
+      const locDesc = locData?.description;
+      const locDescText =
+        typeof locDesc === "string"
+          ? locDesc
+          : Array.isArray(locDesc) && locDesc.length > 0
+          ? prismic.asText(locDesc as RichTextField)
           : null;
 
       return {
@@ -42,15 +62,10 @@ export default async function HomePage() {
               name: locData?.name ?? null,
               address: locData?.address ?? null,
               category: locData?.category ?? null,
-              website: locData?.website?.url ?? null,
-              description:
-                locData?.description && Array.isArray(locData.description)
-                  ? prismic.asText(locData.description)
-                  : typeof locData?.description === "string"
-                  ? locData.description
-                  : null
+              website: websiteUrl ?? null,
+              description: locDescText,
             }
-          : null
+          : null,
       };
     })
     .filter((e) => Boolean(e.start_datetime));
