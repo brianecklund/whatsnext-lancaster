@@ -1,20 +1,27 @@
 import { createClient, prismic } from "@/prismicio";
 import { format, parseISO } from "date-fns";
 
+type PageProps = {
+  params: { uid: string };
+};
+
 export const dynamic = "force-dynamic";
 
-export default async function LocationPage({ params }: { params: { uid: string } }) {
+export default async function LocationPage({ params }: PageProps) {
   const client = createClient();
   const location = await client.getByUID("location", params.uid);
 
   const eventDocs = await client.getAllByType("event", {
     filters: [prismic.filter.at("my.event.location", location.id)],
-    orderings: [{ field: "my.event.start_datetime", direction: "asc" }]
+    orderings: [{ field: "my.event.start_datetime", direction: "asc" }],
   });
 
   const desc = location.data?.description;
   const descText =
     typeof desc === "string" ? desc : Array.isArray(desc) ? prismic.asText(desc) : null;
+
+  // ✅ Safe Prismic link handling (no `.url` access)
+  const websiteUrl = prismic.asLink(location.data?.website);
 
   return (
     <div className="pageShell">
@@ -23,12 +30,18 @@ export default async function LocationPage({ params }: { params: { uid: string }
           <h1 className="detailTitle">{location.data?.name ?? "Location"}</h1>
 
           <div className="kv" style={{ marginBottom: 10 }}>
-            {location.data?.category ? <span className="badge">{location.data.category}</span> : null}
+            {location.data?.category ? (
+              <span className="badge">{location.data.category}</span>
+            ) : null}
+
             {location.data?.address ? <span>{location.data.address}</span> : null}
-            {location.data?.website?.url ? (
+
+            {websiteUrl ? (
               <>
                 <span>•</span>
-                <a href={location.data.website.url} target="_blank" rel="noreferrer">Website</a>
+                <a href={websiteUrl} target="_blank" rel="noreferrer">
+                  Website
+                </a>
               </>
             ) : null}
           </div>
@@ -52,7 +65,9 @@ export default async function LocationPage({ params }: { params: { uid: string }
                     <div key={e.id} className="row" style={{ cursor: "default" }}>
                       <div className="rowTop">
                         <div className="rowTitle">{e.data?.title ?? "Event"}</div>
-                        {e.data?.event_type ? <span className="badge">{e.data.event_type}</span> : null}
+                        {e.data?.event_type ? (
+                          <span className="badge">{e.data.event_type}</span>
+                        ) : null}
                       </div>
                       <div className="meta">
                         {start ? <span>{format(start, "MMM d, h:mm a")}</span> : null}
@@ -66,7 +81,8 @@ export default async function LocationPage({ params }: { params: { uid: string }
 
           <div className="detailBlock">
             <div className="subtle">
-              Prefer split view? <a href={`/locations?loc=${location.uid}`}>Open in split layout</a>
+              Prefer split view?{" "}
+              <a href={`/locations?loc=${location.uid}`}>Open in split layout</a>
             </div>
           </div>
         </div>
