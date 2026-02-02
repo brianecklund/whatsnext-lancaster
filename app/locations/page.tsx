@@ -1,81 +1,98 @@
 import { createClient, prismic } from "@/prismicio";
-import LocationsSplitClient from "./LocationsSplitClient";
-import type { LocationLite, EventLite } from "@/lib/types";
+import { format, parseISO } from "date-fns";
+import type { RichTextField } from "@prismicio/client";
 
 export const dynamic = "force-dynamic";
 
-export default async function LocationsPage() {
-  const client = createClient();
+type PageProps = {
+  params: Promise<{ uid: string }>;
+};
 
-  const locationDocs = await client.getAllByType("location", {
-    orderings: [{ field: "my.location.name", direction: "asc" }]
-  });
+export default async function LocationPage({ params }: PageProps) {
+  const { uid } = await params;
+
+  const client = createClient();
+  const location = await client.getByUID("location", uid);
 
   const eventDocs = await client.getAllByType("event", {
+    filters: [prismic.filter.at("my.event.location", location.id)],
     orderings: [{ field: "my.event.start_datetime", direction: "asc" }],
-    fetchLinks: ["location.name", "location.address", "location.category", "location.website", "location.description"]
   });
 
-  const locations: LocationLite[] = locationDocs.map((loc: any) => {
-    const desc = loc.data?.description;
-    return {
-      id: loc.id,
-      uid: loc.uid ?? null,
-      name: loc.data?.name ?? null,
-      address: loc.data?.address ?? null,
-      category: loc.data?.category ?? null,
-      website: loc.data?.website?.url ?? null,
-      description:
-        typeof desc === "string"
-          ? desc
-          : Array.isArray(desc)
-          ? prismic.asText(desc)
-          : null
-    };
-  });
+  const desc = location.data?.description;
+  const descText =
+    typeof desc === "string"
+      ? desc
+      : Array.isArray(desc) && desc.length > 0
+      ? prismic.asText(desc as RichTextField)
+      : null;
 
-  const events: EventLite[] = eventDocs
-    .map((doc: any) => {
-      const loc = doc.data?.location;
-      const locData = loc?.data;
+  const websiteUrl = prismic.asLink(location.data?.website);
 
-      const desc = doc.data?.description;
-      const descText =
-        typeof desc === "string"
-          ? desc
-          : Array.isArray(desc)
-          ? prismic.asText(desc)
-          : null;
+  return (
+    <div className="pageShell">
+      <div className="scroll">
+        <div style={{ paddingTop: 18 }}>
+          <h1 className="detailTitle">{location.data?.name ?? "Location"}</h1>
 
-      return {
-        id: doc.id,
-        key: doc.uid ?? doc.id,
-        uid: doc.uid ?? null,
-        title: doc.data?.title ?? null,
-        artists: doc.data?.artists ?? null,
-        description: descText,
-        start_datetime: doc.data?.start_datetime ?? null,
-        end_datetime: doc.data?.end_datetime ?? null,
-        event_type: doc.data?.event_type ?? null,
-        location: loc
-          ? {
-              id: loc.id,
-              uid: loc.uid ?? null,
-              name: locData?.name ?? null,
-              address: locData?.address ?? null,
-              category: locData?.category ?? null,
-              website: locData?.website?.url ?? null,
-              description:
-                locData?.description && Array.isArray(locData.description)
-                  ? prismic.asText(locData.description)
-                  : typeof locData?.description === "string"
-                  ? locData.description
-                  : null
-            }
-          : null
-      };
-    })
-    .filter((e) => Boolean(e.start_datetime));
+          <div className="kv" style={{ marginBottom: 10 }}>
+            {location.data?.category ? (
+              <span className="badge">{location.data.category}</span>
+            ) : null}
 
-  return <LocationsSplitClient locations={locations} events={events} />;
+            {location.data?.address ? <span>{location.data.address}</span> : null}
+
+            {websiteUrl ? (
+              <>
+                <span>•</span>
+                <a href={websiteUrl} target="_blank" rel="noreferrer">
+                  Website
+                </a>
+              </>
+            ) : null}
+          </div>
+
+          <div className="detailBlock">
+            <div className="h2">About</div>
+            <div className="subtle" style={{ whiteSpace: "pre-wrap" }}>
+              {descText ?? "No description added yet."}
+            </div>
+          </div>
+
+          <div className="detailBlock">
+            <div className="h2">Upcoming events</div>
+            {eventDocs.length === 0 ? (
+              <div className="subtle">No upcoming events published for this location yet.</div>
+            ) : (
+              <div>
+                {eventDocs.map((e: any) => {
+                  const start = e.data?.start_datetime ? parseISO(e.data.start_datetime) : null;
+                  return (
+                    <div key={e.id} className="row" style={{ cursor: "default" }}>
+                      <div className="rowTop">
+                        <div className="rowTitle">{e.data?.title ?? "Event"}</div>
+                        {e.data?.event_type ? (
+                          <span className="badge">{e.data.event_type}</span>
+                        ) : null}
+                      </div>
+                      <div className="meta">
+                        {start ? <span>{format(start, "MMM d, h:mm a")}</span> : null}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div className="detailBlock">
+            <div className="subtle">
+              Prefer split view?{" "}
+              <a href={`/locations?loc=${location.uid}`}>Open in split layout</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

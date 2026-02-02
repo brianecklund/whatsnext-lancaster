@@ -1,5 +1,6 @@
 import { createClient, prismic } from "@/prismicio";
 import { format, parseISO } from "date-fns";
+import type { RichTextField } from "@prismicio/client";
 
 export const dynamic = "force-dynamic";
 
