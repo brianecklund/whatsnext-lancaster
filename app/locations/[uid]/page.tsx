@@ -3,10 +3,6 @@ import { format, parseISO } from "date-fns";
 
 export const dynamic = "force-dynamic";
 
-/**
- * Optional detail route (useful for sharing deep links).
- * The main UX is split-view at /locations.
- */
 export default async function LocationPage({ params }: { params: { uid: string } }) {
   const client = createClient();
   const location = await client.getByUID("location", params.uid);

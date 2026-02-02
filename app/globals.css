@@ -6,6 +6,7 @@
   --chip:#f4f4f4;
   --chipOn:#111111;
   --chipOnText:#ffffff;
+  --hover:#f7f7f7;
 
   --navH: 62px;
   --gutter: 18px;
@@ -19,7 +20,7 @@ body{
   color:var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
   line-height:1.35;
-  overflow: hidden; /* split-pane layout handles scrolling */
+  overflow: hidden;
 }
 
 a{ color:inherit; text-decoration:none; }
@@ -59,10 +60,7 @@ a:hover{ text-decoration:underline; }
   width: 100%;
 }
 
-.pageShell{
-  height: 100%;
-  width: 100%;
-}
+.pageShell{ height:100%; width:100%; }
 
 .stickyBar{
   position: sticky;
@@ -120,7 +118,7 @@ a:hover{ text-decoration:underline; }
 }
 
 @media (max-width: 980px){
-  body{ overflow:auto; } /* allow normal scroll on small screens */
+  body{ overflow:auto; }
   .main{ height:auto; }
   .split{ grid-template-columns: 1fr; }
   .stickyBar{ position: static; }
@@ -131,9 +129,7 @@ a:hover{ text-decoration:underline; }
   overflow: hidden;
   border-right: 1px solid var(--border);
 }
-.paneRight{
-  border-right: 0;
-}
+.paneRight{ border-right:0; }
 
 .scroll{
   height: 100%;
@@ -164,6 +160,13 @@ a:hover{ text-decoration:underline; }
   padding: 10px 0;
   border-top: 1px dotted var(--border);
   cursor: pointer;
+}
+
+.row:hover{
+  background: var(--hover);
+  margin: 0 calc(var(--gutter) * -1);
+  padding-left: var(--gutter);
+  padding-right: var(--gutter);
 }
 
 .row:first-child{ border-top: 0; }
@@ -203,10 +206,7 @@ a:hover{ text-decoration:underline; }
   color: var(--muted);
 }
 
-.detail{
-  padding-top: 18px;
-}
-
+.detail{ padding-top:18px; }
 .detailTitle{
   font-size: 22px;
   letter-spacing:-0.02em;

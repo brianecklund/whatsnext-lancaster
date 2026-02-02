@@ -1,10 +1,10 @@
 import { createClient, prismic } from "@/prismicio";
-import HomeSplitClient from "./HomeSplitClient";
+import CalendarSplitClient from "./CalendarSplitClient";
 import type { EventLite } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
-export default async function HomePage() {
+export default async function CalendarPage() {
   const client = createClient();
 
   const docs = await client.getAllByType("event", {
@@ -59,5 +59,5 @@ export default async function HomePage() {
     new Set(events.map((e) => e.event_type).filter(Boolean) as string[])
   ).sort((a, b) => a.localeCompare(b));
 
-  return <HomeSplitClient events={events} allTypes={allTypes} />;
+  return <CalendarSplitClient events={events} allTypes={allTypes} />;
 }

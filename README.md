@@ -1,40 +1,23 @@
-# What's Next Lancaster (v3) — Split View (Filter Munich-style)
+# What's Next Lancaster — v4 Fixed (no @prismicio/helpers)
 
-## What you asked for
-- Sticky nav bar
-- Sticky filter bar under nav
-- Full-width listings
-- Split layout with two scrollable panes:
-  - Left: listings
-  - Right: detail content (event/location)
+## What’s fixed
+- Removes any import of `@prismicio/helpers` (so `npm run build` won’t fail on that).
+- Uses `images.remotePatterns` (Next warning removed).
+- Includes split-view home + hover highlight on rows.
 
-This build implements that on:
-- /calendar  (events + filters)
-- /locations (locations list + details)
+## Setup
+1) Create `.env.local` in the project root:
+   PRISMIC_REPO_NAME=whatsnext-lancaster
+   # If private:
+   # PRISMIC_ACCESS_TOKEN=YOUR_TOKEN
 
-## 1) Environment variables
+2) Install + run:
+   npm install
+   npm run dev
 
-Create `.env.local` in the project root:
+3) Build:
+   npm run build
 
-PRISMIC_REPO_NAME=whatsnext-lancaster
-# If private:
-# PRISMIC_ACCESS_TOKEN=your-token
-
-Restart dev server after changing env vars.
-
-## 2) Run locally
-
-npm install
-npm run dev
-
-## 3) How selection works
-- Calendar selection is stored in the URL:
-  - /calendar?event=<uid-or-id>&types=...
-- Location selection is stored in the URL:
-  - /locations?loc=<location-uid>
-
-This makes the split view shareable.
-
-## 4) Notes
-- On small screens, the layout collapses to a single column for usability.
-- If you want the right panel to be a real route (e.g. /calendar/<uid>), we can do that in v4.
+## If Next says “multiple lockfiles”
+That’s caused by an unrelated `package-lock.json` somewhere above your project folder.
+Make sure you run commands from *inside* this project folder (where this package.json lives).

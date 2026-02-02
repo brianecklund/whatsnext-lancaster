@@ -2,8 +2,8 @@
 
 import { useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import type { LocationLite, EventLite } from "@/lib/types";
 import { format, parseISO } from "date-fns";
+import type { LocationLite, EventLite } from "@/lib/types";
 
 export default function LocationsSplitClient({
   locations,
@@ -31,9 +31,7 @@ export default function LocationsSplitClient({
 
   const upcomingForSelected = useMemo(() => {
     if (!selectedLocation) return [];
-    return events
-      .filter((e) => e.location?.id === selectedLocation.id)
-      .slice(0, 20);
+    return events.filter((e) => e.location?.id === selectedLocation.id).slice(0, 30);
   }, [events, selectedLocation]);
 
   return (
@@ -125,7 +123,13 @@ export default function LocationsSplitClient({
                   ) : (
                     <div>
                       {upcomingForSelected.map((e) => (
-                        <div key={e.id} className="row" onClick={() => router.replace(`/calendar?event=${e.key}`)}>
+                        <div
+                          key={e.id}
+                          className="row"
+                          onClick={() => router.replace(`/calendar?event=${encodeURIComponent(e.key)}`)}
+                          role="button"
+                          tabIndex={0}
+                        >
                           <div className="rowTop">
                             <div className="rowTitle">{e.title ?? "Event"}</div>
                             {e.event_type ? <span className="badge">{e.event_type}</span> : null}

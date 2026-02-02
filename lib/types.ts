@@ -10,7 +10,7 @@ export type LocationLite = {
 
 export type EventLite = {
   id: string;
-  key: string; // uid if present else id (used for selection)
+  key: string;
   uid?: string | null;
   title?: string | null;
   artists?: string | null;
