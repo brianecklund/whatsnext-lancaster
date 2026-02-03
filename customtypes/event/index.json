@@ -91,7 +91,7 @@
         }
       },
       "cost": {
-        "type": "KeyText",
+        "type": "Text",
         "config": {
           "label": "Cost / Cover",
           "placeholder": "Free, $10, $25 advance"
