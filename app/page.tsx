@@ -7,25 +7,71 @@ export const dynamic = "force-dynamic";
 
 /**
  * Homepage: split calendar list + event detail.
- * Data source: Prismic `event` documents.
+ * Data source: Prismic event-like documents.
  */
 export default async function HomePage() {
   const client = createClient();
 
-  // IMPORTANT:
-  // Do NOT order by a specific Prismic field that might have changed (start_datetime).
-  // We'll sort locally after we normalize the start date field.
-  const docs = await client.getAllByType("event", {
-    fetchLinks: [
-      "location.name",
-      "location.address",
-      "location.category",
-      "location.website",
-      "location.description",
-    ],
-  });
+  /**
+   * Slice Machine edits often change Custom Type API IDs.
+   * Try common variations so your calendar doesn't go blank.
+   */
+  const EVENT_TYPE_CANDIDATES = [
+    "event",
+    "events",
+    "calendar_event",
+    "calendar-events",
+    "calendarEvent",
+    "calendar",
+  ];
 
-  // Helper: safely pick the first valid Prismic date/timestamp string from a list of possible API IDs.
+  let docs: any[] = [];
+  let foundType: string | null = null;
+  let typeErrors: Record<string, string> = {};
+
+  for (const t of EVENT_TYPE_CANDIDATES) {
+    try {
+      const found = await client.getAllByType(t, {
+        fetchLinks: [
+          "location.name",
+          "location.address",
+          "location.category",
+          "location.website",
+          "location.description",
+        ],
+      });
+
+      if (Array.isArray(found) && found.length > 0) {
+        docs = found;
+        foundType = t;
+        break;
+      }
+    } catch (err: any) {
+      typeErrors[t] = err?.message ? String(err.message) : String(err);
+    }
+  }
+
+  /**
+   * If we still have nothing, fetch a small sample of ANY docs
+   * so we can display their types + keys on the page.
+   *
+   * NOTE: Use client.getAll() instead of client.get() to avoid API/typing differences.
+   */
+  let debugSample: any[] = [];
+  let debugError: string | null = null;
+
+  if (!docs.length) {
+    try {
+      // Many Prismic clients support getAll(params) to retrieve docs across pagination.
+      // We'll keep it small with pageSize.
+      debugSample = await client.getAll({ pageSize: 10 });
+    } catch (err: any) {
+      debugError = err?.message ? String(err.message) : String(err);
+      debugSample = [];
+    }
+  }
+
+  // Helper: pick the first valid Prismic date/timestamp string from a list of possible API IDs.
   const pickDate = (data: any, keys: string[]) => {
     for (const k of keys) {
       const v = data?.[k];
@@ -39,7 +85,6 @@ export default async function HomePage() {
       const loc = doc.data?.location;
       const locData = loc?.data;
 
-      // Rich text -> plain text (safe for empty arrays)
       const desc = doc.data?.description;
       const descText =
         typeof desc === "string"
@@ -69,25 +114,25 @@ export default async function HomePage() {
         ? doc.data.tags.map((t: any) => t?.tag).filter(Boolean)
         : [];
 
-      /**
-       * Prismic Date vs Timestamp compatibility + Slice Machine API ID changes:
-       * - Timestamp fields often called: start_datetime / end_datetime
-       * - Date fields often called: start_date / end_date or just date
-       *
-       * We accept several possible names so events don't "disappear" when models change.
-       */
+      // Support common “start/end” API ID variations after Slice Machine edits
       const startVal =
         pickDate(doc.data, [
           "start_datetime",
           "start_date",
           "start",
           "date",
-          "start_time",
+          "datetime",
+          "event_date",
         ]) ?? null;
 
       const endVal =
-        pickDate(doc.data, ["end_datetime", "end_date", "end", "end_time"]) ??
-        null;
+        pickDate(doc.data, [
+          "end_datetime",
+          "end_date",
+          "end",
+          "endtime",
+          "end_time",
+        ]) ?? null;
 
       return {
         id: doc.id,
@@ -128,14 +173,101 @@ export default async function HomePage() {
           : null,
       } as EventLite;
     })
-    // Only require *some* start value (whatever the current Prismic model uses)
     .filter((e) => Boolean(e.start_datetime))
-    // Sort locally to avoid relying on a Prismic field that may not exist anymore
     .sort((a, b) => {
       const ta = Date.parse(a.start_datetime ?? "") || 0;
       const tb = Date.parse(b.start_datetime ?? "") || 0;
       return ta - tb;
     });
 
-  return <HomeSplitClient events={events} />;
+  // If we found events, render your normal UI
+  if (events.length) {
+    return <HomeSplitClient events={events} />;
+  }
+
+  // Otherwise show a helpful debug panel right on the page
+  return (
+    <div style={{ padding: 24, maxWidth: 900 }}>
+      <h1 style={{ fontSize: 22, marginBottom: 8 }}>
+        No events returned from Prismic
+      </h1>
+
+      <p style={{ opacity: 0.85, lineHeight: 1.5 }}>
+        Your homepage is querying Prismic for event documents but it is getting{" "}
+        <b>0 results</b>. This usually means your Custom Type API ID changed
+        after Slice Machine updates (for example, it&apos;s now{" "}
+        <code>events</code> instead of <code>event</code>), or your environment
+        variables are pointing at a different Prismic repo.
+      </p>
+
+      <h2 style={{ marginTop: 18, fontSize: 16 }}>Tried these Custom Type IDs</h2>
+      <pre
+        style={{
+          padding: 12,
+          background: "rgba(0,0,0,0.06)",
+          borderRadius: 8,
+          overflowX: "auto",
+          fontSize: 12,
+        }}
+      >
+        {JSON.stringify(
+          {
+            candidates: EVENT_TYPE_CANDIDATES,
+            foundType,
+            typeErrors,
+          },
+          null,
+          2
+        )}
+      </pre>
+
+      <h2 style={{ marginTop: 18, fontSize: 16 }}>
+        Sample docs from your repository (type + data keys)
+      </h2>
+
+      {debugError ? (
+        <pre
+          style={{
+            padding: 12,
+            background: "rgba(0,0,0,0.06)",
+            borderRadius: 8,
+            overflowX: "auto",
+            fontSize: 12,
+          }}
+        >
+          {debugError}
+        </pre>
+      ) : debugSample.length === 0 ? (
+        <p style={{ opacity: 0.85 }}>
+          Could not fetch a sample of docs. This can happen if the Prismic repo /
+          token env vars are misconfigured, or there are no documents at all.
+        </p>
+      ) : (
+        <pre
+          style={{
+            padding: 12,
+            background: "rgba(0,0,0,0.06)",
+            borderRadius: 8,
+            overflowX: "auto",
+            fontSize: 12,
+          }}
+        >
+          {JSON.stringify(
+            debugSample.map((d: any) => ({
+              type: d.type,
+              uid: d.uid,
+              dataKeys: Object.keys(d.data ?? {}),
+            })),
+            null,
+            2
+          )}
+        </pre>
+      )}
+
+      <p style={{ marginTop: 18, opacity: 0.85, lineHeight: 1.5 }}>
+        Find the correct <b>type</b> in the JSON above (for example{" "}
+        <code>events</code>). Then update your code to query that exact type.
+      </p>
+    </div>
+  );
 }
