@@ -82,7 +82,6 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/text
    */
-  \1
   /**
    * Summary field in *Event*
    *
