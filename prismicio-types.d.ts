@@ -82,7 +82,16 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/text
    */
-  title: prismic.KeyTextField;
+  \1
+  /**
+   * Summary field in *Event*
+   *
+   * - **Field Type**: Text
+   * - **API ID Path**: event.summary
+   * - **Tab**: Main
+   */
+  summary: prismic.KeyTextField;
+
 
   /**
    * Start Date & Time field in *Event*
@@ -93,7 +102,7 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/date
    */
-  start_datetime: prismic.DateField;
+  start_datetime: prismic.TimestampField;
 
   /**
    * End Date & Time field in *Event*
@@ -104,7 +113,17 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/date
    */
-  end_datetime: prismic.DateField;
+  \1
+
+  /**
+   * All Day field in *Event*
+   *
+   * - **Field Type**: Boolean
+   * - **API ID Path**: event.all_day
+   * - **Tab**: Main
+   */
+  all_day: prismic.BooleanField;
+
 
   /**
    * Event Type field in *Event*
@@ -115,9 +134,15 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/select
    */
-  event_type: prismic.SelectField<
-    "Live Music" | "Trivia" | "Workshop" | "Opening" | "Talk" | "Market"
-  >;
+  \1
+  status: prismic.SelectField<\"Scheduled\" | \"Cancelled\" | \"Postponed\">;
+  featured: prismic.BooleanField;
+  cost: prismic.KeyTextField;
+  age_restriction: prismic.SelectField<\"All ages\" | \"18+\" | \"21+\">;
+  website_url: prismic.LinkField;
+  tickets_url: prismic.LinkField;
+  image: prismic.ImageField;
+  tags: prismic.GroupField<{ tag: prismic.KeyTextField }>; 
 
   /**
    * Description field in *Event*
