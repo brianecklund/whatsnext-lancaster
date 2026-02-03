@@ -12,8 +12,10 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const client = createClient();
 
+  // IMPORTANT:
+  // Do NOT order by a specific Prismic field that might have changed (start_datetime).
+  // We'll sort locally after we normalize the start date field.
   const docs = await client.getAllByType("event", {
-    orderings: [{ field: "my.event.start_datetime", direction: "asc" }],
     fetchLinks: [
       "location.name",
       "location.address",
@@ -22,6 +24,15 @@ export default async function HomePage() {
       "location.description",
     ],
   });
+
+  // Helper: safely pick the first valid Prismic date/timestamp string from a list of possible API IDs.
+  const pickDate = (data: any, keys: string[]) => {
+    for (const k of keys) {
+      const v = data?.[k];
+      if (typeof v === "string" && v.trim()) return v;
+    }
+    return null;
+  };
 
   const events: EventLite[] = docs
     .map((doc: any) => {
@@ -54,14 +65,29 @@ export default async function HomePage() {
       const imageUrl =
         heroImg && typeof heroImg === "object" ? heroImg.url ?? null : null;
 
-      const tagsArr =
-        Array.isArray(doc.data?.tags) ? doc.data.tags.map((t: any) => t?.tag).filter(Boolean) : [];
+      const tagsArr = Array.isArray(doc.data?.tags)
+        ? doc.data.tags.map((t: any) => t?.tag).filter(Boolean)
+        : [];
 
-      // Prismic Date vs Timestamp compatibility:
-      // - Date: YYYY-MM-DD (no time)
-      // - Timestamp: ISO string
-      const startVal = doc.data?.start_datetime ?? null;
-      const endVal = doc.data?.end_datetime ?? null;
+      /**
+       * Prismic Date vs Timestamp compatibility + Slice Machine API ID changes:
+       * - Timestamp fields often called: start_datetime / end_datetime
+       * - Date fields often called: start_date / end_date or just date
+       *
+       * We accept several possible names so events don't "disappear" when models change.
+       */
+      const startVal =
+        pickDate(doc.data, [
+          "start_datetime",
+          "start_date",
+          "start",
+          "date",
+          "start_time",
+        ]) ?? null;
+
+      const endVal =
+        pickDate(doc.data, ["end_datetime", "end_date", "end", "end_time"]) ??
+        null;
 
       return {
         id: doc.id,
@@ -102,7 +128,14 @@ export default async function HomePage() {
           : null,
       } as EventLite;
     })
-    .filter((e) => Boolean(e.start_datetime));
+    // Only require *some* start value (whatever the current Prismic model uses)
+    .filter((e) => Boolean(e.start_datetime))
+    // Sort locally to avoid relying on a Prismic field that may not exist anymore
+    .sort((a, b) => {
+      const ta = Date.parse(a.start_datetime ?? "") || 0;
+      const tb = Date.parse(b.start_datetime ?? "") || 0;
+      return ta - tb;
+    });
 
   return <HomeSplitClient events={events} />;
 }
