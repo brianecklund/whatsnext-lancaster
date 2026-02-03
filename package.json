@@ -2,11 +2,12 @@
   "name": "whatsnext-lancaster",
   "version": "4.0.1",
   "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start"
-  },
+ "scripts": {
+  "dev": "next dev",
+  "build": "next build",
+  "start": "next start",
+  "slicemachine": "start-slicemachine"
+},
   "dependencies": {
     "@prismicio/client": "^7.21.3",
     "@prismicio/next": "^1.7.2",
