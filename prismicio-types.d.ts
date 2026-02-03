@@ -82,7 +82,6 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/text
    */
-  \1
   /**
    * Summary field in *Event*
    *
@@ -113,7 +112,6 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/date
    */
-  \1
 
   /**
    * All Day field in *Event*
@@ -134,7 +132,6 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/select
    */
-  \1
   status: prismic.SelectField<\"Scheduled\" | \"Cancelled\" | \"Postponed\">;
   featured: prismic.BooleanField;
   cost: prismic.KeyTextField;
