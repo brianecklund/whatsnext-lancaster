@@ -16,18 +16,32 @@
           "placeholder": ""
         }
       },
+      "summary": {
+        "type": "Text",
+        "config": {
+          "label": "Summary",
+          "placeholder": ""
+        }
+      },
       "start_datetime": {
-        "type": "Date",
+        "type": "Timestamp",
         "config": {
           "label": "Start Date & Time",
           "placeholder": ""
         }
       },
       "end_datetime": {
-        "type": "Date",
+        "type": "Timestamp",
         "config": {
           "label": "End Date & Time",
           "placeholder": ""
+        }
+      },
+      "all_day": {
+        "type": "Boolean",
+        "config": {
+          "label": "All Day",
+          "default_value": false
         }
       },
       "event_type": {
@@ -45,6 +59,79 @@
           ]
         }
       },
+      "status": {
+        "type": "Select",
+        "config": {
+          "label": "Status",
+          "placeholder": "",
+          "options": [
+            "Scheduled",
+            "Cancelled",
+            "Postponed"
+          ]
+        }
+      },
+      "featured": {
+        "type": "Boolean",
+        "config": {
+          "label": "Featured",
+          "default_value": false
+        }
+      },
+      "cost": {
+        "type": "Text",
+        "config": {
+          "label": "Cost / Cover",
+          "placeholder": ""
+        }
+      },
+      "age_restriction": {
+        "type": "Select",
+        "config": {
+          "label": "Age Restriction",
+          "placeholder": "",
+          "options": [
+            "All ages",
+            "18+",
+            "21+"
+          ]
+        }
+      },
+      "website_url": {
+        "type": "Link",
+        "config": {
+          "label": "Event Website URL",
+          "placeholder": "",
+          "select": "web",
+          "allowTargetBlank": true
+        }
+      },
+      "tickets_url": {
+        "type": "Link",
+        "config": {
+          "label": "Tickets URL",
+          "placeholder": "",
+          "select": "web",
+          "allowTargetBlank": true
+        }
+      },
+      "image": {
+        "type": "Image",
+        "config": {
+          "label": "Hero Image",
+          "constraint": {
+            "width": 2400,
+            "height": 2400
+          },
+          "thumbnails": [
+            {
+              "name": "Square",
+              "width": 800,
+              "height": 800
+            }
+          ]
+        }
+      },
       "description": {
         "type": "StructuredText",
         "config": {
@@ -52,6 +139,22 @@
           "placeholder": "",
           "allowTargetBlank": true,
           "multi": "paragraph,preformatted,heading1,heading2,heading3,heading4,heading5,heading6,strong,em,hyperlink,image,embed,list-item,o-list-item,rtl"
+        }
+      },
+      "tags": {
+        "type": "Group",
+        "config": {
+          "label": "Tags",
+          "repeat": true,
+          "fields": {
+            "tag": {
+              "type": "Text",
+              "config": {
+                "label": "Tag",
+                "placeholder": "free, outdoor, family-friendly"
+              }
+            }
+          }
         }
       },
       "location": {

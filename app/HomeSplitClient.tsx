@@ -4,14 +4,32 @@ import { useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import type { EventLite } from "@/lib/types";
-import { prismic } from "@/prismicio";
 
-export default function HomeSplitClient({
-  events
-}: {
-  events: EventLite[];
-  allTypes: string[];
-}) {
+function safeParseDate(value: string | null | undefined): Date | null {
+  if (!value) return null;
+  // Prismic Date can be YYYY-MM-DD. Timestamp can be ISO.
+  try {
+    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+      return parseISO(value + "T00:00:00");
+    }
+    return parseISO(value);
+  } catch {
+    return null;
+  }
+}
+
+function dayLabel(dateKey: string) {
+  const dayDate = safeParseDate(dateKey);
+  if (!dayDate) return dateKey;
+  const label = isToday(dayDate)
+    ? "Today"
+    : isTomorrow(dayDate)
+    ? "Tomorrow"
+    : format(dayDate, "EEEE");
+  return `${label}, ${format(dayDate, "MMM d")}`;
+}
+
+export default function HomeSplitClient({ events }: { events: EventLite[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -38,18 +56,20 @@ export default function HomeSplitClient({
     const map = new Map<string, EventLite[]>();
     for (const e of events) {
       if (!e.start_datetime) continue;
-      const d = parseISO(e.start_datetime);
+      const d = safeParseDate(e.start_datetime);
+      if (!d) continue;
       const key = format(d, "yyyy-MM-dd");
       const cur = map.get(key) ?? [];
       cur.push(e);
       map.set(key, cur);
     }
+
     const keys = Array.from(map.keys()).sort();
     return keys.map((k) => {
       const list = map.get(k) ?? [];
       list.sort((a, b) => {
-        const ad = a.start_datetime ? parseISO(a.start_datetime).getTime() : 0;
-        const bd = b.start_datetime ? parseISO(b.start_datetime).getTime() : 0;
+        const ad = a.start_datetime ? safeParseDate(a.start_datetime)?.getTime() ?? 0 : 0;
+        const bd = b.start_datetime ? safeParseDate(b.start_datetime)?.getTime() ?? 0 : 0;
         return ad - bd;
       });
       return { key: k, events: list };
@@ -69,16 +89,6 @@ export default function HomeSplitClient({
 
   const mobileDetailOpen = Boolean(selectedEventKey);
 
-  function dayLabel(dateKey: string) {
-    const dayDate = parseISO(dateKey);
-    const label = isToday(dayDate)
-      ? "Today"
-      : isTomorrow(dayDate)
-      ? "Tomorrow"
-      : format(dayDate, "EEEE");
-    return `${label}, ${format(dayDate, "MMM d")}`;
-  }
-
   return (
     <div className="pageShell">
       <div className="tagline">
@@ -90,36 +100,52 @@ export default function HomeSplitClient({
         <div className="pane">
           <div className="scroll">
             <div className="leftSticky">
-              <div className="tabs">
-                <a className="tabBtn" href="/" role="button">Calendar</a>
-                <a className="tabBtn" href="/locations" role="button">Directory</a>
-                <a className="tabBtn" href="/updates" role="button">Updates</a>
+              <div className="tabs" aria-label="Primary navigation">
+                <a className="tabBtn" href="/" aria-current="page">Calendar</a>
+                <a className="tabBtn" href="/locations">Directory</a>
+                <a className="tabBtn" href="/updates">Updates</a>
               </div>
             </div>
 
-            {grouped.map(({ key, events: dayEvents }, idx) => (
-              <section key={key} className="dayBlock" style={{ borderTop: idx === 0 ? "0" : undefined }}>
-                <div className="dayTitle">
-                  <span>{dayLabel(key)}</span>
-                </div>
+            {grouped.length === 0 ? (
+              <div className="emptyList">No upcoming events yet.</div>
+            ) : (
+              grouped.map(({ key, events: dayEvents }, idx) => (
+                <section
+                  key={key}
+                  className="dayBlock"
+                  style={{ borderTop: idx === 0 ? "0" : undefined }}
+                >
+                  <div className="dayTitle">
+                    <span className="dayTitleText">{dayLabel(key)}</span>
+                  </div>
 
-                {dayEvents.map((e) => {
-                  const active = selectedEventKey ? selectedEventKey === e.key : selectedEventDesktop?.key === e.key;
-                  return (
-                    <div
-                      key={e.id}
-                      className="eventRow"
-                      data-active={active ? "true" : "false"}
-                      onClick={() => setSelectedEvent(e.key)}
-                      role="button"
-                      tabIndex={0}
-                    >
-                      {e.title ?? "Untitled event"}
-                    </div>
-                  );
-                })}
-              </section>
-            ))}
+                  {dayEvents.map((e) => {
+                    const active = selectedEventKey
+                      ? selectedEventKey === e.key
+                      : selectedEventDesktop?.key === e.key;
+
+                    return (
+                      <button
+                        key={e.id}
+                        className="eventRow"
+                        data-active={active ? "true" : "false"}
+                        onClick={() => setSelectedEvent(e.key)}
+                        type="button"
+                      >
+                        <span className="eventRowTitle">{e.title ?? "Untitled event"}</span>
+
+                        <span className="eventRowMeta">
+                          {formatEventTime(e)}
+                          {e.location?.name ? <span className="dot">•</span> : null}
+                          {e.location?.name ? <span>{e.location.name}</span> : null}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </section>
+              ))
+            )}
           </div>
         </div>
 
@@ -127,7 +153,7 @@ export default function HomeSplitClient({
         <div className="pane paneRight">
           <div className="scroll">
             {!selectedEventDesktop ? (
-              <div style={{ paddingTop: 24, color: "var(--muted)" }}>No events found.</div>
+              <div className="emptyRight">Select an event to see details.</div>
             ) : (
               <EventDetail event={selectedEventDesktop} />
             )}
@@ -137,18 +163,22 @@ export default function HomeSplitClient({
 
       {/* Mobile bottom tabs */}
       <div className="mobileTabs" aria-label="Primary navigation">
-        <a className="tabBtn" href="/" role="button">Calendar</a>
-        <a className="tabBtn" href="/locations" role="button">Directory</a>
-        <a className="tabBtn" href="/updates" role="button">Updates</a>
+        <a className="tabBtn" href="/" aria-current="page">Calendar</a>
+        <a className="tabBtn" href="/locations">Directory</a>
+        <a className="tabBtn" href="/updates">Updates</a>
       </div>
 
       {/* Mobile detail overlay */}
-      <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
+      <div
+        className="mobileDetail"
+        data-open={mobileDetailOpen ? "true" : "false"}
+        aria-hidden={!mobileDetailOpen}
+      >
         <div className="mobileDetailHeader">
           <button className="backBtn" type="button" onClick={clearSelectedEvent}>
             Back
           </button>
-          <div style={{ fontWeight: 900 }}>Event</div>
+          <div className="mobileDetailTitle">Event</div>
         </div>
         <div className="scroll" style={{ padding: "0 16px 24px 16px" }}>
           {selectedEventMobile ? <EventDetail event={selectedEventMobile} /> : null}
@@ -158,15 +188,37 @@ export default function HomeSplitClient({
   );
 }
 
+function formatEventTime(event: EventLite): string {
+  const start = safeParseDate(event.start_datetime);
+  const end = safeParseDate(event.end_datetime);
+
+  // Date-only events (no time) or explicitly all-day
+  const hasTime = Boolean(event.start_datetime && !/^\d{4}-\d{2}-\d{2}$/.test(event.start_datetime));
+  const allDay = Boolean(event.all_day) || !hasTime;
+
+  if (allDay) return "All day";
+
+  if (start && end) {
+    const s = format(start, "h:mma").toLowerCase();
+    const e = format(end, "h:mma").toLowerCase();
+    return `${s} – ${e}`;
+  }
+
+  if (start) return format(start, "h:mma").toLowerCase();
+
+  return "";
+}
+
 function EventDetail({ event }: { event: EventLite }) {
-  const start = event.start_datetime ? parseISO(event.start_datetime) : null;
-  const end = event.end_datetime ? parseISO(event.end_datetime) : null;
-
+  const start = safeParseDate(event.start_datetime);
   const dayStr = start ? format(start, "EEEE, MMMM do") : "";
-  const timeStr =
-    start && end ? `${format(start, "h:mma").toLowerCase()} – ${format(end, "h:mma").toLowerCase()}` : start ? format(start, "h:mma").toLowerCase() : "";
 
-  const websiteHref = event.location?.website ? (event.location.website as string) : null;
+  const timeStr = formatEventTime(event);
+
+  const status = event.status && event.status !== "Scheduled" ? event.status : null;
+
+  const websiteHref = event.website_url || null;
+  const ticketsHref = event.tickets_url || null;
 
   return (
     <div>
@@ -176,32 +228,86 @@ function EventDetail({ event }: { event: EventLite }) {
         <h1 className="detailTitle">{event.title ?? "Event"}</h1>
 
         <div className="detailMeta">
-          <span>{event.location?.name ?? "Unknown location"}</span>
+          <span className="venue">{event.location?.name ?? "Unknown location"}</span>
           {timeStr ? <span className="muted">{timeStr}</span> : null}
+        </div>
+
+        <div className="detailChips" aria-label="Event highlights">
+          {event.event_type ? <span className="pill">{event.event_type}</span> : null}
+          {event.cost ? <span className="pill">{event.cost}</span> : null}
+          {event.age_restriction ? <span className="pill">{event.age_restriction}</span> : null}
+          {status ? <span className="pill pillWarn">{status}</span> : null}
+          {Array.isArray(event.tags)
+            ? event.tags.slice(0, 4).map((t) => (
+                <span key={t} className="pill pillSoft">
+                  {t}
+                </span>
+              ))
+            : null}
         </div>
       </div>
 
-      <div className="heroImage" aria-hidden="true" />
+      <div
+        className="heroImage"
+        style={
+          event.image_url
+            ? { backgroundImage: `url(${event.image_url})` }
+            : undefined
+        }
+        aria-hidden="true"
+      />
+
+      {event.summary ? <p className="summary">{event.summary}</p> : null}
 
       <div className="detailBody">
         {event.description ? event.description : "No description added yet."}
       </div>
 
       <div className="ctaRow">
-        {websiteHref ? (
-          <a className="ctaBtn" href={websiteHref} target="_blank" rel="noreferrer">
-            Website
-          </a>
-        ) : (
-          <span className="ctaBtn" aria-disabled="true">
-            Website
-          </span>
-        )}
+        <a
+          className="ctaBtn"
+          data-disabled={!websiteHref ? "true" : "false"}
+          href={websiteHref ?? undefined}
+          target={websiteHref ? "_blank" : undefined}
+          rel={websiteHref ? "noreferrer" : undefined}
+          aria-disabled={!websiteHref}
+          onClick={(e) => {
+            if (!websiteHref) e.preventDefault();
+          }}
+        >
+          Website
+        </a>
 
-        <span className="ctaBtn" aria-disabled="true">
+        <a
+          className="ctaBtn"
+          data-disabled={!ticketsHref ? "true" : "false"}
+          href={ticketsHref ?? undefined}
+          target={ticketsHref ? "_blank" : undefined}
+          rel={ticketsHref ? "noreferrer" : undefined}
+          aria-disabled={!ticketsHref}
+          onClick={(e) => {
+            if (!ticketsHref) e.preventDefault();
+          }}
+        >
           Tickets
-        </span>
+        </a>
       </div>
+
+      {event.location?.address ? (
+        <div className="finePrint">
+          <span className="label">Address</span>
+          <span>{event.location.address}</span>
+        </div>
+      ) : null}
+
+      {event.location?.website ? (
+        <div className="finePrint">
+          <span className="label">Venue site</span>
+          <a href={event.location.website} target="_blank" rel="noreferrer">
+            {event.location.website}
+          </a>
+        </div>
+      ) : null}
     </div>
   );
 }
