@@ -22,13 +22,13 @@
       "start_datetime": {
         "type": "Timestamp",
         "config": {
-          "label": "Start date & time"
+          "label": "Start date and time"
         }
       },
       "end_datetime": {
         "type": "Timestamp",
         "config": {
-          "label": "End date & time"
+          "label": "End date and time"
         }
       },
       "all_day": {
@@ -93,7 +93,7 @@
       "cost": {
         "type": "Text",
         "config": {
-          "label": "Cost / Cover",
+          "label": "Cost or cover",
           "placeholder": "Free, $10, $25 advance"
         }
       },
