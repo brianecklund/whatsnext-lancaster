@@ -8,7 +8,7 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const client = createClient();
 
-  // Keep this typed: your generated types confirm "event" exists
+  // ✅ Must be a literal to satisfy your generated types
   const docs = await client.getAllByType("event", {
     fetchLinks: [
       "location.name",
@@ -19,7 +19,6 @@ export default async function HomePage() {
     ],
   });
 
-  // Helper: pick the first valid string value from candidate keys
   const pickString = (data: any, keys: string[]) => {
     for (const k of keys) {
       const v = data?.[k];
@@ -28,7 +27,6 @@ export default async function HomePage() {
     return null;
   };
 
-  // Helper: find *any* plausible date/timestamp field (string) on the doc
   const pickStart = (data: any) =>
     pickString(data, [
       "start_datetime",
@@ -40,15 +38,9 @@ export default async function HomePage() {
     ]);
 
   const pickEnd = (data: any) =>
-    pickString(data, [
-      "end_datetime",
-      "end_date",
-      "end",
-      "end_time",
-      "endtime",
-    ]);
+    pickString(data, ["end_datetime", "end_date", "end", "end_time", "endtime"]);
 
-  const eventsRaw = docs.map((doc: any) => {
+  const mapped = docs.map((doc: any) => {
     const loc = doc.data?.location;
     const locData = loc?.data;
 
@@ -83,7 +75,7 @@ export default async function HomePage() {
     const startVal = pickStart(doc.data);
     const endVal = pickEnd(doc.data);
 
-    const e: EventLite = {
+    const event: EventLite = {
       id: doc.id,
       key: doc.uid ?? doc.id,
       uid: doc.uid ?? null,
@@ -122,11 +114,10 @@ export default async function HomePage() {
         : null,
     };
 
-    return { event: e, dataKeys: Object.keys(doc.data ?? {}) };
+    return { event, dataKeys: Object.keys(doc.data ?? {}) };
   });
 
-  // Keep all events, but sort ones with valid start dates first
-  const events: EventLite[] = eventsRaw
+  const events: EventLite[] = mapped
     .map((x) => x.event)
     .sort((a, b) => {
       const ta = Date.parse(a.start_datetime ?? "") || Number.POSITIVE_INFINITY;
@@ -134,21 +125,22 @@ export default async function HomePage() {
       return ta - tb;
     });
 
-  // If nothing came back at all, show debug
+  // Debug screen #1: query returned nothing
   if (!docs.length) {
     return (
       <div style={{ padding: 24, maxWidth: 900 }}>
         <h1 style={{ fontSize: 22, marginBottom: 8 }}>No Prismic events found</h1>
         <p style={{ opacity: 0.85, lineHeight: 1.5 }}>
-          The query <code>getAllByType("event")</code> returned 0 docs.
-          This usually means your Prismic repo/env vars are pointing to a repo
-          that doesn’t have published event documents.
+          The query <code>getAllByType("event")</code> returned 0 docs. This
+          usually means your deployed environment variables are pointing to a
+          different Prismic repo than the one you’re editing in, or the docs
+          are not published.
         </p>
       </div>
     );
   }
 
-  // If events exist but none have a recognizable start date field, show the keys so we can fix the mapping
+  // Debug screen #2: events exist but we can't find a usable start field
   const noneHaveStart = events.every((e) => !e.start_datetime);
   if (noneHaveStart) {
     return (
@@ -157,12 +149,15 @@ export default async function HomePage() {
           Events exist, but no start date field matched
         </h1>
         <p style={{ opacity: 0.85, lineHeight: 1.5 }}>
-          You have <b>{docs.length}</b> event documents, but the homepage can’t find any of these
-          fields: <code>start_datetime</code>, <code>start_date</code>, <code>date</code>, etc.
-          This means Slice Machine changed your field API IDs.
+          You have <b>{docs.length}</b> event documents, but the homepage can’t
+          find any of these fields: <code>start_datetime</code>,{" "}
+          <code>start_date</code>, <code>date</code>, etc. That means Slice
+          Machine changed your field API ID.
         </p>
 
-        <h2 style={{ marginTop: 18, fontSize: 16 }}>Event doc field keys (first 5 docs)</h2>
+        <h2 style={{ marginTop: 18, fontSize: 16 }}>
+          Event doc field keys (first 5 docs)
+        </h2>
         <pre
           style={{
             padding: 12,
@@ -172,16 +167,16 @@ export default async function HomePage() {
             fontSize: 12,
           }}
         >
-          {JSON.stringify(eventsRaw.slice(0, 5).map((x) => x.dataKeys), null, 2)}
+          {JSON.stringify(mapped.slice(0, 5).map((x) => x.dataKeys), null, 2)}
         </pre>
 
         <p style={{ marginTop: 12, opacity: 0.85 }}>
-          Copy/paste that JSON here and I’ll update the code to use the exact correct field name.
+          Copy/paste that JSON here and I’ll update the code to use the exact
+          correct date field.
         </p>
       </div>
     );
   }
 
-  // Normal render
   return <HomeSplitClient events={events} />;
 }
