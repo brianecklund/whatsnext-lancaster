@@ -1,22 +1,19 @@
 import "./globals.css";
 
-export const metadata = {
-  title: "What's Next Lancaster",
-  description: "A simple city events calendar powered by Prismic."
-};
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
-        <header className="header">
-          <div className="brand">What&apos;s Next Lancaster</div>
-          <nav className="nav">
-            <a href="/">Home</a>
-            <a href="/calendar">Calendar</a>
-            <a href="/locations">Locations</a>
+        <header className="siteHeader">
+          <div className="brand">What’s Next Lancaster</div>
+          <nav className="topNav">
+            <a href="/">Calendar</a>
+            <a href="/locations">Directory</a>
+            <a href="/about">About</a>
+            <a href="/contact">Contact</a>
           </nav>
         </header>
+
         <main className="main">{children}</main>
       </body>
     </html>

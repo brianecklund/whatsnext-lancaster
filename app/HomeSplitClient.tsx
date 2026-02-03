@@ -4,15 +4,10 @@ import { useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import type { EventLite } from "@/lib/types";
-
-function parseSelectedTypes(param: string | null): string[] {
-  if (!param) return [];
-  return param.split(",").map((s) => s.trim()).filter(Boolean);
-}
+import { prismic } from "@/prismicio";
 
 export default function HomeSplitClient({
-  events,
-  allTypes
+  events
 }: {
   events: EventLite[];
   allTypes: string[];
@@ -20,11 +15,6 @@ export default function HomeSplitClient({
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const selectedTypes = useMemo(
-    () => parseSelectedTypes(searchParams.get("types")),
-    [searchParams]
-  );
-  const selectedSet = useMemo(() => new Set(selectedTypes), [selectedTypes]);
   const selectedEventKey = searchParams.get("event");
 
   function navigate(params: URLSearchParams) {
@@ -38,32 +28,15 @@ export default function HomeSplitClient({
     navigate(params);
   }
 
-  function toggleType(t: string) {
-    const next = new Set(selectedSet);
-    if (next.has(t)) next.delete(t);
-    else next.add(t);
-
+  function clearSelectedEvent() {
     const params = new URLSearchParams(searchParams.toString());
-    const nextArr = Array.from(next.values());
-    if (nextArr.length === 0) params.delete("types");
-    else params.set("types", nextArr.join(","));
+    params.delete("event");
     navigate(params);
   }
-
-  function clearTypes() {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("types");
-    navigate(params);
-  }
-
-  const filtered = useMemo(() => {
-    if (selectedSet.size === 0) return events;
-    return events.filter((e) => e.event_type && selectedSet.has(e.event_type));
-  }, [events, selectedSet]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, EventLite[]>();
-    for (const e of filtered) {
+    for (const e of events) {
       if (!e.start_datetime) continue;
       const d = parseISO(e.start_datetime);
       const key = format(d, "yyyy-MM-dd");
@@ -81,166 +54,153 @@ export default function HomeSplitClient({
       });
       return { key: k, events: list };
     });
-  }, [filtered]);
+  }, [events]);
 
-  const selectedEvent = useMemo(() => {
-    if (!selectedEventKey && filtered.length) return filtered[0];
-    return filtered.find((e) => e.key === selectedEventKey) ?? (filtered[0] ?? null);
-  }, [filtered, selectedEventKey]);
+  const selectedEventDesktop = useMemo(() => {
+    if (!events.length) return null;
+    if (!selectedEventKey) return events[0];
+    return events.find((e) => e.key === selectedEventKey) ?? events[0];
+  }, [events, selectedEventKey]);
+
+  const selectedEventMobile = useMemo(() => {
+    if (!selectedEventKey) return null;
+    return events.find((e) => e.key === selectedEventKey) ?? null;
+  }, [events, selectedEventKey]);
+
+  const mobileDetailOpen = Boolean(selectedEventKey);
+
+  function dayLabel(dateKey: string) {
+    const dayDate = parseISO(dateKey);
+    const label = isToday(dayDate)
+      ? "Today"
+      : isTomorrow(dayDate)
+      ? "Tomorrow"
+      : format(dayDate, "EEEE");
+    return `${label}, ${format(dayDate, "MMM d")}`;
+  }
 
   return (
     <div className="pageShell">
-      <div className="stickyBar">
-        <div className="toolbar">
-          <div className="chips" aria-label="Event type filters">
-            {allTypes.map((t) => (
-              <button
-                key={t}
-                className="chip"
-                data-on={selectedSet.has(t) ? "true" : "false"}
-                onClick={() => toggleType(t)}
-                type="button"
-                aria-pressed={selectedSet.has(t)}
-              >
-                {t}
-              </button>
+      <div className="tagline">
+        A shared calendar for local events, specials, and pop-ups in Lancaster, PA.
+      </div>
+
+      <div className="split">
+        {/* LEFT */}
+        <div className="pane">
+          <div className="scroll">
+            <div className="leftSticky">
+              <div className="tabs">
+                <a className="tabBtn" href="/" role="button">Calendar</a>
+                <a className="tabBtn" href="/locations" role="button">Directory</a>
+                <a className="tabBtn" href="/updates" role="button">Updates</a>
+              </div>
+            </div>
+
+            {grouped.map(({ key, events: dayEvents }, idx) => (
+              <section key={key} className="dayBlock" style={{ borderTop: idx === 0 ? "0" : undefined }}>
+                <div className="dayTitle">
+                  <span>{dayLabel(key)}</span>
+                </div>
+
+                {dayEvents.map((e) => {
+                  const active = selectedEventKey ? selectedEventKey === e.key : selectedEventDesktop?.key === e.key;
+                  return (
+                    <div
+                      key={e.id}
+                      className="eventRow"
+                      data-active={active ? "true" : "false"}
+                      onClick={() => setSelectedEvent(e.key)}
+                      role="button"
+                      tabIndex={0}
+                    >
+                      {e.title ?? "Untitled event"}
+                    </div>
+                  );
+                })}
+              </section>
             ))}
           </div>
+        </div>
 
-          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6 }}>
-            <button className="btnLink" onClick={clearTypes} type="button">
-              Clear
-            </button>
-            <span className="subtle" style={{ fontSize: 13 }}>
-              {filtered.length} event{filtered.length === 1 ? "" : "s"}
-            </span>
+        {/* RIGHT (desktop) */}
+        <div className="pane paneRight">
+          <div className="scroll">
+            {!selectedEventDesktop ? (
+              <div style={{ paddingTop: 24, color: "var(--muted)" }}>No events found.</div>
+            ) : (
+              <EventDetail event={selectedEventDesktop} />
+            )}
           </div>
         </div>
       </div>
 
-      <div className="split">
-        <div className="pane">
-          <div className="scroll">
-            <div className="listHeader">
-              <h1 className="h1">Upcoming</h1>
-              <div className="subtle" style={{ fontSize: 13 }}>
-                Events across Lancaster. Hover for a subtle highlight.
-              </div>
-            </div>
+      {/* Mobile bottom tabs */}
+      <div className="mobileTabs" aria-label="Primary navigation">
+        <a className="tabBtn" href="/" role="button">Calendar</a>
+        <a className="tabBtn" href="/locations" role="button">Directory</a>
+        <a className="tabBtn" href="/updates" role="button">Updates</a>
+      </div>
 
-            {grouped.length === 0 ? (
-              <p className="subtle" style={{ paddingTop: 14 }}>
-                No events found for the selected filters.
-              </p>
-            ) : (
-              grouped.map(({ key, events: dayEvents }) => {
-                const dayDate = parseISO(key);
-                const label = isToday(dayDate)
-                  ? "Today"
-                  : isTomorrow(dayDate)
-                  ? "Tomorrow"
-                  : format(dayDate, "EEEE");
-
-                return (
-                  <section key={key} className="dayBlock">
-                    <div className="dayTitle">
-                      <span>
-                        {label}, {format(dayDate, "MMM d")}
-                      </span>
-                      <span className="subtle">
-                        {dayEvents.length} item{dayEvents.length === 1 ? "" : "s"}
-                      </span>
-                    </div>
-
-                    {dayEvents.map((e) => {
-                      const start = e.start_datetime ? parseISO(e.start_datetime) : null;
-                      const time = start ? format(start, "h:mm a") : "";
-                      const active = selectedEvent?.key === e.key;
-
-                      return (
-                        <div
-                          key={e.id}
-                          className={`row ${active ? "rowActive" : ""}`}
-                          onClick={() => setSelectedEvent(e.key)}
-                          role="button"
-                          tabIndex={0}
-                        >
-                          <div className="rowTop">
-                            <div className="rowTitle">{e.title ?? "Untitled event"}</div>
-                            {e.event_type ? <span className="badge">{e.event_type}</span> : null}
-                          </div>
-
-                          <div className="meta">
-                            <span>{time}</span>
-                            <span>{e.location?.name ?? "Unknown location"}</span>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </section>
-                );
-              })
-            )}
-          </div>
+      {/* Mobile detail overlay */}
+      <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
+        <div className="mobileDetailHeader">
+          <button className="backBtn" type="button" onClick={clearSelectedEvent}>
+            Back
+          </button>
+          <div style={{ fontWeight: 900 }}>Event</div>
         </div>
-
-        <div className="pane paneRight">
-          <div className="scroll">
-            {!selectedEvent ? (
-              <div className="emptyState">
-                <div>
-                  <div className="h2">No event selected</div>
-                  <div className="subtle">Pick an event from the left.</div>
-                </div>
-              </div>
-            ) : (
-              <div className="detail">
-                <h2 className="detailTitle">{selectedEvent.title ?? "Event"}</h2>
-
-                <div className="kv" style={{ marginBottom: 10 }}>
-                  {selectedEvent.event_type ? <span className="badge">{selectedEvent.event_type}</span> : null}
-                  {selectedEvent.start_datetime ? (
-                    <span>{format(parseISO(selectedEvent.start_datetime), "MMM d, h:mm a")}</span>
-                  ) : null}
-                </div>
-
-                <div className="detailBlock">
-                  <div className="h2">Where</div>
-                  <div className="kv">
-                    <span>
-                      <a
-                        href={
-                          selectedEvent.location?.uid
-                            ? `/locations?loc=${selectedEvent.location.uid}`
-                            : "/locations"
-                        }
-                      >
-                        {selectedEvent.location?.name ?? "Unknown location"}
-                      </a>
-                    </span>
-                    {selectedEvent.location?.address ? <span>•</span> : null}
-                    {selectedEvent.location?.address ? <span>{selectedEvent.location.address}</span> : null}
-                  </div>
-                </div>
-
-                <div className="detailBlock">
-                  <div className="h2">Details</div>
-                  <div className="subtle" style={{ whiteSpace: "pre-wrap" }}>
-                    {selectedEvent.description ?? "No description added yet."}
-                  </div>
-                </div>
-
-                <div className="detailBlock">
-                  <div className="kv">
-                    <a href="/calendar">Open full calendar</a>
-                    <span>•</span>
-                    <a href="/locations">Browse locations</a>
-                  </div>
-                </div>
-              </div>
-            )}
-          </div>
+        <div className="scroll" style={{ padding: "0 16px 24px 16px" }}>
+          {selectedEventMobile ? <EventDetail event={selectedEventMobile} /> : null}
         </div>
+      </div>
+    </div>
+  );
+}
+
+function EventDetail({ event }: { event: EventLite }) {
+  const start = event.start_datetime ? parseISO(event.start_datetime) : null;
+  const end = event.end_datetime ? parseISO(event.end_datetime) : null;
+
+  const dayStr = start ? format(start, "EEEE, MMMM do") : "";
+  const timeStr =
+    start && end ? `${format(start, "h:mma").toLowerCase()} – ${format(end, "h:mma").toLowerCase()}` : start ? format(start, "h:mma").toLowerCase() : "";
+
+  const websiteHref = event.location?.website ? (event.location.website as string) : null;
+
+  return (
+    <div>
+      <div className="rightHeader">
+        {dayStr ? <div className="rightDayLabel">{dayStr}</div> : null}
+
+        <h1 className="detailTitle">{event.title ?? "Event"}</h1>
+
+        <div className="detailMeta">
+          <span>{event.location?.name ?? "Unknown location"}</span>
+          {timeStr ? <span className="muted">{timeStr}</span> : null}
+        </div>
+      </div>
+
+      <div className="heroImage" aria-hidden="true" />
+
+      <div className="detailBody">
+        {event.description ? event.description : "No description added yet."}
+      </div>
+
+      <div className="ctaRow">
+        {websiteHref ? (
+          <a className="ctaBtn" href={websiteHref} target="_blank" rel="noreferrer">
+            Website
+          </a>
+        ) : (
+          <span className="ctaBtn" aria-disabled="true">
+            Website
+          </span>
+        )}
+
+        <span className="ctaBtn" aria-disabled="true">
+          Tickets
+        </span>
       </div>
     </div>
   );
