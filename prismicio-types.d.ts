@@ -72,7 +72,7 @@ type ContentRelationshipFieldWithData<
 /**
  * Content for Event documents
  */
-interface EventDocumentData {
+export interface EventDocumentData {
   /**
    * Title field in *Event*
    *
@@ -82,6 +82,8 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/text
    */
+  title: prismic.KeyTextField;
+
   /**
    * Summary field in *Event*
    *
@@ -90,7 +92,6 @@ interface EventDocumentData {
    * - **Tab**: Main
    */
   summary: prismic.KeyTextField;
-
 
   /**
    * Start Date & Time field in *Event*
@@ -112,7 +113,7 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/date
    */
-  \1
+  end_datetime: prismic.TimestampField;
 
   /**
    * All Day field in *Event*
@@ -123,7 +124,6 @@ interface EventDocumentData {
    */
   all_day: prismic.BooleanField;
 
-
   /**
    * Event Type field in *Event*
    *
@@ -133,15 +133,79 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/select
    */
-  \1
-  status: prismic.SelectField<\"Scheduled\" | \"Cancelled\" | \"Postponed\">;
+  event_type: prismic.SelectField<string>;
+
+  /**
+   * Status field in *Event*
+   *
+   * - **Field Type**: Select
+   * - **API ID Path**: event.status
+   * - **Tab**: Main
+   */
+  status: prismic.SelectField<"Scheduled" | "Cancelled" | "Postponed">;
+
+  /**
+   * Featured field in *Event*
+   *
+   * - **Field Type**: Boolean
+   * - **API ID Path**: event.featured
+   * - **Tab**: Main
+   */
   featured: prismic.BooleanField;
+
+  /**
+   * Cost field in *Event*
+   *
+   * - **Field Type**: Text
+   * - **API ID Path**: event.cost
+   * - **Tab**: Main
+   */
   cost: prismic.KeyTextField;
-  age_restriction: prismic.SelectField<\"All ages\" | \"18+\" | \"21+\">;
+
+  /**
+   * Age Restriction field in *Event*
+   *
+   * - **Field Type**: Select
+   * - **API ID Path**: event.age_restriction
+   * - **Tab**: Main
+   */
+  age_restriction: prismic.SelectField<"All ages" | "18+" | "21+">;
+
+  /**
+   * Website URL field in *Event*
+   *
+   * - **Field Type**: Link
+   * - **API ID Path**: event.website_url
+   * - **Tab**: Main
+   */
   website_url: prismic.LinkField;
+
+  /**
+   * Tickets URL field in *Event*
+   *
+   * - **Field Type**: Link
+   * - **API ID Path**: event.tickets_url
+   * - **Tab**: Main
+   */
   tickets_url: prismic.LinkField;
+
+  /**
+   * Image field in *Event*
+   *
+   * - **Field Type**: Image
+   * - **API ID Path**: event.image
+   * - **Tab**: Main
+   */
   image: prismic.ImageField;
-  tags: prismic.GroupField<{ tag: prismic.KeyTextField }>; 
+
+  /**
+   * Tags field in *Event*
+   *
+   * - **Field Type**: Group
+   * - **API ID Path**: event.tags
+   * - **Tab**: Main
+   */
+  tags: prismic.GroupField<{ tag: prismic.KeyTextField }>;
 
   /**
    * Description field in *Event*
@@ -185,7 +249,7 @@ interface EventDocumentData {
 export type EventDocument<Lang extends string = string> =
   prismic.PrismicDocumentWithUID<Simplify<EventDocumentData>, "event", Lang>;
 
-interface FooterDocumentData {}
+export interface FooterDocumentData {}
 
 /**
  * Footer document from Prismic
@@ -203,12 +267,12 @@ export type FooterDocument<Lang extends string = string> =
     Lang
   >;
 
-type HomeDocumentDataSlicesSlice = never;
+export type HomeDocumentDataSlicesSlice = never;
 
 /**
  * Content for Home documents
  */
-interface HomeDocumentData {
+export interface HomeDocumentData {
   /**
    * Slice Zone field in *Home*
    *
@@ -218,7 +282,9 @@ interface HomeDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/slices
    */
-  slices: prismic.SliceZone<HomeDocumentDataSlicesSlice>; /**
+  slices: prismic.SliceZone<HomeDocumentDataSlicesSlice>;
+
+  /**
    * Meta Title field in *Home*
    *
    * - **Field Type**: Text
@@ -267,7 +333,7 @@ export type HomeDocument<Lang extends string = string> =
 /**
  * Content for Location documents
  */
-interface LocationDocumentData {
+export interface LocationDocumentData {
   /**
    * Name field in *Location*
    *
@@ -310,13 +376,7 @@ interface LocationDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/link
    */
-  website: prismic.LinkField<
-    string,
-    string,
-    unknown,
-    prismic.FieldState,
-    never
-  >;
+  website: prismic.LinkField<string, string, unknown, prismic.FieldState, never>;
 
   /**
    * Category field in *Location*
@@ -358,14 +418,14 @@ declare module "@prismicio/client" {
   interface CreateClient {
     (
       repositoryNameOrEndpoint: string,
-      options?: prismic.ClientConfig,
+      options?: prismic.ClientConfig
     ): prismic.Client<AllDocumentTypes>;
   }
 
   interface CreateWriteClient {
     (
       repositoryNameOrEndpoint: string,
-      options: prismic.WriteClientConfig,
+      options: prismic.WriteClientConfig
     ): prismic.WriteClient<AllDocumentTypes>;
   }
 
