@@ -132,10 +132,10 @@ interface EventDocumentData {
    * - **Tab**: Main
    * - **Documentation**: https://prismic.io/docs/fields/select
    */
-  status: prismic.SelectField<\"Scheduled\" | \"Cancelled\" | \"Postponed\">;
+  status: prismic.SelectField<"Scheduled" | "Cancelled" | "Postponed">;
   featured: prismic.BooleanField;
   cost: prismic.KeyTextField;
-  age_restriction: prismic.SelectField<\"All ages\" | \"18+\" | \"21+\">;
+  age_restriction: prismic.SelectField<"All ages" | "18+" | "21+">;
   website_url: prismic.LinkField;
   tickets_url: prismic.LinkField;
   image: prismic.ImageField;
