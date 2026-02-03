@@ -5,34 +5,26 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import type { EventLite } from "@/lib/types";
 
-function safeParseDate(value: string | null | undefined): Date | null {
-  if (!value) return null;
-  // Prismic Date can be YYYY-MM-DD. Timestamp can be ISO.
-  try {
-    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      return parseISO(value + "T00:00:00");
-    }
-    return parseISO(value);
-  } catch {
-    return null;
-  }
+function parseSelectedTypes(param: string | null): string[] {
+  if (!param) return [];
+  return param.split(",").map((s) => s.trim()).filter(Boolean);
 }
 
-function dayLabel(dateKey: string) {
-  const dayDate = safeParseDate(dateKey);
-  if (!dayDate) return dateKey;
-  const label = isToday(dayDate)
-    ? "Today"
-    : isTomorrow(dayDate)
-    ? "Tomorrow"
-    : format(dayDate, "EEEE");
-  return `${label}, ${format(dayDate, "MMM d")}`;
-}
-
-export default function HomeSplitClient({ events }: { events: EventLite[] }) {
+export default function HomeSplitClient({
+  events,
+  allTypes
+}: {
+  events: EventLite[];
+  allTypes: string[];
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const selectedTypes = useMemo(
+    () => parseSelectedTypes(searchParams.get("types")),
+    [searchParams]
+  );
+  const selectedSet = useMemo(() => new Set(selectedTypes), [selectedTypes]);
   const selectedEventKey = searchParams.get("event");
 
   function navigate(params: URLSearchParams) {
@@ -46,268 +38,210 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
     navigate(params);
   }
 
-  function clearSelectedEvent() {
+  function toggleType(t: string) {
+    const next = new Set(selectedSet);
+    if (next.has(t)) next.delete(t);
+    else next.add(t);
+
     const params = new URLSearchParams(searchParams.toString());
-    params.delete("event");
+    const nextArr = Array.from(next.values());
+    if (nextArr.length === 0) params.delete("types");
+    else params.set("types", nextArr.join(","));
     navigate(params);
   }
 
+  function clearTypes() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("types");
+    navigate(params);
+  }
+
+  const filtered = useMemo(() => {
+    if (selectedSet.size === 0) return events;
+    return events.filter((e) => e.event_type && selectedSet.has(e.event_type));
+  }, [events, selectedSet]);
+
   const grouped = useMemo(() => {
     const map = new Map<string, EventLite[]>();
-    for (const e of events) {
+    for (const e of filtered) {
       if (!e.start_datetime) continue;
-      const d = safeParseDate(e.start_datetime);
-      if (!d) continue;
+      const d = parseISO(e.start_datetime);
       const key = format(d, "yyyy-MM-dd");
       const cur = map.get(key) ?? [];
       cur.push(e);
       map.set(key, cur);
     }
-
     const keys = Array.from(map.keys()).sort();
     return keys.map((k) => {
       const list = map.get(k) ?? [];
       list.sort((a, b) => {
-        const ad = a.start_datetime ? safeParseDate(a.start_datetime)?.getTime() ?? 0 : 0;
-        const bd = b.start_datetime ? safeParseDate(b.start_datetime)?.getTime() ?? 0 : 0;
+        const ad = a.start_datetime ? parseISO(a.start_datetime).getTime() : 0;
+        const bd = b.start_datetime ? parseISO(b.start_datetime).getTime() : 0;
         return ad - bd;
       });
       return { key: k, events: list };
     });
-  }, [events]);
+  }, [filtered]);
 
-  const selectedEventDesktop = useMemo(() => {
-    if (!events.length) return null;
-    if (!selectedEventKey) return events[0];
-    return events.find((e) => e.key === selectedEventKey) ?? events[0];
-  }, [events, selectedEventKey]);
-
-  const selectedEventMobile = useMemo(() => {
-    if (!selectedEventKey) return null;
-    return events.find((e) => e.key === selectedEventKey) ?? null;
-  }, [events, selectedEventKey]);
-
-  const mobileDetailOpen = Boolean(selectedEventKey);
+  const selectedEvent = useMemo(() => {
+    if (!selectedEventKey && filtered.length) return filtered[0];
+    return filtered.find((e) => e.key === selectedEventKey) ?? (filtered[0] ?? null);
+  }, [filtered, selectedEventKey]);
 
   return (
     <div className="pageShell">
-      <div className="tagline">
-        A shared calendar for local events, specials, and pop-ups in Lancaster, PA.
+      <div className="stickyBar">
+        <div className="toolbar">
+          <div className="chips" aria-label="Event type filters">
+            {allTypes.map((t) => (
+              <button
+                key={t}
+                className="chip"
+                data-on={selectedSet.has(t) ? "true" : "false"}
+                onClick={() => toggleType(t)}
+                type="button"
+                aria-pressed={selectedSet.has(t)}
+              >
+                {t}
+              </button>
+            ))}
+          </div>
+
+          <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6 }}>
+            <button className="btnLink" onClick={clearTypes} type="button">
+              Clear
+            </button>
+            <span className="subtle" style={{ fontSize: 13 }}>
+              {filtered.length} event{filtered.length === 1 ? "" : "s"}
+            </span>
+          </div>
+        </div>
       </div>
 
       <div className="split">
-        {/* LEFT */}
         <div className="pane">
           <div className="scroll">
-            <div className="leftSticky">
-              <div className="tabs" aria-label="Primary navigation">
-                <a className="tabBtn" href="/" aria-current="page">Calendar</a>
-                <a className="tabBtn" href="/locations">Directory</a>
-                <a className="tabBtn" href="/updates">Updates</a>
+            <div className="listHeader">
+              <h1 className="h1">Upcoming</h1>
+              <div className="subtle" style={{ fontSize: 13 }}>
+                Events across Lancaster. Hover for a subtle highlight.
               </div>
             </div>
 
             {grouped.length === 0 ? (
-              <div className="emptyList">No upcoming events yet.</div>
+              <p className="subtle" style={{ paddingTop: 14 }}>
+                No events found for the selected filters.
+              </p>
             ) : (
-              grouped.map(({ key, events: dayEvents }, idx) => (
-                <section
-                  key={key}
-                  className="dayBlock"
-                  style={{ borderTop: idx === 0 ? "0" : undefined }}
-                >
-                  <div className="dayTitle">
-                    <span className="dayTitleText">{dayLabel(key)}</span>
-                  </div>
+              grouped.map(({ key, events: dayEvents }) => {
+                const dayDate = parseISO(key);
+                const label = isToday(dayDate)
+                  ? "Today"
+                  : isTomorrow(dayDate)
+                  ? "Tomorrow"
+                  : format(dayDate, "EEEE");
 
-                  {dayEvents.map((e) => {
-                    const active = selectedEventKey
-                      ? selectedEventKey === e.key
-                      : selectedEventDesktop?.key === e.key;
+                return (
+                  <section key={key} className="dayBlock">
+                    <div className="dayTitle">
+                      <span>
+                        {label}, {format(dayDate, "MMM d")}
+                      </span>
+                      <span className="subtle">
+                        {dayEvents.length} item{dayEvents.length === 1 ? "" : "s"}
+                      </span>
+                    </div>
 
-                    return (
-                      <button
-                        key={e.id}
-                        className="eventRow"
-                        data-active={active ? "true" : "false"}
-                        onClick={() => setSelectedEvent(e.key)}
-                        type="button"
-                      >
-                        <span className="eventRowTitle">{e.title ?? "Untitled event"}</span>
+                    {dayEvents.map((e) => {
+                      const start = e.start_datetime ? parseISO(e.start_datetime) : null;
+                      const time = start ? format(start, "h:mm a") : "";
+                      const active = selectedEvent?.key === e.key;
 
-                        <span className="eventRowMeta">
-                          {formatEventTime(e)}
-                          {e.location?.name ? <span className="dot">•</span> : null}
-                          {e.location?.name ? <span>{e.location.name}</span> : null}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </section>
-              ))
+                      return (
+                        <div
+                          key={e.id}
+                          className={`row ${active ? "rowActive" : ""}`}
+                          onClick={() => setSelectedEvent(e.key)}
+                          role="button"
+                          tabIndex={0}
+                        >
+                          <div className="rowTop">
+                            <div className="rowTitle">{e.title ?? "Untitled event"}</div>
+                            {e.event_type ? <span className="badge">{e.event_type}</span> : null}
+                          </div>
+
+                          <div className="meta">
+                            <span>{time}</span>
+                            <span>{e.location?.name ?? "Unknown location"}</span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </section>
+                );
+              })
             )}
           </div>
         </div>
 
-        {/* RIGHT (desktop) */}
         <div className="pane paneRight">
           <div className="scroll">
-            {!selectedEventDesktop ? (
-              <div className="emptyRight">Select an event to see details.</div>
+            {!selectedEvent ? (
+              <div className="emptyState">
+                <div>
+                  <div className="h2">No event selected</div>
+                  <div className="subtle">Pick an event from the left.</div>
+                </div>
+              </div>
             ) : (
-              <EventDetail event={selectedEventDesktop} />
+              <div className="detail">
+                <h2 className="detailTitle">{selectedEvent.title ?? "Event"}</h2>
+
+                <div className="kv" style={{ marginBottom: 10 }}>
+                  {selectedEvent.event_type ? <span className="badge">{selectedEvent.event_type}</span> : null}
+                  {selectedEvent.start_datetime ? (
+                    <span>{format(parseISO(selectedEvent.start_datetime), "MMM d, h:mm a")}</span>
+                  ) : null}
+                </div>
+
+                <div className="detailBlock">
+                  <div className="h2">Where</div>
+                  <div className="kv">
+                    <span>
+                      <a
+                        href={
+                          selectedEvent.location?.uid
+                            ? `/locations?loc=${selectedEvent.location.uid}`
+                            : "/locations"
+                        }
+                      >
+                        {selectedEvent.location?.name ?? "Unknown location"}
+                      </a>
+                    </span>
+                    {selectedEvent.location?.address ? <span>•</span> : null}
+                    {selectedEvent.location?.address ? <span>{selectedEvent.location.address}</span> : null}
+                  </div>
+                </div>
+
+                <div className="detailBlock">
+                  <div className="h2">Details</div>
+                  <div className="subtle" style={{ whiteSpace: "pre-wrap" }}>
+                    {selectedEvent.description ?? "No description added yet."}
+                  </div>
+                </div>
+
+                <div className="detailBlock">
+                  <div className="kv">
+                    <a href="/calendar">Open full calendar</a>
+                    <span>•</span>
+                    <a href="/locations">Browse locations</a>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
         </div>
       </div>
-
-      {/* Mobile bottom tabs */}
-      <div className="mobileTabs" aria-label="Primary navigation">
-        <a className="tabBtn" href="/" aria-current="page">Calendar</a>
-        <a className="tabBtn" href="/locations">Directory</a>
-        <a className="tabBtn" href="/updates">Updates</a>
-      </div>
-
-      {/* Mobile detail overlay */}
-      <div
-        className="mobileDetail"
-        data-open={mobileDetailOpen ? "true" : "false"}
-        aria-hidden={!mobileDetailOpen}
-      >
-        <div className="mobileDetailHeader">
-          <button className="backBtn" type="button" onClick={clearSelectedEvent}>
-            Back
-          </button>
-          <div className="mobileDetailTitle">Event</div>
-        </div>
-        <div className="scroll" style={{ padding: "0 16px 24px 16px" }}>
-          {selectedEventMobile ? <EventDetail event={selectedEventMobile} /> : null}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function formatEventTime(event: EventLite): string {
-  const start = safeParseDate(event.start_datetime);
-  const end = safeParseDate(event.end_datetime);
-
-  // Date-only events (no time) or explicitly all-day
-  const hasTime = Boolean(event.start_datetime && !/^\d{4}-\d{2}-\d{2}$/.test(event.start_datetime));
-  const allDay = Boolean(event.all_day) || !hasTime;
-
-  if (allDay) return "All day";
-
-  if (start && end) {
-    const s = format(start, "h:mma").toLowerCase();
-    const e = format(end, "h:mma").toLowerCase();
-    return `${s} – ${e}`;
-  }
-
-  if (start) return format(start, "h:mma").toLowerCase();
-
-  return "";
-}
-
-function EventDetail({ event }: { event: EventLite }) {
-  const start = safeParseDate(event.start_datetime);
-  const dayStr = start ? format(start, "EEEE, MMMM do") : "";
-
-  const timeStr = formatEventTime(event);
-
-  const status = event.status && event.status !== "Scheduled" ? event.status : null;
-
-  const websiteHref = event.website_url || null;
-  const ticketsHref = event.tickets_url || null;
-
-  return (
-    <div>
-      <div className="rightHeader">
-        {dayStr ? <div className="rightDayLabel">{dayStr}</div> : null}
-
-        <h1 className="detailTitle">{event.title ?? "Event"}</h1>
-
-        <div className="detailMeta">
-          <span className="venue">{event.location?.name ?? "Unknown location"}</span>
-          {timeStr ? <span className="muted">{timeStr}</span> : null}
-        </div>
-
-        <div className="detailChips" aria-label="Event highlights">
-          {event.event_type ? <span className="pill">{event.event_type}</span> : null}
-          {event.cost ? <span className="pill">{event.cost}</span> : null}
-          {event.age_restriction ? <span className="pill">{event.age_restriction}</span> : null}
-          {status ? <span className="pill pillWarn">{status}</span> : null}
-          {Array.isArray(event.tags)
-            ? event.tags.slice(0, 4).map((t) => (
-                <span key={t} className="pill pillSoft">
-                  {t}
-                </span>
-              ))
-            : null}
-        </div>
-      </div>
-
-      <div
-        className="heroImage"
-        style={
-          event.image_url
-            ? { backgroundImage: `url(${event.image_url})` }
-            : undefined
-        }
-        aria-hidden="true"
-      />
-
-      {event.summary ? <p className="summary">{event.summary}</p> : null}
-
-      <div className="detailBody">
-        {event.description ? event.description : "No description added yet."}
-      </div>
-
-      <div className="ctaRow">
-        <a
-          className="ctaBtn"
-          data-disabled={!websiteHref ? "true" : "false"}
-          href={websiteHref ?? undefined}
-          target={websiteHref ? "_blank" : undefined}
-          rel={websiteHref ? "noreferrer" : undefined}
-          aria-disabled={!websiteHref}
-          onClick={(e) => {
-            if (!websiteHref) e.preventDefault();
-          }}
-        >
-          Website
-        </a>
-
-        <a
-          className="ctaBtn"
-          data-disabled={!ticketsHref ? "true" : "false"}
-          href={ticketsHref ?? undefined}
-          target={ticketsHref ? "_blank" : undefined}
-          rel={ticketsHref ? "noreferrer" : undefined}
-          aria-disabled={!ticketsHref}
-          onClick={(e) => {
-            if (!ticketsHref) e.preventDefault();
-          }}
-        >
-          Tickets
-        </a>
-      </div>
-
-      {event.location?.address ? (
-        <div className="finePrint">
-          <span className="label">Address</span>
-          <span>{event.location.address}</span>
-        </div>
-      ) : null}
-
-      {event.location?.website ? (
-        <div className="finePrint">
-          <span className="label">Venue site</span>
-          <a href={event.location.website} target="_blank" rel="noreferrer">
-            {event.location.website}
-          </a>
-        </div>
-      ) : null}
     </div>
   );
 }

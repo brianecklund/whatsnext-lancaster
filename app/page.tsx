@@ -5,10 +5,6 @@ import type { RichTextField } from "@prismicio/client";
 
 export const dynamic = "force-dynamic";
 
-/**
- * Homepage: split calendar list + event detail.
- * Data source: Prismic `event` documents.
- */
 export default async function HomePage() {
   const client = createClient();
 
@@ -28,7 +24,7 @@ export default async function HomePage() {
       const loc = doc.data?.location;
       const locData = loc?.data;
 
-      // Rich text -> plain text (safe for empty arrays)
+      // ✅ Safe event description handling (guards empty arrays)
       const desc = doc.data?.description;
       const descText =
         typeof desc === "string"
@@ -37,8 +33,10 @@ export default async function HomePage() {
           ? prismic.asText(desc as RichTextField)
           : null;
 
+      // ✅ Safe location website handling (no `.url` access)
       const websiteUrl = prismic.asLink(locData?.website);
 
+      // ✅ Safe location description handling (guards empty arrays)
       const locDesc = locData?.description;
       const locDescText =
         typeof locDesc === "string"
@@ -47,48 +45,16 @@ export default async function HomePage() {
           ? prismic.asText(locDesc as RichTextField)
           : null;
 
-      const eventWebsite = prismic.asLink(doc.data?.website_url);
-      const ticketsUrl = prismic.asLink(doc.data?.tickets_url);
-
-      const heroImg = doc.data?.image;
-      const imageUrl =
-        heroImg && typeof heroImg === "object" ? heroImg.url ?? null : null;
-
-      const tagsArr =
-        Array.isArray(doc.data?.tags) ? doc.data.tags.map((t: any) => t?.tag).filter(Boolean) : [];
-
-      // Prismic Date vs Timestamp compatibility:
-      // - Date: YYYY-MM-DD (no time)
-      // - Timestamp: ISO string
-      const startVal = doc.data?.start_datetime ?? null;
-      const endVal = doc.data?.end_datetime ?? null;
-
       return {
         id: doc.id,
         key: doc.uid ?? doc.id,
         uid: doc.uid ?? null,
-
         title: doc.data?.title ?? null,
-        summary: doc.data?.summary ?? null,
+        artists: doc.data?.artists ?? null,
         description: descText,
-
-        start_datetime: startVal,
-        end_datetime: endVal,
-        all_day: doc.data?.all_day ?? null,
-
+        start_datetime: doc.data?.start_datetime ?? null,
+        end_datetime: doc.data?.end_datetime ?? null,
         event_type: doc.data?.event_type ?? null,
-        status: doc.data?.status ?? null,
-        featured: doc.data?.featured ?? null,
-
-        cost: doc.data?.cost ?? null,
-        age_restriction: doc.data?.age_restriction ?? null,
-
-        website_url: eventWebsite ?? null,
-        tickets_url: ticketsUrl ?? null,
-
-        image_url: imageUrl,
-        tags: tagsArr,
-
         location: loc
           ? {
               id: loc.id,
@@ -100,9 +66,13 @@ export default async function HomePage() {
               description: locDescText,
             }
           : null,
-      } as EventLite;
+      };
     })
     .filter((e) => Boolean(e.start_datetime));
 
-  return <HomeSplitClient events={events} />;
+  const allTypes = Array.from(
+    new Set(events.map((e) => e.event_type).filter(Boolean) as string[])
+  ).sort((a, b) => a.localeCompare(b));
+
+  return <HomeSplitClient events={events} allTypes={allTypes} />;
 }
