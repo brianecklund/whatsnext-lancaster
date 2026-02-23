@@ -5,7 +5,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en">
       <body>
         <header className="siteHeader">
-          <div className="brand">What’s Next Lancaster</div>
+          <div className="brand">
+            <img
+              className="brandLogo brandLogoDesktop"
+              src="/brand/AT-Lanc-Logo.png"
+              alt="What’s Next Lancaster"
+            />
+            <img
+              className="brandLogo brandLogoMobile"
+              src="/brand/AT-Lanc-Logo-Mobile.png"
+              alt="What’s Next Lancaster"
+            />
+          </div>
           <nav className="topNav">
             <a href="/">Calendar</a>
             <a href="/locations">Directory</a>
