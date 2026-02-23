@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from \"react\";
-import { useRouter, useSearchParams } from \"next/navigation\";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type EventLite = {
   id: string;
@@ -38,10 +38,10 @@ type Props = {
   events: EventLite[];
 };
 
-const WEEKLY_KEY = \"__weekly__\";
+const WEEKLY_KEY = "__weekly__";
 
 function norm(v: string) {
-  return (v || \"\").toLowerCase().trim();
+  return (v || "").toLowerCase().trim();
 }
 
 function safeDateFromEvent(e: EventLite): Date | null {
@@ -75,26 +75,26 @@ function startOfDay(d: Date): Date {
 
 function dayKey(d: Date): string {
   const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, \"0\");
-  const dd = String(d.getDate()).padStart(2, \"0\");
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
   return `${y}-${m}-${dd}`;
 }
 
 function formatDayHeading(d: Date): string {
   return d.toLocaleDateString(undefined, {
-    weekday: \"long\",
-    month: \"short\",
-    day: \"numeric\",
+    weekday: "long",
+    month: "short",
+    day: "numeric",
   });
 }
 
 function formatTimeLabel(d: Date): string {
   return d.toLocaleString(undefined, {
-    weekday: \"short\",
-    month: \"short\",
-    day: \"numeric\",
-    hour: \"numeric\",
-    minute: \"2-digit\",
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
   });
 }
 
@@ -103,13 +103,13 @@ function pickImageUrl(e: any): string | null {
   if (!e) return null;
 
   // normalized keys
-  if (typeof e.imageUrl === \"string\" && e.imageUrl) return e.imageUrl;
-  if (typeof e.image_url === \"string\" && e.image_url) return e.image_url;
+  if (typeof e.imageUrl === "string" && e.imageUrl) return e.imageUrl;
+  if (typeof e.image_url === "string" && e.image_url) return e.image_url;
 
   // raw prismic-ish image field
   const img = e.image;
   if (img) {
-    if (typeof img.url === \"string\" && img.url) return img.url;
+    if (typeof img.url === "string" && img.url) return img.url;
     const square = img.Square || img.square;
     if (square?.url) return square.url;
 
@@ -127,14 +127,14 @@ function pickDescriptionText(e: EventLite): string | null {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const d: any = (e as any).description;
   if (!d) return null;
-  if (typeof d === \"string\") return d;
+  if (typeof d === "string") return d;
 
   // very lightweight rich text fallback (avoid prismic runtime dependency here)
   if (Array.isArray(d)) {
     const parts = d
-      .map((b) => (typeof b?.text === \"string\" ? b.text : \"\"))
+      .map((b) => (typeof b?.text === "string" ? b.text : ""))
       .filter(Boolean);
-    return parts.length ? parts.join(\"\\n\\n\") : null;
+    return parts.length ? parts.join("\n\n") : null;
   }
 
   return null;
@@ -144,32 +144,32 @@ export default function HomeSplitClient({ events }: Props) {
   const router = useRouter();
   const sp = useSearchParams();
 
-  const q = sp.get(\"q\") || \"\";
-  const type = sp.get(\"type\") || \"\";
+  const q = sp.get("q") || "";
+  const type = sp.get("type") || "";
 
   // default selection = weekly overview
-  const selectedParam = sp.get(\"event\");
+  const selectedParam = sp.get("event");
   const selectedKey = selectedParam ?? WEEKLY_KEY;
 
   const [overlayOpen, setOverlayOpen] = useState(false);
 
   const [isMobile, setIsMobile] = useState(false);
-  const [mobileTab, setMobileTab] = useState<\"list\" | \"detail\">(\"list\");
+  const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
 
   useEffect(() => {
-    const mq = window.matchMedia(\"(max-width: 980px)\");
+    const mq = window.matchMedia("(max-width: 980px)");
     const apply = () => setIsMobile(mq.matches);
     apply();
-    mq.addEventListener(\"change\", apply);
-    return () => mq.removeEventListener(\"change\", apply);
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
   }, []);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
-      if (e.key === \"Escape\") setOverlayOpen(false);
+      if (e.key === "Escape") setOverlayOpen(false);
     }
-    window.addEventListener(\"keydown\", onKey);
-    return () => window.removeEventListener(\"keydown\", onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, []);
 
   function setParam(key: string, value: string | null) {
@@ -180,7 +180,7 @@ export default function HomeSplitClient({ events }: Props) {
   }
 
   function goDetailMobile() {
-    if (isMobile) setMobileTab(\"detail\");
+    if (isMobile) setMobileTab("detail");
   }
 
   const eventTypes = useMemo(() => {
@@ -196,18 +196,18 @@ export default function HomeSplitClient({ events }: Props) {
     return events.filter((e) => {
       const hay = norm(
         [
-          e.title ?? \"\",
-          e.summary ?? \"\",
-          e.locationName ?? \"\",
-          e.address ?? \"\",
-          e.event_type ?? \"\",
+          e.title ?? "",
+          e.summary ?? "",
+          e.locationName ?? "",
+          e.address ?? "",
+          e.event_type ?? "",
         ]
           .filter(Boolean)
-          .join(\" \")
+          .join(" ")
       );
 
       const matchesSearch = !nq || hay.includes(nq);
-      const matchesType = !nt || norm(e.event_type ?? \"\") === nt;
+      const matchesType = !nt || norm(e.event_type ?? "") === nt;
       return matchesSearch && matchesType;
     });
   }, [events, q, type]);
@@ -300,8 +300,8 @@ export default function HomeSplitClient({ events }: Props) {
   // stagger counter for left list
   let listAnimIndex = 0;
 
-  const showLeft = !isMobile || mobileTab === \"list\";
-  const showRight = !isMobile || mobileTab === \"detail\";
+  const showLeft = !isMobile || mobileTab === "list";
+  const showRight = !isMobile || mobileTab === "detail";
 
   // Right pane content helpers
   const selectedImg = selectedEvent ? pickImageUrl(selectedEvent) : null;
@@ -309,42 +309,42 @@ export default function HomeSplitClient({ events }: Props) {
   const selectedTime = selectedEvent
     ? (() => {
         const d = safeDateFromEvent(selectedEvent);
-        return d ? formatTimeLabel(d) : \"Time TBD\";
+        return d ? formatTimeLabel(d) : "Time TBD";
       })()
     : null;
 
   return (
-    <div className=\"pageShell\">
-      <div className=\"split\">
+    <div className="pageShell">
+      <div className="split">
         {/* LEFT */}
         {showLeft ? (
-          <aside className=\"pane paneLeft\">
-            <div className=\"scroll\">
-              <div className=\"leftSticky\">
-                <div className=\"leftControls\">
+          <aside className="pane paneLeft">
+            <div className="scroll">
+              <div className="leftSticky">
+                <div className="leftControls">
                   <input
-                    className=\"searchInput\"
-                    placeholder=\"Search events…\"
+                    className="searchInput"
+                    placeholder="Search events…"
                     value={q}
-                    onChange={(e) => setParam(\"q\", e.target.value)}
+                    onChange={(e) => setParam("q", e.target.value)}
                   />
 
                   <button
-                    className=\"filterBtn\"
+                    className="filterBtn"
                     onClick={() => setOverlayOpen(true)}
-                    type=\"button\"
+                    type="button"
                   >
                     Filter
                   </button>
 
                   {(q || type) ? (
                     <button
-                      className=\"clearBtn\"
+                      className="clearBtn"
                       onClick={() => {
-                        setParam(\"q\", null);
-                        setParam(\"type\", null);
+                        setParam("q", null);
+                        setParam("type", null);
                       }}
-                      type=\"button\"
+                      type="button"
                     >
                       Clear
                     </button>
@@ -352,58 +352,59 @@ export default function HomeSplitClient({ events }: Props) {
                 </div>
               </div>
 
-              {/* Weekly Overview (left) – match existing CSS structure */}
+              {/* Weekly Overview (left) */}
               <button
-                type=\"button\"
-                className=\"weeklyOverview fadeInItem\"
+                type="button"
+                className="weeklyOverview fadeInItem"
                 style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
-                data-active={selectedKey === WEEKLY_KEY ? \"true\" : \"false\"}
+                data-active={selectedKey === WEEKLY_KEY ? "true" : "false"}
                 onClick={() => {
-                  setParam(\"event\", WEEKLY_KEY);
+                  setParam("event", WEEKLY_KEY);
                   goDetailMobile();
                 }}
               >
-                <div className=\"weeklyTitle\">Weekly Overview</div>
-                <div className=\"weeklyCount\">
-                  {weekEventsCount} event{weekEventsCount === 1 ? \"\" : \"s\"} left this week
+                <div className="weeklyTitle">Weekly Overview</div>
+                <div className="weeklyCount">
+                  {weekEventsCount} event{weekEventsCount === 1 ? "" : "s"} left
+                  this week
                 </div>
               </button>
 
               {leftDayGroups.length === 0 ? (
-                <div className=\"emptyList\">No events match your search.</div>
+                <div className="emptyList">No events match your search.</div>
               ) : null}
 
               {/* Left list */}
               {leftDayGroups.map((g) => (
-                <section key={dayKey(g.date)} className=\"dayBlock\">
-                  <div className=\"dayTitle\">{formatDayHeading(g.date)}</div>
+                <section key={dayKey(g.date)} className="dayBlock">
+                  <div className="dayTitle">{formatDayHeading(g.date)}</div>
 
                   {g.items.map((e) => {
                     const active =
                       selectedEvent?.id === e.id ||
                       (selectedEvent?.uid && e.uid && selectedEvent.uid === e.uid);
 
-                    const title = e.title || \"Untitled event\";
+                    const title = e.title || "Untitled event";
                     const d = safeDateFromEvent(e);
-                    const timeLabel = d ? formatTimeLabel(d) : \"Time TBD\";
+                    const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
 
                     return (
                       <button
                         key={e.id}
-                        className=\"eventRow fadeInItem\"
+                        className="eventRow fadeInItem"
                         style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
-                        data-active={active ? \"true\" : \"false\"}
+                        data-active={active ? "true" : "false"}
                         onClick={() => {
-                          if (e.uid) setParam(\"event\", e.uid);
-                          else setParam(\"event\", e.id);
+                          if (e.uid) setParam("event", e.uid);
+                          else setParam("event", e.id);
                           goDetailMobile();
                         }}
-                        type=\"button\"
+                        type="button"
                       >
-                        <div className=\"eventRowTitle\">{title}</div>
-                        <div className=\"eventRowMeta\">
+                        <div className="eventRowTitle">{title}</div>
+                        <div className="eventRowMeta">
                           <span>{timeLabel}</span>
-                          {e.event_type ? <span className=\"dot\">•</span> : null}
+                          {e.event_type ? <span className="dot">•</span> : null}
                           {e.event_type ? <span>{e.event_type}</span> : null}
                         </div>
                       </button>
@@ -412,33 +413,33 @@ export default function HomeSplitClient({ events }: Props) {
                 </section>
               ))}
 
-              {/* Left overlay filter – match existing CSS */}
-              <div className=\"leftOverlay\" data-open={overlayOpen ? \"true\" : \"false\"}>
-                <div className=\"leftOverlayHeader\">
-                  <div className=\"leftOverlayTitle\">Filter</div>
+              {/* Left overlay filter */}
+              <div className="leftOverlay" data-open={overlayOpen ? "true" : "false"}>
+                <div className="leftOverlayHeader">
+                  <div className="leftOverlayTitle">Filter</div>
                   <button
-                    className=\"overlayClose\"
+                    className="overlayClose"
                     onClick={() => setOverlayOpen(false)}
-                    aria-label=\"Close\"
-                    type=\"button\"
+                    aria-label="Close"
+                    type="button"
                   >
                     ×
                   </button>
                 </div>
 
-                <div className=\"filterGrid\">
+                <div className="filterGrid">
                   {eventTypes.map((t) => {
                     const on = norm(type) === norm(t);
                     return (
                       <button
                         key={t}
-                        className=\"pillBtn\"
-                        data-active={on ? \"true\" : \"false\"}
+                        className="pillBtn"
+                        data-active={on ? "true" : "false"}
                         onClick={() => {
-                          setParam(\"type\", t);
+                          setParam("type", t);
                           setOverlayOpen(false);
                         }}
-                        type=\"button\"
+                        type="button"
                       >
                         {t}
                       </button>
@@ -446,12 +447,12 @@ export default function HomeSplitClient({ events }: Props) {
                   })}
 
                   <button
-                    className=\"pillBtn pillBtnSecondary\"
+                    className="pillBtn pillBtnSecondary"
                     onClick={() => {
-                      setParam(\"type\", null);
+                      setParam("type", null);
                       setOverlayOpen(false);
                     }}
-                    type=\"button\"
+                    type="button"
                   >
                     Clear filter
                   </button>
@@ -463,63 +464,64 @@ export default function HomeSplitClient({ events }: Props) {
 
         {/* RIGHT */}
         {showRight ? (
-          <main className=\"pane paneRight\">
-            <div className=\"scroll\">
+          <main className="pane paneRight">
+            <div className="scroll">
               {selectedKey === WEEKLY_KEY ? (
-                <div className=\"rightHeader\">
-                  <div className=\"rightDayLabel\">Weekly Overview</div>
+                <div className="rightHeader">
+                  <div className="rightDayLabel">Weekly Overview</div>
 
-                  {/* Right weekly overview as card blocks */}
                   {weekEventsCount === 0 ? (
-                    <div className=\"emptyRight\">No events scheduled for the rest of this week.</div>
+                    <div className="emptyRight">
+                      No events scheduled for the rest of this week.
+                    </div>
                   ) : (
-                    <div className=\"weeklyCards\">
+                    <div className="weeklyCards">
                       {weekGroups.map((g) => (
-                        <div key={dayKey(g.date)} className=\"weeklyDayGroup\">
-                          <div className=\"dayTitle\">{formatDayHeading(g.date)}</div>
+                        <div key={dayKey(g.date)} className="weeklyDayGroup">
+                          <div className="dayTitle">{formatDayHeading(g.date)}</div>
 
                           {g.items.map((e) => {
-                            const title = e.title || \"Untitled event\";
+                            const title = e.title || "Untitled event";
                             const d = safeDateFromEvent(e);
-                            const timeLabel = d ? formatTimeLabel(d) : \"Time TBD\";
+                            const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
                             const img = pickImageUrl(e);
                             const desc = pickDescriptionText(e);
 
                             return (
                               <button
                                 key={e.id}
-                                type=\"button\"
-                                className=\"weeklyCard weeklyCardSelectable\"
+                                type="button"
+                                className="weeklyCard weeklyCardSelectable"
                                 onClick={() => {
-                                  if (e.uid) setParam(\"event\", e.uid);
-                                  else setParam(\"event\", e.id);
+                                  if (e.uid) setParam("event", e.uid);
+                                  else setParam("event", e.id);
                                   goDetailMobile();
                                 }}
                               >
-                                <div className=\"weeklyCardMedia\">
+                                <div className="weeklyCardMedia">
                                   {img ? (
                                     // eslint-disable-next-line @next/next/no-img-element
-                                    <img className=\"weeklyThumb\" src={img} alt=\"\" />
+                                    <img className="weeklyThumb" src={img} alt="" />
                                   ) : (
-                                    <div className=\"weeklyThumbPlaceholder\" aria-hidden />
+                                    <div className="weeklyThumbPlaceholder" aria-hidden />
                                   )}
                                 </div>
 
-                                <div className=\"weeklyCardContent\">
-                                  <div className=\"weeklyCardTop\">
-                                    <div className=\"weeklyCardTitleWrap\">
-                                      <div className=\"weeklyCardTitle\">{title}</div>
-                                      <div className=\"weeklyCardTime\">{timeLabel}</div>
+                                <div className="weeklyCardContent">
+                                  <div className="weeklyCardTop">
+                                    <div className="weeklyCardTitleWrap">
+                                      <div className="weeklyCardTitle">{title}</div>
+                                      <div className="weeklyCardTime">{timeLabel}</div>
                                     </div>
 
                                     {(e.tickets_url || e.website_url) ? (
-                                      <div className=\"weeklyCardActions\">
+                                      <div className="weeklyCardActions">
                                         {e.tickets_url ? (
                                           <a
-                                            className=\"weeklyMiniBtn\"
+                                            className="weeklyMiniBtn"
                                             href={e.tickets_url}
-                                            target=\"_blank\"
-                                            rel=\"noreferrer\"
+                                            target="_blank"
+                                            rel="noreferrer"
                                             onClick={(ev) => ev.stopPropagation()}
                                           >
                                             Tickets
@@ -527,10 +529,10 @@ export default function HomeSplitClient({ events }: Props) {
                                         ) : null}
                                         {e.website_url ? (
                                           <a
-                                            className=\"weeklyMiniBtn\"
+                                            className="weeklyMiniBtn"
                                             href={e.website_url}
-                                            target=\"_blank\"
-                                            rel=\"noreferrer\"
+                                            target="_blank"
+                                            rel="noreferrer"
                                             onClick={(ev) => ev.stopPropagation()}
                                           >
                                             Website
@@ -540,7 +542,7 @@ export default function HomeSplitClient({ events }: Props) {
                                     ) : null}
                                   </div>
 
-                                  {desc ? <div className=\"weeklyCardDesc\">{desc}</div> : null}
+                                  {desc ? <div className="weeklyCardDesc">{desc}</div> : null}
                                 </div>
                               </button>
                             );
@@ -551,47 +553,47 @@ export default function HomeSplitClient({ events }: Props) {
                   )}
                 </div>
               ) : !selectedEvent ? (
-                <div className=\"emptyRight\">Select an event.</div>
+                <div className="emptyRight">Select an event.</div>
               ) : (
-                <div className=\"rightHeader\">
-                  <div className=\"rightDayLabel\">{selectedEvent.event_type || \"Event\"}</div>
+                <div className="rightHeader">
+                  <div className="rightDayLabel">{selectedEvent.event_type || "Event"}</div>
 
-                  <h1 className=\"detailTitle\">{selectedEvent.title || \"Untitled event\"}</h1>
+                  <h1 className="detailTitle">{selectedEvent.title || "Untitled event"}</h1>
 
-                  <div className=\"detailMeta\">
+                  <div className="detailMeta">
                     <span>{selectedTime}</span>
                     {selectedEvent.locationName ? (
                       <>
-                        <span className=\"dot\">•</span>
-                        <span className=\"venue\">{selectedEvent.locationName}</span>
+                        <span className="dot">•</span>
+                        <span className="venue">{selectedEvent.locationName}</span>
                       </>
                     ) : null}
                     {selectedEvent.address ? (
                       <>
-                        <span className=\"dot\">•</span>
-                        <span className=\"muted\">{selectedEvent.address}</span>
+                        <span className="dot">•</span>
+                        <span className="muted">{selectedEvent.address}</span>
                       </>
                     ) : null}
                   </div>
 
                   {/* Always render heroImage for placeholder behavior */}
                   <div
-                    className=\"heroImage\"
+                    className="heroImage"
                     style={selectedImg ? { backgroundImage: `url(${selectedImg})` } : undefined}
                   />
 
-                  {selectedEvent.summary ? <p className=\"summary\">{selectedEvent.summary}</p> : null}
+                  {selectedEvent.summary ? <p className="summary">{selectedEvent.summary}</p> : null}
 
-                  {selectedDesc ? <div className=\"detailBody\">{selectedDesc}</div> : null}
+                  {selectedDesc ? <div className="detailBody">{selectedDesc}</div> : null}
 
                   {(selectedEvent.website_url || selectedEvent.tickets_url) ? (
-                    <div className=\"ctaRow\">
+                    <div className="ctaRow">
                       <a
-                        className=\"ctaBtn\"
-                        data-disabled={selectedEvent.website_url ? \"false\" : \"true\"}
-                        href={selectedEvent.website_url || \"#\"}
-                        target={selectedEvent.website_url ? \"_blank\" : undefined}
-                        rel={selectedEvent.website_url ? \"noreferrer\" : undefined}
+                        className="ctaBtn"
+                        data-disabled={selectedEvent.website_url ? "false" : "true"}
+                        href={selectedEvent.website_url || "#"}
+                        target={selectedEvent.website_url ? "_blank" : undefined}
+                        rel={selectedEvent.website_url ? "noreferrer" : undefined}
                         onClick={(ev) => {
                           if (!selectedEvent.website_url) ev.preventDefault();
                         }}
@@ -600,11 +602,11 @@ export default function HomeSplitClient({ events }: Props) {
                       </a>
 
                       <a
-                        className=\"ctaBtn\"
-                        data-disabled={selectedEvent.tickets_url ? \"false\" : \"true\"}
-                        href={selectedEvent.tickets_url || \"#\"}
-                        target={selectedEvent.tickets_url ? \"_blank\" : undefined}
-                        rel={selectedEvent.tickets_url ? \"noreferrer\" : undefined}
+                        className="ctaBtn"
+                        data-disabled={selectedEvent.tickets_url ? "false" : "true"}
+                        href={selectedEvent.tickets_url || "#"}
+                        target={selectedEvent.tickets_url ? "_blank" : undefined}
+                        rel={selectedEvent.tickets_url ? "noreferrer" : undefined}
                         onClick={(ev) => {
                           if (!selectedEvent.tickets_url) ev.preventDefault();
                         }}
@@ -622,20 +624,20 @@ export default function HomeSplitClient({ events }: Props) {
 
       {/* Mobile bottom tabs */}
       {isMobile ? (
-        <div className=\"mobileTabs\">
+        <div className="mobileTabs">
           <button
-            className=\"tabBtn\"
-            aria-current={mobileTab === \"list\" ? \"page\" : undefined}
-            onClick={() => setMobileTab(\"list\")}
-            type=\"button\"
+            className="tabBtn"
+            aria-current={mobileTab === "list" ? "page" : undefined}
+            onClick={() => setMobileTab("list")}
+            type="button"
           >
             List
           </button>
           <button
-            className=\"tabBtn\"
-            aria-current={mobileTab === \"detail\" ? \"page\" : undefined}
-            onClick={() => setMobileTab(\"detail\")}
-            type=\"button\"
+            className="tabBtn"
+            aria-current={mobileTab === "detail" ? "page" : undefined}
+            onClick={() => setMobileTab("detail")}
+            type="button"
           >
             Details
           </button>
