@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 type EventLite = {
   id: string;
@@ -143,7 +143,6 @@ function pickDescriptionText(e: EventLite): string | null {
 export default function HomeSplitClient({ events }: Props) {
   const router = useRouter();
   const sp = useSearchParams();
-  const pathname = usePathname();
 
   const q = sp.get("q") || "";
   const type = sp.get("type") || "";
@@ -151,6 +150,9 @@ export default function HomeSplitClient({ events }: Props) {
   // default selection = weekly overview
   const selectedParam = sp.get("event");
   const selectedKey = selectedParam ?? WEEKLY_KEY;
+
+  const [overlayOpen, setOverlayOpen] = useState(false);
+
   const [isMobile, setIsMobile] = useState(false);
   const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
 
@@ -161,6 +163,15 @@ export default function HomeSplitClient({ events }: Props) {
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
   }, []);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOverlayOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   function setParam(key: string, value: string | null) {
     const params = new URLSearchParams(sp.toString());
     if (!value) params.delete(key);
@@ -304,47 +315,29 @@ export default function HomeSplitClient({ events }: Props) {
 
   return (
     <div className="pageShell">
-      <div className="tagline">A calendar of events, specials, and pop-ups in Lancaster, PA.</div>
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
           <aside className="pane paneLeft">
             <div className="scroll">
               <div className="leftSticky">
-                <div className="tabs" aria-label="Primary navigation">
-                  <button
-                    type="button"
-                    className="tabBtn"
-                    data-active={pathname === "/" ? "true" : "false"}
-                    onClick={() => router.push("/")}
-                  >
-                    Calendar
-                  </button>
-                  <button
-                    type="button"
-                    className="tabBtn"
-                    data-active={pathname?.startsWith("/locations") ? "true" : "false"}
-                    onClick={() => router.push("/locations")}
-                  >
-                    Directory
-                  </button>
-                  <button
-                    type="button"
-                    className="tabBtn"
-                    data-active={pathname?.startsWith("/updates") ? "true" : "false"}
-                    onClick={() => router.push("/updates")}
-                  >
-                    Updates
-                  </button>
-                </div>
-
                 <div className="leftControls">
                   <input
                     className="searchInput"
                     placeholder="Search events…"
                     value={q}
                     onChange={(e) => setParam("q", e.target.value)}
-                  />{(q || type) ? (
+                  />
+
+                  <button
+                    className="filterBtn"
+                    onClick={() => setOverlayOpen(true)}
+                    type="button"
+                  >
+                    Filter
+                  </button>
+
+                  {(q || type) ? (
                     <button
                       className="clearBtn"
                       onClick={() => {
@@ -356,31 +349,6 @@ export default function HomeSplitClient({ events }: Props) {
                       Clear
                     </button>
                   ) : null}
-                </div>
-
-                <div className="typePills" role="group" aria-label="Event type filters">
-                  <button
-                    type="button"
-                    className="typePill"
-                    data-active={!type ? "true" : "false"}
-                    onClick={() => setParam("type", null)}
-                  >
-                    All
-                  </button>
-                  {eventTypes.map((t) => {
-                    const on = norm(type) === norm(t);
-                    return (
-                      <button
-                        key={t}
-                        type="button"
-                        className="typePill"
-                        data-active={on ? "true" : "false"}
-                        onClick={() => setParam("type", on ? null : t)}
-                      >
-                        {t}
-                      </button>
-                    );
-                  })}
                 </div>
               </div>
 
@@ -439,24 +407,57 @@ export default function HomeSplitClient({ events }: Props) {
                           {e.event_type ? <span className="dot">•</span> : null}
                           {e.event_type ? <span>{e.event_type}</span> : null}
                         </div>
-                        {(() => {
-                          const raw =
-                            (e.summary ?? "") || (pickDescriptionText(e) ?? "");
-                          const s = (raw || "").trim();
-                          if (!s) return null;
-                          return (
-                            <div className="eventRowDesc">
-                              {s.length > 180 ? `${s.slice(0, 180).trim()}…` : s}
-                            </div>
-                          );
-                        })()}
-
                       </button>
                     );
                   })}
                 </section>
               ))}
 
+              {/* Left overlay filter */}
+              <div className="leftOverlay" data-open={overlayOpen ? "true" : "false"}>
+                <div className="leftOverlayHeader">
+                  <div className="leftOverlayTitle">Filter</div>
+                  <button
+                    className="overlayClose"
+                    onClick={() => setOverlayOpen(false)}
+                    aria-label="Close"
+                    type="button"
+                  >
+                    ×
+                  </button>
+                </div>
+
+                <div className="filterGrid">
+                  {eventTypes.map((t) => {
+                    const on = norm(type) === norm(t);
+                    return (
+                      <button
+                        key={t}
+                        className="pillBtn"
+                        data-active={on ? "true" : "false"}
+                        onClick={() => {
+                          setParam("type", t);
+                          setOverlayOpen(false);
+                        }}
+                        type="button"
+                      >
+                        {t}
+                      </button>
+                    );
+                  })}
+
+                  <button
+                    className="pillBtn pillBtnSecondary"
+                    onClick={() => {
+                      setParam("type", null);
+                      setOverlayOpen(false);
+                    }}
+                    type="button"
+                  >
+                    Clear filter
+                  </button>
+                </div>
+              </div>
             </div>
           </aside>
         ) : null}
@@ -465,18 +466,6 @@ export default function HomeSplitClient({ events }: Props) {
         {showRight ? (
           <main className="pane paneRight">
             <div className="scroll">
-              {isMobile && mobileTab === "detail" ? (
-                <div className="mobileBackBar">
-                  <button
-                    type="button"
-                    className="mobileBackBtn"
-                    onClick={() => setMobileTab("list")}
-                  >
-                    ← Back to list
-                  </button>
-                </div>
-              ) : null}
-
               {selectedKey === WEEKLY_KEY ? (
                 <div className="rightHeader">
                   <div className="rightDayLabel">Weekly Overview</div>
@@ -496,6 +485,7 @@ export default function HomeSplitClient({ events }: Props) {
                             const d = safeDateFromEvent(e);
                             const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
                             const img = pickImageUrl(e);
+                            const desc = pickDescriptionText(e);
 
                             return (
                               <button
@@ -551,6 +541,8 @@ export default function HomeSplitClient({ events }: Props) {
                                       </div>
                                     ) : null}
                                   </div>
+
+                                  {desc ? <div className="weeklyCardDesc">{desc}</div> : null}
                                 </div>
                               </button>
                             );
@@ -632,30 +624,22 @@ export default function HomeSplitClient({ events }: Props) {
 
       {/* Mobile bottom tabs */}
       {isMobile ? (
-        <div className="mobileTabs" aria-label="Primary navigation">
+        <div className="mobileTabs">
           <button
-            type="button"
             className="tabBtn"
-            data-active={pathname === "/" ? "true" : "false"}
-            onClick={() => router.push("/")}
+            aria-current={mobileTab === "list" ? "page" : undefined}
+            onClick={() => setMobileTab("list")}
+            type="button"
           >
-            Calendar
+            List
           </button>
           <button
-            type="button"
             className="tabBtn"
-            data-active={pathname?.startsWith("/locations") ? "true" : "false"}
-            onClick={() => router.push("/locations")}
-          >
-            Directory
-          </button>
-          <button
+            aria-current={mobileTab === "detail" ? "page" : undefined}
+            onClick={() => setMobileTab("detail")}
             type="button"
-            className="tabBtn"
-            data-active={pathname?.startsWith("/updates") ? "true" : "false"}
-            onClick={() => router.push("/updates")}
           >
-            Updates
+            Details
           </button>
         </div>
       ) : null}
