@@ -16,9 +16,6 @@ export default async function HomePage() {
   let prismicError: string | null = null;
 
   try {
-    // IMPORTANT:
-    // Don't rely on orderings for a field that might have changed (start_datetime).
-    // We'll sort locally after normalizing the start date.
     docs = await client.getAllByType("event", {
       fetchLinks: [
         "location.name",
@@ -31,18 +28,17 @@ export default async function HomePage() {
   } catch (err: any) {
     prismicError =
       err?.message ??
-      (typeof err === "string" ? err : "Unknown error while fetching events from Prismic.");
+      (typeof err === "string"
+        ? err
+        : "Unknown error while fetching events from Prismic.");
   }
 
-  // Helper: pick first usable date/time value from a list of possible field API IDs.
-// Prismic Timestamp/Date fields usually come through as ISO strings, but we handle a few variants.
   const pickDateLike = (data: any, keys: string[]) => {
     for (const k of keys) {
       const v = data?.[k];
       if (!v) continue;
       if (typeof v === "string" && v.trim()) return v;
       if (v instanceof Date && !isNaN(v.getTime())) return v.toISOString();
-      // sometimes a field value can be nested (rare, but safe)
       if (typeof v === "object") {
         const vv = (v as any).value ?? (v as any).iso ?? (v as any).url;
         if (typeof vv === "string" && vv.trim()) return vv;
@@ -56,7 +52,7 @@ export default async function HomePage() {
       const loc = doc.data?.location;
       const locData = loc?.data;
 
-      // Rich text -> plain text (safe for empty arrays)
+      // Event description (RichText -> plain)
       const desc = doc.data?.description;
       const descText =
         typeof desc === "string"
@@ -65,8 +61,7 @@ export default async function HomePage() {
           ? prismic.asText(desc as RichTextField)
           : null;
 
-      const websiteUrl = prismic.asLink(locData?.website);
-
+      // Location description (RichText -> plain)
       const locDesc = locData?.description;
       const locDescText =
         typeof locDesc === "string"
@@ -75,9 +70,12 @@ export default async function HomePage() {
           ? prismic.asText(locDesc as RichTextField)
           : null;
 
+      const locationWebsiteUrl = prismic.asLink(locData?.website);
+
       const eventWebsite = prismic.asLink(doc.data?.website_url);
       const ticketsUrl = prismic.asLink(doc.data?.tickets_url);
 
+      // Image URL
       const heroImg = doc.data?.image;
       const imageUrl =
         heroImg && typeof heroImg === "object" ? heroImg.url ?? null : null;
@@ -86,8 +84,7 @@ export default async function HomePage() {
         ? doc.data.tags.map((t: any) => t?.tag).filter(Boolean)
         : [];
 
-      // ✅ Date/Timestamp compatibility + model changes:
-      // Prefer start_datetime, but fall back to common alternatives.
+      // Date/Timestamp compatibility
       const startVal =
         pickDateLike(doc.data, [
           "start_datetime",
@@ -99,29 +96,34 @@ export default async function HomePage() {
         ]) ?? null;
 
       const endVal =
-        pickDateLike(doc.data, [
-          "end_datetime",
-          "end_date",
-          "end",
-          "end_time",
-          "endtime",
-        ]) ?? null;
+        pickDateLike(doc.data, ["end_datetime", "end_date", "end", "end_time", "endtime"]) ??
+        null;
 
-      // Some Prismic models (or older docs) may have an `end_datetime` filled while
-      // `start_datetime` is empty. The UI expects a usable `start_datetime` for grouping.
-      // Use end as a fallback so the event still appears in the calendar list.
       const effectiveStart = startVal ?? endVal;
 
+      const locationName = locData?.name ?? null;
+      const locationAddress = locData?.address ?? null;
+
       return {
+        // identity
         id: doc.id,
         key: doc.uid ?? doc.id,
         uid: doc.uid ?? null,
 
+        // core
         title: doc.data?.title ?? null,
         summary: doc.data?.summary ?? null,
-        description: descText,
 
-        // keep property name as start_datetime because the rest of your UI expects it
+        // ✅ UI EXPECTS THESE:
+        descriptionText: descText, // used by right-pane + weekly cards
+        imageUrl: imageUrl, // used by right-pane + weekly cards
+        locationName, // used by list/meta + right-pane
+        address: locationAddress, // used by list/meta + right-pane
+
+        // ✅ keep old keys too (won't hurt)
+        description: descText,
+        image_url: imageUrl,
+
         start_datetime: effectiveStart,
         end_datetime: endVal,
         all_day: doc.data?.all_day ?? null,
@@ -136,30 +138,26 @@ export default async function HomePage() {
         website_url: eventWebsite ?? null,
         tickets_url: ticketsUrl ?? null,
 
-        image_url: imageUrl,
         tags: tagsArr,
 
+        // keep nested location object (directory + other uses)
         location: loc
           ? {
               id: loc.id,
               uid: loc.uid ?? null,
-              name: locData?.name ?? null,
-              address: locData?.address ?? null,
+              name: locationName,
+              address: locationAddress,
               category: locData?.category ?? null,
-              website: websiteUrl ?? null,
+              website: locationWebsiteUrl ?? null,
               description: locDescText,
             }
           : null,
       } as EventLite;
     })
-    // ✅ Only filter out events with truly no usable start field
-    // ✅ Keep events even if missing a start date (they'll sort to the bottom)
-    // ✅ Sort locally so events appear in order regardless of which field name is used
     .sort((a, b) => {
       const ta = a.start_datetime ? Date.parse(a.start_datetime) : NaN;
       const tb = b.start_datetime ? Date.parse(b.start_datetime) : NaN;
 
-      // Put valid-dated events first; undated events last.
       const aValid = Number.isFinite(ta);
       const bValid = Number.isFinite(tb);
       if (aValid && bValid) return ta - tb;
@@ -168,7 +166,6 @@ export default async function HomePage() {
       return 0;
     });
 
-  // If Prismic fetch failed, show a helpful error instead of a blank calendar.
   if (prismicError) {
     return (
       <div style={{ padding: 24, maxWidth: 820 }}>
@@ -177,10 +174,16 @@ export default async function HomePage() {
         </h1>
         <p style={{ marginBottom: 12, opacity: 0.9 }}>
           This page couldn&apos;t fetch <code>event</code> documents from Prismic.
-          The most common causes are a missing/incorrect <code>PRISMIC_REPO_NAME</code>
+          The most common causes are a missing/incorrect <code>PRISMIC_REPO_NAME</code>{" "}
           and/or a missing access token when the repository is private.
         </p>
-        <div style={{ padding: 12, border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12 }}>
+        <div
+          style={{
+            padding: 12,
+            border: "1px solid rgba(255,255,255,0.15)",
+            borderRadius: 12,
+          }}
+        >
           <div style={{ fontWeight: 600, marginBottom: 6 }}>Error</div>
           <code style={{ whiteSpace: "pre-wrap" }}>{prismicError}</code>
         </div>
