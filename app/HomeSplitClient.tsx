@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 type EventItem = {
   id: string;
-  uid: string | null;
+  uid?: string | null; // ✅ optional to match EventLite
   title: string;
   summary: string | null;
   start_datetime: string | null;
@@ -33,9 +33,7 @@ export default function HomeSplitClient({ events }: Props) {
 
   const [filterOpen, setFilterOpen] = useState(false);
 
-  // --------------------------------------------------
-  // EVENT TYPES (derived from full dataset)
-  // --------------------------------------------------
+  // Types derived from all events
   const eventTypes = useMemo(() => {
     const set = new Set<string>();
     for (const e of events) {
@@ -44,22 +42,14 @@ export default function HomeSplitClient({ events }: Props) {
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [events]);
 
-  // --------------------------------------------------
-  // FILTERED EVENTS
-  // --------------------------------------------------
+  // Filtered list
   const filteredEvents = useMemo(() => {
     const nq = normalize(q);
     const nt = normalize(type);
 
     return events.filter((e) => {
       const haystack = normalize(
-        [
-          e.title,
-          e.summary,
-          e.locationName,
-          e.address,
-          e.event_type,
-        ]
+        [e.title, e.summary, e.locationName, e.address, e.event_type]
           .filter(Boolean)
           .join(" ")
       );
@@ -71,26 +61,26 @@ export default function HomeSplitClient({ events }: Props) {
     });
   }, [events, q, type]);
 
+  // Selected event: only match by uid if uid exists
   const selectedEvent =
-    filteredEvents.find((e) => e.uid === selectedUid) ||
+    (selectedUid
+      ? filteredEvents.find((e) => e.uid && e.uid === selectedUid)
+      : null) ||
     filteredEvents[0] ||
     null;
 
   function updateParam(key: string, value: string | null) {
     const params = new URLSearchParams(searchParams.toString());
 
-    if (!value) {
-      params.delete(key);
-    } else {
-      params.set(key, value);
-    }
+    if (!value) params.delete(key);
+    else params.set(key, value);
 
     router.push(`/?${params.toString()}`);
   }
 
   return (
     <div className="splitLayout">
-      {/* LEFT SIDE */}
+      {/* LEFT */}
       <div className="leftPane">
         <div className="topControls">
           <input
@@ -100,10 +90,7 @@ export default function HomeSplitClient({ events }: Props) {
             onChange={(e) => updateParam("q", e.target.value)}
           />
 
-          <button
-            className="filterButton"
-            onClick={() => setFilterOpen(true)}
-          >
+          <button className="filterButton" onClick={() => setFilterOpen(true)}>
             Filter
           </button>
         </div>
@@ -115,7 +102,10 @@ export default function HomeSplitClient({ events }: Props) {
               className={`eventRow ${
                 selectedEvent?.id === event.id ? "active" : ""
               }`}
-              onClick={() => updateParam("event", event.uid)}
+              onClick={() => {
+                // ✅ Only set URL param if it has a uid
+                if (event.uid) updateParam("event", event.uid);
+              }}
             >
               <div className="eventTitle">{event.title}</div>
               {event.start_datetime && (
@@ -131,10 +121,7 @@ export default function HomeSplitClient({ events }: Props) {
         {filterOpen && (
           <div className="filterOverlay">
             <div className="filterHeader">
-              <button
-                className="closeButton"
-                onClick={() => setFilterOpen(false)}
-              >
+              <button className="closeButton" onClick={() => setFilterOpen(false)}>
                 ✕
               </button>
             </div>
@@ -171,23 +158,17 @@ export default function HomeSplitClient({ events }: Props) {
         )}
       </div>
 
-      {/* RIGHT SIDE */}
+      {/* RIGHT */}
       <div className="rightPane">
         {selectedEvent ? (
           <div className="eventDetail">
             <h2>{selectedEvent.title}</h2>
 
             {selectedEvent.start_datetime && (
-              <p>
-                {new Date(
-                  selectedEvent.start_datetime
-                ).toLocaleString()}
-              </p>
+              <p>{new Date(selectedEvent.start_datetime).toLocaleString()}</p>
             )}
 
-            {selectedEvent.summary && (
-              <p>{selectedEvent.summary}</p>
-            )}
+            {selectedEvent.summary && <p>{selectedEvent.summary}</p>}
           </div>
         ) : (
           <div className="emptyState">No events found.</div>
