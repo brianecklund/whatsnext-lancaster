@@ -1,5 +1,9 @@
 {
+  "format": "custom",
   "id": "event",
+  "label": "Event",
+  "repeatable": true,
+  "status": true,
   "json": {
     "Main": {
       "uid": {
@@ -41,6 +45,8 @@
         "type": "Boolean",
         "config": {
           "label": "All Day",
+          "placeholder_false": "false",
+          "placeholder_true": "true",
           "default_value": false
         }
       },
@@ -49,14 +55,7 @@
         "config": {
           "label": "Event Type",
           "placeholder": "",
-          "options": [
-            "Live Music",
-            "Trivia",
-            "Workshop",
-            "Opening",
-            "Talk",
-            "Market"
-          ]
+          "options": ["1", "2"]
         }
       },
       "status": {
@@ -64,17 +63,15 @@
         "config": {
           "label": "Status",
           "placeholder": "",
-          "options": [
-            "Scheduled",
-            "Cancelled",
-            "Postponed"
-          ]
+          "options": ["1", "2"]
         }
       },
       "featured": {
         "type": "Boolean",
         "config": {
           "label": "Featured",
+          "placeholder_false": "false",
+          "placeholder_true": "true",
           "default_value": false
         }
       },
@@ -90,11 +87,7 @@
         "config": {
           "label": "Age Restriction",
           "placeholder": "",
-          "options": [
-            "All ages",
-            "18+",
-            "21+"
-          ]
+          "options": ["1", "2"]
         }
       },
       "website_url": {
@@ -102,34 +95,29 @@
         "config": {
           "label": "Event Website URL",
           "placeholder": "",
-          "select": "web",
-          "allowTargetBlank": true
+          "select": null,
+          "allowTargetBlank": true,
+          "allowText": true,
+          "repeat": false
         }
       },
       "tickets_url": {
         "type": "Link",
         "config": {
-          "label": "Tickets URL",
+          "label": "Tickets_url",
           "placeholder": "",
-          "select": "web",
-          "allowTargetBlank": true
+          "select": null,
+          "allowTargetBlank": true,
+          "allowText": true,
+          "repeat": false
         }
       },
       "image": {
         "type": "Image",
         "config": {
           "label": "Hero Image",
-          "constraint": {
-            "width": 2400,
-            "height": 2400
-          },
-          "thumbnails": [
-            {
-              "name": "Square",
-              "width": 800,
-              "height": 800
-            }
-          ]
+          "constraint": {},
+          "thumbnails": []
         }
       },
       "description": {
@@ -151,7 +139,7 @@
               "type": "Text",
               "config": {
                 "label": "Tag",
-                "placeholder": "free, outdoor, family-friendly"
+                "placeholder": ""
               }
             }
           }
@@ -178,9 +166,5 @@
         }
       }
     }
-  },
-  "label": "Event",
-  "repeatable": true,
-  "status": true,
-  "format": "custom"
+  }
 }
