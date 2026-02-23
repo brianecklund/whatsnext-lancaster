@@ -428,6 +428,7 @@ export default function HomeSplitClient({ events }: Props) {
                 </section>
               ))}
 
+            </div>
           </aside>
         ) : null}
 
