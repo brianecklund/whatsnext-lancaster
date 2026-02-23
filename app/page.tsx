@@ -34,11 +34,19 @@ export default async function HomePage() {
       (typeof err === "string" ? err : "Unknown error while fetching events from Prismic.");
   }
 
-  // Helper: pick first existing string value from a list of possible field API IDs.
-  const pickString = (data: any, keys: string[]) => {
+  // Helper: pick first usable date/time value from a list of possible field API IDs.
+// Prismic Timestamp/Date fields usually come through as ISO strings, but we handle a few variants.
+  const pickDateLike = (data: any, keys: string[]) => {
     for (const k of keys) {
       const v = data?.[k];
+      if (!v) continue;
       if (typeof v === "string" && v.trim()) return v;
+      if (v instanceof Date && !isNaN(v.getTime())) return v.toISOString();
+      // sometimes a field value can be nested (rare, but safe)
+      if (typeof v === "object") {
+        const vv = (v as any).value ?? (v as any).iso ?? (v as any).url;
+        if (typeof vv === "string" && vv.trim()) return vv;
+      }
     }
     return null;
   };
@@ -81,7 +89,7 @@ export default async function HomePage() {
       // ✅ Date/Timestamp compatibility + model changes:
       // Prefer start_datetime, but fall back to common alternatives.
       const startVal =
-        pickString(doc.data, [
+        pickDateLike(doc.data, [
           "start_datetime",
           "start_date",
           "date",
@@ -91,7 +99,7 @@ export default async function HomePage() {
         ]) ?? null;
 
       const endVal =
-        pickString(doc.data, [
+        pickDateLike(doc.data, [
           "end_datetime",
           "end_date",
           "end",
@@ -140,12 +148,19 @@ export default async function HomePage() {
       } as EventLite;
     })
     // ✅ Only filter out events with truly no usable start field
-    .filter((e) => Boolean(e.start_datetime))
+    // ✅ Keep events even if missing a start date (they'll sort to the bottom)
     // ✅ Sort locally so events appear in order regardless of which field name is used
     .sort((a, b) => {
-      const ta = Date.parse(a.start_datetime ?? "") || 0;
-      const tb = Date.parse(b.start_datetime ?? "") || 0;
-      return ta - tb;
+      const ta = a.start_datetime ? Date.parse(a.start_datetime) : NaN;
+      const tb = b.start_datetime ? Date.parse(b.start_datetime) : NaN;
+
+      // Put valid-dated events first; undated events last.
+      const aValid = Number.isFinite(ta);
+      const bValid = Number.isFinite(tb);
+      if (aValid && bValid) return ta - tb;
+      if (aValid && !bValid) return -1;
+      if (!aValid && bValid) return 1;
+      return 0;
     });
 
   // If Prismic fetch failed, show a helpful error instead of a blank calendar.
