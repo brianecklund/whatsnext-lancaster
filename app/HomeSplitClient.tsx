@@ -2,435 +2,197 @@
 
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { format, isToday, isTomorrow, parseISO } from "date-fns";
-import type { EventLite } from "@/lib/types";
 
-function safeParseDate(value: string | null | undefined): Date | null {
-  if (!value) return null;
-  // Prismic Date can be YYYY-MM-DD. Timestamp can be ISO.
-  try {
-    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      return parseISO(value + "T00:00:00");
-    }
-    return parseISO(value);
-  } catch {
-    return null;
-  }
+type EventItem = {
+  id: string;
+  uid: string | null;
+  title: string;
+  summary: string | null;
+  start_datetime: string | null;
+  end_datetime: string | null;
+  event_type: string | null;
+  locationName?: string | null;
+  address?: string | null;
+};
+
+type Props = {
+  events: EventItem[];
+};
+
+function normalize(str: string) {
+  return str.toLowerCase().trim();
 }
 
-function dayLabel(dateKey: string) {
-  const dayDate = safeParseDate(dateKey);
-  if (!dayDate) return dateKey;
-  const label = isToday(dayDate)
-    ? "Today"
-    : isTomorrow(dayDate)
-    ? "Tomorrow"
-    : format(dayDate, "EEEE");
-  return `${label}, ${format(dayDate, "MMM d")}`;
-}
-
-
-function normalize(s: string) {
-  return s.trim().toLowerCase();
-}
-
-export default function HomeSplitClient({ events }: { events: EventLite[] }) {
+export default function HomeSplitClient({ events }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  const selectedEventKey = searchParams.get("event");
+  const q = searchParams.get("q") || "";
+  const type = searchParams.get("type") || "";
+  const selectedUid = searchParams.get("event");
 
-  function navigate(params: URLSearchParams) {
-    const qs = params.toString();
-    router.replace(qs ? `/?${qs}` : "/");
-  }
+  const [filterOpen, setFilterOpen] = useState(false);
 
-  function setSelectedEvent(key: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("event", key);
-    navigate(params);
-  }
-
-  function clearSelectedEvent() {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("event");
-    navigate(params);
-  }
-
-  function setQuery(next: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (next.trim()) params.set("q", next);
-    else params.delete("q");
-    // don't force-close the detail; selection fallback is handled below
-    navigate(params);
-  }
-
-  function setType(next: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (next) params.set("type", next);
-    else params.delete("type");
-    // reset selection when changing filters for clarity
-    params.delete("event");
-    navigate(params);
-  }
-
-
+  // --------------------------------------------------
+  // EVENT TYPES (derived from full dataset)
+  // --------------------------------------------------
   const eventTypes = useMemo(() => {
     const set = new Set<string>();
-    for (const e of filteredEvents) {
+    for (const e of events) {
       if (e.event_type) set.add(e.event_type);
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [filteredEvents]);
+  }, [events]);
 
+  // --------------------------------------------------
+  // FILTERED EVENTS
+  // --------------------------------------------------
   const filteredEvents = useMemo(() => {
-    const nq = normalize(q || "");
-    const nt = normalize(type || "");
+    const nq = normalize(q);
+    const nt = normalize(type);
 
     return events.filter((e) => {
-      if (nt && normalize(e.event_type ?? "") !== nt) return false;
+      const haystack = normalize(
+        [
+          e.title,
+          e.summary,
+          e.locationName,
+          e.address,
+          e.event_type,
+        ]
+          .filter(Boolean)
+          .join(" ")
+      );
 
-      if (!nq) return true;
+      const matchesSearch = !nq || haystack.includes(nq);
+      const matchesType = !nt || normalize(e.event_type || "") === nt;
 
-      const hay = `${e.title ?? ""} ${e.summary ?? ""} ${e.description ?? ""} ${e.location?.name ?? ""}`.toLowerCase();
-      return hay.includes(nq);
+      return matchesSearch && matchesType;
     });
   }, [events, q, type]);
 
-  const grouped = useMemo(() => {
-    const map = new Map<string, EventLite[]>();
-    for (const e of filteredEvents) {
-      if (!e.start_datetime) continue;
-      const d = safeParseDate(e.start_datetime);
-      if (!d) continue;
-      const key = format(d, "yyyy-MM-dd");
-      const cur = map.get(key) ?? [];
-      cur.push(e);
-      map.set(key, cur);
+  const selectedEvent =
+    filteredEvents.find((e) => e.uid === selectedUid) ||
+    filteredEvents[0] ||
+    null;
+
+  function updateParam(key: string, value: string | null) {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (!value) {
+      params.delete(key);
+    } else {
+      params.set(key, value);
     }
 
-    const keys = Array.from(map.keys()).sort();
-    return keys.map((k) => {
-      const list = map.get(k) ?? [];
-      list.sort((a, b) => {
-        const ad = a.start_datetime ? safeParseDate(a.start_datetime)?.getTime() ?? 0 : 0;
-        const bd = b.start_datetime ? safeParseDate(b.start_datetime)?.getTime() ?? 0 : 0;
-        return ad - bd;
-      });
-      return { key: k, events: list };
-    });
-  }, [filteredEvents]);
-
-  const selectedEventDesktop = useMemo(() => {
-    if (!filteredEvents.length) return null;
-    if (!selectedEventKey) return filteredEvents[0];
-    return (
-      filteredEvents.find((e) => e.key === selectedEventKey) ?? filteredEvents[0]
-    );
-  }, [filteredEvents, selectedEventKey]);
-
-  const selectedEventMobile = useMemo(() => {
-    if (!selectedEventKey) return null;
-    return filteredEvents.find((e) => e.key === selectedEventKey) ?? null;
-  }, [filteredEvents, selectedEventKey]);
-
-  const mobileDetailOpen = Boolean(selectedEventKey);
+    router.push(`/?${params.toString()}`);
+  }
 
   return (
-    <div className="pageShell">
-      <div className="tagline">
-        A shared calendar for local events, specials, and pop-ups in Lancaster, PA.
-      </div>
+    <div className="splitLayout">
+      {/* LEFT SIDE */}
+      <div className="leftPane">
+        <div className="topControls">
+          <input
+            className="searchInput"
+            placeholder="Search events..."
+            value={q}
+            onChange={(e) => updateParam("q", e.target.value)}
+          />
 
-      <div className="split">
-        {/* LEFT */}
-        <div className="pane">
-          <div className="scroll">
-            <div className="leftSticky">
-              <div className="leftTopControls" aria-label="Search and filters">
-                <input
-                  className="searchInput"
-                  type="search"
-                  value={q}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search events…"
-                />
-                <button className="filterBtn" type="button" onClick={() => setFilterOpen(true)}>
-                  Filter
-                </button>
-              </div>
+          <button
+            className="filterButton"
+            onClick={() => setFilterOpen(true)}
+          >
+            Filter
+          </button>
+        </div>
 
-              <div className="tabs" aria-label="Primary navigation">
-                <a className="tabBtn" href="/" aria-current="page">Calendar</a>
-                <a className="tabBtn" href="/locations">Directory</a>
-                <a className="tabBtn" href="/updates">Updates</a>
-              </div>
+        <div className="eventList">
+          {filteredEvents.map((event) => (
+            <div
+              key={event.id}
+              className={`eventRow ${
+                selectedEvent?.id === event.id ? "active" : ""
+              }`}
+              onClick={() => updateParam("event", event.uid)}
+            >
+              <div className="eventTitle">{event.title}</div>
+              {event.start_datetime && (
+                <div className="eventMeta">
+                  {new Date(event.start_datetime).toLocaleString()}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+
+        {/* FILTER OVERLAY */}
+        {filterOpen && (
+          <div className="filterOverlay">
+            <div className="filterHeader">
+              <button
+                className="closeButton"
+                onClick={() => setFilterOpen(false)}
+              >
+                ✕
+              </button>
             </div>
 
-            {grouped.length === 0 ? (
-              <div className="emptyList">No upcoming events yet.</div>
-            ) : (
-              grouped.map(({ key, events: dayEvents }, idx) => (
-                <section
-                  key={key}
-                  className="dayBlock"
-                  style={{ borderTop: idx === 0 ? "0" : undefined }}
-                >
-                  <div className="dayTitle">
-                    <span className="dayTitleText">{dayLabel(key)}</span>
-                  </div>
-
-                  {dayEvents.map((e) => {
-                    const active = selectedEventKey
-                      ? selectedEventKey === e.key
-                      : selectedEventDesktop?.key === e.key;
-
-                    return (
-                      <button
-                        key={e.id}
-                        className="eventRow"
-                        data-active={active ? "true" : "false"}
-                        onClick={() => setSelectedEvent(e.key)}
-                        type="button"
-                      >
-                        <span className="eventRowTitle">{e.title ?? "Untitled event"}</span>
-
-                        <span className="eventRowMeta">
-                          {formatEventTime(e)}
-                          {e.location?.name ? <span className="dot">•</span> : null}
-                          {e.location?.name ? <span>{e.location.name}</span> : null}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </section>
-              ))
-            )}
-
-            {/* Filter overlay (covers LEFT content area) */}
-            <div
-              className="filterOverlay"
-              data-open={filterOpen ? "true" : "false"}
-              aria-hidden={!filterOpen}
-            >
-              <div className="filterOverlayHeader">
-                <div className="filterOverlayTitle">Filter</div>
+            <div className="filterOptions">
+              {eventTypes.map((t) => (
                 <button
-                  className="overlayClose"
-                  type="button"
-                  aria-label="Close filters"
-                  onClick={() => setFilterOpen(false)}
-                >
-                  ×
-                </button>
-              </div>
-
-              <div className="filterOptions">
-                <button
-                  className="pillBtn"
-                  data-active={type ? "false" : "true"}
-                  type="button"
+                  key={t}
+                  className={`filterPill ${
+                    normalize(type) === normalize(t) ? "active" : ""
+                  }`}
                   onClick={() => {
-                    setType("");
+                    updateParam("type", t);
                     setFilterOpen(false);
                   }}
                 >
-                  All
+                  {t}
                 </button>
+              ))}
 
-                {eventTypes.map((t) => (
-                  <button
-                    key={t}
-                    className="pillBtn"
-                    data-active={normalize(type) === normalize(t) ? "true" : "false"}
-                    type="button"
-                    onClick={() => {
-                      setType(t);
-                      setFilterOpen(false);
-                    }}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
+              {type && (
+                <button
+                  className="filterPill clear"
+                  onClick={() => {
+                    updateParam("type", null);
+                    setFilterOpen(false);
+                  }}
+                >
+                  Clear Filter
+                </button>
+              )}
             </div>
           </div>
-        </div>
+        )}
+      </div>
 
-        {/* RIGHT (desktop) */}
-        <div className="pane paneRight">
-          <div className="scroll">
-            {!selectedEventDesktop ? (
-              <div className="emptyRight">Select an event to see details.</div>
-            ) : (
-              <EventDetail event={selectedEventDesktop} />
+      {/* RIGHT SIDE */}
+      <div className="rightPane">
+        {selectedEvent ? (
+          <div className="eventDetail">
+            <h2>{selectedEvent.title}</h2>
+
+            {selectedEvent.start_datetime && (
+              <p>
+                {new Date(
+                  selectedEvent.start_datetime
+                ).toLocaleString()}
+              </p>
+            )}
+
+            {selectedEvent.summary && (
+              <p>{selectedEvent.summary}</p>
             )}
           </div>
-        </div>
+        ) : (
+          <div className="emptyState">No events found.</div>
+        )}
       </div>
-
-
-      {/* Mobile controls (above bottom tabs) */}
-      <div className="mobileControls" aria-label="Search and filters">
-        <input
-          className="searchInput"
-          type="search"
-          value={q}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search events…"
-        />
-        <button className="filterBtn" type="button" onClick={() => setFilterOpen(true)}>
-          Filter
-        </button>
-      </div>
-
-      {/* Mobile bottom tabs */}
-      <div className="mobileTabs" aria-label="Primary navigation">
-        <a className="tabBtn" href="/" aria-current="page">Calendar</a>
-        <a className="tabBtn" href="/locations">Directory</a>
-        <a className="tabBtn" href="/updates">Updates</a>
-      </div>
-
-      {/* Mobile detail overlay */}
-      <div
-        className="mobileDetail"
-        data-open={mobileDetailOpen ? "true" : "false"}
-        aria-hidden={!mobileDetailOpen}
-      >
-        <div className="mobileDetailHeader">
-          <button className="backBtn" type="button" onClick={clearSelectedEvent}>
-            Back
-          </button>
-          <div className="mobileDetailTitle">Event</div>
-        </div>
-        <div className="scroll" style={{ padding: "0 16px 24px 16px" }}>
-          {selectedEventMobile ? <EventDetail event={selectedEventMobile} /> : null}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function formatEventTime(event: EventLite): string {
-  const start = safeParseDate(event.start_datetime);
-  const end = safeParseDate(event.end_datetime);
-
-  // Date-only events (no time) or explicitly all-day
-  const hasTime = Boolean(event.start_datetime && !/^\d{4}-\d{2}-\d{2}$/.test(event.start_datetime));
-  const allDay = Boolean(event.all_day) || !hasTime;
-
-  if (allDay) return "All day";
-
-  if (start && end) {
-    const s = format(start, "h:mma").toLowerCase();
-    const e = format(end, "h:mma").toLowerCase();
-    return `${s} – ${e}`;
-  }
-
-  if (start) return format(start, "h:mma").toLowerCase();
-
-  return "";
-}
-
-function EventDetail({ event }: { event: EventLite }) {
-  const start = safeParseDate(event.start_datetime);
-  const dayStr = start ? format(start, "EEEE, MMMM do") : "";
-
-  const timeStr = formatEventTime(event);
-
-  const status = event.status && event.status !== "Scheduled" ? event.status : null;
-
-  const websiteHref = event.website_url || null;
-  const ticketsHref = event.tickets_url || null;
-
-  return (
-    <div>
-      <div className="rightHeader">
-        {dayStr ? <div className="rightDayLabel">{dayStr}</div> : null}
-
-        <h1 className="detailTitle">{event.title ?? "Event"}</h1>
-
-        <div className="detailMeta">
-          <span className="venue">{event.location?.name ?? "Unknown location"}</span>
-          {timeStr ? <span className="muted">{timeStr}</span> : null}
-        </div>
-
-        <div className="detailChips" aria-label="Event highlights">
-          {event.event_type ? <span className="pill">{event.event_type}</span> : null}
-          {event.cost ? <span className="pill">{event.cost}</span> : null}
-          {event.age_restriction ? <span className="pill">{event.age_restriction}</span> : null}
-          {status ? <span className="pill pillWarn">{status}</span> : null}
-          {Array.isArray(event.tags)
-            ? event.tags.slice(0, 4).map((t) => (
-                <span key={t} className="pill pillSoft">
-                  {t}
-                </span>
-              ))
-            : null}
-        </div>
-      </div>
-
-      <div
-        className="heroImage"
-        style={
-          event.image_url
-            ? { backgroundImage: `url(${event.image_url})` }
-            : undefined
-        }
-        aria-hidden="true"
-      />
-
-      {event.summary ? <p className="summary">{event.summary}</p> : null}
-
-      <div className="detailBody">
-        {event.description ? event.description : "No description added yet."}
-      </div>
-
-      <div className="ctaRow">
-        <a
-          className="ctaBtn"
-          data-disabled={!websiteHref ? "true" : "false"}
-          href={websiteHref ?? undefined}
-          target={websiteHref ? "_blank" : undefined}
-          rel={websiteHref ? "noreferrer" : undefined}
-          aria-disabled={!websiteHref}
-          onClick={(e) => {
-            if (!websiteHref) e.preventDefault();
-          }}
-        >
-          Website
-        </a>
-
-        <a
-          className="ctaBtn"
-          data-disabled={!ticketsHref ? "true" : "false"}
-          href={ticketsHref ?? undefined}
-          target={ticketsHref ? "_blank" : undefined}
-          rel={ticketsHref ? "noreferrer" : undefined}
-          aria-disabled={!ticketsHref}
-          onClick={(e) => {
-            if (!ticketsHref) e.preventDefault();
-          }}
-        >
-          Tickets
-        </a>
-      </div>
-
-      {event.location?.address ? (
-        <div className="finePrint">
-          <span className="label">Address</span>
-          <span>{event.location.address}</span>
-        </div>
-      ) : null}
-
-      {event.location?.website ? (
-        <div className="finePrint">
-          <span className="label">Venue site</span>
-          <a href={event.location.website} target="_blank" rel="noreferrer">
-            {event.location.website}
-          </a>
-        </div>
-      ) : null}
     </div>
   );
 }
