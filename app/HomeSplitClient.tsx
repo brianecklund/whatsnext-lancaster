@@ -30,8 +30,6 @@ function dayLabel(dateKey: string) {
 }
 
 function normalize(v: string) {
-  let listAnimIndex = 0;
-
   return (v || "").toLowerCase().trim();
 }
 
@@ -209,8 +207,7 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
                     return (
                       <button
                         key={e.id}
-                        className="eventRow fadeInItem"
-                        style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
+                        className="eventRow"
                         data-active={active ? "true" : "false"}
                         onClick={() => setSelectedEvent(e.key)}
                         type="button"
@@ -348,17 +345,17 @@ function EventDetail({ event }: { event: EventLite }) {
 
   return (
     <div>
-      <div className="rightHeader cascade">
-        {dayStr ? <div className="rightDayLabel cascadeItem" style={{ animationDelay: "40ms" }}>{dayStr}</div> : null}
+      <div className="rightHeader">
+        {dayStr ? <div className="rightDayLabel">{dayStr}</div> : null}
 
-        <h1 className="detailTitle cascadeItem" style={{ animationDelay: "80ms" }}>{event.title ?? "Event"}</h1>
+        <h1 className="detailTitle">{event.title ?? "Event"}</h1>
 
-        <div className="detailMeta cascadeItem" style={{ animationDelay: "120ms" }}>
+        <div className="detailMeta">
           <span className="venue">{event.location?.name ?? "Unknown location"}</span>
           {timeStr ? <span className="muted">{timeStr}</span> : null}
         </div>
 
-        <div className="detailChips cascadeItem" style={{ animationDelay: "160ms" }} aria-label="Event highlights">
+        <div className="detailChips" aria-label="Event highlights">
           {event.event_type ? <span className="pill">{event.event_type}</span> : null}
           {event.cost ? <span className="pill">{event.cost}</span> : null}
           {event.age_restriction ? <span className="pill">{event.age_restriction}</span> : null}
@@ -374,7 +371,7 @@ function EventDetail({ event }: { event: EventLite }) {
       </div>
 
       <div
-        className="heroImage cascadeItem" style={{ animationDelay: "200ms" }}
+        className="heroImage"
         style={
           event.image_url
             ? { backgroundImage: `url(${event.image_url})` }
@@ -383,13 +380,13 @@ function EventDetail({ event }: { event: EventLite }) {
         aria-hidden="true"
       />
 
-      {event.summary ? <p className="summary cascadeItem" style={{ animationDelay: "240ms" }}>{event.summary}</p> : null}
+      {event.summary ? <p className="summary">{event.summary}</p> : null}
 
-      <div className="detailBody cascadeItem" style={{ animationDelay: "280ms" }}>
+      <div className="detailBody">
         {event.description ? event.description : "No description added yet."}
       </div>
 
-      <div className="ctaRow cascadeItem" style={{ animationDelay: "320ms" }}>
+      <div className="ctaRow">
         <a
           className="ctaBtn"
           data-disabled={!websiteHref ? "true" : "false"}

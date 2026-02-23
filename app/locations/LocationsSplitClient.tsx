@@ -5,8 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
 
 function normalize(v: string) {
-  let listAnimIndex = 0;
-
   return (v || "").toLowerCase().trim();
 }
 
@@ -131,8 +129,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                   return (
                     <button
                       key={l.id}
-                      className="eventRow fadeInItem"
-                      style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
+                      className="eventRow"
                       data-active={active ? "true" : "false"}
                       onClick={() => setSelected(l.key)}
                       type="button"
@@ -238,9 +235,9 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 function LocationDetail({ location }: { location: LocationRow }) {
   return (
     <div className="detailCard">
-      <div className="detailTitle cascadeItem" style={{ animationDelay: "80ms" }}>{location.name ?? "Untitled listing"}</div>
+      <div className="detailTitle">{location.name ?? "Untitled listing"}</div>
 
-      <div className="detailMeta cascadeItem" style={{ animationDelay: "120ms" }}>
+      <div className="detailMeta">
         {location.category ? <span className="badge">{location.category}</span> : null}
         {location.address ? <span className="muted">{location.address}</span> : null}
       </div>
@@ -254,11 +251,11 @@ function LocationDetail({ location }: { location: LocationRow }) {
       ) : null}
 
       {location.description ? (
-        <div className="detailBody cascadeItem" style={{ animationDelay: "180ms" }} style={{ marginTop: 14 }}>
+        <div className="detailBody" style={{ marginTop: 14 }}>
           <p>{location.description}</p>
         </div>
       ) : (
-        <div className="detailBody cascadeItem" style={{ animationDelay: "180ms" }} style={{ marginTop: 14 }}>
+        <div className="detailBody" style={{ marginTop: 14 }}>
           <p className="muted">No description yet.</p>
         </div>
       )}
