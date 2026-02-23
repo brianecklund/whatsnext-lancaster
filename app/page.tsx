@@ -12,18 +12,27 @@ export const dynamic = "force-dynamic";
 export default async function HomePage() {
   const client = createClient();
 
-  // IMPORTANT:
-  // Don't rely on orderings for a field that might have changed (start_datetime).
-  // We'll sort locally after normalizing the start date.
-  const docs = await client.getAllByType("event", {
-    fetchLinks: [
-      "location.name",
-      "location.address",
-      "location.category",
-      "location.website",
-      "location.description",
-    ],
-  });
+  let docs: any[] = [];
+  let prismicError: string | null = null;
+
+  try {
+    // IMPORTANT:
+    // Don't rely on orderings for a field that might have changed (start_datetime).
+    // We'll sort locally after normalizing the start date.
+    docs = await client.getAllByType("event", {
+      fetchLinks: [
+        "location.name",
+        "location.address",
+        "location.category",
+        "location.website",
+        "location.description",
+      ],
+    });
+  } catch (err: any) {
+    prismicError =
+      err?.message ??
+      (typeof err === "string" ? err : "Unknown error while fetching events from Prismic.");
+  }
 
   // Helper: pick first existing string value from a list of possible field API IDs.
   const pickString = (data: any, keys: string[]) => {
@@ -138,6 +147,29 @@ export default async function HomePage() {
       const tb = Date.parse(b.start_datetime ?? "") || 0;
       return ta - tb;
     });
+
+  // If Prismic fetch failed, show a helpful error instead of a blank calendar.
+  if (prismicError) {
+    return (
+      <div style={{ padding: 24, maxWidth: 820 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>
+          Prismic is not returning events
+        </h1>
+        <p style={{ marginBottom: 12, opacity: 0.9 }}>
+          This page couldn&apos;t fetch <code>event</code> documents from Prismic.
+          The most common causes are a missing/incorrect <code>PRISMIC_REPO_NAME</code>
+          and/or a missing access token when the repository is private.
+        </p>
+        <div style={{ padding: 12, border: "1px solid rgba(255,255,255,0.15)", borderRadius: 12 }}>
+          <div style={{ fontWeight: 600, marginBottom: 6 }}>Error</div>
+          <code style={{ whiteSpace: "pre-wrap" }}>{prismicError}</code>
+        </div>
+        <p style={{ marginTop: 14, opacity: 0.9 }}>
+          Debug endpoint: <code>/api/prismic-debug</code>
+        </p>
+      </div>
+    );
+  }
 
   return <HomeSplitClient events={events} />;
 }
