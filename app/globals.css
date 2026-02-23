@@ -23,32 +23,45 @@
 }
 
 @font-face{
-  font-family: "Geologica";
-  src: url("/fonts/Geologica-VariableFont_CRSV,SHRP,slnt,wght.ttf") format("truetype");
-  font-style: normal;
-  font-weight: 100 900;
-  font-display: swap;
-}
-
-@font-face{
-  font-family: "Geologica", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  src: url("/fonts/gapsans-webfont.ttf") format("truetype");
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
   font-display: swap;
 }
 @font-face{
-  font-family: "Geologica", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  src: url("/fonts/gapsansbold-webfont.ttf") format("truetype");
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face{
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-Medium.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face{
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face{
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
   font-display: swap;
 }
 @font-face{
-  font-family: "Geologica", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-  src: url("/fonts/gapsansblack-webfont.ttf") format("truetype");
-  font-weight: 900;
-  font-style: normal;
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-BoldItalic.ttf") format("truetype");
+  font-weight: 700;
+  font-style: italic;
   font-display: swap;
 }
 
@@ -56,7 +69,7 @@
 html,body{ height:100%; }
 body{
   margin:0;
-  font-family: "Geologica", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family: "Google Sans", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   background: var(--bg);
   color: var(--text);
 }
@@ -81,7 +94,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .brand{
-  font-weight: 900;
+  font-weight: 700;
   font-size: 46px;
   letter-spacing: -0.02em;
   line-height: 1;
@@ -171,7 +184,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 0 18px;
   border-radius: var(--radius);
   background: var(--btnBg);
-  font-weight: 900;
+  font-weight: 700;
   font-size: 18px;
   letter-spacing: -0.01em;
   box-shadow: 0 0 0 1px rgba(0,0,0,0.04) inset;
@@ -188,7 +201,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .dayTitle{
-  font-weight: 900;
+  font-weight: 700;
   font-size: 14px;
   letter-spacing: 0.02em;
   text-transform: uppercase;
@@ -213,12 +226,12 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35) inset;
 }
 .eventRowTitle{
-  font-weight: 900;
-  font-size: 16px;
+  font-weight: 700;
+  font-size: 18px;
   letter-spacing: -0.01em;
 }
 .eventRowMeta{
-  font-size: 13px;
+  font-size: 14px;
   color: var(--muted);
   display:flex;
   align-items:center;
@@ -232,7 +245,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .rightDayLabel{
-  font-weight: 900;
+  font-weight: 700;
   font-size: 14px;
   text-transform: uppercase;
   letter-spacing: 0.02em;
@@ -240,7 +253,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .detailTitle{
-  font-weight: 900;
+  font-weight: 700;
   font-size: 44px;
   letter-spacing: -0.02em;
   margin: 0 0 10px 0;
@@ -250,7 +263,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   display:flex;
   flex-wrap: wrap;
   gap: 12px;
-  font-weight: 900;
+  font-weight: 700;
   font-size: 16px;
 }
 .detailMeta .muted{
@@ -272,7 +285,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   height: 30px;
   padding: 0 12px;
   border-radius: var(--pill);
-  font-weight: 900;
+  font-weight: 700;
   font-size: 13px;
   background: #e8e8e8;
 }
@@ -323,7 +336,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   height: 46px;
   padding: 0 18px;
   border-radius: var(--pill);
-  font-weight: 900;
+  font-weight: 700;
   font-size: 22px;
   background: #d9d9d9;
   text-decoration: none;
@@ -351,7 +364,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   color: var(--muted);
 }
 .finePrint .label{
-  font-weight: 900;
+  font-weight: 700;
   color: var(--text);
   font-size: 12px;
   text-transform: uppercase;
@@ -438,7 +451,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   .backBtn{
     border: 0;
     background: transparent;
-    font-weight: 900;
+    font-weight: 700;
     color: var(--accent);
     font-size: 18px;
     padding: 8px 10px;
@@ -446,7 +459,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   }
   .backBtn:hover{ background: var(--hover); }
   .mobileDetailTitle{
-    font-weight: 900;
+    font-weight: 700;
     font-size: 18px;
   }
 }
@@ -479,7 +492,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   border-radius: 14px;
   border: 1px solid var(--border);
   background: var(--btnBg);
-  font-weight: 900;
+  font-weight: 700;
 }
 .filterBtn:hover, .clearBtn:hover{ background: var(--btnBgHover); }
 
@@ -502,7 +515,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   margin-bottom: 14px;
 }
 .leftOverlayTitle{
-  font-weight: 900;
+  font-weight: 700;
   font-size: 18px;
 }
 .overlayClose{
@@ -513,7 +526,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   background: var(--btnBg);
   font-size: 28px;
   line-height: 1;
-  font-weight: 900;
+  font-weight: 700;
 }
 .overlayClose:hover{ background: var(--btnBgHover); }
 
@@ -529,7 +542,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   border-radius: var(--pill);
   border: 1px solid var(--border);
   background: #fff;
-  font-weight: 900;
+  font-weight: 700;
 }
 .pillBtn[data-active="true"]{
   background: var(--accentSoft);
