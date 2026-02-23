@@ -50,10 +50,9 @@ function startOfToday(): Date {
 }
 
 function endOfSundayFromToday(): Date {
-  // Week ends Sunday. We count from today -> Sunday.
   const today = startOfToday();
   const day = today.getDay(); // 0=Sun .. 6=Sat
-  const daysUntilSunday = (7 - day) % 7; // Sunday => 0
+  const daysUntilSunday = (7 - day) % 7;
   const end = new Date(today);
   end.setDate(today.getDate() + daysUntilSunday);
   end.setHours(23, 59, 59, 999);
@@ -67,7 +66,6 @@ function startOfDay(d: Date): Date {
 }
 
 function dayKey(d: Date): string {
-  // YYYY-MM-DD
   const y = d.getFullYear();
   const m = String(d.getMonth() + 1).padStart(2, "0");
   const dd = String(d.getDate()).padStart(2, "0");
@@ -75,7 +73,6 @@ function dayKey(d: Date): string {
 }
 
 function formatDayHeading(d: Date): string {
-  // Ex: Monday, Feb 23
   return d.toLocaleDateString(undefined, {
     weekday: "long",
     month: "short",
@@ -100,13 +97,13 @@ export default function HomeSplitClient({ events }: Props) {
   const q = sp.get("q") || "";
   const type = sp.get("type") || "";
 
-  // If no event param, default to weekly overview (per request)
+  // Default to weekly overview on page load if no explicit selection
   const selectedParam = sp.get("event");
   const selectedKey = selectedParam ?? WEEKLY_KEY;
 
   const [filterOpen, setFilterOpen] = useState(false);
 
-  // Optional mobile tab behavior (keeps your “split” UX stable)
+  // mobile tab toggle (keeps your bottom buttons behavior)
   const [isMobile, setIsMobile] = useState(false);
   const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
 
@@ -130,20 +127,19 @@ export default function HomeSplitClient({ events }: Props) {
     const params = new URLSearchParams(sp.toString());
     if (!value) params.delete(key);
     else params.set(key, value);
-
     router.push(`/?${params.toString()}`);
   }
 
-  // Event types for filter pills (derived from full dataset)
+  function goDetailMobile() {
+    if (isMobile) setMobileTab("detail");
+  }
+
   const eventTypes = useMemo(() => {
     const set = new Set<string>();
-    for (const e of events) {
-      if (e.event_type) set.add(e.event_type);
-    }
+    for (const e of events) if (e.event_type) set.add(e.event_type);
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [events]);
 
-  // Filtered events (search + type)
   const filteredEvents = useMemo(() => {
     const nq = norm(q);
     const nt = norm(type);
@@ -163,20 +159,18 @@ export default function HomeSplitClient({ events }: Props) {
 
       const matchesSearch = !nq || hay.includes(nq);
       const matchesType = !nt || norm(e.event_type ?? "") === nt;
-
       return matchesSearch && matchesType;
     });
   }, [events, q, type]);
 
-  // Group left list by day (based on date)
   const leftDayGroups = useMemo(() => {
     const map = new Map<string, { date: Date; items: EventLite[] }>();
 
     for (const e of filteredEvents) {
       const d = safeDateFromEvent(e);
       if (!d) continue;
-
       const dk = dayKey(d);
+
       if (!map.has(dk)) map.set(dk, { date: startOfDay(d), items: [] });
       map.get(dk)!.items.push(e);
     }
@@ -185,7 +179,6 @@ export default function HomeSplitClient({ events }: Props) {
       (a, b) => a.date.getTime() - b.date.getTime()
     );
 
-    // Sort inside each day by time
     for (const g of groups) {
       g.items.sort((a, b) => {
         const da = safeDateFromEvent(a)?.getTime() ?? 0;
@@ -197,7 +190,6 @@ export default function HomeSplitClient({ events }: Props) {
     return groups;
   }, [filteredEvents]);
 
-  // Weekly overview range + events
   const weeklyRange = useMemo(() => {
     const start = startOfToday();
     const end = endOfSundayFromToday();
@@ -207,24 +199,28 @@ export default function HomeSplitClient({ events }: Props) {
   const weekEvents = useMemo(() => {
     const { start, end } = weeklyRange;
 
-    const items = filteredEvents
+    return filteredEvents
       .map((e) => ({ e, d: safeDateFromEvent(e) }))
-      .filter(({ d }) => d && d.getTime() >= start.getTime() && d.getTime() <= end.getTime())
-      .sort((a, b) => (a.d!.getTime() - b.d!.getTime()))
+      .filter(
+        ({ d }) =>
+          d &&
+          d.getTime() >= start.getTime() &&
+          d.getTime() <= end.getTime()
+      )
+      .sort((a, b) => a.d!.getTime() - b.d!.getTime())
       .map(({ e }) => e);
-
-    return items;
   }, [filteredEvents, weeklyRange]);
 
   const weekEventsCount = weekEvents.length;
 
   const weekGroups = useMemo(() => {
     const map = new Map<string, { date: Date; items: EventLite[] }>();
+
     for (const e of weekEvents) {
       const d = safeDateFromEvent(e);
       if (!d) continue;
-
       const dk = dayKey(d);
+
       if (!map.has(dk)) map.set(dk, { date: startOfDay(d), items: [] });
       map.get(dk)!.items.push(e);
     }
@@ -244,28 +240,18 @@ export default function HomeSplitClient({ events }: Props) {
     return groups;
   }, [weekEvents]);
 
-  // Selected event (right pane). Weekly is special key.
   const selectedEvent = useMemo(() => {
     if (!filteredEvents.length) return null;
-
     if (selectedKey === WEEKLY_KEY) return null;
 
     const byUid =
-      selectedKey &&
-      filteredEvents.find((e) => e.uid && e.uid === selectedKey);
-
-    const byId =
-      selectedKey && filteredEvents.find((e) => e.id === selectedKey);
+      selectedKey && filteredEvents.find((e) => e.uid && e.uid === selectedKey);
+    const byId = selectedKey && filteredEvents.find((e) => e.id === selectedKey);
 
     return byUid || byId || null;
   }, [filteredEvents, selectedKey]);
 
-  // When user clicks list item on mobile, jump to detail tab
-  function goDetailMobile() {
-    if (isMobile) setMobileTab("detail");
-  }
-
-  // Stagger counter for left list animations
+  // stagger counter for left list (only affects animation delay if you already have fadeInItem)
   let listAnimIndex = 0;
 
   const showLeft = !isMobile || mobileTab === "list";
@@ -274,11 +260,11 @@ export default function HomeSplitClient({ events }: Props) {
   return (
     <div className="pageShell">
       <div className="split">
-        {/* LEFT PANE */}
+        {/* LEFT */}
         {showLeft ? (
           <aside className="pane">
             <div className="scroll">
-              {/* Sticky controls */}
+              {/* Keep your existing sticky/filter UI structure as-is */}
               <div className="leftSticky">
                 <div className="leftTopControls">
                   <input
@@ -287,7 +273,6 @@ export default function HomeSplitClient({ events }: Props) {
                     value={q}
                     onChange={(e) => setParam("q", e.target.value)}
                   />
-
                   <button
                     className="filterButton"
                     onClick={() => setFilterOpen(true)}
@@ -307,7 +292,6 @@ export default function HomeSplitClient({ events }: Props) {
                       {type} <span aria-hidden>×</span>
                     </button>
                   ) : null}
-
                   {q ? (
                     <button
                       className="activeChip"
@@ -320,10 +304,10 @@ export default function HomeSplitClient({ events }: Props) {
                 </div>
               </div>
 
-              {/* Weekly Overview card */}
+              {/* Weekly Overview (left) — uses the SAME row styling system */}
               <button
                 type="button"
-                className="weeklyOverviewCard fadeInItem"
+                className="eventRow weeklyOverviewRow fadeInItem"
                 style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
                 data-active={selectedKey === WEEKLY_KEY ? "true" : "false"}
                 onClick={() => {
@@ -331,13 +315,14 @@ export default function HomeSplitClient({ events }: Props) {
                   goDetailMobile();
                 }}
               >
-                <div className="weeklyOverviewLabel">Weekly Overview</div>
-                <div className="weeklyOverviewCount">
-                  {weekEventsCount} event{weekEventsCount === 1 ? "" : "s"} left this week
+                <div className="eventRowTitle">Weekly Overview</div>
+                <div className="eventRowMeta">
+                  {weekEventsCount} event{weekEventsCount === 1 ? "" : "s"} left
+                  this week
                 </div>
               </button>
 
-              {/* Day-grouped listings */}
+              {/* Left list */}
               {leftDayGroups.map((g) => (
                 <section key={dayKey(g.date)} className="dayBlock">
                   <div className="dayTitle">{formatDayHeading(g.date)}</div>
@@ -376,7 +361,7 @@ export default function HomeSplitClient({ events }: Props) {
                 </section>
               ))}
 
-              {/* Filter overlay (left pane) */}
+              {/* Filter Overlay — keep structure consistent */}
               {filterOpen ? (
                 <div className="filterOverlay" role="dialog" aria-modal="true">
                   <div className="filterOverlayHeader">
@@ -431,11 +416,10 @@ export default function HomeSplitClient({ events }: Props) {
           </aside>
         ) : null}
 
-        {/* RIGHT PANE */}
+        {/* RIGHT */}
         {showRight ? (
           <main className="pane paneRight">
             <div className="scroll">
-              {/* WEEKLY OVERVIEW (default) */}
               {selectedKey === WEEKLY_KEY ? (
                 <div className="detailWrap">
                   <div className="detailKicker">Weekly Overview</div>
@@ -460,7 +444,9 @@ export default function HomeSplitClient({ events }: Props) {
                   </div>
 
                   {weekEventsCount === 0 ? (
-                    <div className="emptyRight">No events scheduled for the rest of this week.</div>
+                    <div className="emptyRight">
+                      No events scheduled for the rest of this week.
+                    </div>
                   ) : (
                     <div className="weeklyCards">
                       {weekGroups.map((g) => (
@@ -472,8 +458,21 @@ export default function HomeSplitClient({ events }: Props) {
                             const d = safeDateFromEvent(e);
                             const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
 
+                            const isSelected =
+                              selectedEvent?.id === e.id ||
+                              (selectedEvent?.uid && e.uid && selectedEvent.uid === e.uid);
+
                             return (
-                              <div key={e.id} className="weeklyCard">
+                              <button
+                                key={e.id}
+                                type="button"
+                                className="weeklyCard weeklyCardSelectable"
+                                aria-selected={isSelected ? "true" : "false"}
+                                onClick={() => {
+                                  if (e.uid) setParam("event", e.uid);
+                                  else setParam("event", e.id);
+                                }}
+                              >
                                 <div className="weeklyCardMedia">
                                   {e.imageUrl ? (
                                     // eslint-disable-next-line @next/next/no-img-element
@@ -498,6 +497,7 @@ export default function HomeSplitClient({ events }: Props) {
                                             href={e.tickets_url}
                                             target="_blank"
                                             rel="noreferrer"
+                                            onClick={(ev) => ev.stopPropagation()}
                                           >
                                             Tickets
                                           </a>
@@ -509,6 +509,7 @@ export default function HomeSplitClient({ events }: Props) {
                                             href={e.website_url}
                                             target="_blank"
                                             rel="noreferrer"
+                                            onClick={(ev) => ev.stopPropagation()}
                                           >
                                             Website
                                           </a>
@@ -523,7 +524,7 @@ export default function HomeSplitClient({ events }: Props) {
                                     </div>
                                   ) : null}
                                 </div>
-                              </div>
+                              </button>
                             );
                           })}
                         </div>
@@ -534,10 +535,8 @@ export default function HomeSplitClient({ events }: Props) {
               ) : !selectedEvent ? (
                 <div className="emptyRight">Select an event.</div>
               ) : (
-                // SINGLE EVENT DETAIL
                 <div className="detailWrap">
                   <div className="detailKicker">{selectedEvent.event_type || "Event"}</div>
-
                   <h1 className="detailTitle">{selectedEvent.title || "Untitled event"}</h1>
 
                   <div className="detailMeta">
@@ -608,7 +607,7 @@ export default function HomeSplitClient({ events }: Props) {
         ) : null}
       </div>
 
-      {/* Mobile bottom tabs (uses existing .mobileTabs + .tabBtn styles) */}
+      {/* Mobile bottom tabs */}
       {isMobile ? (
         <div className="mobileTabs">
           <button
