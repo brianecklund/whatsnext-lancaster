@@ -1,49 +1,58 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import type { LocationLite } from "@/lib/types";
 
-type LocationLite = {
-  id: string;
-  uid?: string | null;
+function normalize(v: string) {
+  let listAnimIndex = 0;
 
-  name?: string | null;
-  descriptionText?: string | null;
-
-  address?: string | null;
-  category?: string | null;
-
-  website?: string | null;
-
-  imageUrl?: string | null;
-};
-
-type Props = {
-  locations: LocationLite[];
-};
-
-function norm(v: string) {
   return (v || "").toLowerCase().trim();
 }
 
-export default function LocationsSplitClient({ locations }: Props) {
-  const router = useRouter();
-  const sp = useSearchParams();
+type LocationRow = LocationLite & { key: string };
 
-  const q = sp.get("q") || "";
-  const cat = sp.get("cat") || "";
-  const selectedKey = sp.get("location") || ""; // uid preferred
+export default function LocationsSplitClient({ locations }: { locations: LocationRow[] }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const selectedKey = searchParams.get("location");
+  const q = searchParams.get("q") ?? "";
+  const cat = searchParams.get("cat") ?? "";
 
   const [filterOpen, setFilterOpen] = useState(false);
 
-  // close filter overlay on escape
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setFilterOpen(false);
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+  function navigate(params: URLSearchParams) {
+    const qs = params.toString();
+    router.replace(qs ? `/locations?${qs}` : "/locations");
+  }
+
+  function setSelected(key: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("location", key);
+    navigate(params);
+  }
+
+  function clearSelected() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.delete("location");
+    navigate(params);
+  }
+
+  function setQuery(next: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (!next) params.delete("q");
+    else params.set("q", next);
+    navigate(params);
+  }
+
+  function setCategory(next: string | null) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (!next) params.delete("cat");
+    else params.set("cat", next);
+    params.delete("location");
+    navigate(params);
+  }
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -53,245 +62,206 @@ export default function LocationsSplitClient({ locations }: Props) {
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [locations]);
 
-  const filteredLocations = useMemo(() => {
-    const nq = norm(q);
-    const nc = norm(cat);
+  const filtered = useMemo(() => {
+    const nq = normalize(q);
+    const nc = normalize(cat);
 
     return locations.filter((l) => {
-      const hay = norm(
-        [l.name ?? "", l.descriptionText ?? "", l.address ?? "", l.category ?? ""]
-          .filter(Boolean)
-          .join(" ")
-      );
-
+      const hay = normalize([l.name ?? "", l.address ?? "", l.category ?? "", l.description ?? ""].filter(Boolean).join(" "));
       const matchesSearch = !nq || hay.includes(nq);
-      const matchesCat = !nc || norm(l.category ?? "") === nc;
-
+      const matchesCat = !nc || normalize(l.category ?? "") === nc;
       return matchesSearch && matchesCat;
     });
   }, [locations, q, cat]);
 
-  const selectedLocation = useMemo(() => {
-    if (!filteredLocations.length) return null;
+  const selectedDesktop = useMemo(() => {
+    if (!filtered.length) return null;
+    if (!selectedKey) return filtered[0];
+    return filtered.find((l) => l.key === selectedKey) ?? filtered[0];
+  }, [filtered, selectedKey]);
 
-    const byUid =
-      selectedKey &&
-      filteredLocations.find((l) => l.uid && l.uid === selectedKey);
+  const selectedMobile = useMemo(() => {
+    if (!selectedKey) return null;
+    return filtered.find((l) => l.key === selectedKey) ?? null;
+  }, [filtered, selectedKey]);
 
-    const byId =
-      selectedKey && filteredLocations.find((l) => l.id === selectedKey);
-
-    return byUid || byId || filteredLocations[0];
-  }, [filteredLocations, selectedKey]);
-
-  function setParam(key: string, value: string | null) {
-    const params = new URLSearchParams(sp.toString());
-    if (!value) params.delete(key);
-    else params.set(key, value);
-
-    router.push(`/locations?${params.toString()}`);
-  }
-
-  // ✅ FIX: declare stagger counter for list animation
-  let listAnimIndex = 0;
+  const mobileDetailOpen = Boolean(selectedKey);
 
   return (
     <div className="pageShell">
+      <div className="tagline">A directory of places in Lancaster to explore.</div>
+
       <div className="split">
         {/* LEFT */}
-        <aside className="pane leftPane">
-          <div className="leftSticky">
-            <div className="leftTopControls">
-              <input
-                className="searchInput"
-                placeholder="Search places…"
-                value={q}
-                onChange={(e) => setParam("q", e.target.value)}
-              />
+        <div className="pane paneLeft">
+          <div className="scroll">
+            <div className="leftSticky">
+              <div className="tabs" aria-label="Primary navigation">
+                <a className="tabBtn" href="/">Calendar</a>
+                <a className="tabBtn" href="/locations" aria-current="page">Directory</a>
+                <a className="tabBtn" href="/updates">Updates</a>
+              </div>
 
-              <button
-                className="filterButton"
-                onClick={() => setFilterOpen(true)}
-                type="button"
-              >
-                Filter
-              </button>
+              <div className="leftControls">
+                <input
+                  className="searchInput"
+                  value={q}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search"
+                  aria-label="Search locations"
+                />
+                <button className="filterBtn" type="button" onClick={() => setFilterOpen(true)}>
+                  Filter
+                </button>
+
+                {cat ? (
+                  <button className="clearBtn" type="button" onClick={() => setCategory(null)}>
+                    Clear
+                  </button>
+                ) : null}
+              </div>
             </div>
 
-            <div className="leftActiveFilters">
-              {cat ? (
-                <button
-                  className="activeChip"
-                  onClick={() => setParam("cat", null)}
-                  type="button"
-                >
-                  {cat} <span aria-hidden>×</span>
-                </button>
-              ) : null}
-
-              {q ? (
-                <button
-                  className="activeChip"
-                  onClick={() => setParam("q", null)}
-                  type="button"
-                >
-                  “{q}” <span aria-hidden>×</span>
-                </button>
-              ) : null}
-            </div>
-          </div>
-
-          <div className="listWrap">
-            {filteredLocations.length === 0 ? (
-              <div className="emptyLeft fadeInBlock">No matching listings.</div>
+            {filtered.length === 0 ? (
+              <div className="emptyList">No listings yet.</div>
             ) : (
-              <div className="eventList">
-                {filteredLocations.map((l) => {
-                  const active =
-                    (selectedLocation?.uid &&
-                      l.uid &&
-                      selectedLocation.uid === l.uid) ||
-                    selectedLocation?.id === l.id;
-
-                  const title = l.name || "Untitled location";
-
+              <div style={{ paddingTop: 6 }}>
+                {filtered.map((l) => {
+                  const active = selectedKey ? selectedKey === l.key : selectedDesktop?.key === l.key;
                   return (
                     <button
                       key={l.id}
                       className="eventRow fadeInItem"
                       style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
                       data-active={active ? "true" : "false"}
-                      onClick={() => {
-                        if (l.uid) setParam("location", l.uid);
-                        else setParam("location", l.id);
-                      }}
+                      onClick={() => setSelected(l.key)}
                       type="button"
                     >
-                      <div className="eventRowTitle">{title}</div>
-                      <div className="eventRowMeta">
-                        {l.category ? <span>{l.category}</span> : <span>Listing</span>}
+                      <span className="eventRowTitle">{l.name ?? "Untitled listing"}</span>
+                      <span className="eventRowMeta">
+                        {l.category ? <span>{l.category}</span> : null}
                         {l.address ? <span className="dot">•</span> : null}
                         {l.address ? <span>{l.address}</span> : null}
-                      </div>
+                      </span>
                     </button>
                   );
                 })}
               </div>
             )}
-          </div>
 
-          {/* FILTER OVERLAY (covers LEFT pane) */}
-          {filterOpen ? (
-            <div className="filterOverlay" role="dialog" aria-modal="true">
-              <div className="filterOverlayHeader">
-                <div className="filterOverlayTitle">Filter</div>
-                <button
-                  className="filterOverlayClose"
-                  onClick={() => setFilterOpen(false)}
-                  aria-label="Close filters"
-                  type="button"
-                >
+            {/* Left filter overlay */}
+            <div
+              className="leftOverlay"
+              data-open={filterOpen ? "true" : "false"}
+              aria-hidden={!filterOpen}
+            >
+              <div className="leftOverlayHeader">
+                <div className="leftOverlayTitle">Filter directory</div>
+                <button className="overlayClose" type="button" onClick={() => setFilterOpen(false)}>
                   ×
                 </button>
               </div>
 
-              <div className="filterOverlayBody">
-                <div className="filterPills">
-                  {categories.map((c) => {
-                    const isOn = norm(cat) === norm(c);
-                    return (
-                      <button
-                        key={c}
-                        className={`filterPill ${isOn ? "on" : ""}`}
-                        onClick={() => {
-                          setParam("cat", c);
-                          setFilterOpen(false);
-                        }}
-                        type="button"
-                      >
-                        {c}
-                      </button>
-                    );
-                  })}
-                </div>
-
-                <div className="filterOverlayFooter">
-                  <button
-                    className="filterClear"
-                    onClick={() => {
-                      setParam("cat", null);
-                      setFilterOpen(false);
-                    }}
-                    disabled={!cat}
-                    type="button"
-                  >
-                    Clear
-                  </button>
-                </div>
-              </div>
-            </div>
-          ) : null}
-        </aside>
-
-        {/* RIGHT */}
-        <main className="pane rightPane">
-          {!selectedLocation ? (
-            <div className="emptyRight fadeInBlock">Select a listing.</div>
-          ) : (
-            <div className="detailWrap">
-              <div className="fadeInBlock" style={{ animationDelay: "0ms" }}>
-                <div className="detailKicker">
-                  {selectedLocation.category ? selectedLocation.category : "Directory"}
-                </div>
-              </div>
-
-              <div className="fadeInBlock" style={{ animationDelay: "70ms" }}>
-                <h1 className="detailTitle">
-                  {selectedLocation.name || "Untitled location"}
-                </h1>
-              </div>
-
-              <div className="fadeInBlock" style={{ animationDelay: "140ms" }}>
-                <div className="detailMeta">
-                  {selectedLocation.address ? (
-                    <span>{selectedLocation.address}</span>
-                  ) : (
-                    <span>Address TBD</span>
-                  )}
-                </div>
-              </div>
-
-              {selectedLocation.imageUrl ? (
-                <div className="fadeInBlock" style={{ animationDelay: "210ms" }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img className="detailImage" src={selectedLocation.imageUrl} alt="" />
-                </div>
-              ) : null}
-
-              {selectedLocation.descriptionText ? (
-                <div className="fadeInBlock" style={{ animationDelay: "280ms" }}>
-                  <div className="detailBody">{selectedLocation.descriptionText}</div>
-                </div>
-              ) : null}
-
-              {selectedLocation.website ? (
-                <div className="fadeInBlock" style={{ animationDelay: "350ms" }}>
-                  <div className="detailActions">
-                    <a
-                      className="detailButton"
-                      href={selectedLocation.website}
-                      target="_blank"
-                      rel="noreferrer"
+              <div className="filterGrid">
+                {categories.map((t) => {
+                  const active = normalize(cat) === normalize(t);
+                  return (
+                    <button
+                      key={t}
+                      className="pillBtn"
+                      data-active={active ? "true" : "false"}
+                      type="button"
+                      onClick={() => {
+                        setCategory(t);
+                        setFilterOpen(false);
+                      }}
                     >
-                      Website
-                    </a>
-                  </div>
-                </div>
-              ) : null}
+                      {t}
+                    </button>
+                  );
+                })}
+
+                <button
+                  className="pillBtn pillBtnSecondary"
+                  type="button"
+                  onClick={() => {
+                    setCategory(null);
+                    setFilterOpen(false);
+                  }}
+                >
+                  Show all
+                </button>
+              </div>
             </div>
-          )}
-        </main>
+          </div>
+        </div>
+
+        {/* RIGHT (desktop) */}
+        <div className="pane paneRight">
+          <div className="scroll">
+            {!selectedDesktop ? (
+              <div className="emptyRight">Select a listing to see details.</div>
+            ) : (
+              <LocationDetail location={selectedDesktop} />
+            )}
+          </div>
+        </div>
       </div>
+
+      {/* Mobile bottom tabs */}
+      <div className="mobileTabs" aria-label="Primary navigation">
+        <a className="tabBtn" href="/">Calendar</a>
+        <a className="tabBtn" href="/locations" aria-current="page">Directory</a>
+        <a className="tabBtn" href="/updates">Updates</a>
+      </div>
+
+      {/* Mobile detail overlay */}
+      <div
+        className="mobileDetail"
+        data-open={mobileDetailOpen ? "true" : "false"}
+        aria-hidden={!mobileDetailOpen}
+      >
+        <div className="mobileDetailHeader">
+          <button className="backBtn" type="button" onClick={clearSelected}>
+            Back
+          </button>
+          <div className="mobileDetailTitle">Listing</div>
+        </div>
+        <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
+          {selectedMobile ? <LocationDetail location={selectedMobile} /> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function LocationDetail({ location }: { location: LocationRow }) {
+  return (
+    <div className="detailCard">
+      <div className="detailTitle cascadeItem" style={{ animationDelay: "80ms" }}>{location.name ?? "Untitled listing"}</div>
+
+      <div className="detailMeta cascadeItem" style={{ animationDelay: "120ms" }}>
+        {location.category ? <span className="badge">{location.category}</span> : null}
+        {location.address ? <span className="muted">{location.address}</span> : null}
+      </div>
+
+      {location.website ? (
+        <p style={{ marginTop: 10 }}>
+          <a className="link" href={location.website} target="_blank" rel="noreferrer">
+            Website
+          </a>
+        </p>
+      ) : null}
+
+      {location.description ? (
+        <div className="detailBody cascadeItem" style={{ animationDelay: "180ms" }} style={{ marginTop: 14 }}>
+          <p>{location.description}</p>
+        </div>
+      ) : (
+        <div className="detailBody cascadeItem" style={{ animationDelay: "180ms" }} style={{ marginTop: 14 }}>
+          <p className="muted">No description yet.</p>
+        </div>
+      )}
     </div>
   );
 }
