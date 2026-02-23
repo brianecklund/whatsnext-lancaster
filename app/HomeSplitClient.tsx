@@ -5,12 +5,17 @@ import { useRouter, useSearchParams } from "next/navigation";
 
 type EventItem = {
   id: string;
-  uid?: string | null; // ✅ optional to match EventLite
-  title: string;
-  summary: string | null;
-  start_datetime: string | null;
-  end_datetime: string | null;
-  event_type: string | null;
+  uid?: string | null;
+
+  // These can be missing depending on how EventLite is typed upstream
+  title?: string | null;
+  summary?: string | null;
+
+  start_datetime?: string | null;
+  end_datetime?: string | null;
+
+  event_type?: string | null;
+
   locationName?: string | null;
   address?: string | null;
 };
@@ -20,7 +25,7 @@ type Props = {
 };
 
 function normalize(str: string) {
-  return str.toLowerCase().trim();
+  return (str || "").toLowerCase().trim();
 }
 
 export default function HomeSplitClient({ events }: Props) {
@@ -37,7 +42,8 @@ export default function HomeSplitClient({ events }: Props) {
   const eventTypes = useMemo(() => {
     const set = new Set<string>();
     for (const e of events) {
-      if (e.event_type) set.add(e.event_type);
+      const t = e.event_type || "";
+      if (t) set.add(t);
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [events]);
@@ -49,13 +55,19 @@ export default function HomeSplitClient({ events }: Props) {
 
     return events.filter((e) => {
       const haystack = normalize(
-        [e.title, e.summary, e.locationName, e.address, e.event_type]
+        [
+          e.title ?? "",
+          e.summary ?? "",
+          e.locationName ?? "",
+          e.address ?? "",
+          e.event_type ?? "",
+        ]
           .filter(Boolean)
           .join(" ")
       );
 
       const matchesSearch = !nq || haystack.includes(nq);
-      const matchesType = !nt || normalize(e.event_type || "") === nt;
+      const matchesType = !nt || normalize(e.event_type ?? "") === nt;
 
       return matchesSearch && matchesType;
     });
@@ -96,32 +108,39 @@ export default function HomeSplitClient({ events }: Props) {
         </div>
 
         <div className="eventList">
-          {filteredEvents.map((event) => (
-            <div
-              key={event.id}
-              className={`eventRow ${
-                selectedEvent?.id === event.id ? "active" : ""
-              }`}
-              onClick={() => {
-                // ✅ Only set URL param if it has a uid
-                if (event.uid) updateParam("event", event.uid);
-              }}
-            >
-              <div className="eventTitle">{event.title}</div>
-              {event.start_datetime && (
-                <div className="eventMeta">
-                  {new Date(event.start_datetime).toLocaleString()}
-                </div>
-              )}
-            </div>
-          ))}
+          {filteredEvents.map((event) => {
+            const title = event.title || "Untitled event";
+            const dt = event.start_datetime || event.end_datetime;
+
+            return (
+              <div
+                key={event.id}
+                className={`eventRow ${
+                  selectedEvent?.id === event.id ? "active" : ""
+                }`}
+                onClick={() => {
+                  if (event.uid) updateParam("event", event.uid);
+                }}
+              >
+                <div className="eventTitle">{title}</div>
+                {dt && (
+                  <div className="eventMeta">
+                    {new Date(dt).toLocaleString()}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         {/* FILTER OVERLAY */}
         {filterOpen && (
           <div className="filterOverlay">
             <div className="filterHeader">
-              <button className="closeButton" onClick={() => setFilterOpen(false)}>
+              <button
+                className="closeButton"
+                onClick={() => setFilterOpen(false)}
+              >
                 ✕
               </button>
             </div>
@@ -162,10 +181,14 @@ export default function HomeSplitClient({ events }: Props) {
       <div className="rightPane">
         {selectedEvent ? (
           <div className="eventDetail">
-            <h2>{selectedEvent.title}</h2>
+            <h2>{selectedEvent.title || "Untitled event"}</h2>
 
-            {selectedEvent.start_datetime && (
-              <p>{new Date(selectedEvent.start_datetime).toLocaleString()}</p>
+            {(selectedEvent.start_datetime || selectedEvent.end_datetime) && (
+              <p>
+                {new Date(
+                  selectedEvent.start_datetime || selectedEvent.end_datetime!
+                ).toLocaleString()}
+              </p>
             )}
 
             {selectedEvent.summary && <p>{selectedEvent.summary}</p>}
