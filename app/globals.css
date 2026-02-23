@@ -304,16 +304,19 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   border-bottom: 1px solid var(--border);
 }
 
+/* Primary navigation tabs: 3 equal-width buttons spanning the left pane */
 .tabs{
-  display:flex;
-  gap: 16px;
+  display:grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
 }
 
 .tabBtn{
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  min-width: 160px;
+  width: 100%;
+  min-width: 0;
   height: 46px;
   padding: 0 18px;
   border-radius: var(--radius);

@@ -304,6 +304,7 @@ export default function HomeSplitClient({ events }: Props) {
 
   return (
     <div className="pageShell">
+      <div className="tagline">A calendar of events, specials, and pop-ups in Lancaster, PA.</div>
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
