@@ -1,91 +1,140 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { endOfWeek, format, isToday, isTomorrow, parseISO, startOfDay } from "date-fns";
-import type { EventLite } from "@/lib/types";
 
-function safeParseDate(value: string | null | undefined): Date | null {
-  if (!value) return null;
-  // Prismic Date can be YYYY-MM-DD. Timestamp can be ISO.
-  try {
-    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      return parseISO(value + "T00:00:00");
-    }
-    return parseISO(value);
-  } catch {
-    return null;
-  }
-}
+type EventLite = {
+  id: string;
+  uid?: string | null;
 
-function dayLabel(dateKey: string) {
-  const dayDate = safeParseDate(dateKey);
-  if (!dayDate) return dateKey;
-  const label = isToday(dayDate)
-    ? "Today"
-    : isTomorrow(dayDate)
-    ? "Tomorrow"
-    : format(dayDate, "EEEE");
-  return `${label}, ${format(dayDate, "MMM d")}`;
-}
+  title?: string | null;
+  summary?: string | null;
 
-function normalize(v: string) {
+  start_datetime?: string | null;
+  end_datetime?: string | null;
+
+  event_type?: string | null;
+  status?: string | null;
+
+  locationName?: string | null;
+  address?: string | null;
+
+  website_url?: string | null;
+  tickets_url?: string | null;
+
+  imageUrl?: string | null;
+  descriptionText?: string | null;
+};
+
+type Props = {
+  events: EventLite[];
+};
+
+const WEEKLY_KEY = "__weekly__";
+
+function norm(v: string) {
   return (v || "").toLowerCase().trim();
 }
 
-export default function HomeSplitClient({ events }: { events: EventLite[] }) {
+function safeDateFromEvent(e: EventLite): Date | null {
+  const raw = e.start_datetime || e.end_datetime;
+  if (!raw) return null;
+  const d = new Date(raw);
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function startOfToday(): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function endOfSundayFromToday(): Date {
+  // Week ends Sunday. We count from today -> Sunday.
+  const today = startOfToday();
+  const day = today.getDay(); // 0=Sun .. 6=Sat
+  const daysUntilSunday = (7 - day) % 7; // Sunday => 0
+  const end = new Date(today);
+  end.setDate(today.getDate() + daysUntilSunday);
+  end.setHours(23, 59, 59, 999);
+  return end;
+}
+
+function startOfDay(d: Date): Date {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+function dayKey(d: Date): string {
+  // YYYY-MM-DD
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${dd}`;
+}
+
+function formatDayHeading(d: Date): string {
+  // Ex: Monday, Feb 23
+  return d.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatTimeLabel(d: Date): string {
+  return d.toLocaleString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+export default function HomeSplitClient({ events }: Props) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const sp = useSearchParams();
 
-  const selectedEventKey = searchParams.get("event");
-  const q = searchParams.get("q") ?? "";
-  const type = searchParams.get("type") ?? "";
+  const q = sp.get("q") || "";
+  const type = sp.get("type") || "";
 
-  const WEEKLY_KEY = "__weekly__";
+  // If no event param, default to weekly overview (per request)
+  const selectedParam = sp.get("event");
+  const selectedKey = selectedParam ?? WEEKLY_KEY;
 
   const [filterOpen, setFilterOpen] = useState(false);
 
-  function navigate(params: URLSearchParams) {
-    const qs = params.toString();
-    router.replace(qs ? `/?${qs}` : "/");
+  // Optional mobile tab behavior (keeps your “split” UX stable)
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 980px)");
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setFilterOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  function setParam(key: string, value: string | null) {
+    const params = new URLSearchParams(sp.toString());
+    if (!value) params.delete(key);
+    else params.set(key, value);
+
+    router.push(`/?${params.toString()}`);
   }
 
-  function setSelectedEvent(key: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("event", key);
-    navigate(params);
-  }
-
-  function setWeeklySelected() {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("event", WEEKLY_KEY);
-    navigate(params);
-  }
-
-  function clearSelectedEvent() {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("event");
-    navigate(params);
-  }
-
-  function setQuery(next: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (!next) params.delete("q");
-    else params.set("q", next);
-    // keep selection if still visible; we'll reconcile below
-    navigate(params);
-  }
-
-  function setType(next: string | null) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (!next) params.delete("type");
-    else params.set("type", next);
-    // When changing type, reset selection (avoids "selected but filtered out")
-    params.delete("event");
-    navigate(params);
-  }
-
-  // Unique event types (for filter overlay)
+  // Event types for filter pills (derived from full dataset)
   const eventTypes = useMemo(() => {
     const set = new Set<string>();
     for (const e of events) {
@@ -94,19 +143,18 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [events]);
 
-  // Apply search + type filters before grouping
+  // Filtered events (search + type)
   const filteredEvents = useMemo(() => {
-    const nq = normalize(q);
-    const nt = normalize(type);
+    const nq = norm(q);
+    const nt = norm(type);
 
     return events.filter((e) => {
-      // Search across title + summary + location + type
-      const hay = normalize(
+      const hay = norm(
         [
           e.title ?? "",
           e.summary ?? "",
-          e.location?.name ?? "",
-          e.location?.address ?? "",
+          e.locationName ?? "",
+          e.address ?? "",
           e.event_type ?? "",
         ]
           .filter(Boolean)
@@ -114,438 +162,471 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
       );
 
       const matchesSearch = !nq || hay.includes(nq);
-      const matchesType = !nt || normalize(e.event_type ?? "") === nt;
+      const matchesType = !nt || norm(e.event_type ?? "") === nt;
 
       return matchesSearch && matchesType;
     });
   }, [events, q, type]);
 
-  const grouped = useMemo(() => {
-    const map = new Map<string, EventLite[]>();
+  // Group left list by day (based on date)
+  const leftDayGroups = useMemo(() => {
+    const map = new Map<string, { date: Date; items: EventLite[] }>();
+
     for (const e of filteredEvents) {
-      if (!e.start_datetime) continue;
-      const d = safeParseDate(e.start_datetime);
+      const d = safeDateFromEvent(e);
       if (!d) continue;
-      const key = format(d, "yyyy-MM-dd");
-      const cur = map.get(key) ?? [];
-      cur.push(e);
-      map.set(key, cur);
+
+      const dk = dayKey(d);
+      if (!map.has(dk)) map.set(dk, { date: startOfDay(d), items: [] });
+      map.get(dk)!.items.push(e);
     }
 
-    const keys = Array.from(map.keys()).sort();
-    return keys.map((k) => {
-      const list = map.get(k) ?? [];
-      list.sort((a, b) => {
-        const ad = a.start_datetime ? safeParseDate(a.start_datetime)?.getTime() ?? 0 : 0;
-        const bd = b.start_datetime ? safeParseDate(b.start_datetime)?.getTime() ?? 0 : 0;
-        return ad - bd;
+    const groups = Array.from(map.values()).sort(
+      (a, b) => a.date.getTime() - b.date.getTime()
+    );
+
+    // Sort inside each day by time
+    for (const g of groups) {
+      g.items.sort((a, b) => {
+        const da = safeDateFromEvent(a)?.getTime() ?? 0;
+        const db = safeDateFromEvent(b)?.getTime() ?? 0;
+        return da - db;
       });
-      return { key: k, events: list };
-    });
-  }, [filteredEvents]);
-
-  const weeklyEvents = useMemo(() => {
-    const today = startOfDay(new Date());
-    const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
-    return filteredEvents.filter((e) => {
-      if (!e.start_datetime) return false;
-      const d = safeParseDate(e.start_datetime);
-      if (!d) return false;
-      return d.getTime() >= today.getTime() && d.getTime() <= weekEnd.getTime();
-    });
-  }, [filteredEvents]);
-
-  const weeklyGrouped = useMemo(() => {
-    const map = new Map<string, EventLite[]>();
-    for (const e of weeklyEvents) {
-      if (!e.start_datetime) continue;
-      const d = safeParseDate(e.start_datetime);
-      if (!d) continue;
-      const key = format(d, "yyyy-MM-dd");
-      const cur = map.get(key) ?? [];
-      cur.push(e);
-      map.set(key, cur);
     }
-    const keys = Array.from(map.keys()).sort();
-    return keys.map((k) => {
-      const list = map.get(k) ?? [];
-      list.sort((a, b) => {
-        const ad = a.start_datetime ? safeParseDate(a.start_datetime)?.getTime() ?? 0 : 0;
-        const bd = b.start_datetime ? safeParseDate(b.start_datetime)?.getTime() ?? 0 : 0;
-        return ad - bd;
-      });
-      return { key: k, events: list };
-    });
-  }, [weeklyEvents]);
 
-  const selectedEventDesktop = useMemo(() => {
+    return groups;
+  }, [filteredEvents]);
+
+  // Weekly overview range + events
+  const weeklyRange = useMemo(() => {
+    const start = startOfToday();
+    const end = endOfSundayFromToday();
+    return { start, end };
+  }, []);
+
+  const weekEvents = useMemo(() => {
+    const { start, end } = weeklyRange;
+
+    const items = filteredEvents
+      .map((e) => ({ e, d: safeDateFromEvent(e) }))
+      .filter(({ d }) => d && d.getTime() >= start.getTime() && d.getTime() <= end.getTime())
+      .sort((a, b) => (a.d!.getTime() - b.d!.getTime()))
+      .map(({ e }) => e);
+
+    return items;
+  }, [filteredEvents, weeklyRange]);
+
+  const weekEventsCount = weekEvents.length;
+
+  const weekGroups = useMemo(() => {
+    const map = new Map<string, { date: Date; items: EventLite[] }>();
+    for (const e of weekEvents) {
+      const d = safeDateFromEvent(e);
+      if (!d) continue;
+
+      const dk = dayKey(d);
+      if (!map.has(dk)) map.set(dk, { date: startOfDay(d), items: [] });
+      map.get(dk)!.items.push(e);
+    }
+
+    const groups = Array.from(map.values()).sort(
+      (a, b) => a.date.getTime() - b.date.getTime()
+    );
+
+    for (const g of groups) {
+      g.items.sort((a, b) => {
+        const da = safeDateFromEvent(a)?.getTime() ?? 0;
+        const db = safeDateFromEvent(b)?.getTime() ?? 0;
+        return da - db;
+      });
+    }
+
+    return groups;
+  }, [weekEvents]);
+
+  // Selected event (right pane). Weekly is special key.
+  const selectedEvent = useMemo(() => {
     if (!filteredEvents.length) return null;
-    if (!selectedEventKey || selectedEventKey === WEEKLY_KEY) return null;
-    return filteredEvents.find((e) => e.key === selectedEventKey) ?? filteredEvents[0];
-  }, [filteredEvents, selectedEventKey]);
 
-  const selectedEventMobile = useMemo(() => {
-    if (!selectedEventKey) return null;
-    if (selectedEventKey === WEEKLY_KEY) return null;
-    return filteredEvents.find((e) => e.key === selectedEventKey) ?? null;
-  }, [filteredEvents, selectedEventKey]);
+    if (selectedKey === WEEKLY_KEY) return null;
 
-  const isWeeklySelected = !selectedEventKey || selectedEventKey === WEEKLY_KEY;
+    const byUid =
+      selectedKey &&
+      filteredEvents.find((e) => e.uid && e.uid === selectedKey);
 
-  const mobileDetailOpen = Boolean(selectedEventKey);
+    const byId =
+      selectedKey && filteredEvents.find((e) => e.id === selectedKey);
+
+    return byUid || byId || null;
+  }, [filteredEvents, selectedKey]);
+
+  // When user clicks list item on mobile, jump to detail tab
+  function goDetailMobile() {
+    if (isMobile) setMobileTab("detail");
+  }
+
+  // Stagger counter for left list animations
+  let listAnimIndex = 0;
+
+  const showLeft = !isMobile || mobileTab === "list";
+  const showRight = !isMobile || mobileTab === "detail";
 
   return (
     <div className="pageShell">
-      <div className="tagline">
-        A shared calendar for local events, specials, and pop-ups in Lancaster, PA.
-      </div>
-
       <div className="split">
-        {/* LEFT */}
-        <div className="pane paneLeft">
-          <div className="scroll">
-            <div className="leftSticky">
-              <div className="tabs" aria-label="Primary navigation">
-                <a className="tabBtn" href="/" aria-current="page">Calendar</a>
-                <a className="tabBtn" href="/locations">Directory</a>
-                <a className="tabBtn" href="/updates">Updates</a>
-              </div>
+        {/* LEFT PANE */}
+        {showLeft ? (
+          <aside className="pane">
+            <div className="scroll">
+              {/* Sticky controls */}
+              <div className="leftSticky">
+                <div className="leftTopControls">
+                  <input
+                    className="searchInput"
+                    placeholder="Search events…"
+                    value={q}
+                    onChange={(e) => setParam("q", e.target.value)}
+                  />
 
-              <div className="leftControls">
-                <input
-                  className="searchInput"
-                  value={q}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search"
-                  aria-label="Search events"
-                />
-                <button className="filterBtn" type="button" onClick={() => setFilterOpen(true)}>
-                  Filter
-                </button>
-
-                {type ? (
-                  <button className="clearBtn" type="button" onClick={() => setType(null)}>
-                    Clear
+                  <button
+                    className="filterButton"
+                    onClick={() => setFilterOpen(true)}
+                    type="button"
+                  >
+                    Filter
                   </button>
-                ) : null}
+                </div>
+
+                <div className="leftActiveFilters">
+                  {type ? (
+                    <button
+                      className="activeChip"
+                      onClick={() => setParam("type", null)}
+                      type="button"
+                    >
+                      {type} <span aria-hidden>×</span>
+                    </button>
+                  ) : null}
+
+                  {q ? (
+                    <button
+                      className="activeChip"
+                      onClick={() => setParam("q", null)}
+                      type="button"
+                    >
+                      “{q}” <span aria-hidden>×</span>
+                    </button>
+                  ) : null}
+                </div>
               </div>
-            </div>
 
-            {/* Weekly overview */}
-            <button
-              className="weeklyOverview"
-              data-active={isWeeklySelected ? "true" : "false"}
-              type="button"
-              onClick={setWeeklySelected}
-            >
-              <div className="weeklyTitle">Weekly Overview</div>
-              <div className="weeklyCount">
-                {weeklyEvents.length} event{weeklyEvents.length === 1 ? "" : "s"} left this week
-              </div>
-            </button>
+              {/* Weekly Overview card */}
+              <button
+                type="button"
+                className="weeklyOverviewCard fadeInItem"
+                style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
+                data-active={selectedKey === WEEKLY_KEY ? "true" : "false"}
+                onClick={() => {
+                  setParam("event", WEEKLY_KEY);
+                  goDetailMobile();
+                }}
+              >
+                <div className="weeklyOverviewLabel">Weekly Overview</div>
+                <div className="weeklyOverviewCount">
+                  {weekEventsCount} event{weekEventsCount === 1 ? "" : "s"} left this week
+                </div>
+              </button>
 
-            {grouped.length === 0 ? (
-              <div className="emptyList">No upcoming events yet.</div>
-            ) : (
-              grouped.map(({ key, events: dayEvents }, idx) => (
-                <section
-                  key={key}
-                  className="dayBlock"
-                  style={{ borderTop: idx === 0 ? "0" : undefined }}
-                >
-                  <div className="dayTitle">
-                    <span className="dayTitleText">{dayLabel(key)}</span>
-                  </div>
+              {/* Day-grouped listings */}
+              {leftDayGroups.map((g) => (
+                <section key={dayKey(g.date)} className="dayBlock">
+                  <div className="dayTitle">{formatDayHeading(g.date)}</div>
 
-                  {dayEvents.map((e) => {
-                    const active = selectedEventKey
-                      ? selectedEventKey === e.key
-                      : (!isWeeklySelected && selectedEventDesktop?.key === e.key);
+                  {g.items.map((e) => {
+                    const active =
+                      selectedEvent?.id === e.id ||
+                      (selectedEvent?.uid && e.uid && selectedEvent.uid === e.uid);
+
+                    const title = e.title || "Untitled event";
+                    const d = safeDateFromEvent(e);
+                    const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
 
                     return (
                       <button
                         key={e.id}
-                        className="eventRow"
+                        className="eventRow fadeInItem"
+                        style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
                         data-active={active ? "true" : "false"}
-                        onClick={() => setSelectedEvent(e.key)}
+                        onClick={() => {
+                          if (e.uid) setParam("event", e.uid);
+                          else setParam("event", e.id);
+                          goDetailMobile();
+                        }}
                         type="button"
                       >
-                        <span className="eventRowTitle">{e.title ?? "Untitled event"}</span>
-
-                        <span className="eventRowMeta">
-                          {formatEventTime(e)}
-                          {e.location?.name ? <span className="dot">•</span> : null}
-                          {e.location?.name ? <span>{e.location.name}</span> : null}
-                        </span>
+                        <div className="eventRowTitle">{title}</div>
+                        <div className="eventRowMeta">
+                          <span>{timeLabel}</span>
+                          {e.event_type ? <span className="dot">•</span> : null}
+                          {e.event_type ? <span>{e.event_type}</span> : null}
+                        </div>
                       </button>
                     );
                   })}
                 </section>
-              ))
-            )}
+              ))}
 
-            {/* Left filter overlay */}
-            <div
-              className="leftOverlay"
-              data-open={filterOpen ? "true" : "false"}
-              aria-hidden={!filterOpen}
-            >
-              <div className="leftOverlayHeader">
-                <div className="leftOverlayTitle">Filter events</div>
-                <button className="overlayClose" type="button" onClick={() => setFilterOpen(false)}>
-                  ×
-                </button>
-              </div>
-
-              <div className="filterGrid">
-                {eventTypes.map((t) => {
-                  const active = normalize(type) === normalize(t);
-                  return (
+              {/* Filter overlay (left pane) */}
+              {filterOpen ? (
+                <div className="filterOverlay" role="dialog" aria-modal="true">
+                  <div className="filterOverlayHeader">
+                    <div className="filterOverlayTitle">Filter</div>
                     <button
-                      key={t}
-                      className="pillBtn"
-                      data-active={active ? "true" : "false"}
+                      className="filterOverlayClose"
+                      onClick={() => setFilterOpen(false)}
+                      aria-label="Close filters"
                       type="button"
-                      onClick={() => {
-                        setType(t);
-                        setFilterOpen(false);
-                      }}
                     >
-                      {t}
+                      ×
                     </button>
-                  );
-                })}
+                  </div>
 
-                <button
-                  className="pillBtn pillBtnSecondary"
-                  type="button"
-                  onClick={() => {
-                    setType(null);
-                    setFilterOpen(false);
-                  }}
-                >
-                  Show all
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+                  <div className="filterOverlayBody">
+                    <div className="filterPills">
+                      {eventTypes.map((t) => {
+                        const isOn = norm(type) === norm(t);
+                        return (
+                          <button
+                            key={t}
+                            className={`filterPill ${isOn ? "on" : ""}`}
+                            onClick={() => {
+                              setParam("type", t);
+                              setFilterOpen(false);
+                            }}
+                            type="button"
+                          >
+                            {t}
+                          </button>
+                        );
+                      })}
+                    </div>
 
-        {/* RIGHT (desktop) */}
-        <div className="pane paneRight">
-          <div className="scroll">
-            {isWeeklySelected ? (
-              <WeeklyDetail grouped={weeklyGrouped} count={weeklyEvents.length} />
-            ) : !selectedEventDesktop ? (
-              <div className="emptyRight">Select an event to see details.</div>
-            ) : (
-              <EventDetail event={selectedEventDesktop} />
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile bottom tabs */}
-      <div className="mobileTabs" aria-label="Primary navigation">
-        <a className="tabBtn" href="/" aria-current="page">Calendar</a>
-        <a className="tabBtn" href="/locations">Directory</a>
-        <a className="tabBtn" href="/updates">Updates</a>
-      </div>
-
-      {/* Mobile detail overlay */}
-      <div
-        className="mobileDetail"
-        data-open={mobileDetailOpen ? "true" : "false"}
-        aria-hidden={!mobileDetailOpen}
-      >
-        <div className="mobileDetailHeader">
-          <button className="backBtn" type="button" onClick={clearSelectedEvent}>
-            Back
-          </button>
-          <div className="mobileDetailTitle">
-            {selectedEventKey === WEEKLY_KEY ? "Weekly Overview" : "Event"}
-          </div>
-        </div>
-        <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
-          {selectedEventKey === WEEKLY_KEY ? (
-            <WeeklyDetail grouped={weeklyGrouped} count={weeklyEvents.length} compact />
-          ) : selectedEventMobile ? (
-            <EventDetail event={selectedEventMobile} />
-          ) : null}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function WeeklyDetail({
-  grouped,
-  count,
-  compact,
-}: {
-  grouped: { key: string; events: EventLite[] }[];
-  count: number;
-  compact?: boolean;
-}) {
-  const today = startOfDay(new Date());
-  const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
-  const range = `${format(today, "MMM d")} – ${format(weekEnd, "MMM d")}`;
-
-  return (
-    <div>
-      <div className="rightHeader">
-        <div className="rightDayLabel">This week</div>
-        <h1 className="detailTitle">Weekly Overview</h1>
-        <div className="detailMeta">
-          <span className="venue">{range}</span>
-          <span className="muted">
-            {count} event{count === 1 ? "" : "s"}
-          </span>
-        </div>
-      </div>
-
-      {count === 0 ? (
-        <div className="detailBody">No more events scheduled for this week.</div>
-      ) : (
-        <div className={compact ? "weeklyList weeklyListCompact" : "weeklyList"}>
-          {grouped.map(({ key, events }) => (
-            <section key={key} className="weeklyDay">
-              <div className="weeklyDayTitle">{dayLabel(key)}</div>
-              {events.map((e) => (
-                <div key={e.id} className="weeklyItem">
-                  <div className="weeklyItemTitle">{e.title ?? "Untitled event"}</div>
-                  <div className="weeklyItemMeta">
-                    {formatEventTime(e)}
-                    {e.location?.name ? <span className="dot">•</span> : null}
-                    {e.location?.name ? <span>{e.location.name}</span> : null}
+                    <div className="filterOverlayFooter">
+                      <button
+                        className="filterClear"
+                        onClick={() => {
+                          setParam("type", null);
+                          setFilterOpen(false);
+                        }}
+                        disabled={!type}
+                        type="button"
+                      >
+                        Clear
+                      </button>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </section>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-}
-function formatEventTime(event: EventLite): string {
-  const start = safeParseDate(event.start_datetime);
-  const end = safeParseDate(event.end_datetime);
+              ) : null}
+            </div>
+          </aside>
+        ) : null}
 
-  // Date-only events (no time) or explicitly all-day
-  const hasTime = Boolean(event.start_datetime && !/^\d{4}-\d{2}-\d{2}$/.test(event.start_datetime));
-  const allDay = Boolean(event.all_day) || !hasTime;
+        {/* RIGHT PANE */}
+        {showRight ? (
+          <main className="pane paneRight">
+            <div className="scroll">
+              {/* WEEKLY OVERVIEW (default) */}
+              {selectedKey === WEEKLY_KEY ? (
+                <div className="detailWrap">
+                  <div className="detailKicker">Weekly Overview</div>
+                  <h1 className="detailTitle">This Week</h1>
 
-  if (allDay) return "All day";
+                  <div className="detailMeta">
+                    <span>
+                      {weeklyRange.start.toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                      })}{" "}
+                      –{" "}
+                      {weeklyRange.end.toLocaleDateString(undefined, {
+                        month: "short",
+                        day: "numeric",
+                      })}
+                    </span>
+                    <span className="dot">•</span>
+                    <span>
+                      {weekEventsCount} event{weekEventsCount === 1 ? "" : "s"} left
+                    </span>
+                  </div>
 
-  if (start && end) {
-    const s = format(start, "h:mma").toLowerCase();
-    const e = format(end, "h:mma").toLowerCase();
-    return `${s} – ${e}`;
-  }
+                  {weekEventsCount === 0 ? (
+                    <div className="emptyRight">No events scheduled for the rest of this week.</div>
+                  ) : (
+                    <div className="weeklyCards">
+                      {weekGroups.map((g) => (
+                        <div key={dayKey(g.date)} className="weeklyDayGroup">
+                          <div className="dayTitle">{formatDayHeading(g.date)}</div>
 
-  if (start) return format(start, "h:mma").toLowerCase();
+                          {g.items.map((e) => {
+                            const title = e.title || "Untitled event";
+                            const d = safeDateFromEvent(e);
+                            const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
 
-  return "";
-}
+                            return (
+                              <div key={e.id} className="weeklyCard">
+                                <div className="weeklyCardMedia">
+                                  {e.imageUrl ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img className="weeklyThumb" src={e.imageUrl} alt="" />
+                                  ) : (
+                                    <div className="weeklyThumbPlaceholder" aria-hidden />
+                                  )}
+                                </div>
 
-function EventDetail({ event }: { event: EventLite }) {
-  const start = safeParseDate(event.start_datetime);
-  const dayStr = start ? format(start, "EEEE, MMMM do") : "";
+                                <div className="weeklyCardContent">
+                                  <div className="weeklyCardTop">
+                                    <div className="weeklyCardTitleWrap">
+                                      <div className="weeklyCardTitle">{title}</div>
+                                      <div className="weeklyCardTime">{timeLabel}</div>
+                                    </div>
 
-  const timeStr = formatEventTime(event);
+                                    {(e.tickets_url || e.website_url) ? (
+                                      <div className="weeklyCardActions">
+                                        {e.tickets_url ? (
+                                          <a
+                                            className="weeklyMiniBtn"
+                                            href={e.tickets_url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                          >
+                                            Tickets
+                                          </a>
+                                        ) : null}
 
-  const status = event.status && event.status !== "Scheduled" ? event.status : null;
+                                        {e.website_url ? (
+                                          <a
+                                            className="weeklyMiniBtn"
+                                            href={e.website_url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                          >
+                                            Website
+                                          </a>
+                                        ) : null}
+                                      </div>
+                                    ) : null}
+                                  </div>
 
-  const websiteHref = event.website_url || null;
-  const ticketsHref = event.tickets_url || null;
+                                  {(e.summary || e.descriptionText) ? (
+                                    <div className="weeklyCardDesc">
+                                      {e.summary || e.descriptionText}
+                                    </div>
+                                  ) : null}
+                                </div>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : !selectedEvent ? (
+                <div className="emptyRight">Select an event.</div>
+              ) : (
+                // SINGLE EVENT DETAIL
+                <div className="detailWrap">
+                  <div className="detailKicker">{selectedEvent.event_type || "Event"}</div>
 
-  return (
-    <div>
-      <div className="rightHeader">
-        {dayStr ? <div className="rightDayLabel">{dayStr}</div> : null}
+                  <h1 className="detailTitle">{selectedEvent.title || "Untitled event"}</h1>
 
-        <h1 className="detailTitle">{event.title ?? "Event"}</h1>
+                  <div className="detailMeta">
+                    <span>
+                      {(() => {
+                        const d = safeDateFromEvent(selectedEvent);
+                        return d ? formatTimeLabel(d) : "Time TBD";
+                      })()}
+                    </span>
 
-        <div className="detailMeta">
-          <span className="venue">{event.location?.name ?? "Unknown location"}</span>
-          {timeStr ? <span className="muted">{timeStr}</span> : null}
-        </div>
+                    {selectedEvent.locationName ? (
+                      <>
+                        <span className="dot">•</span>
+                        <span>{selectedEvent.locationName}</span>
+                      </>
+                    ) : null}
 
-        <div className="detailChips" aria-label="Event highlights">
-          {event.event_type ? <span className="pill">{event.event_type}</span> : null}
-          {event.cost ? <span className="pill">{event.cost}</span> : null}
-          {event.age_restriction ? <span className="pill">{event.age_restriction}</span> : null}
-          {status ? <span className="pill pillWarn">{status}</span> : null}
-          {Array.isArray(event.tags)
-            ? event.tags.slice(0, 4).map((t) => (
-                <span key={t} className="pill pillSoft">
-                  {t}
-                </span>
-              ))
-            : null}
-        </div>
+                    {selectedEvent.address ? (
+                      <>
+                        <span className="dot">•</span>
+                        <span>{selectedEvent.address}</span>
+                      </>
+                    ) : null}
+                  </div>
+
+                  {selectedEvent.summary ? (
+                    <p className="detailSummary">{selectedEvent.summary}</p>
+                  ) : null}
+
+                  {selectedEvent.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img className="detailImage" src={selectedEvent.imageUrl} alt="" />
+                  ) : null}
+
+                  {selectedEvent.descriptionText ? (
+                    <div className="detailBody">{selectedEvent.descriptionText}</div>
+                  ) : null}
+
+                  {(selectedEvent.website_url || selectedEvent.tickets_url) ? (
+                    <div className="detailActions">
+                      {selectedEvent.website_url ? (
+                        <a
+                          className="detailButton"
+                          href={selectedEvent.website_url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Website
+                        </a>
+                      ) : null}
+
+                      {selectedEvent.tickets_url ? (
+                        <a
+                          className="detailButton"
+                          href={selectedEvent.tickets_url}
+                          target="_blank"
+                          rel="noreferrer"
+                        >
+                          Tickets
+                        </a>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </div>
+          </main>
+        ) : null}
       </div>
 
-      <div
-        className="heroImage"
-        style={
-          event.image_url
-            ? { backgroundImage: `url(${event.image_url})` }
-            : undefined
-        }
-        aria-hidden="true"
-      />
-
-      {event.summary ? <p className="summary">{event.summary}</p> : null}
-
-      <div className="detailBody">
-        {event.description ? event.description : "No description added yet."}
-      </div>
-
-      <div className="ctaRow">
-        <a
-          className="ctaBtn"
-          data-disabled={!websiteHref ? "true" : "false"}
-          href={websiteHref ?? undefined}
-          target={websiteHref ? "_blank" : undefined}
-          rel={websiteHref ? "noreferrer" : undefined}
-          aria-disabled={!websiteHref}
-          onClick={(e) => {
-            if (!websiteHref) e.preventDefault();
-          }}
-        >
-          Website
-        </a>
-
-        <a
-          className="ctaBtn"
-          data-disabled={!ticketsHref ? "true" : "false"}
-          href={ticketsHref ?? undefined}
-          target={ticketsHref ? "_blank" : undefined}
-          rel={ticketsHref ? "noreferrer" : undefined}
-          aria-disabled={!ticketsHref}
-          onClick={(e) => {
-            if (!ticketsHref) e.preventDefault();
-          }}
-        >
-          Tickets
-        </a>
-      </div>
-
-      {event.location?.address ? (
-        <div className="finePrint">
-          <span className="label">Address</span>
-          <span>{event.location.address}</span>
-        </div>
-      ) : null}
-
-      {event.location?.website ? (
-        <div className="finePrint">
-          <span className="label">Venue site</span>
-          <a href={event.location.website} target="_blank" rel="noreferrer">
-            {event.location.website}
-          </a>
+      {/* Mobile bottom tabs (uses existing .mobileTabs + .tabBtn styles) */}
+      {isMobile ? (
+        <div className="mobileTabs">
+          <button
+            className="tabBtn"
+            aria-current={mobileTab === "list" ? "page" : undefined}
+            onClick={() => setMobileTab("list")}
+            type="button"
+          >
+            List
+          </button>
+          <button
+            className="tabBtn"
+            aria-current={mobileTab === "detail" ? "page" : undefined}
+            onClick={() => setMobileTab("detail")}
+            type="button"
+          >
+            Details
+          </button>
         </div>
       ) : null}
     </div>
