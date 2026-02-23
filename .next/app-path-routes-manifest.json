@@ -1,7 +1,10 @@
 {
+  "/_global-error/page": "/_global-error",
   "/_not-found/page": "/_not-found",
-  "/updates/page": "/updates",
-  "/contact/page": "/contact",
   "/about/page": "/about",
-  "/page": "/"
+  "/api/prismic-debug/route": "/api/prismic-debug",
+  "/contact/page": "/contact",
+  "/locations/page": "/locations",
+  "/page": "/",
+  "/updates/page": "/updates"
 }

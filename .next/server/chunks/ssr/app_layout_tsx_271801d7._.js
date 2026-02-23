@@ -1,0 +1,3 @@
+module.exports=[33290,a=>{"use strict";var b=a.i(7997);function c({children:a}){return(0,b.jsx)("html",{lang:"en",children:(0,b.jsxs)("body",{children:[(0,b.jsxs)("header",{className:"siteHeader",children:[(0,b.jsx)("div",{className:"brand",children:"What’s Next Lancaster"}),(0,b.jsxs)("nav",{className:"topNav",children:[(0,b.jsx)("a",{href:"/",children:"Calendar"}),(0,b.jsx)("a",{href:"/locations",children:"Directory"}),(0,b.jsx)("a",{href:"/about",children:"About"}),(0,b.jsx)("a",{href:"/contact",children:"Contact"})]})]}),(0,b.jsx)("main",{className:"main",children:a})]})})}a.s(["default",()=>c])}];
+
+//# sourceMappingURL=app_layout_tsx_271801d7._.js.map
