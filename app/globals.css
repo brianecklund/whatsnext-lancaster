@@ -598,14 +598,16 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     font-size: 18px;
   }
 
-  /* Top sticky buttons hidden on mobile */
+  /* Keep search + filters at top on mobile */
   .leftSticky{
-    position: static;
-    border-bottom: 0;
-    padding: 0 0 10px 0;
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--bg);
+    border-bottom: 1px solid var(--border);
+    padding: 10px 0 12px 0;
   }
-
-  /* Slide-in detail overlay */
+/* Slide-in detail overlay */
   .mobileDetail{
     display:block;
     position: fixed;
@@ -677,6 +679,44 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   font-weight: 700;
 }
 .filterBtn:hover, .clearBtn:hover{ background: var(--btnBgHover); }
+
+
+
+.typePills{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 10px;
+}
+
+.typePill{
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-weight: 800;
+  font-size: 14px;
+  line-height: 36px;
+  white-space: nowrap;
+}
+.typePill:hover{ background: var(--btnBgHover); }
+.typePill[data-active="true"]{
+  background: #000;
+  color: #fff;
+  border-color: #000;
+}
+
+.eventRowDesc{
+  margin-top: 6px;
+  font-size: 14px;
+  line-height: 1.25;
+  opacity: 0.85;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
 
 /* Left-pane overlay */
 .leftOverlay{

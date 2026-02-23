@@ -150,9 +150,6 @@ export default function HomeSplitClient({ events }: Props) {
   // default selection = weekly overview
   const selectedParam = sp.get("event");
   const selectedKey = selectedParam ?? WEEKLY_KEY;
-
-  const [overlayOpen, setOverlayOpen] = useState(false);
-
   const [isMobile, setIsMobile] = useState(false);
   const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
 
@@ -163,15 +160,6 @@ export default function HomeSplitClient({ events }: Props) {
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
   }, []);
-
-  useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOverlayOpen(false);
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
   function setParam(key: string, value: string | null) {
     const params = new URLSearchParams(sp.toString());
     if (!value) params.delete(key);
@@ -327,17 +315,7 @@ export default function HomeSplitClient({ events }: Props) {
                     placeholder="Search events…"
                     value={q}
                     onChange={(e) => setParam("q", e.target.value)}
-                  />
-
-                  <button
-                    className="filterBtn"
-                    onClick={() => setOverlayOpen(true)}
-                    type="button"
-                  >
-                    Filter
-                  </button>
-
-                  {(q || type) ? (
+                  />{(q || type) ? (
                     <button
                       className="clearBtn"
                       onClick={() => {
@@ -349,6 +327,31 @@ export default function HomeSplitClient({ events }: Props) {
                       Clear
                     </button>
                   ) : null}
+                </div>
+
+                <div className="typePills" role="group" aria-label="Event type filters">
+                  <button
+                    type="button"
+                    className="typePill"
+                    data-active={!type ? "true" : "false"}
+                    onClick={() => setParam("type", null)}
+                  >
+                    All
+                  </button>
+                  {eventTypes.map((t) => {
+                    const on = norm(type) === norm(t);
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        className="typePill"
+                        data-active={on ? "true" : "false"}
+                        onClick={() => setParam("type", on ? null : t)}
+                      >
+                        {t}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -407,58 +410,24 @@ export default function HomeSplitClient({ events }: Props) {
                           {e.event_type ? <span className="dot">•</span> : null}
                           {e.event_type ? <span>{e.event_type}</span> : null}
                         </div>
+                        {(() => {
+                          const raw =
+                            (e.summary ?? "") || (pickDescriptionText(e) ?? "");
+                          const s = (raw || "").trim();
+                          if (!s) return null;
+                          return (
+                            <div className="eventRowDesc">
+                              {s.length > 180 ? `${s.slice(0, 180).trim()}…` : s}
+                            </div>
+                          );
+                        })()}
+
                       </button>
                     );
                   })}
                 </section>
               ))}
 
-              {/* Left overlay filter */}
-              <div className="leftOverlay" data-open={overlayOpen ? "true" : "false"}>
-                <div className="leftOverlayHeader">
-                  <div className="leftOverlayTitle">Filter</div>
-                  <button
-                    className="overlayClose"
-                    onClick={() => setOverlayOpen(false)}
-                    aria-label="Close"
-                    type="button"
-                  >
-                    ×
-                  </button>
-                </div>
-
-                <div className="filterGrid">
-                  {eventTypes.map((t) => {
-                    const on = norm(type) === norm(t);
-                    return (
-                      <button
-                        key={t}
-                        className="pillBtn"
-                        data-active={on ? "true" : "false"}
-                        onClick={() => {
-                          setParam("type", t);
-                          setOverlayOpen(false);
-                        }}
-                        type="button"
-                      >
-                        {t}
-                      </button>
-                    );
-                  })}
-
-                  <button
-                    className="pillBtn pillBtnSecondary"
-                    onClick={() => {
-                      setParam("type", null);
-                      setOverlayOpen(false);
-                    }}
-                    type="button"
-                  >
-                    Clear filter
-                  </button>
-                </div>
-              </div>
-            </div>
           </aside>
         ) : null}
 
