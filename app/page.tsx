@@ -33,6 +33,7 @@ export default async function HomePage() {
         : "Unknown error while fetching events from Prismic.");
   }
 
+  // Helper: pick first usable date/time value from a list of possible field API IDs.
   const pickDateLike = (data: any, keys: string[]) => {
     for (const k of keys) {
       const v = data?.[k];
@@ -40,7 +41,7 @@ export default async function HomePage() {
       if (typeof v === "string" && v.trim()) return v;
       if (v instanceof Date && !isNaN(v.getTime())) return v.toISOString();
       if (typeof v === "object") {
-        const vv = (v as any).value ?? (v as any).iso ?? (v as any).url;
+        const vv = (v as any).value ?? (v as any).iso;
         if (typeof vv === "string" && vv.trim()) return vv;
       }
     }
@@ -52,7 +53,7 @@ export default async function HomePage() {
       const loc = doc.data?.location;
       const locData = loc?.data;
 
-      // Event description (RichText -> plain)
+      // Rich text -> plain text
       const desc = doc.data?.description;
       const descText =
         typeof desc === "string"
@@ -61,7 +62,6 @@ export default async function HomePage() {
           ? prismic.asText(desc as RichTextField)
           : null;
 
-      // Location description (RichText -> plain)
       const locDesc = locData?.description;
       const locDescText =
         typeof locDesc === "string"
@@ -70,12 +70,11 @@ export default async function HomePage() {
           ? prismic.asText(locDesc as RichTextField)
           : null;
 
-      const locationWebsiteUrl = prismic.asLink(locData?.website);
+      const websiteUrl = prismic.asLink(locData?.website);
 
       const eventWebsite = prismic.asLink(doc.data?.website_url);
       const ticketsUrl = prismic.asLink(doc.data?.tickets_url);
 
-      // Image URL
       const heroImg = doc.data?.image;
       const imageUrl =
         heroImg && typeof heroImg === "object" ? heroImg.url ?? null : null;
@@ -84,7 +83,6 @@ export default async function HomePage() {
         ? doc.data.tags.map((t: any) => t?.tag).filter(Boolean)
         : [];
 
-      // Date/Timestamp compatibility
       const startVal =
         pickDateLike(doc.data, [
           "start_datetime",
@@ -96,33 +94,39 @@ export default async function HomePage() {
         ]) ?? null;
 
       const endVal =
-        pickDateLike(doc.data, ["end_datetime", "end_date", "end", "end_time", "endtime"]) ??
-        null;
+        pickDateLike(doc.data, [
+          "end_datetime",
+          "end_date",
+          "end",
+          "end_time",
+          "endtime",
+        ]) ?? null;
 
+      // If start is missing but end exists, use end as a fallback so it still appears.
       const effectiveStart = startVal ?? endVal;
 
       const locationName = locData?.name ?? null;
       const locationAddress = locData?.address ?? null;
 
       return {
-        // identity
         id: doc.id,
         key: doc.uid ?? doc.id,
         uid: doc.uid ?? null,
 
-        // core
         title: doc.data?.title ?? null,
         summary: doc.data?.summary ?? null,
 
-        // ✅ UI EXPECTS THESE:
-        descriptionText: descText, // used by right-pane + weekly cards
-        imageUrl: imageUrl, // used by right-pane + weekly cards
-        locationName, // used by list/meta + right-pane
-        address: locationAddress, // used by list/meta + right-pane
-
-        // ✅ keep old keys too (won't hurt)
+        // ✅ Provide BOTH description keys (older/newer clients)
         description: descText,
+        descriptionText: descText,
+
+        // ✅ Provide BOTH image keys
         image_url: imageUrl,
+        imageUrl: imageUrl,
+
+        // ✅ Provide direct location fields used by UI
+        locationName,
+        address: locationAddress,
 
         start_datetime: effectiveStart,
         end_datetime: endVal,
@@ -140,7 +144,6 @@ export default async function HomePage() {
 
         tags: tagsArr,
 
-        // keep nested location object (directory + other uses)
         location: loc
           ? {
               id: loc.id,
@@ -148,7 +151,7 @@ export default async function HomePage() {
               name: locationName,
               address: locationAddress,
               category: locData?.category ?? null,
-              website: locationWebsiteUrl ?? null,
+              website: websiteUrl ?? null,
               description: locDescText,
             }
           : null,
@@ -174,13 +177,13 @@ export default async function HomePage() {
         </h1>
         <p style={{ marginBottom: 12, opacity: 0.9 }}>
           This page couldn&apos;t fetch <code>event</code> documents from Prismic.
-          The most common causes are a missing/incorrect <code>PRISMIC_REPO_NAME</code>{" "}
+          The most common causes are a missing/incorrect <code>PRISMIC_REPO_NAME</code>
           and/or a missing access token when the repository is private.
         </p>
         <div
           style={{
             padding: 12,
-            border: "1px solid rgba(255,255,255,0.15)",
+            border: "1px solid rgba(0,0,0,0.12)",
             borderRadius: 12,
           }}
         >

@@ -739,17 +739,3 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   .leftControls{ padding-bottom: 12px; }
   .leftOverlay{ position: fixed; inset: 0; padding-bottom: 88px; }
 }
-
-
-/* Weekly cards: make selectable + hover (without changing layout) */
-.weeklyCardSelectable{
-  text-align: left;
-  cursor: pointer;
-  transition: background 140ms ease, transform 140ms ease;
-}
-.weeklyCardSelectable:hover{
-  background: var(--hover);
-}
-.weeklyCardSelectable:active{
-  transform: translateY(1px);
-}
