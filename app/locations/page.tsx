@@ -5,6 +5,8 @@ import LocationsSplitClient from "./LocationsSplitClient";
 
 export const dynamic = "force-dynamic";
 
+type LocationRow = LocationLite & { key: string };
+
 export default async function LocationsPage() {
   const client = createClient();
 
@@ -13,15 +15,12 @@ export default async function LocationsPage() {
 
   try {
     docs = await client.getAllByType("location");
-  } catch (err: any) {
-    prismicError =
-      err?.message ??
-      (typeof err === "string" ? err : "Unknown error while fetching locations from Prismic.");
+  } catch (e: any) {
+    prismicError = e?.message ? String(e.message) : "Unknown error fetching locations";
+    docs = [];
   }
 
-  const locations: LocationLite[] = docs.map((doc: any) => {
-    const website = prismic.asLink(doc.data?.website);
-
+  const locations: LocationRow[] = docs.map((doc: any) => {
     const desc = doc.data?.description;
     const descText =
       typeof desc === "string"
@@ -30,37 +29,31 @@ export default async function LocationsPage() {
         ? prismic.asText(desc as RichTextField)
         : null;
 
+    const websiteUrl = prismic.asLink(doc.data?.website);
+
     return {
       id: doc.id,
+      key: doc.uid ?? doc.id,
       uid: doc.uid ?? null,
       name: doc.data?.name ?? null,
       address: doc.data?.address ?? null,
       category: doc.data?.category ?? null,
-      website: website ?? null,
-      description: descText,
-    } as LocationLite;
+      website: websiteUrl ?? null,
+      description: descText ?? null,
+    };
   });
+
+  // Simple alpha sort
+  locations.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
 
   if (prismicError) {
     return (
-      <div style={{ padding: 24, maxWidth: 820 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>
-          Prismic is not returning locations
-        </h1>
-        <p style={{ marginBottom: 12, opacity: 0.9 }}>
-          This page couldn&apos;t fetch <code>location</code> documents from Prismic.
-        </p>
-        <pre
-          style={{
-            background: "#f5f5f5",
-            padding: 12,
-            borderRadius: 12,
-            overflowX: "auto",
-            border: "1px solid #ddd",
-          }}
-        >
-          {prismicError}
-        </pre>
+      <div className="pageShell">
+        <div className="tagline">Directory</div>
+        <div className="emptyRight">
+          <div style={{ fontWeight: 900, marginBottom: 8 }}>Couldn’t load locations from Prismic.</div>
+          <div className="muted">{prismicError}</div>
+        </div>
       </div>
     );
   }
