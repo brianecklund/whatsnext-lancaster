@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { format, isToday, isTomorrow, parseISO } from "date-fns";
 import type { EventLite } from "@/lib/types";
@@ -29,6 +29,11 @@ function dayLabel(dateKey: string) {
   return `${label}, ${format(dayDate, "MMM d")}`;
 }
 
+
+function normalize(s: string) {
+  return s.trim().toLowerCase();
+}
+
 export default function HomeSplitClient({ events }: { events: EventLite[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -52,9 +57,49 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
     navigate(params);
   }
 
+  function setQuery(next: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next.trim()) params.set("q", next);
+    else params.delete("q");
+    // don't force-close the detail; selection fallback is handled below
+    navigate(params);
+  }
+
+  function setType(next: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (next) params.set("type", next);
+    else params.delete("type");
+    // reset selection when changing filters for clarity
+    params.delete("event");
+    navigate(params);
+  }
+
+
+  const eventTypes = useMemo(() => {
+    const set = new Set<string>();
+    for (const e of filteredEvents) {
+      if (e.event_type) set.add(e.event_type);
+    }
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
+  }, [filteredEvents]);
+
+  const filteredEvents = useMemo(() => {
+    const nq = normalize(q || "");
+    const nt = normalize(type || "");
+
+    return events.filter((e) => {
+      if (nt && normalize(e.event_type ?? "") !== nt) return false;
+
+      if (!nq) return true;
+
+      const hay = `${e.title ?? ""} ${e.summary ?? ""} ${e.description ?? ""} ${e.location?.name ?? ""}`.toLowerCase();
+      return hay.includes(nq);
+    });
+  }, [events, q, type]);
+
   const grouped = useMemo(() => {
     const map = new Map<string, EventLite[]>();
-    for (const e of events) {
+    for (const e of filteredEvents) {
       if (!e.start_datetime) continue;
       const d = safeParseDate(e.start_datetime);
       if (!d) continue;
@@ -74,18 +119,20 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
       });
       return { key: k, events: list };
     });
-  }, [events]);
+  }, [filteredEvents]);
 
   const selectedEventDesktop = useMemo(() => {
-    if (!events.length) return null;
-    if (!selectedEventKey) return events[0];
-    return events.find((e) => e.key === selectedEventKey) ?? events[0];
-  }, [events, selectedEventKey]);
+    if (!filteredEvents.length) return null;
+    if (!selectedEventKey) return filteredEvents[0];
+    return (
+      filteredEvents.find((e) => e.key === selectedEventKey) ?? filteredEvents[0]
+    );
+  }, [filteredEvents, selectedEventKey]);
 
   const selectedEventMobile = useMemo(() => {
     if (!selectedEventKey) return null;
-    return events.find((e) => e.key === selectedEventKey) ?? null;
-  }, [events, selectedEventKey]);
+    return filteredEvents.find((e) => e.key === selectedEventKey) ?? null;
+  }, [filteredEvents, selectedEventKey]);
 
   const mobileDetailOpen = Boolean(selectedEventKey);
 
@@ -100,6 +147,19 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
         <div className="pane">
           <div className="scroll">
             <div className="leftSticky">
+              <div className="leftTopControls" aria-label="Search and filters">
+                <input
+                  className="searchInput"
+                  type="search"
+                  value={q}
+                  onChange={(e) => setQuery(e.target.value)}
+                  placeholder="Search events…"
+                />
+                <button className="filterBtn" type="button" onClick={() => setFilterOpen(true)}>
+                  Filter
+                </button>
+              </div>
+
               <div className="tabs" aria-label="Primary navigation">
                 <a className="tabBtn" href="/" aria-current="page">Calendar</a>
                 <a className="tabBtn" href="/locations">Directory</a>
@@ -146,6 +206,54 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
                 </section>
               ))
             )}
+
+            {/* Filter overlay (covers LEFT content area) */}
+            <div
+              className="filterOverlay"
+              data-open={filterOpen ? "true" : "false"}
+              aria-hidden={!filterOpen}
+            >
+              <div className="filterOverlayHeader">
+                <div className="filterOverlayTitle">Filter</div>
+                <button
+                  className="overlayClose"
+                  type="button"
+                  aria-label="Close filters"
+                  onClick={() => setFilterOpen(false)}
+                >
+                  ×
+                </button>
+              </div>
+
+              <div className="filterOptions">
+                <button
+                  className="pillBtn"
+                  data-active={type ? "false" : "true"}
+                  type="button"
+                  onClick={() => {
+                    setType("");
+                    setFilterOpen(false);
+                  }}
+                >
+                  All
+                </button>
+
+                {eventTypes.map((t) => (
+                  <button
+                    key={t}
+                    className="pillBtn"
+                    data-active={normalize(type) === normalize(t) ? "true" : "false"}
+                    type="button"
+                    onClick={() => {
+                      setType(t);
+                      setFilterOpen(false);
+                    }}
+                  >
+                    {t}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -159,6 +267,21 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
             )}
           </div>
         </div>
+      </div>
+
+
+      {/* Mobile controls (above bottom tabs) */}
+      <div className="mobileControls" aria-label="Search and filters">
+        <input
+          className="searchInput"
+          type="search"
+          value={q}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Search events…"
+        />
+        <button className="filterBtn" type="button" onClick={() => setFilterOpen(true)}>
+          Filter
+        </button>
       </div>
 
       {/* Mobile bottom tabs */}
