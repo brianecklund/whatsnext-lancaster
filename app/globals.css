@@ -22,48 +22,47 @@
   --btnBgHover: #cfcfcf;
 }
 
-/* Gabarito */
-
-@font-face {
-  font-family: "Gabarito";
-  src: url("/fonts/gabarito/Gabarito-Regular.ttf") format("truetype");
+@font-face{
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-Regular.ttf") format("truetype");
   font-weight: 400;
   font-style: normal;
+  font-display: swap;
 }
-
-@font-face {
-  font-family: "Gabarito";
-  src: url("/fonts/gabarito/Gabarito-Medium.ttf") format("truetype");
+@font-face{
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-Italic.ttf") format("truetype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face{
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
+  font-display: swap;
 }
-
-@font-face {
-  font-family: "Gabarito";
-  src: url("/fonts/gabarito/Gabarito-SemiBold.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
+@font-face{
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-MediumItalic.ttf") format("truetype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
 }
-
-@font-face {
-  font-family: "Gabarito";
-  src: url("/fonts/gabarito/Gabarito-Bold.ttf") format("truetype");
+@font-face{
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-Bold.ttf") format("truetype");
   font-weight: 700;
   font-style: normal;
+  font-display: swap;
 }
-
-@font-face {
-  font-family: "Gabarito";
-  src: url("/fonts/gabarito/Gabarito-Italic.ttf") format("truetype");
-  font-weight: 400;
-  font-style: italic;
-}
-
-@font-face {
-  font-family: "Gabarito";
-  src: url("/fonts/gabarito/Gabarito-BoldItalic.ttf") format("truetype");
+@font-face{
+  font-family: "Google Sans";
+  src: url("/fonts/GoogleSans-BoldItalic.ttf") format("truetype");
   font-weight: 700;
   font-style: italic;
+  font-display: swap;
 }
 
 *{ box-sizing:border-box; }
@@ -155,128 +154,6 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding-left: var(--gutter);
 }
 
-/* Weekly Overview cards (Right Pane) */
-.weeklyCards{
-  display:flex;
-  flex-direction: column;
-  gap: 14px;
-  margin-top: 16px;
-}
-
-.weeklyCard{
-  width: 100%;
-  display: grid;
-  grid-template-columns: 128px 1fr;
-  gap: 14px;
-  padding: 14px;
-  border: 1px solid var(--border);
-  border-radius: 18px;
-  background: #fff;
-}
-
-.weeklyCardMedia{
-  width: 100%;
-}
-
-.weeklyThumb{
-  width: 100%;
-  height: 96px;
-  object-fit: cover;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  display:block;
-}
-
-.weeklyThumbPlaceholder{
-  width: 100%;
-  height: 96px;
-  border-radius: 14px;
-  border: 1px solid var(--border);
-  background: var(--panel);
-}
-
-.weeklyCardContent{
-  min-width: 0;
-  display:flex;
-  flex-direction: column;
-  gap: 10px;
-}
-
-.weeklyCardTop{
-  display:flex;
-  align-items:flex-start;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.weeklyCardTitleWrap{
-  min-width: 0;
-}
-
-.weeklyCardTitle{
-  font-weight: 700;
-  font-size: 20px;
-  letter-spacing: -0.01em;
-  line-height: 1.15;
-}
-
-.weeklyCardTime{
-  margin-top: 4px;
-  font-weight: 500;
-  font-size: 14px;
-  color: var(--muted);
-}
-
-.weeklyCardActions{
-  display:flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.weeklyMiniBtn{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  height: 30px;
-  padding: 0 10px;
-  border-radius: 12px;
-  background: var(--btnBg);
-  font-weight: 700;
-  font-size: 13px;
-  text-decoration: none;
-  white-space: nowrap;
-}
-
-.weeklyMiniBtn:hover{
-  background: var(--btnBgHover);
-  text-decoration: none;
-}
-
-.weeklyCardDesc{
-  font-size: 15px;
-  line-height: 1.55;
-  color: var(--text);
-  opacity: 0.92;
-}
-
-/* Mobile adjustments */
-@media (max-width: 980px){
-  .weeklyCard{
-    grid-template-columns: 112px 1fr;
-    padding: 12px;
-  }
-
-  .weeklyThumb,
-  .weeklyThumbPlaceholder{
-    height: 84px;
-  }
-
-  .weeklyCardTitle{
-    font-size: 18px;
-  }
-}
-
 .scroll{
   height: 100%;
   overflow: auto;
@@ -321,35 +198,6 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .dayBlock{
   padding: 18px 0;
   border-top: 1px solid var(--border);
-}
-
-/* Weekly Overview (left list header card) */
-.weeklyOverview{
-  width: 100%;
-  text-align: left;
-  border: 1px solid var(--border);
-  background: #f4f4f4;
-  border-radius: 14px;
-  padding: 14px 14px;
-  margin: 14px 0 8px 0;
-  cursor: pointer;
-}
-.weeklyOverview:hover{ background: #efefef; }
-.weeklyOverview[data-active="true"]{
-  box-shadow: 0 0 0 2px var(--accent) inset;
-}
-.weeklyTitle{
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 4px;
-}
-.weeklyCount{
-  font-weight: 700;
-  font-size: 16px;
-  letter-spacing: -0.01em;
 }
 
 .dayTitle{
@@ -473,36 +321,6 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   color: var(--text);
   white-space: pre-wrap;
 }
-
-/* Weekly Overview (right pane list) */
-.weeklyList{ margin-top: 10px; }
-.weeklyDay{ padding: 16px 0; border-top: 1px solid var(--border); }
-.weeklyDay:first-child{ border-top: 0; padding-top: 6px; }
-.weeklyDayTitle{
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 10px;
-}
-.weeklyItem{ padding: 10px 0; }
-.weeklyItemTitle{
-  font-weight: 700;
-  font-size: 18px;
-  letter-spacing: -0.01em;
-  margin-bottom: 4px;
-}
-.weeklyItemMeta{
-  font-size: 14px;
-  color: var(--muted);
-  display:flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  align-items: center;
-}
-.weeklyListCompact .weeklyItemTitle{ font-size: 16px; }
-.weeklyListCompact .weeklyItemMeta{ font-size: 13px; }
 
 .ctaRow{
   display:flex;
