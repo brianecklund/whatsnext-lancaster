@@ -107,6 +107,11 @@ export default async function HomePage() {
           "endtime",
         ]) ?? null;
 
+      // Some Prismic models (or older docs) may have an `end_datetime` filled while
+      // `start_datetime` is empty. The UI expects a usable `start_datetime` for grouping.
+      // Use end as a fallback so the event still appears in the calendar list.
+      const effectiveStart = startVal ?? endVal;
+
       return {
         id: doc.id,
         key: doc.uid ?? doc.id,
@@ -117,7 +122,7 @@ export default async function HomePage() {
         description: descText,
 
         // keep property name as start_datetime because the rest of your UI expects it
-        start_datetime: startVal,
+        start_datetime: effectiveStart,
         end_datetime: endVal,
         all_day: doc.data?.all_day ?? null,
 
