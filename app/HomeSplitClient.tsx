@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 type EventLite = {
   id: string;
@@ -143,6 +143,7 @@ function pickDescriptionText(e: EventLite): string | null {
 export default function HomeSplitClient({ events }: Props) {
   const router = useRouter();
   const sp = useSearchParams();
+  const pathname = usePathname();
 
   const q = sp.get("q") || "";
   const type = sp.get("type") || "";
@@ -309,6 +310,33 @@ export default function HomeSplitClient({ events }: Props) {
           <aside className="pane paneLeft">
             <div className="scroll">
               <div className="leftSticky">
+                <div className="tabs" aria-label="Primary navigation">
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname === "/" ? "true" : "false"}
+                    onClick={() => router.push("/")}
+                  >
+                    Calendar
+                  </button>
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+                    onClick={() => router.push("/locations")}
+                  >
+                    Directory
+                  </button>
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+                    onClick={() => router.push("/updates")}
+                  >
+                    Updates
+                  </button>
+                </div>
+
                 <div className="leftControls">
                   <input
                     className="searchInput"
@@ -436,6 +464,18 @@ export default function HomeSplitClient({ events }: Props) {
         {showRight ? (
           <main className="pane paneRight">
             <div className="scroll">
+              {isMobile && mobileTab === "detail" ? (
+                <div className="mobileBackBar">
+                  <button
+                    type="button"
+                    className="mobileBackBtn"
+                    onClick={() => setMobileTab("list")}
+                  >
+                    ← Back to list
+                  </button>
+                </div>
+              ) : null}
+
               {selectedKey === WEEKLY_KEY ? (
                 <div className="rightHeader">
                   <div className="rightDayLabel">Weekly Overview</div>
@@ -455,7 +495,6 @@ export default function HomeSplitClient({ events }: Props) {
                             const d = safeDateFromEvent(e);
                             const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
                             const img = pickImageUrl(e);
-                            const desc = pickDescriptionText(e);
 
                             return (
                               <button
@@ -511,8 +550,6 @@ export default function HomeSplitClient({ events }: Props) {
                                       </div>
                                     ) : null}
                                   </div>
-
-                                  {desc ? <div className="weeklyCardDesc">{desc}</div> : null}
                                 </div>
                               </button>
                             );
@@ -594,22 +631,30 @@ export default function HomeSplitClient({ events }: Props) {
 
       {/* Mobile bottom tabs */}
       {isMobile ? (
-        <div className="mobileTabs">
+        <div className="mobileTabs" aria-label="Primary navigation">
           <button
-            className="tabBtn"
-            aria-current={mobileTab === "list" ? "page" : undefined}
-            onClick={() => setMobileTab("list")}
             type="button"
+            className="tabBtn"
+            data-active={pathname === "/" ? "true" : "false"}
+            onClick={() => router.push("/")}
           >
-            List
+            Calendar
           </button>
           <button
-            className="tabBtn"
-            aria-current={mobileTab === "detail" ? "page" : undefined}
-            onClick={() => setMobileTab("detail")}
             type="button"
+            className="tabBtn"
+            data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+            onClick={() => router.push("/locations")}
           >
-            Details
+            Directory
+          </button>
+          <button
+            type="button"
+            className="tabBtn"
+            data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+            onClick={() => router.push("/updates")}
+          >
+            Updates
           </button>
         </div>
       ) : null}
