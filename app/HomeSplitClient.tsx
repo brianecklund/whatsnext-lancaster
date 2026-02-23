@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { format, isToday, isTomorrow, parseISO } from "date-fns";
+import { endOfWeek, format, isToday, isTomorrow, parseISO, startOfDay } from "date-fns";
 import type { EventLite } from "@/lib/types";
 
 function safeParseDate(value: string | null | undefined): Date | null {
@@ -41,6 +41,8 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
   const q = searchParams.get("q") ?? "";
   const type = searchParams.get("type") ?? "";
 
+  const WEEKLY_KEY = "__weekly__";
+
   const [filterOpen, setFilterOpen] = useState(false);
 
   function navigate(params: URLSearchParams) {
@@ -51,6 +53,12 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
   function setSelectedEvent(key: string) {
     const params = new URLSearchParams(searchParams.toString());
     params.set("event", key);
+    navigate(params);
+  }
+
+  function setWeeklySelected() {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("event", WEEKLY_KEY);
     navigate(params);
   }
 
@@ -136,16 +144,53 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
     });
   }, [filteredEvents]);
 
+  const weeklyEvents = useMemo(() => {
+    const today = startOfDay(new Date());
+    const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
+    return filteredEvents.filter((e) => {
+      if (!e.start_datetime) return false;
+      const d = safeParseDate(e.start_datetime);
+      if (!d) return false;
+      return d.getTime() >= today.getTime() && d.getTime() <= weekEnd.getTime();
+    });
+  }, [filteredEvents]);
+
+  const weeklyGrouped = useMemo(() => {
+    const map = new Map<string, EventLite[]>();
+    for (const e of weeklyEvents) {
+      if (!e.start_datetime) continue;
+      const d = safeParseDate(e.start_datetime);
+      if (!d) continue;
+      const key = format(d, "yyyy-MM-dd");
+      const cur = map.get(key) ?? [];
+      cur.push(e);
+      map.set(key, cur);
+    }
+    const keys = Array.from(map.keys()).sort();
+    return keys.map((k) => {
+      const list = map.get(k) ?? [];
+      list.sort((a, b) => {
+        const ad = a.start_datetime ? safeParseDate(a.start_datetime)?.getTime() ?? 0 : 0;
+        const bd = b.start_datetime ? safeParseDate(b.start_datetime)?.getTime() ?? 0 : 0;
+        return ad - bd;
+      });
+      return { key: k, events: list };
+    });
+  }, [weeklyEvents]);
+
   const selectedEventDesktop = useMemo(() => {
     if (!filteredEvents.length) return null;
-    if (!selectedEventKey) return filteredEvents[0];
+    if (!selectedEventKey || selectedEventKey === WEEKLY_KEY) return null;
     return filteredEvents.find((e) => e.key === selectedEventKey) ?? filteredEvents[0];
   }, [filteredEvents, selectedEventKey]);
 
   const selectedEventMobile = useMemo(() => {
     if (!selectedEventKey) return null;
+    if (selectedEventKey === WEEKLY_KEY) return null;
     return filteredEvents.find((e) => e.key === selectedEventKey) ?? null;
   }, [filteredEvents, selectedEventKey]);
+
+  const isWeeklySelected = !selectedEventKey || selectedEventKey === WEEKLY_KEY;
 
   const mobileDetailOpen = Boolean(selectedEventKey);
 
@@ -186,6 +231,19 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
               </div>
             </div>
 
+            {/* Weekly overview */}
+            <button
+              className="weeklyOverview"
+              data-active={isWeeklySelected ? "true" : "false"}
+              type="button"
+              onClick={setWeeklySelected}
+            >
+              <div className="weeklyTitle">Weekly Overview</div>
+              <div className="weeklyCount">
+                {weeklyEvents.length} event{weeklyEvents.length === 1 ? "" : "s"} left this week
+              </div>
+            </button>
+
             {grouped.length === 0 ? (
               <div className="emptyList">No upcoming events yet.</div>
             ) : (
@@ -202,7 +260,7 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
                   {dayEvents.map((e) => {
                     const active = selectedEventKey
                       ? selectedEventKey === e.key
-                      : selectedEventDesktop?.key === e.key;
+                      : (!isWeeklySelected && selectedEventDesktop?.key === e.key);
 
                     return (
                       <button
@@ -276,7 +334,9 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
         {/* RIGHT (desktop) */}
         <div className="pane paneRight">
           <div className="scroll">
-            {!selectedEventDesktop ? (
+            {isWeeklySelected ? (
+              <WeeklyDetail grouped={weeklyGrouped} count={weeklyEvents.length} />
+            ) : !selectedEventDesktop ? (
               <div className="emptyRight">Select an event to see details.</div>
             ) : (
               <EventDetail event={selectedEventDesktop} />
@@ -302,12 +362,69 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
           <button className="backBtn" type="button" onClick={clearSelectedEvent}>
             Back
           </button>
-          <div className="mobileDetailTitle">Event</div>
+          <div className="mobileDetailTitle">
+            {selectedEventKey === WEEKLY_KEY ? "Weekly Overview" : "Event"}
+          </div>
         </div>
         <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
-          {selectedEventMobile ? <EventDetail event={selectedEventMobile} /> : null}
+          {selectedEventKey === WEEKLY_KEY ? (
+            <WeeklyDetail grouped={weeklyGrouped} count={weeklyEvents.length} compact />
+          ) : selectedEventMobile ? (
+            <EventDetail event={selectedEventMobile} />
+          ) : null}
         </div>
       </div>
+    </div>
+  );
+}
+
+function WeeklyDetail({
+  grouped,
+  count,
+  compact,
+}: {
+  grouped: { key: string; events: EventLite[] }[];
+  count: number;
+  compact?: boolean;
+}) {
+  const today = startOfDay(new Date());
+  const weekEnd = endOfWeek(today, { weekStartsOn: 1 });
+  const range = `${format(today, "MMM d")} – ${format(weekEnd, "MMM d")}`;
+
+  return (
+    <div>
+      <div className="rightHeader">
+        <div className="rightDayLabel">This week</div>
+        <h1 className="detailTitle">Weekly Overview</h1>
+        <div className="detailMeta">
+          <span className="venue">{range}</span>
+          <span className="muted">
+            {count} event{count === 1 ? "" : "s"}
+          </span>
+        </div>
+      </div>
+
+      {count === 0 ? (
+        <div className="detailBody">No more events scheduled for this week.</div>
+      ) : (
+        <div className={compact ? "weeklyList weeklyListCompact" : "weeklyList"}>
+          {grouped.map(({ key, events }) => (
+            <section key={key} className="weeklyDay">
+              <div className="weeklyDayTitle">{dayLabel(key)}</div>
+              {events.map((e) => (
+                <div key={e.id} className="weeklyItem">
+                  <div className="weeklyItemTitle">{e.title ?? "Untitled event"}</div>
+                  <div className="weeklyItemMeta">
+                    {formatEventTime(e)}
+                    {e.location?.name ? <span className="dot">•</span> : null}
+                    {e.location?.name ? <span>{e.location.name}</span> : null}
+                  </div>
+                </div>
+              ))}
+            </section>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
