@@ -212,6 +212,15 @@ export default function HomeSplitClient({ events }: Props) {
     });
   }, [events, q, type]);
 
+  const effectiveSelectedKey = useMemo(() => {
+    // If a specific event is selected via URL, keep it.
+    if (selectedKey !== WEEKLY_KEY) return selectedKey;
+    // Otherwise, default to the first visible event so the right pane shows details.
+    const first = filteredEvents[0];
+    return first ? (first.uid || first.id) : WEEKLY_KEY;
+  }, [selectedKey, filteredEvents]);
+
+
   const leftDayGroups = useMemo(() => {
     const map = new Map<string, { date: Date; items: EventLite[] }>();
 
@@ -288,14 +297,14 @@ export default function HomeSplitClient({ events }: Props) {
 
   const selectedEvent = useMemo(() => {
     if (!filteredEvents.length) return null;
-    if (selectedKey === WEEKLY_KEY) return null;
+    if (effectiveSelectedKey === WEEKLY_KEY) return null;
 
     const byUid =
-      selectedKey && filteredEvents.find((e) => e.uid && e.uid === selectedKey);
-    const byId = selectedKey && filteredEvents.find((e) => e.id === selectedKey);
+      effectiveSelectedKey && filteredEvents.find((e) => e.uid && e.uid === selectedKey);
+    const byId = effectiveSelectedKey && filteredEvents.find((e) => e.id === selectedKey);
 
     return byUid || byId || null;
-  }, [filteredEvents, selectedKey]);
+  }, [filteredEvents, effectiveSelectedKey]);
 
   // stagger counter for left list
   let listAnimIndex = 0;
@@ -321,7 +330,13 @@ export default function HomeSplitClient({ events }: Props) {
           <aside className="pane paneLeft">
             <div className="scroll">
               <div className="leftSticky">
-                <div className="leftControls">
+              <div className="tabs" aria-label="Primary navigation">
+                <a className="tabBtn" href="/" aria-current="page">Calendar</a>
+                <a className="tabBtn" href="/locations">Directory</a>
+                <a className="tabBtn" href="/updates">Updates</a>
+              </div>
+
+              <div className="leftControls">
                   <input
                     className="searchInput"
                     placeholder="Search events…"
@@ -466,7 +481,7 @@ export default function HomeSplitClient({ events }: Props) {
         {showRight ? (
           <main className="pane paneRight">
             <div className="scroll">
-              {selectedKey === WEEKLY_KEY ? (
+              {effectiveSelectedKey === WEEKLY_KEY ? (
                 <div className="rightHeader">
                   <div className="rightDayLabel">Weekly Overview</div>
 
