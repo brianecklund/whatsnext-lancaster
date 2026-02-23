@@ -1,104 +1,205 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { format, isToday, isTomorrow, parseISO } from "date-fns";
-import type { EventLite } from "@/lib/types";
 
-function safeParseDate(value: string | null | undefined): Date | null {
-  if (!value) return null;
-  // Prismic Date can be YYYY-MM-DD. Timestamp can be ISO.
-  try {
-    if (/^\d{4}-\d{2}-\d{2}$/.test(value)) {
-      return parseISO(value + "T00:00:00");
-    }
-    return parseISO(value);
-  } catch {
-    return null;
-  }
-}
+type EventLite = {
+  id: string;
+  uid?: string | null;
 
-function dayLabel(dateKey: string) {
-  const dayDate = safeParseDate(dateKey);
-  if (!dayDate) return dateKey;
-  const label = isToday(dayDate)
-    ? "Today"
-    : isTomorrow(dayDate)
-    ? "Tomorrow"
-    : format(dayDate, "EEEE");
-  return `${label}, ${format(dayDate, "MMM d")}`;
-}
+  title?: string | null;
+  summary?: string | null;
 
-function normalize(v: string) {
+  start_datetime?: string | null;
+  end_datetime?: string | null;
+
+  event_type?: string | null;
+  status?: string | null;
+
+  locationName?: string | null;
+  address?: string | null;
+
+  website_url?: string | null;
+  tickets_url?: string | null;
+
+  // Some builds normalize this already
+  imageUrl?: string | null;
+  image_url?: string | null;
+  descriptionText?: string | null;
+
+  // Others pass through raw Prismic-ish shapes
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  image?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  description?: any;
+};
+
+type Props = {
+  events: EventLite[];
+};
+
+const WEEKLY_KEY = "__weekly__";
+
+function norm(v: string) {
   return (v || "").toLowerCase().trim();
 }
 
-export default function HomeSplitClient({ events }: { events: EventLite[] }) {
+function safeDateFromEvent(e: EventLite): Date | null {
+  const raw = e.start_datetime || e.end_datetime;
+  if (!raw) return null;
+  const d = new Date(raw);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function startOfToday(): Date {
+  const d = new Date();
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
+function endOfSundayFromToday(): Date {
+  const today = startOfToday();
+  const day = today.getDay(); // 0=Sun..6=Sat
+  const daysUntilSunday = (7 - day) % 7;
+  const end = new Date(today);
+  end.setDate(today.getDate() + daysUntilSunday);
+  end.setHours(23, 59, 59, 999);
+  return end;
+}
+
+function startOfDay(d: Date): Date {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
+function dayKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const dd = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${dd}`;
+}
+
+function formatDayHeading(d: Date): string {
+  return d.toLocaleDateString(undefined, {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+  });
+}
+
+function formatTimeLabel(d: Date): string {
+  return d.toLocaleString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function pickImageUrl(e: any): string | null {
+  if (!e) return null;
+
+  // normalized keys
+  if (typeof e.imageUrl === "string" && e.imageUrl) return e.imageUrl;
+  if (typeof e.image_url === "string" && e.image_url) return e.image_url;
+
+  // raw prismic-ish image field
+  const img = e.image;
+  if (img) {
+    if (typeof img.url === "string" && img.url) return img.url;
+    const square = img.Square || img.square;
+    if (square?.url) return square.url;
+
+    const thumbs = img.thumbnails || img.variants;
+    if (thumbs?.Square?.url) return thumbs.Square.url;
+    if (thumbs?.square?.url) return thumbs.square.url;
+  }
+
+  return null;
+}
+
+function pickDescriptionText(e: EventLite): string | null {
+  if (e.descriptionText) return e.descriptionText;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const d: any = (e as any).description;
+  if (!d) return null;
+  if (typeof d === "string") return d;
+
+  // very lightweight rich text fallback (avoid prismic runtime dependency here)
+  if (Array.isArray(d)) {
+    const parts = d
+      .map((b) => (typeof b?.text === "string" ? b.text : ""))
+      .filter(Boolean);
+    return parts.length ? parts.join("\n\n") : null;
+  }
+
+  return null;
+}
+
+export default function HomeSplitClient({ events }: Props) {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const sp = useSearchParams();
 
-  const selectedEventKey = searchParams.get("event");
-  const q = searchParams.get("q") ?? "";
-  const type = searchParams.get("type") ?? "";
+  const q = sp.get("q") || "";
+  const type = sp.get("type") || "";
 
-  const [filterOpen, setFilterOpen] = useState(false);
+  // default selection = weekly overview
+  const selectedParam = sp.get("event");
+  const selectedKey = selectedParam ?? WEEKLY_KEY;
 
-  function navigate(params: URLSearchParams) {
-    const qs = params.toString();
-    router.replace(qs ? `/?${qs}` : "/");
+  const [overlayOpen, setOverlayOpen] = useState(false);
+
+  const [isMobile, setIsMobile] = useState(false);
+  const [mobileDetailOpen, setMobileDetailOpen] = useState(false);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 980px)");
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
+  }, []);
+
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (e.key === "Escape") setOverlayOpen(false);
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  function setParam(key: string, value: string | null) {
+    const params = new URLSearchParams(sp.toString());
+    if (!value) params.delete(key);
+    else params.set(key, value);
+    router.push(`/?${params.toString()}`);
   }
 
-  function setSelectedEvent(key: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("event", key);
-    navigate(params);
+  function goDetailMobile() {
+    if (isMobile) setMobileDetailOpen(true);
   }
 
-  function clearSelectedEvent() {
-    const params = new URLSearchParams(searchParams.toString());
-    params.delete("event");
-    navigate(params);
-  }
-
-  function setQuery(next: string) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (!next) params.delete("q");
-    else params.set("q", next);
-    // keep selection if still visible; we'll reconcile below
-    navigate(params);
-  }
-
-  function setType(next: string | null) {
-    const params = new URLSearchParams(searchParams.toString());
-    if (!next) params.delete("type");
-    else params.set("type", next);
-    // When changing type, reset selection (avoids "selected but filtered out")
-    params.delete("event");
-    navigate(params);
-  }
-
-  // Unique event types (for filter overlay)
   const eventTypes = useMemo(() => {
     const set = new Set<string>();
-    for (const e of events) {
-      if (e.event_type) set.add(e.event_type);
-    }
+    for (const e of events) if (e.event_type) set.add(e.event_type);
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [events]);
 
-  // Apply search + type filters before grouping
   const filteredEvents = useMemo(() => {
-    const nq = normalize(q);
-    const nt = normalize(type);
+    const nq = norm(q);
+    const nt = norm(type);
 
     return events.filter((e) => {
-      // Search across title + summary + location + type
-      const hay = normalize(
+      const hay = norm(
         [
           e.title ?? "",
           e.summary ?? "",
-          e.location?.name ?? "",
-          e.location?.address ?? "",
+          e.locationName ?? "",
+          e.address ?? "",
           e.event_type ?? "",
         ]
           .filter(Boolean)
@@ -106,60 +207,128 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
       );
 
       const matchesSearch = !nq || hay.includes(nq);
-      const matchesType = !nt || normalize(e.event_type ?? "") === nt;
-
+      const matchesType = !nt || norm(e.event_type ?? "") === nt;
       return matchesSearch && matchesType;
     });
   }, [events, q, type]);
 
-  const grouped = useMemo(() => {
-    const map = new Map<string, EventLite[]>();
+  const effectiveSelectedKey = useMemo(() => {
+    // If a specific event is selected via URL, keep it.
+    if (selectedKey !== WEEKLY_KEY) return selectedKey;
+    // Otherwise, default to Weekly Overview.
+    return WEEKLY_KEY;
+  }, [selectedKey, filteredEvents]);
+
+
+  const leftDayGroups = useMemo(() => {
+    const map = new Map<string, { date: Date; items: EventLite[] }>();
+
     for (const e of filteredEvents) {
-      if (!e.start_datetime) continue;
-      const d = safeParseDate(e.start_datetime);
+      const d = safeDateFromEvent(e);
       if (!d) continue;
-      const key = format(d, "yyyy-MM-dd");
-      const cur = map.get(key) ?? [];
-      cur.push(e);
-      map.set(key, cur);
+      const dk = dayKey(d);
+      if (!map.has(dk)) map.set(dk, { date: startOfDay(d), items: [] });
+      map.get(dk)!.items.push(e);
     }
 
-    const keys = Array.from(map.keys()).sort();
-    return keys.map((k) => {
-      const list = map.get(k) ?? [];
-      list.sort((a, b) => {
-        const ad = a.start_datetime ? safeParseDate(a.start_datetime)?.getTime() ?? 0 : 0;
-        const bd = b.start_datetime ? safeParseDate(b.start_datetime)?.getTime() ?? 0 : 0;
-        return ad - bd;
+    const groups = Array.from(map.values()).sort(
+      (a, b) => a.date.getTime() - b.date.getTime()
+    );
+
+    for (const g of groups) {
+      g.items.sort((a, b) => {
+        const da = safeDateFromEvent(a)?.getTime() ?? 0;
+        const db = safeDateFromEvent(b)?.getTime() ?? 0;
+        return da - db;
       });
-      return { key: k, events: list };
-    });
+    }
+
+    return groups;
   }, [filteredEvents]);
 
-  const selectedEventDesktop = useMemo(() => {
+  const weeklyRange = useMemo(() => {
+    const start = startOfToday();
+    const end = endOfSundayFromToday();
+    return { start, end };
+  }, []);
+
+  const weekEvents = useMemo(() => {
+    const { start, end } = weeklyRange;
+
+    return filteredEvents
+      .map((e) => ({ e, d: safeDateFromEvent(e) }))
+      .filter(
+        ({ d }) =>
+          d &&
+          d.getTime() >= start.getTime() &&
+          d.getTime() <= end.getTime()
+      )
+      .sort((a, b) => a.d!.getTime() - b.d!.getTime())
+      .map(({ e }) => e);
+  }, [filteredEvents, weeklyRange]);
+
+  const weekEventsCount = weekEvents.length;
+
+  const weekGroups = useMemo(() => {
+    const map = new Map<string, { date: Date; items: EventLite[] }>();
+    for (const e of weekEvents) {
+      const d = safeDateFromEvent(e);
+      if (!d) continue;
+      const dk = dayKey(d);
+      if (!map.has(dk)) map.set(dk, { date: startOfDay(d), items: [] });
+      map.get(dk)!.items.push(e);
+    }
+
+    const groups = Array.from(map.values()).sort(
+      (a, b) => a.date.getTime() - b.date.getTime()
+    );
+
+    for (const g of groups) {
+      g.items.sort((a, b) => {
+        const da = safeDateFromEvent(a)?.getTime() ?? 0;
+        const db = safeDateFromEvent(b)?.getTime() ?? 0;
+        return da - db;
+      });
+    }
+
+    return groups;
+  }, [weekEvents]);
+
+  const selectedEvent = useMemo(() => {
     if (!filteredEvents.length) return null;
-    if (!selectedEventKey) return filteredEvents[0];
-    return filteredEvents.find((e) => e.key === selectedEventKey) ?? filteredEvents[0];
-  }, [filteredEvents, selectedEventKey]);
+    if (effectiveSelectedKey === WEEKLY_KEY) return null;
 
-  const selectedEventMobile = useMemo(() => {
-    if (!selectedEventKey) return null;
-    return filteredEvents.find((e) => e.key === selectedEventKey) ?? null;
-  }, [filteredEvents, selectedEventKey]);
+    const byUid =
+      effectiveSelectedKey && filteredEvents.find((e) => e.uid && e.uid === selectedKey);
+    const byId = effectiveSelectedKey && filteredEvents.find((e) => e.id === selectedKey);
 
-  const mobileDetailOpen = Boolean(selectedEventKey);
+    return byUid || byId || null;
+  }, [filteredEvents, effectiveSelectedKey]);
+
+  // stagger counter for left list
+  let listAnimIndex = 0;
+
+  const showLeft = true;
+  const showRight = !isMobile;
+
+  // Right pane content helpers
+  const selectedImg = selectedEvent ? pickImageUrl(selectedEvent) : null;
+  const selectedDesc = selectedEvent ? pickDescriptionText(selectedEvent) : null;
+  const selectedTime = selectedEvent
+    ? (() => {
+        const d = safeDateFromEvent(selectedEvent);
+        return d ? formatTimeLabel(d) : "Time TBD";
+      })()
+    : null;
 
   return (
     <div className="pageShell">
-      <div className="tagline">
-        A shared calendar for local events, specials, and pop-ups in Lancaster, PA.
-      </div>
-
       <div className="split">
         {/* LEFT */}
-        <div className="pane paneLeft">
-          <div className="scroll">
-            <div className="leftSticky">
+        {showLeft ? (
+          <aside className="pane paneLeft">
+            <div className="scroll">
+              <div className="leftSticky">
               <div className="tabs" aria-label="Primary navigation">
                 <a className="tabBtn" href="/" aria-current="page">Calendar</a>
                 <a className="tabBtn" href="/locations">Directory</a>
@@ -167,124 +336,307 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
               </div>
 
               <div className="leftControls">
-                <input
-                  className="searchInput"
-                  value={q}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search"
-                  aria-label="Search events"
-                />
-                <button className="filterBtn" type="button" onClick={() => setFilterOpen(true)}>
-                  Filter
-                </button>
+                  <input
+                    className="searchInput"
+                    placeholder="Search events…"
+                    value={q}
+                    onChange={(e) => setParam("q", e.target.value)}
+                  />
 
-                {type ? (
-                  <button className="clearBtn" type="button" onClick={() => setType(null)}>
-                    Clear
+                  <button
+                    className="filterBtn"
+                    onClick={() => setOverlayOpen(true)}
+                    type="button"
+                  >
+                    Filter
                   </button>
-                ) : null}
+
+                  {(q || type) ? (
+                    <button
+                      className="clearBtn"
+                      onClick={() => {
+                        setParam("q", null);
+                        setParam("type", null);
+                      }}
+                      type="button"
+                    >
+                      Clear
+                    </button>
+                  ) : null}
+                </div>
               </div>
-            </div>
 
-            {grouped.length === 0 ? (
-              <div className="emptyList">No upcoming events yet.</div>
-            ) : (
-              grouped.map(({ key, events: dayEvents }, idx) => (
-                <section
-                  key={key}
-                  className="dayBlock"
-                  style={{ borderTop: idx === 0 ? "0" : undefined }}
-                >
-                  <div className="dayTitle">
-                    <span className="dayTitleText">{dayLabel(key)}</span>
-                  </div>
+              {/* Weekly Overview (left) */}
+              <button
+                type="button"
+                className="weeklyOverview fadeInItem"
+                style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
+                data-active={selectedKey === WEEKLY_KEY ? "true" : "false"}
+                onClick={() => {
+                  setParam("event", WEEKLY_KEY);
+                  goDetailMobile();
+                }}
+              >
+                <div className="weeklyTitle">Weekly Overview</div>
+                <div className="weeklyCount">
+                  {weekEventsCount} event{weekEventsCount === 1 ? "" : "s"} left
+                  this week
+                </div>
+              </button>
 
-                  {dayEvents.map((e) => {
-                    const active = selectedEventKey
-                      ? selectedEventKey === e.key
-                      : selectedEventDesktop?.key === e.key;
+              {leftDayGroups.length === 0 ? (
+                <div className="emptyList">No events match your search.</div>
+              ) : null}
+
+              {/* Left list */}
+              {leftDayGroups.map((g) => (
+                <section key={dayKey(g.date)} className="dayBlock">
+                  <div className="dayTitle">{formatDayHeading(g.date)}</div>
+
+                  {g.items.map((e) => {
+                    const active =
+                      selectedEvent?.id === e.id ||
+                      (selectedEvent?.uid && e.uid && selectedEvent.uid === e.uid);
+
+                    const title = e.title || "Untitled event";
+                    const d = safeDateFromEvent(e);
+                    const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
 
                     return (
                       <button
                         key={e.id}
-                        className="eventRow"
+                        className="eventRow fadeInItem"
+                        style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
                         data-active={active ? "true" : "false"}
-                        onClick={() => setSelectedEvent(e.key)}
+                        onClick={() => {
+                          if (e.uid) setParam("event", e.uid);
+                          else setParam("event", e.id);
+                          goDetailMobile();
+                        }}
                         type="button"
                       >
-                        <span className="eventRowTitle">{e.title ?? "Untitled event"}</span>
-
-                        <span className="eventRowMeta">
-                          {formatEventTime(e)}
-                          {e.location?.name ? <span className="dot">•</span> : null}
-                          {e.location?.name ? <span>{e.location.name}</span> : null}
-                        </span>
+                        <div className="eventRowTitle">{title}</div>
+                        <div className="eventRowMeta">
+                          <span>{timeLabel}</span>
+                          {e.event_type ? <span className="dot">•</span> : null}
+                          {e.event_type ? <span>{e.event_type}</span> : null}
+                        </div>
                       </button>
                     );
                   })}
                 </section>
-              ))
-            )}
+              ))}
 
-            {/* Left filter overlay */}
-            <div
-              className="leftOverlay"
-              data-open={filterOpen ? "true" : "false"}
-              aria-hidden={!filterOpen}
-            >
-              <div className="leftOverlayHeader">
-                <div className="leftOverlayTitle">Filter events</div>
-                <button className="overlayClose" type="button" onClick={() => setFilterOpen(false)}>
-                  ×
-                </button>
-              </div>
+              {/* Left overlay filter */}
+              <div className="leftOverlay" data-open={overlayOpen ? "true" : "false"}>
+                <div className="leftOverlayHeader">
+                  <div className="leftOverlayTitle">Filter</div>
+                  <button
+                    className="overlayClose"
+                    onClick={() => setOverlayOpen(false)}
+                    aria-label="Close"
+                    type="button"
+                  >
+                    ×
+                  </button>
+                </div>
 
-              <div className="filterGrid">
-                {eventTypes.map((t) => {
-                  const active = normalize(type) === normalize(t);
-                  return (
-                    <button
-                      key={t}
-                      className="pillBtn"
-                      data-active={active ? "true" : "false"}
-                      type="button"
-                      onClick={() => {
-                        setType(t);
-                        setFilterOpen(false);
-                      }}
-                    >
-                      {t}
-                    </button>
-                  );
-                })}
+                <div className="filterGrid">
+                  {eventTypes.map((t) => {
+                    const on = norm(type) === norm(t);
+                    return (
+                      <button
+                        key={t}
+                        className="pillBtn"
+                        data-active={on ? "true" : "false"}
+                        onClick={() => {
+                          setParam("type", t);
+                          setOverlayOpen(false);
+                        }}
+                        type="button"
+                      >
+                        {t}
+                      </button>
+                    );
+                  })}
 
-                <button
-                  className="pillBtn pillBtnSecondary"
-                  type="button"
-                  onClick={() => {
-                    setType(null);
-                    setFilterOpen(false);
-                  }}
-                >
-                  Show all
-                </button>
+                  <button
+                    className="pillBtn pillBtnSecondary"
+                    onClick={() => {
+                      setParam("type", null);
+                      setOverlayOpen(false);
+                    }}
+                    type="button"
+                  >
+                    Clear filter
+                  </button>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
+          </aside>
+        ) : null}
 
-        {/* RIGHT (desktop) */}
-        <div className="pane paneRight">
-          <div className="scroll">
-            {!selectedEventDesktop ? (
-              <div className="emptyRight">Select an event to see details.</div>
-            ) : (
-              <EventDetail event={selectedEventDesktop} />
-            )}
-          </div>
-        </div>
+        {/* RIGHT */}
+        {showRight ? (
+          <main className="pane paneRight">
+            <div className="scroll">
+              {effectiveSelectedKey === WEEKLY_KEY ? (
+                <div className="rightHeader">
+                  <div className="rightDayLabel">Weekly Overview</div>
+
+                  {weekEventsCount === 0 ? (
+                    <div className="emptyRight">
+                      No events scheduled for the rest of this week.
+                    </div>
+                  ) : (
+                    <div className="weeklyCards">
+                      {weekGroups.map((g) => (
+                        <div key={dayKey(g.date)} className="weeklyDayGroup">
+                          <div className="dayTitle">{formatDayHeading(g.date)}</div>
+
+                          {g.items.map((e) => {
+                            const title = e.title || "Untitled event";
+                            const d = safeDateFromEvent(e);
+                            const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
+                            const img = pickImageUrl(e);
+                            const desc = pickDescriptionText(e);
+
+                            return (
+                              <button
+                                key={e.id}
+                                type="button"
+                                className="weeklyCard weeklyCardSelectable"
+                                onClick={() => {
+                                  if (e.uid) setParam("event", e.uid);
+                                  else setParam("event", e.id);
+                                  goDetailMobile();
+                                }}
+                              >
+                                <div className="weeklyCardMedia">
+                                  {img ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img className="weeklyThumb" src={img} alt="" />
+                                  ) : (
+                                    <div className="weeklyThumbPlaceholder" aria-hidden />
+                                  )}
+                                </div>
+
+                                <div className="weeklyCardContent">
+                                  <div className="weeklyCardTop">
+                                    <div className="weeklyCardTitleWrap">
+                                      <div className="weeklyCardTitle">{title}</div>
+                                      <div className="weeklyCardTime">{timeLabel}</div>
+                                    </div>
+
+                                    {(e.tickets_url || e.website_url) ? (
+                                      <div className="weeklyCardActions">
+                                        {e.tickets_url ? (
+                                          <a
+                                            className="weeklyMiniBtn"
+                                            href={e.tickets_url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            onClick={(ev) => ev.stopPropagation()}
+                                          >
+                                            Tickets
+                                          </a>
+                                        ) : null}
+                                        {e.website_url ? (
+                                          <a
+                                            className="weeklyMiniBtn"
+                                            href={e.website_url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            onClick={(ev) => ev.stopPropagation()}
+                                          >
+                                            Website
+                                          </a>
+                                        ) : null}
+                                      </div>
+                                    ) : null}
+                                  </div>
+
+                                  {desc ? <div className="weeklyCardDesc">{desc}</div> : null}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : !selectedEvent ? (
+                <div className="emptyRight">Select an event.</div>
+              ) : (
+                <div className="rightHeader">
+                  <div className="rightDayLabel">{selectedEvent.event_type || "Event"}</div>
+
+                  <h1 className="detailTitle">{selectedEvent.title || "Untitled event"}</h1>
+
+                  <div className="detailMeta">
+                    <span>{selectedTime}</span>
+                    {selectedEvent.locationName ? (
+                      <>
+                        <span className="dot">•</span>
+                        <span className="venue">{selectedEvent.locationName}</span>
+                      </>
+                    ) : null}
+                    {selectedEvent.address ? (
+                      <>
+                        <span className="dot">•</span>
+                        <span className="muted">{selectedEvent.address}</span>
+                      </>
+                    ) : null}
+                  </div>
+
+                  {/* Always render heroImage for placeholder behavior */}
+                  <div
+                    className="heroImage"
+                    style={selectedImg ? { backgroundImage: `url(${selectedImg})` } : undefined}
+                  />
+
+                  {selectedEvent.summary ? <p className="summary">{selectedEvent.summary}</p> : null}
+
+                  {selectedDesc ? <div className="detailBody">{selectedDesc}</div> : null}
+
+                  {(selectedEvent.website_url || selectedEvent.tickets_url) ? (
+                    <div className="ctaRow">
+                      <a
+                        className="ctaBtn"
+                        data-disabled={selectedEvent.website_url ? "false" : "true"}
+                        href={selectedEvent.website_url || "#"}
+                        target={selectedEvent.website_url ? "_blank" : undefined}
+                        rel={selectedEvent.website_url ? "noreferrer" : undefined}
+                        onClick={(ev) => {
+                          if (!selectedEvent.website_url) ev.preventDefault();
+                        }}
+                      >
+                        Website
+                      </a>
+
+                      <a
+                        className="ctaBtn"
+                        data-disabled={selectedEvent.tickets_url ? "false" : "true"}
+                        href={selectedEvent.tickets_url || "#"}
+                        target={selectedEvent.tickets_url ? "_blank" : undefined}
+                        rel={selectedEvent.tickets_url ? "noreferrer" : undefined}
+                        onClick={(ev) => {
+                          if (!selectedEvent.tickets_url) ev.preventDefault();
+                        }}
+                      >
+                        Tickets
+                      </a>
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </div>
+          </main>
+        ) : null}
       </div>
 
+      
       {/* Mobile bottom tabs */}
       <div className="mobileTabs" aria-label="Primary navigation">
         <a className="tabBtn" href="/" aria-current="page">Calendar</a>
@@ -299,138 +651,169 @@ export default function HomeSplitClient({ events }: { events: EventLite[] }) {
         aria-hidden={!mobileDetailOpen}
       >
         <div className="mobileDetailHeader">
-          <button className="backBtn" type="button" onClick={clearSelectedEvent}>
+          <button className="backBtn" type="button" onClick={() => setMobileDetailOpen(false)}>
             Back
           </button>
-          <div className="mobileDetailTitle">Event</div>
+          <div className="mobileDetailTitle">
+            {effectiveSelectedKey === WEEKLY_KEY ? "Weekly Overview" : "Event"}
+          </div>
         </div>
+
         <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
-          {selectedEventMobile ? <EventDetail event={selectedEventMobile} /> : null}
+
+              {effectiveSelectedKey === WEEKLY_KEY ? (
+                <div className="rightHeader">
+                  <div className="rightDayLabel">Weekly Overview</div>
+
+                  {weekEventsCount === 0 ? (
+                    <div className="emptyRight">
+                      No events scheduled for the rest of this week.
+                    </div>
+                  ) : (
+                    <div className="weeklyCards">
+                      {weekGroups.map((g) => (
+                        <div key={dayKey(g.date)} className="weeklyDayGroup">
+                          <div className="dayTitle">{formatDayHeading(g.date)}</div>
+
+                          {g.items.map((e) => {
+                            const title = e.title || "Untitled event";
+                            const d = safeDateFromEvent(e);
+                            const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
+                            const img = pickImageUrl(e);
+                            const desc = pickDescriptionText(e);
+
+                            return (
+                              <button
+                                key={e.id}
+                                type="button"
+                                className="weeklyCard weeklyCardSelectable"
+                                onClick={() => {
+                                  if (e.uid) setParam("event", e.uid);
+                                  else setParam("event", e.id);
+                                  goDetailMobile();
+                                }}
+                              >
+                                <div className="weeklyCardMedia">
+                                  {img ? (
+                                    // eslint-disable-next-line @next/next/no-img-element
+                                    <img className="weeklyThumb" src={img} alt="" />
+                                  ) : (
+                                    <div className="weeklyThumbPlaceholder" aria-hidden />
+                                  )}
+                                </div>
+
+                                <div className="weeklyCardContent">
+                                  <div className="weeklyCardTop">
+                                    <div className="weeklyCardTitleWrap">
+                                      <div className="weeklyCardTitle">{title}</div>
+                                      <div className="weeklyCardTime">{timeLabel}</div>
+                                    </div>
+
+                                    {(e.tickets_url || e.website_url) ? (
+                                      <div className="weeklyCardActions">
+                                        {e.tickets_url ? (
+                                          <a
+                                            className="weeklyMiniBtn"
+                                            href={e.tickets_url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            onClick={(ev) => ev.stopPropagation()}
+                                          >
+                                            Tickets
+                                          </a>
+                                        ) : null}
+                                        {e.website_url ? (
+                                          <a
+                                            className="weeklyMiniBtn"
+                                            href={e.website_url}
+                                            target="_blank"
+                                            rel="noreferrer"
+                                            onClick={(ev) => ev.stopPropagation()}
+                                          >
+                                            Website
+                                          </a>
+                                        ) : null}
+                                      </div>
+                                    ) : null}
+                                  </div>
+
+                                  {desc ? <div className="weeklyCardDesc">{desc}</div> : null}
+                                </div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : !selectedEvent ? (
+                <div className="emptyRight">Select an event.</div>
+              ) : (
+                <div className="rightHeader">
+                  <div className="rightDayLabel">{selectedEvent.event_type || "Event"}</div>
+
+                  <h1 className="detailTitle">{selectedEvent.title || "Untitled event"}</h1>
+
+                  <div className="detailMeta">
+                    <span>{selectedTime}</span>
+                    {selectedEvent.locationName ? (
+                      <>
+                        <span className="dot">•</span>
+                        <span className="venue">{selectedEvent.locationName}</span>
+                      </>
+                    ) : null}
+                    {selectedEvent.address ? (
+                      <>
+                        <span className="dot">•</span>
+                        <span className="muted">{selectedEvent.address}</span>
+                      </>
+                    ) : null}
+                  </div>
+
+                  {/* Always render heroImage for placeholder behavior */}
+                  <div
+                    className="heroImage"
+                    style={selectedImg ? { backgroundImage: `url(${selectedImg})` } : undefined}
+                  />
+
+                  {selectedEvent.summary ? <p className="summary">{selectedEvent.summary}</p> : null}
+
+                  {selectedDesc ? <div className="detailBody">{selectedDesc}</div> : null}
+
+                  {(selectedEvent.website_url || selectedEvent.tickets_url) ? (
+                    <div className="ctaRow">
+                      <a
+                        className="ctaBtn"
+                        data-disabled={selectedEvent.website_url ? "false" : "true"}
+                        href={selectedEvent.website_url || "#"}
+                        target={selectedEvent.website_url ? "_blank" : undefined}
+                        rel={selectedEvent.website_url ? "noreferrer" : undefined}
+                        onClick={(ev) => {
+                          if (!selectedEvent.website_url) ev.preventDefault();
+                        }}
+                      >
+                        Website
+                      </a>
+
+                      <a
+                        className="ctaBtn"
+                        data-disabled={selectedEvent.tickets_url ? "false" : "true"}
+                        href={selectedEvent.tickets_url || "#"}
+                        target={selectedEvent.tickets_url ? "_blank" : undefined}
+                        rel={selectedEvent.tickets_url ? "noreferrer" : undefined}
+                        onClick={(ev) => {
+                          if (!selectedEvent.tickets_url) ev.preventDefault();
+                        }}
+                      >
+                        Tickets
+                      </a>
+                    </div>
+                  ) : null}
+                </div>
+              )}
         </div>
       </div>
-    </div>
-  );
-}
-function formatEventTime(event: EventLite): string {
-  const start = safeParseDate(event.start_datetime);
-  const end = safeParseDate(event.end_datetime);
-
-  // Date-only events (no time) or explicitly all-day
-  const hasTime = Boolean(event.start_datetime && !/^\d{4}-\d{2}-\d{2}$/.test(event.start_datetime));
-  const allDay = Boolean(event.all_day) || !hasTime;
-
-  if (allDay) return "All day";
-
-  if (start && end) {
-    const s = format(start, "h:mma").toLowerCase();
-    const e = format(end, "h:mma").toLowerCase();
-    return `${s} – ${e}`;
-  }
-
-  if (start) return format(start, "h:mma").toLowerCase();
-
-  return "";
-}
-
-function EventDetail({ event }: { event: EventLite }) {
-  const start = safeParseDate(event.start_datetime);
-  const dayStr = start ? format(start, "EEEE, MMMM do") : "";
-
-  const timeStr = formatEventTime(event);
-
-  const status = event.status && event.status !== "Scheduled" ? event.status : null;
-
-  const websiteHref = event.website_url || null;
-  const ticketsHref = event.tickets_url || null;
-
-  return (
-    <div>
-      <div className="rightHeader">
-        {dayStr ? <div className="rightDayLabel">{dayStr}</div> : null}
-
-        <h1 className="detailTitle">{event.title ?? "Event"}</h1>
-
-        <div className="detailMeta">
-          <span className="venue">{event.location?.name ?? "Unknown location"}</span>
-          {timeStr ? <span className="muted">{timeStr}</span> : null}
-        </div>
-
-        <div className="detailChips" aria-label="Event highlights">
-          {event.event_type ? <span className="pill">{event.event_type}</span> : null}
-          {event.cost ? <span className="pill">{event.cost}</span> : null}
-          {event.age_restriction ? <span className="pill">{event.age_restriction}</span> : null}
-          {status ? <span className="pill pillWarn">{status}</span> : null}
-          {Array.isArray(event.tags)
-            ? event.tags.slice(0, 4).map((t) => (
-                <span key={t} className="pill pillSoft">
-                  {t}
-                </span>
-              ))
-            : null}
-        </div>
-      </div>
-
-      <div
-        className="heroImage"
-        style={
-          event.image_url
-            ? { backgroundImage: `url(${event.image_url})` }
-            : undefined
-        }
-        aria-hidden="true"
-      />
-
-      {event.summary ? <p className="summary">{event.summary}</p> : null}
-
-      <div className="detailBody">
-        {event.description ? event.description : "No description added yet."}
-      </div>
-
-      <div className="ctaRow">
-        <a
-          className="ctaBtn"
-          data-disabled={!websiteHref ? "true" : "false"}
-          href={websiteHref ?? undefined}
-          target={websiteHref ? "_blank" : undefined}
-          rel={websiteHref ? "noreferrer" : undefined}
-          aria-disabled={!websiteHref}
-          onClick={(e) => {
-            if (!websiteHref) e.preventDefault();
-          }}
-        >
-          Website
-        </a>
-
-        <a
-          className="ctaBtn"
-          data-disabled={!ticketsHref ? "true" : "false"}
-          href={ticketsHref ?? undefined}
-          target={ticketsHref ? "_blank" : undefined}
-          rel={ticketsHref ? "noreferrer" : undefined}
-          aria-disabled={!ticketsHref}
-          onClick={(e) => {
-            if (!ticketsHref) e.preventDefault();
-          }}
-        >
-          Tickets
-        </a>
-      </div>
-
-      {event.location?.address ? (
-        <div className="finePrint">
-          <span className="label">Address</span>
-          <span>{event.location.address}</span>
-        </div>
-      ) : null}
-
-      {event.location?.website ? (
-        <div className="finePrint">
-          <span className="label">Venue site</span>
-          <a href={event.location.website} target="_blank" rel="noreferrer">
-            {event.location.website}
-          </a>
-        </div>
-      ) : null}
     </div>
   );
 }
