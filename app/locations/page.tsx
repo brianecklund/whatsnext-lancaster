@@ -20,26 +20,14 @@ export default async function LocationsPage() {
     docs = [];
   }
 
-
-// Helper: convert a Prismic rich text field (or string) to plain text.
-const pickRichTextAsText = (data: any, keys: string[]) => {
-  for (const k of keys) {
-    const v = data?.[k];
-    if (!v) continue;
-    if (typeof v === "string" && v.trim()) return v;
-    if (Array.isArray(v) && v.length > 0) {
-      try {
-        return prismic.asText(v as RichTextField);
-      } catch {
-        // fall through
-      }
-    }
-  }
-  return null;
-};
-
   const locations: LocationRow[] = docs.map((doc: any) => {
-    const descText = pickRichTextAsText(doc.data, ["description","desc","details","body","content"]); 
+    const desc = doc.data?.description;
+    const descText =
+      typeof desc === "string"
+        ? desc
+        : Array.isArray(desc) && desc.length > 0
+        ? prismic.asText(desc as RichTextField)
+        : null;
 
     const websiteUrl = prismic.asLink(doc.data?.website);
 
