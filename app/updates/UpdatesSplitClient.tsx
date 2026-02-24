@@ -7,6 +7,12 @@ import { useRouter, useSearchParams } from "next/navigation";
 export type UpdateLite = {
   id: string;
   title?: string | null;
+
+  // used by updates/page.tsx sample data
+  date?: string | null;
+  body?: string | null;
+
+  // used elsewhere / UI
   description?: string | null;
   tags?: string[] | null;
 };
@@ -69,10 +75,8 @@ export default function UpdatesSplitClient({ updates }: Props) {
     return updates.filter((u) => {
       const matchesTag =
         !tag || (u.tags || []).some((t) => norm(t) === norm(tag));
-      const matchesQ =
-        !q ||
-        norm(u.title || "").includes(norm(q)) ||
-        norm(u.description || "").includes(norm(q));
+      const hay = `${u.title || ""} ${u.body || ""} ${u.description || ""} ${u.date || ""}`;
+      const matchesQ = !q || norm(hay).includes(norm(q));
       return matchesTag && matchesQ;
     });
   }, [updates, tag, q]);
@@ -95,7 +99,6 @@ export default function UpdatesSplitClient({ updates }: Props) {
         <div className="pane paneLeft">
           <div className="scroll">
             <div className="leftSticky">
-              {/* Search + Filters Row */}
               <div className="searchRow">
                 <input
                   type="text"
@@ -119,11 +122,8 @@ export default function UpdatesSplitClient({ updates }: Props) {
                 ) : null}
               </div>
 
-              {/* Desktop filter pills */}
               <div
-                className={
-                  "typePills" + (effectiveIsMobile ? " mobileHidden" : "")
-                }
+                className={"typePills" + (effectiveIsMobile ? " mobileHidden" : "")}
                 role="group"
                 aria-label="Update filters"
               >
@@ -156,7 +156,6 @@ export default function UpdatesSplitClient({ updates }: Props) {
               </div>
             </div>
 
-            {/* Update List */}
             <div className="list">
               {filtered.map((u) => (
                 <button
@@ -166,6 +165,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
                 >
                   <div className="title">{u.title}</div>
                   <div className="meta">
+                    {u.date ? <span className="tag">{u.date}</span> : null}
                     {(u.tags || []).map((t) => (
                       <span key={t} className="tag">
                         {t}
@@ -185,7 +185,8 @@ export default function UpdatesSplitClient({ updates }: Props) {
               {selectedUpdate ? (
                 <div className="detail">
                   <h2>{selectedUpdate.title}</h2>
-                  <p>{selectedUpdate.description}</p>
+                  {selectedUpdate.date ? <div className="meta">{selectedUpdate.date}</div> : null}
+                  <p>{selectedUpdate.body || selectedUpdate.description}</p>
                 </div>
               ) : (
                 <div className="detailEmpty">Select an update</div>
@@ -198,15 +199,13 @@ export default function UpdatesSplitClient({ updates }: Props) {
       {/* Mobile Detail Overlay */}
       {effectiveIsMobile && selectedUpdate && (
         <div className="mobileOverlay">
-          <button
-            className="overlayClose"
-            onClick={() => updateQuery({ update: null })}
-          >
+          <button className="overlayClose" onClick={() => updateQuery({ update: null })}>
             Back
           </button>
           <div className="detail">
             <h2>{selectedUpdate.title}</h2>
-            <p>{selectedUpdate.description}</p>
+            {selectedUpdate.date ? <div className="meta">{selectedUpdate.date}</div> : null}
+            <p>{selectedUpdate.body || selectedUpdate.description}</p>
           </div>
         </div>
       )}
