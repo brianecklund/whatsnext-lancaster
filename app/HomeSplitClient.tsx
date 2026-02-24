@@ -372,12 +372,17 @@ export default function HomeSplitClient({ events }: Props) {
 
   return (
     <div className="pageShell">
+      {!effectiveIsMobile ? (
       <div className="tagline">A calendar of events, specials, and pop-ups in Lancaster, PA.</div>
+    ) : null}
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
           <aside className="pane paneLeft">
             <div className="scroll">
+              {effectiveIsMobile ? (
+                <div className="tagline">A calendar of events, specials, and pop-ups in Lancaster, PA.</div>
+              ) : null}
               <div className="leftSticky">
                 <div className="tabs" aria-label="Primary navigation">
                   <button
@@ -406,27 +411,32 @@ export default function HomeSplitClient({ events }: Props) {
                   </button>
                 </div>
 
-                <div className="leftControls">
-                  <input
-                    className="searchInput"
-                    placeholder="Search events…"
-                    value={q}
-                    onChange={(e) => setParam("q", e.target.value)}
-                  />{(q || type) ? (
-                    <button
-                      className="clearBtn"
-                      onClick={() => {
-                        setParam("q", null);
-                        setParam("type", null);
-                      }}
-                      type="button"
-                    >
-                      Clear
-                    </button>
-                  ) : null}
-                </div>
+<div className="searchRow">
+  <input
+    className="searchInput"
+    placeholder="Search events…"
+    value={q}
+    onChange={(e) => setParam("q", e.target.value)}
+  />
+  {effectiveIsMobile ? (
+    <button type="button" className="filtersBtn" onClick={() => setFiltersOpen(true)}>
+      Filters
+    </button>
+  ) : (q || type) ? (
+    <button
+      className="clearBtn"
+      onClick={() => {
+        setParam("q", null);
+        setParam("type", null);
+      }}
+      type="button"
+    >
+      Clear
+    </button>
+  ) : null}
+</div>
 
-                <div className="typePills" role="group" aria-label="Event type filters">
+                <div className={"typePills" + (effectiveIsMobile ? " mobileHidden" : "")} role="group" aria-label="Event type filters">
                   <button
                     type="button"
                     className="typePill"
@@ -918,7 +928,54 @@ export default function HomeSplitClient({ events }: Props) {
           ) : null}
         </div>
       </div>
+      {effectiveIsMobile && filtersOpen ? (
+        <div className="filtersOverlay" role="dialog" aria-modal="true" aria-label="Filters">
+          <div className="filtersOverlayPanel">
+            <div className="filtersOverlayHeader">
+              <div className="filtersOverlayTitle">Filters</div>
+              <button
+                type="button"
+                className="filtersOverlayClose"
+                aria-label="Close filters"
+                onClick={() => setFiltersOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="filtersOverlayContent" role="group" aria-label="Event type filters">
+              <button
+                type="button"
+                className="typePill"
+                data-active={!type ? "true" : "false"}
+                onClick={() => {
+                  setParam("type", null);
+                  setFiltersOpen(false);
+                }}
+              >
+                All
+              </button>
+              {eventTypes.map((t) => {
+                const on = norm(type) === norm(t);
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    className="typePill"
+                    data-active={on ? "true" : "false"}
+                    onClick={() => {
+                      setParam("type", on ? null : t);
+                      setFiltersOpen(false);
+                    }}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
-</div>
+    </div>
   );
 }

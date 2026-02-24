@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
@@ -20,6 +20,30 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   const selectedKey = searchParams.get("location");
   const q = searchParams.get("q") ?? "";
   const cat = searchParams.get("cat") ?? "";
+
+  const [filtersOpen, setFiltersOpen] = useState(false);
+
+  // Hydration-safe mobile detection
+  const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(max-width: 980px)");
+    const apply = () => setIsMobile(Boolean(mq.matches));
+    apply();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anyMq: any = mq;
+    if (mq.addEventListener) mq.addEventListener("change", apply);
+    else if (anyMq.addListener) anyMq.addListener(apply);
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener("change", apply);
+      else if (anyMq.removeListener) anyMq.removeListener(apply);
+    };
+  }, []);
+
+  const effectiveIsMobile = mounted ? isMobile : false;
 
   function navigate(params: URLSearchParams) {
     const qs = params.toString();
@@ -88,12 +112,17 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
   return (
     <div className="pageShell">
+      {!effectiveIsMobile ? (
       <div className="tagline">A directory of places in Lancaster to explore.</div>
+    ) : null}
 
       <div className="split">
         {/* LEFT */}
         <div className="pane paneLeft">
           <div className="scroll">
+            {effectiveIsMobile ? (
+              <div className="tagline">A directory of places in Lancaster to explore.</div>
+            ) : null}
             <div className="leftSticky">
               <div className="tabs" aria-label="Primary navigation">
                 <button
@@ -122,16 +151,26 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                 </button>
               </div>
 
-              <div className="leftControls">
-                <input
-                  className="searchInput"
-                  value={q}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search"
-                  aria-label="Search locations"
-                />
-              
-<div className="typePills" role="group" aria-label="Directory filters">
+<div className="searchRow">
+  <input
+    className="searchInput"
+    value={q}
+    onChange={(e) => setQuery(e.target.value)}
+    placeholder="Search"
+    aria-label="Search locations"
+  />
+  {effectiveIsMobile ? (
+    <button type="button" className="filtersBtn" onClick={() => setFiltersOpen(true)}>
+      Filters
+    </button>
+  ) : null}
+</div>
+
+<div
+  className={"typePills" + (effectiveIsMobile ? " mobileHidden" : "")}
+  role="group"
+  aria-label="Directory filters"
+>
   <button
     type="button"
     className="typePill"
@@ -156,8 +195,8 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   })}
 </div>
 
-</div>
             </div>
+          </div>
 
             {filtered.length === 0 ? (
               <div className="emptyList">No listings yet.</div>
@@ -223,9 +262,58 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
           {selectedMobile ? <LocationDetail location={selectedMobile} /> : null}
         </div>
       </div>
+      {effectiveIsMobile && filtersOpen ? (
+        <div className="filtersOverlay" role="dialog" aria-modal="true" aria-label="Filters">
+          <div className="filtersOverlayPanel">
+            <div className="filtersOverlayHeader">
+              <div className="filtersOverlayTitle">Filters</div>
+              <button
+                type="button"
+                className="filtersOverlayClose"
+                aria-label="Close filters"
+                onClick={() => setFiltersOpen(false)}
+              >
+                ×
+              </button>
+            </div>
+            <div className="filtersOverlayContent" role="group" aria-label="Directory filters">
+              <button
+                type="button"
+                className="typePill"
+                data-active={!cat ? "true" : "false"}
+                onClick={() => {
+                  setCategory(null);
+                  setFiltersOpen(false);
+                }}
+              >
+                All
+              </button>
+              {categories.map((t) => {
+                const on = normalize(cat ?? "") === normalize(t);
+                return (
+                  <button
+                    key={t}
+                    type="button"
+                    className="typePill"
+                    data-active={on ? "true" : "false"}
+                    onClick={() => {
+                      setCategory(on ? null : t);
+                      setFiltersOpen(false);
+                    }}
+                  >
+                    {t}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      ) : null}
+
     </div>
   );
 }
+
 
 function LocationDetail({ location }: { location: LocationRow }) {
   return (
