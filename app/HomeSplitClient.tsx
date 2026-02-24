@@ -471,7 +471,69 @@ export default function HomeSplitClient({ events }: Props) {
                 </div>
               </button>
 
-              {leftDayGroups.length === 0 ? (
+              
+              {effectiveIsMobile && selectedKey === WEEKLY_KEY ? (
+                <div className="weeklyMobilePanel fadeInItem" style={{ animationDelay: "320ms" }}>
+                  <div className="weekSummaryMini">
+                    <div className="weekSummaryMiniTitle">Week of {weekLabel}</div>
+                    <div className="weekSummaryMiniGrid" role="list">
+                      <div className="weekSummaryMiniCard" role="listitem">
+                        <div className="weekSummaryMiniKicker">Total</div>
+                        <div className="weekSummaryMiniValue">{weekEventsCount}</div>
+                      </div>
+                      <div className="weekSummaryMiniCard" role="listitem">
+                        <div className="weekSummaryMiniKicker">Live</div>
+                        <div className="weekSummaryMiniValue">{weekInsights["Live music"]}</div>
+                      </div>
+                      <div className="weekSummaryMiniCard" role="listitem">
+                        <div className="weekSummaryMiniKicker">Food</div>
+                        <div className="weekSummaryMiniValue">{weekInsights["Food & drink"]}</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="weeklyCondensed" aria-label="Weekly overview (condensed)">
+                    {weekGroups.map((g) => (
+                      <div key={dayKey(g.date)}>
+                        <div className="weeklyCondensedDayTitle">{formatDayHeading(g.date)}</div>
+
+                        {g.items.map((e) => {
+                          const title = e.title || "Untitled event";
+                          const d = safeDateFromEvent(e);
+                          const timeLabel = d ? formatTimeShort(d) : "Time TBD";
+
+                          const venueBits = [e.locationName, e.event_type]
+                            .filter(Boolean)
+                            .join(" • ");
+
+                          return (
+                            <button
+                              key={e.id}
+                              type="button"
+                              className="weeklyCondRow"
+                              onClick={() => {
+                                const key = e.uid ?? e.id;
+                                setClientSelectedKey(key);
+                                setParam("event", key);
+                              }}
+                            >
+                              <div className="weeklyCondTop">
+                                <div className="weeklyCondTime">{timeLabel}</div>
+                                <div className="weeklyCondTitle">{title}</div>
+                              </div>
+                              {venueBits ? (
+                                <div className="weeklyCondMeta">{venueBits}</div>
+                              ) : null}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+
+{leftDayGroups.length === 0 ? (
                 <div className="emptyList">No events match your search.</div>
               ) : null}
 
