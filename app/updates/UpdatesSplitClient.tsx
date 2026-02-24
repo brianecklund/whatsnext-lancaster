@@ -3,7 +3,8 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
-type UpdateRow = {
+/** ✅ Keep page.tsx import working */
+export type UpdateLite = {
   id: string;
   title?: string | null;
   description?: string | null;
@@ -11,7 +12,7 @@ type UpdateRow = {
 };
 
 type Props = {
-  updates: UpdateRow[];
+  updates: UpdateLite[];
 };
 
 function norm(v: string) {
@@ -76,8 +77,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
     });
   }, [updates, tag, q]);
 
-  const selectedUpdate =
-    updates.find((u) => u.id === selected) || null;
+  const selectedUpdate = updates.find((u) => u.id === selected) || null;
 
   function updateQuery(next: Record<string, string | null>) {
     const params = new URLSearchParams(searchParams.toString());
@@ -122,8 +122,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
               {/* Desktop filter pills */}
               <div
                 className={
-                  "typePills" +
-                  (effectiveIsMobile ? " mobileHidden" : "")
+                  "typePills" + (effectiveIsMobile ? " mobileHidden" : "")
                 }
                 role="group"
                 aria-label="Update filters"
@@ -163,9 +162,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
                 <button
                   key={u.id}
                   className="listItem"
-                  onClick={() =>
-                    updateQuery({ update: u.id })
-                  }
+                  onClick={() => updateQuery({ update: u.id })}
                 >
                   <div className="title">{u.title}</div>
                   <div className="meta">
@@ -191,9 +188,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
                   <p>{selectedUpdate.description}</p>
                 </div>
               ) : (
-                <div className="detailEmpty">
-                  Select an update
-                </div>
+                <div className="detailEmpty">Select an update</div>
               )}
             </div>
           </div>
@@ -219,10 +214,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
       {/* Mobile Filters Overlay */}
       {effectiveIsMobile && filtersOpen && (
         <div className="filtersOverlay">
-          <button
-            className="overlayClose"
-            onClick={() => setFiltersOpen(false)}
-          >
+          <button className="overlayClose" onClick={() => setFiltersOpen(false)}>
             ×
           </button>
 
