@@ -33,7 +33,6 @@ export default function UpdatesSplitClient({ updates }: Props) {
 
   const [isMobile, setIsMobile] = useState(false);
   const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
-  const [filtersOpen, setFiltersOpen] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 980px)");
@@ -99,18 +98,13 @@ export default function UpdatesSplitClient({ updates }: Props) {
 
   return (
     <div className="pageShell">
-      {!isMobile ? (
       <div className="tagline">Updates, openings, menu changes, PSAs, and quick announcements.</div>
-    ) : null}
 
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
           <aside className="pane paneLeft">
             <div className="scroll">
-              {isMobile ? (
-                <div className="tagline">Updates, openings, menu changes, PSAs, and quick announcements.</div>
-              ) : null}
               <div className="leftSticky">
                 <div className="tabs" aria-label="Primary navigation">
                   <button
@@ -139,37 +133,24 @@ export default function UpdatesSplitClient({ updates }: Props) {
                   </button>
                 </div>
 
-<div className="searchRow">
-  <input
-    className="searchInput"
-    placeholder="Search updates…"
-    value={q}
-    onChange={(e) => setParam("q", e.target.value)}
-    aria-label="Search updates"
-  />
-  {isMobile ? (
-    <button type="button" className="filtersBtn" onClick={() => setFiltersOpen(true)}>
-      Filters
-    </button>
-  ) : q ? (
-    <button
-      className="clearBtn"
-      type="button"
-      onClick={() => {
-        setParam("q", null);
-        setParam("tag", null);
-      }}
-    >
-      Clear
-    </button>
-  ) : null}
-</div>
-
-<div
-  className={"typePills" + (isMobile ? " mobileHidden" : "")}
-  role="group"
-  aria-label="Update filters"
->
+                <div className="leftControls">
+                  <input
+                    className="searchInput"
+                    placeholder="Search updates…"
+                    value={q}
+                    onChange={(e) => setParam("q", e.target.value)}
+                    aria-label="Search updates"
+                  />
+                  {q ? (
+                    <button className="clearBtn" type="button" onClick={() => {
+                        setParam("q", null);
+                        setParam("tag", null);
+                      }}>
+                      Clear
+                    </button>
+                  ) : null}
+                
+<div className="typePills" role="group" aria-label="Update filters">
   <button
     type="button"
     className="typePill"
@@ -194,6 +175,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
   })}
 </div>
 
+</div>
               </div>
 
               {filtered.length === 0 ? (
@@ -280,55 +262,6 @@ export default function UpdatesSplitClient({ updates }: Props) {
           </section>
         ) : null}
       </div>
-
-      {/* Mobile filters overlay */}
-      {isMobile && filtersOpen ? (
-        <div className="filtersOverlay" role="dialog" aria-modal="true" aria-label="Filters">
-          <div className="filtersOverlayPanel">
-            <div className="filtersOverlayHeader">
-              <div className="filtersOverlayTitle">Filters</div>
-              <button
-                type="button"
-                className="filtersOverlayClose"
-                aria-label="Close filters"
-                onClick={() => setFiltersOpen(false)}
-              >
-                ×
-              </button>
-            </div>
-            <div className="filtersOverlayContent" role="group" aria-label="Update filters">
-              <button
-                type="button"
-                className="typePill"
-                data-active={!tag ? "true" : "false"}
-                onClick={() => {
-                  setParam("tag", null);
-                  setFiltersOpen(false);
-                }}
-              >
-                All
-              </button>
-              {tags.map((t) => {
-                const on = norm(tag) === norm(t);
-                return (
-                  <button
-                    key={t}
-                    type="button"
-                    className="typePill"
-                    data-active={on ? "true" : "false"}
-                    onClick={() => {
-                      setParam("tag", on ? null : t);
-                      setFiltersOpen(false);
-                    }}
-                  >
-                    {t}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      ) : null}
 
       {/* Mobile bottom tabs */}
       {isMobile ? (
