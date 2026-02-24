@@ -144,6 +144,10 @@ export default async function HomePage() {
 
         tags: tagsArr,
 
+        // Raw Prismic Slice Zone for richer content (configured in Prismic as `content_blocks`)
+        // (Fallback: some repos name this `slices`.)
+        content_blocks: (doc.data?.content_blocks ?? doc.data?.slices ?? null) as any,
+
         location: loc
           ? {
               id: loc.id,

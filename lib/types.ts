@@ -34,5 +34,12 @@ export type EventLite = {
   image_url?: string | null;
   tags?: string[];
 
+  /**
+   * Optional Prismic Slice Zone for richer event content (gallery, video, embeds, etc.).
+   * Stored as raw slice objects so the UI can render flexibly.
+   */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  content_blocks?: any[] | null;
+
   location?: LocationLite | null;
 };

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
+import MediaBlocks from "@/app/components/MediaBlocks";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 type EventLite = {
@@ -33,6 +34,10 @@ type EventLite = {
   image?: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   description?: any;
+
+  /** Optional Prismic slice zone for richer event content. */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  content_blocks?: any[] | null;
 };
 
 type Props = {
@@ -920,6 +925,9 @@ export default function HomeSplitClient({ events }: Props) {
 
                   {selectedDesc ? <div className="detailBody">{selectedDesc}</div> : null}
 
+                  {/* Extra media / rich blocks from Prismic slices (gallery, video, embeds, etc.) */}
+                  <MediaBlocks slices={(selectedEvent as any)?.content_blocks} />
+
                   {(selectedEvent.website_url || selectedEvent.tickets_url) ? (
                     <div className="ctaRow">
                       <a
@@ -1036,6 +1044,8 @@ export default function HomeSplitClient({ events }: Props) {
                   </a>
                 </p>
               ) : null}
+
+              <MediaBlocks slices={(selectedEvent as any)?.content_blocks} />
             </div>
           ) : null}
         </div>
