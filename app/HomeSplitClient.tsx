@@ -342,6 +342,11 @@ export default function HomeSplitClient({ events }: Props) {
 
   const effectiveIsMobile = mounted ? isMobile : false;
 
+  // Close filter overlay when leaving mobile.
+  useEffect(() => {
+    if (!effectiveIsMobile) setFilterOpen(false);
+  }, [effectiveIsMobile]);
+
   const showLeft = true;
 
   // Desktop shows the split detail pane; mobile uses an overlay for details.
@@ -407,50 +412,147 @@ export default function HomeSplitClient({ events }: Props) {
                 </div>
 
                 <div className="leftControls">
-                  <input
-                    className="searchInput"
-                    placeholder="Search events…"
-                    value={q}
-                    onChange={(e) => setParam("q", e.target.value)}
-                  />{(q || type) ? (
-                    <button
-                      className="clearBtn"
-                      onClick={() => {
-                        setParam("q", null);
-                        setParam("type", null);
-                      }}
-                      type="button"
-                    >
-                      Clear
-                    </button>
-                  ) : null}
+                  {effectiveIsMobile ? (
+                    <div className="searchRow">
+                      <input
+                        className="searchInput"
+                        placeholder="Search events…"
+                        value={q}
+                        onChange={(e) => setParam("q", e.target.value)}
+                        aria-label="Search events"
+                      />
+                      <button
+                        type="button"
+                        className="filterBtn"
+                        aria-label={filterOpen ? "Close filters" : "Open filters"}
+                        aria-expanded={filterOpen ? "true" : "false"}
+                        onClick={() => setFilterOpen((v) => !v)}
+                      >
+                        Filter
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <input
+                        className="searchInput"
+                        placeholder="Search events…"
+                        value={q}
+                        onChange={(e) => setParam("q", e.target.value)}
+                      />
+                      {(q || type) ? (
+                        <button
+                          className="clearBtn"
+                          onClick={() => {
+                            setParam("q", null);
+                            setParam("type", null);
+                          }}
+                          type="button"
+                        >
+                          Clear
+                        </button>
+                      ) : null}
+                    </>
+                  )}
                 </div>
 
-                <div className="typePills" role="group" aria-label="Event type filters">
-                  <button
-                    type="button"
-                    className="typePill"
-                    data-active={!type ? "true" : "false"}
-                    onClick={() => setParam("type", null)}
-                  >
-                    All
-                  </button>
-                  {eventTypes.map((t) => {
-                    const on = norm(type) === norm(t);
-                    return (
+                {/* Desktop pills */}
+                {!effectiveIsMobile ? (
+                  <div className="typePills" role="group" aria-label="Event type filters">
+                    <button
+                      type="button"
+                      className="typePill"
+                      data-active={!type ? "true" : "false"}
+                      onClick={() => setParam("type", null)}
+                    >
+                      All
+                    </button>
+                    {eventTypes.map((t) => {
+                      const on = norm(type) === norm(t);
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          className="typePill"
+                          data-active={on ? "true" : "false"}
+                          onClick={() => setParam("type", on ? null : t)}
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+              </div>
+
+              {/* Mobile filter overlay */}
+              {effectiveIsMobile && filterOpen ? (
+                <div
+                  className="filterOverlay"
+                  role="dialog"
+                  aria-modal="true"
+                  aria-label="Filters"
+                  onClick={() => setFilterOpen(false)}
+                >
+                  <div className="filterOverlayPanel" onClick={(e) => e.stopPropagation()}>
+                    <div className="filterOverlayHeader">
+                      <div className="filterOverlayTitle">Filters</div>
                       <button
-                        key={t}
+                        type="button"
+                        className="filterOverlayClose"
+                        onClick={() => setFilterOpen(false)}
+                        aria-label="Close filters"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    {(q || type) ? (
+                      <button
+                        type="button"
+                        className="filterOverlayClear"
+                        onClick={() => {
+                          setParam("q", null);
+                          setParam("type", null);
+                          setFilterOpen(false);
+                        }}
+                      >
+                        Clear search & filters
+                      </button>
+                    ) : null}
+
+                    <div className="typePills" role="group" aria-label="Event type filters">
+                      <button
                         type="button"
                         className="typePill"
-                        data-active={on ? "true" : "false"}
-                        onClick={() => setParam("type", on ? null : t)}
+                        data-active={!type ? "true" : "false"}
+                        onClick={() => {
+                          setParam("type", null);
+                          setFilterOpen(false);
+                        }}
                       >
-                        {t}
+                        All
                       </button>
-                    );
-                  })}
+                      {eventTypes.map((t) => {
+                        const on = norm(type) === norm(t);
+                        return (
+                          <button
+                            key={t}
+                            type="button"
+                            className="typePill"
+                            data-active={on ? "true" : "false"}
+                            onClick={() => {
+                              setParam("type", on ? null : t);
+                              setFilterOpen(false);
+                            }}
+                          >
+                            {t}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              ) : null}
 
               {/* Weekly Overview (left) */}
               <button

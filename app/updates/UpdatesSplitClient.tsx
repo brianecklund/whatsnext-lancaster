@@ -33,6 +33,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
 
   const [isMobile, setIsMobile] = useState(false);
   const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
+  const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 980px)");
@@ -41,6 +42,10 @@ export default function UpdatesSplitClient({ updates }: Props) {
     mq.addEventListener("change", apply);
     return () => mq.removeEventListener("change", apply);
   }, []);
+
+  useEffect(() => {
+    if (!isMobile) setFilterOpen(false);
+  }, [isMobile]);
 
   function setParam(key: string, value: string | null) {
     const params = new URLSearchParams(sp.toString());
@@ -134,48 +139,145 @@ export default function UpdatesSplitClient({ updates }: Props) {
                 </div>
 
                 <div className="leftControls">
-                  <input
-                    className="searchInput"
-                    placeholder="Search updates…"
-                    value={q}
-                    onChange={(e) => setParam("q", e.target.value)}
-                    aria-label="Search updates"
-                  />
-                  {q ? (
-                    <button className="clearBtn" type="button" onClick={() => {
-                        setParam("q", null);
-                        setParam("tag", null);
-                      }}>
-                      Clear
-                    </button>
-                  ) : null}
-                
-<div className="typePills" role="group" aria-label="Update filters">
-  <button
-    type="button"
-    className="typePill"
-    data-active={!tag ? "true" : "false"}
-    onClick={() => setParam("tag", null)}
-  >
-    All
-  </button>
-  {tags.map((t) => {
-    const on = norm(tag) === norm(t);
-    return (
-      <button
-        key={t}
-        type="button"
-        className="typePill"
-        data-active={on ? "true" : "false"}
-        onClick={() => setParam("tag", on ? null : t)}
-      >
-        {t}
-      </button>
-    );
-  })}
-</div>
+                  {isMobile ? (
+                    <div className="searchRow">
+                      <input
+                        className="searchInput"
+                        placeholder="Search updates…"
+                        value={q}
+                        onChange={(e) => setParam("q", e.target.value)}
+                        aria-label="Search updates"
+                      />
+                      <button
+                        type="button"
+                        className="filterBtn"
+                        aria-label={filterOpen ? "Close filters" : "Open filters"}
+                        aria-expanded={filterOpen ? "true" : "false"}
+                        onClick={() => setFilterOpen((v) => !v)}
+                      >
+                        Filter
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <input
+                        className="searchInput"
+                        placeholder="Search updates…"
+                        value={q}
+                        onChange={(e) => setParam("q", e.target.value)}
+                        aria-label="Search updates"
+                      />
+                      {q || tag ? (
+                        <button
+                          className="clearBtn"
+                          type="button"
+                          onClick={() => {
+                            setParam("q", null);
+                            setParam("tag", null);
+                          }}
+                        >
+                          Clear
+                        </button>
+                      ) : null}
+                    </>
+                  )}
+                </div>
 
-</div>
+                {!isMobile ? (
+                  <div className="typePills" role="group" aria-label="Update filters">
+                    <button
+                      type="button"
+                      className="typePill"
+                      data-active={!tag ? "true" : "false"}
+                      onClick={() => setParam("tag", null)}
+                    >
+                      All
+                    </button>
+                    {tags.map((t) => {
+                      const on = norm(tag) === norm(t);
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          className="typePill"
+                          data-active={on ? "true" : "false"}
+                          onClick={() => setParam("tag", on ? null : t)}
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+
+                {isMobile && filterOpen ? (
+                  <div
+                    className="filterOverlay"
+                    role="dialog"
+                    aria-modal="true"
+                    aria-label="Filters"
+                    onClick={() => setFilterOpen(false)}
+                  >
+                    <div className="filterOverlayPanel" onClick={(e) => e.stopPropagation()}>
+                      <div className="filterOverlayHeader">
+                        <div className="filterOverlayTitle">Filters</div>
+                        <button
+                          type="button"
+                          className="filterOverlayClose"
+                          onClick={() => setFilterOpen(false)}
+                          aria-label="Close filters"
+                        >
+                          ✕
+                        </button>
+                      </div>
+
+                      {(q || tag) ? (
+                        <button
+                          type="button"
+                          className="filterOverlayClear"
+                          onClick={() => {
+                            setParam("q", null);
+                            setParam("tag", null);
+                            setFilterOpen(false);
+                          }}
+                        >
+                          Clear search & filters
+                        </button>
+                      ) : null}
+
+                      <div className="typePills" role="group" aria-label="Update filters">
+                        <button
+                          type="button"
+                          className="typePill"
+                          data-active={!tag ? "true" : "false"}
+                          onClick={() => {
+                            setParam("tag", null);
+                            setFilterOpen(false);
+                          }}
+                        >
+                          All
+                        </button>
+                        {tags.map((t) => {
+                          const on = norm(tag) === norm(t);
+                          return (
+                            <button
+                              key={t}
+                              type="button"
+                              className="typePill"
+                              data-active={on ? "true" : "false"}
+                              onClick={() => {
+                                setParam("tag", on ? null : t);
+                                setFilterOpen(false);
+                              }}
+                            >
+                              {t}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
               </div>
 
               {filtered.length === 0 ? (

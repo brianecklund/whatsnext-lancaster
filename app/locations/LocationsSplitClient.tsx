@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
@@ -16,6 +16,31 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const [mounted, setMounted] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    const mq = window.matchMedia("(max-width: 980px)");
+    const apply = () => setIsMobile(mq.matches);
+    apply();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anyMq: any = mq;
+    if (mq.addEventListener) mq.addEventListener("change", apply);
+    else if (anyMq.addListener) anyMq.addListener(apply);
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener("change", apply);
+      else if (anyMq.removeListener) anyMq.removeListener(apply);
+    };
+  }, []);
+
+  const effectiveIsMobile = mounted ? isMobile : false;
+
+  useEffect(() => {
+    if (!effectiveIsMobile) setFilterOpen(false);
+  }, [effectiveIsMobile]);
 
   const selectedKey = searchParams.get("location");
   const q = searchParams.get("q") ?? "";
@@ -123,41 +148,146 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
               </div>
 
               <div className="leftControls">
-                <input
-                  className="searchInput"
-                  value={q}
-                  onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search"
-                  aria-label="Search locations"
-                />
-              
-<div className="typePills" role="group" aria-label="Directory filters">
-  <button
-    type="button"
-    className="typePill"
-    data-active={!cat ? "true" : "false"}
-    onClick={() => setCategory(null)}
-  >
-    All
-  </button>
-  {categories.map((t) => {
-    const on = normalize(cat ?? "") === normalize(t);
-    return (
-      <button
-        key={t}
-        type="button"
-        className="typePill"
-        data-active={on ? "true" : "false"}
-        onClick={() => setCategory(on ? null : t)}
-      >
-        {t}
-      </button>
-    );
-  })}
-</div>
+                {effectiveIsMobile ? (
+                  <div className="searchRow">
+                    <input
+                      className="searchInput"
+                      value={q}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Search"
+                      aria-label="Search locations"
+                    />
+                    <button
+                      type="button"
+                      className="filterBtn"
+                      aria-label={filterOpen ? "Close filters" : "Open filters"}
+                      aria-expanded={filterOpen ? "true" : "false"}
+                      onClick={() => setFilterOpen((v) => !v)}
+                    >
+                      Filter
+                    </button>
+                  </div>
+                ) : (
+                  <>
+                    <input
+                      className="searchInput"
+                      value={q}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Search"
+                      aria-label="Search locations"
+                    />
+                    {(q || cat) ? (
+                      <button
+                        className="clearBtn"
+                        type="button"
+                        onClick={() => {
+                          setQuery("");
+                          setCategory(null);
+                        }}
+                      >
+                        Clear
+                      </button>
+                    ) : null}
+                  </>
+                )}
+              </div>
 
-</div>
+              {!effectiveIsMobile ? (
+                <div className="typePills" role="group" aria-label="Directory filters">
+                  <button
+                    type="button"
+                    className="typePill"
+                    data-active={!cat ? "true" : "false"}
+                    onClick={() => setCategory(null)}
+                  >
+                    All
+                  </button>
+                  {categories.map((t) => {
+                    const on = normalize(cat ?? "") === normalize(t);
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        className="typePill"
+                        data-active={on ? "true" : "false"}
+                        onClick={() => setCategory(on ? null : t)}
+                      >
+                        {t}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null}
             </div>
+
+            {effectiveIsMobile && filterOpen ? (
+              <div
+                className="filterOverlay"
+                role="dialog"
+                aria-modal="true"
+                aria-label="Filters"
+                onClick={() => setFilterOpen(false)}
+              >
+                <div className="filterOverlayPanel" onClick={(e) => e.stopPropagation()}>
+                  <div className="filterOverlayHeader">
+                    <div className="filterOverlayTitle">Filters</div>
+                    <button
+                      type="button"
+                      className="filterOverlayClose"
+                      onClick={() => setFilterOpen(false)}
+                      aria-label="Close filters"
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  {(q || cat) ? (
+                    <button
+                      type="button"
+                      className="filterOverlayClear"
+                      onClick={() => {
+                        setQuery("");
+                        setCategory(null);
+                        setFilterOpen(false);
+                      }}
+                    >
+                      Clear search & filters
+                    </button>
+                  ) : null}
+
+                  <div className="typePills" role="group" aria-label="Directory filters">
+                    <button
+                      type="button"
+                      className="typePill"
+                      data-active={!cat ? "true" : "false"}
+                      onClick={() => {
+                        setCategory(null);
+                        setFilterOpen(false);
+                      }}
+                    >
+                      All
+                    </button>
+                    {categories.map((t) => {
+                      const on = normalize(cat ?? "") === normalize(t);
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          className="typePill"
+                          data-active={on ? "true" : "false"}
+                          onClick={() => {
+                            setCategory(on ? null : t);
+                            setFilterOpen(false);
+                          }}
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            ) : null}
 
             {filtered.length === 0 ? (
               <div className="emptyList">No listings yet.</div>
