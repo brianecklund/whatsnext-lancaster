@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
@@ -13,36 +13,9 @@ type LocationRow = LocationLite & { key: string };
 
 export default function LocationsSplitClient({ locations }: { locations: LocationRow[] }) {
   useSmoothWheel(".scroll");
-  const leftScrollRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
-
-  // Hydration-safe mobile detection (avoid SSR/client mismatch)
-  const [mounted, setMounted] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    setMounted(true);
-    if (typeof window === "undefined") return;
-
-    const mq = window.matchMedia("(max-width: 900px)");
-    const apply = () => setIsMobile(Boolean(mq.matches));
-    apply();
-
-    // Safari fallback
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const anyMq: any = mq;
-    if (mq.addEventListener) mq.addEventListener("change", apply);
-    else if (anyMq.addListener) anyMq.addListener(apply);
-
-    return () => {
-      if (mq.removeEventListener) mq.removeEventListener("change", apply);
-      else if (anyMq.removeListener) anyMq.removeListener(apply);
-    };
-  }, []);
-
-  const effectiveIsMobile = mounted ? isMobile : false;
 
   const selectedKey = searchParams.get("location");
   const q = searchParams.get("q") ?? "";
@@ -120,7 +93,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
       <div className="split">
         {/* LEFT */}
         <div className="pane paneLeft">
-          <div className="scroll" ref={leftScrollRef}>
+          <div className="scroll">
             <div className="leftSticky">
               <div className="tabs" aria-label="Primary navigation">
                 <button
@@ -158,7 +131,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                   aria-label="Search locations"
                 />
               
-<div className={"typePills" + (effectiveIsMobile ? " mobileHidden" : "")} role="group" aria-label="Directory filters">
+<div className="typePills" role="group" aria-label="Directory filters">
   <button
     type="button"
     className="typePill"

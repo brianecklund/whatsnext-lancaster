@@ -1,20 +1,16 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSmoothWheel } from "@/app/components/useSmoothWheel";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
-/** ✅ Keep page.tsx import working */
 export type UpdateLite = {
   id: string;
-  title?: string | null;
-
-  // used by updates/page.tsx sample data
-  date?: string | null;
+  title: string;
+  tags: string[];
+  date?: string | null; // ISO or display
   body?: string | null;
-
-  // used elsewhere / UI
-  description?: string | null;
-  tags?: string[] | null;
+  link?: string | null;
 };
 
 type Props = {
@@ -22,231 +18,272 @@ type Props = {
 };
 
 function norm(v: string) {
-  return v?.toLowerCase().trim();
+  return (v || "").toLowerCase().trim();
 }
 
 export default function UpdatesSplitClient({ updates }: Props) {
+  useSmoothWheel(".scroll");
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const sp = useSearchParams();
+  const pathname = usePathname();
 
-  const selected = searchParams.get("update");
-  const tagParam = searchParams.get("tag") || "";
-  const qParam = searchParams.get("q") || "";
+  const q = sp.get("q") || "";
+  const tag = sp.get("tag") || "";
+  const selectedKey = sp.get("u") || "";
 
-  const [q, setQ] = useState(qParam);
-  const [tag, setTag] = useState(tagParam);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-
-  // --- Hydration-safe mobile detection ---
-  const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
 
   useEffect(() => {
-    setMounted(true);
-    if (typeof window === "undefined") return;
-
     const mq = window.matchMedia("(max-width: 980px)");
-    const apply = () => setIsMobile(Boolean(mq.matches));
+    const apply = () => setIsMobile(mq.matches);
     apply();
-
-    // Safari fallback
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const anyMq: any = mq;
-
-    if (mq.addEventListener) mq.addEventListener("change", apply);
-    else if (anyMq.addListener) anyMq.addListener(apply);
-
-    return () => {
-      if (mq.removeEventListener) mq.removeEventListener("change", apply);
-      else if (anyMq.removeListener) anyMq.removeListener(apply);
-    };
+    mq.addEventListener("change", apply);
+    return () => mq.removeEventListener("change", apply);
   }, []);
 
-  const effectiveIsMobile = mounted ? isMobile : false;
+  function setParam(key: string, value: string | null) {
+    const params = new URLSearchParams(sp.toString());
+    if (!value) params.delete(key);
+    else params.set(key, value);
+    router.push(`/updates?${params.toString()}`);
+  }
 
-  // --- Tags ---
+  function setSelected(id: string) {
+    setParam("u", id);
+    if (isMobile) setMobileTab("detail");
+  }
+
+  // Available tag filters (unique, sorted)
   const tags = useMemo(() => {
-    const all = updates.flatMap((u) => u.tags || []);
-    return Array.from(new Set(all)).sort();
+    const s = new Set<string>();
+    for (const u of updates) {
+      for (const t of u.tags || []) {
+        const tt = (t || "").trim();
+        if (tt) s.add(tt);
+      }
+    }
+    return Array.from(s).sort((a, b) => a.localeCompare(b));
   }, [updates]);
 
-  // --- Filtering ---
   const filtered = useMemo(() => {
+    const nq = norm(q);
+    const nt = norm(tag);
     return updates.filter((u) => {
-      const matchesTag =
-        !tag || (u.tags || []).some((t) => norm(t) === norm(tag));
-      const hay = `${u.title || ""} ${u.body || ""} ${u.description || ""} ${u.date || ""}`;
-      const matchesQ = !q || norm(hay).includes(norm(q));
-      return matchesTag && matchesQ;
+      if (nt) {
+        const utags = (u.tags || []).map((t) => norm(t));
+        if (!utags.includes(nt)) return false;
+      }
+      if (!nq) return true;
+      const hay = norm([u.title, ...(u.tags || []), u.body || ""].join(" "));
+      return hay.includes(nq);
     });
-  }, [updates, tag, q]);
+  }, [updates, q, tag]);
 
-  const selectedUpdate = updates.find((u) => u.id === selected) || null;
+  const selectedDesktop = useMemo(() => {
+    if (!filtered.length) return null;
+    if (!selectedKey) return filtered[0];
+    return filtered.find((u) => u.id === selectedKey) ?? filtered[0];
+  }, [filtered, selectedKey]);
 
-  function updateQuery(next: Record<string, string | null>) {
-    const params = new URLSearchParams(searchParams.toString());
-    Object.entries(next).forEach(([k, v]) => {
-      if (!v) params.delete(k);
-      else params.set(k, v);
-    });
-    router.push(`?${params.toString()}`, { scroll: false });
-  }
+  const selectedMobile = useMemo(() => {
+    if (!selectedKey) return null;
+    return filtered.find((u) => u.id === selectedKey) ?? null;
+  }, [filtered, selectedKey]);
+
+  const selected = isMobile ? selectedMobile : selectedDesktop;
+
+  const showLeft = !isMobile || mobileTab === "list";
+  const showRight = !isMobile || mobileTab === "detail";
 
   return (
     <div className="pageShell">
+      <div className="tagline">Updates, openings, menu changes, PSAs, and quick announcements.</div>
+
       <div className="split">
         {/* LEFT */}
-        <div className="pane paneLeft">
-          <div className="scroll">
-            <div className="leftSticky">
-              <div className="searchRow">
-                <input
-                  type="text"
-                  placeholder="Search updates..."
-                  value={q}
-                  onChange={(e) => {
-                    setQ(e.target.value);
-                    updateQuery({ q: e.target.value || null });
-                  }}
-                  aria-label="Search updates"
-                />
-
-                {effectiveIsMobile ? (
-                  <button
-                    type="button"
-                    className="filtersBtn"
-                    onClick={() => setFiltersOpen(true)}
-                  >
-                    Filters
-                  </button>
-                ) : null}
-              </div>
-
-              <div
-                className={"typePills" + (effectiveIsMobile ? " mobileHidden" : "")}
-                role="group"
-                aria-label="Update filters"
-              >
-                <button
-                  type="button"
-                  className="typePill"
-                  data-active={!tag}
-                  onClick={() => {
-                    setTag("");
-                    updateQuery({ tag: null });
-                  }}
-                >
-                  All
-                </button>
-
-                {tags.map((t) => (
-                  <button
-                    key={t}
-                    type="button"
-                    className="typePill"
-                    data-active={norm(tag) === norm(t)}
-                    onClick={() => {
-                      setTag(t);
-                      updateQuery({ tag: t });
-                    }}
-                  >
-                    {t}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div className="list">
-              {filtered.map((u) => (
-                <button
-                  key={u.id}
-                  className="listItem"
-                  onClick={() => updateQuery({ update: u.id })}
-                >
-                  <div className="title">{u.title}</div>
-                  <div className="meta">
-                    {u.date ? <span className="tag">{u.date}</span> : null}
-                    {(u.tags || []).map((t) => (
-                      <span key={t} className="tag">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* RIGHT */}
-        {!effectiveIsMobile && (
-          <div className="pane paneRight">
+        {showLeft ? (
+          <aside className="pane paneLeft">
             <div className="scroll">
-              {selectedUpdate ? (
-                <div className="detail">
-                  <h2>{selectedUpdate.title}</h2>
-                  {selectedUpdate.date ? <div className="meta">{selectedUpdate.date}</div> : null}
-                  <p>{selectedUpdate.body || selectedUpdate.description}</p>
+              <div className="leftSticky">
+                <div className="tabs" aria-label="Primary navigation">
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname === "/" ? "true" : "false"}
+                    onClick={() => router.push("/")}
+                  >
+                    Calendar
+                  </button>
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+                    onClick={() => router.push("/locations")}
+                  >
+                    Directory
+                  </button>
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+                    onClick={() => router.push("/updates")}
+                  >
+                    Updates
+                  </button>
                 </div>
+
+                <div className="leftControls">
+                  <input
+                    className="searchInput"
+                    placeholder="Search updates…"
+                    value={q}
+                    onChange={(e) => setParam("q", e.target.value)}
+                    aria-label="Search updates"
+                  />
+                  {q ? (
+                    <button className="clearBtn" type="button" onClick={() => {
+                        setParam("q", null);
+                        setParam("tag", null);
+                      }}>
+                      Clear
+                    </button>
+                  ) : null}
+                
+<div className="typePills" role="group" aria-label="Update filters">
+  <button
+    type="button"
+    className="typePill"
+    data-active={!tag ? "true" : "false"}
+    onClick={() => setParam("tag", null)}
+  >
+    All
+  </button>
+  {tags.map((t) => {
+    const on = norm(tag) === norm(t);
+    return (
+      <button
+        key={t}
+        type="button"
+        className="typePill"
+        data-active={on ? "true" : "false"}
+        onClick={() => setParam("tag", on ? null : t)}
+      >
+        {t}
+      </button>
+    );
+  })}
+</div>
+
+</div>
+              </div>
+
+              {filtered.length === 0 ? (
+                <div className="emptyList">No updates found.</div>
               ) : (
-                <div className="detailEmpty">Select an update</div>
+                <div style={{ paddingTop: 6 }}>
+                  {filtered.map((u) => {
+                    const active = selected?.id === u.id;
+                    return (
+                      <button
+                        key={u.id}
+                        className="eventRow"
+                        data-active={active ? "true" : "false"}
+                        onClick={() => setSelected(u.id)}
+                        type="button"
+                      >
+                        <span className="eventRowTitle">{u.title}</span>
+                        <span className="eventRowMeta">
+                          {u.date ? <span>{u.date}</span> : null}
+                        </span>
+                        {u.tags?.length ? (
+                          <span className="tagRow" aria-label="Update tags">
+                            {u.tags.slice(0, 3).map((t) => (
+                              <span key={t} className="tagChip">
+                                {t}
+                              </span>
+                            ))}
+                          </span>
+                        ) : null}
+                      </button>
+                    );
+                  })}
+                </div>
               )}
             </div>
-          </div>
-        )}
+          </aside>
+        ) : null}
+
+        {/* RIGHT */}
+        {showRight ? (
+          <section className="pane paneRight">
+            <div className="scroll">
+              {!selected ? (
+                <div className="emptyRight">Select an update to view details.</div>
+              ) : (
+                <div className="detailCard">
+                  <div className="detailHeader">
+                    <div>
+                      <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
+                        {selected.title}
+                      </div>
+                      <div className="detailMeta fadeInItem" style={{ animationDelay: "320ms" }}>
+                        {selected.date ? <span>{selected.date}</span> : null}
+                      </div>
+                    </div>
+                  </div>
+
+                  {selected.tags?.length ? (
+                    <div className="tagRow" style={{ marginTop: 10 }}>
+                      {selected.tags.map((t) => (
+                        <span key={t} className="tagChip">
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  ) : null}
+
+                  {selected.body ? (
+                    <div className="detailDesc fadeInItem" style={{ animationDelay: "360ms" }}>
+                      {selected.body}
+                    </div>
+                  ) : null}
+
+                  {selected.link ? (
+                    <div className="detailLinks">
+                      <a className="pillBtn" href={selected.link} target="_blank" rel="noreferrer">
+                        Learn more
+                      </a>
+                    </div>
+                  ) : null}
+                </div>
+              )}
+            </div>
+          </section>
+        ) : null}
       </div>
 
-      {/* Mobile Detail Overlay */}
-      {effectiveIsMobile && selectedUpdate && (
-        <div className="mobileOverlay">
-          <button className="overlayClose" onClick={() => updateQuery({ update: null })}>
-            Back
+      {/* Mobile bottom tabs */}
+      {isMobile ? (
+        <div className="mobileTabs" role="tablist" aria-label="Updates view">
+          <button
+            type="button"
+            className="mobileTab"
+            data-active={mobileTab === "list" ? "true" : "false"}
+            onClick={() => setMobileTab("list")}
+          >
+            List
           </button>
-          <div className="detail">
-            <h2>{selectedUpdate.title}</h2>
-            {selectedUpdate.date ? <div className="meta">{selectedUpdate.date}</div> : null}
-            <p>{selectedUpdate.body || selectedUpdate.description}</p>
-          </div>
-        </div>
-      )}
-
-      {/* Mobile Filters Overlay */}
-      {effectiveIsMobile && filtersOpen && (
-        <div className="filtersOverlay">
-          <button className="overlayClose" onClick={() => setFiltersOpen(false)}>
-            ×
+          <button
+            type="button"
+            className="mobileTab"
+            data-active={mobileTab === "detail" ? "true" : "false"}
+            onClick={() => setMobileTab("detail")}
+          >
+            Details
           </button>
-
-          <div className="filtersContent">
-            <button
-              className="typePill"
-              data-active={!tag}
-              onClick={() => {
-                setTag("");
-                updateQuery({ tag: null });
-                setFiltersOpen(false);
-              }}
-            >
-              All
-            </button>
-
-            {tags.map((t) => (
-              <button
-                key={t}
-                className="typePill"
-                data-active={norm(tag) === norm(t)}
-                onClick={() => {
-                  setTag(t);
-                  updateQuery({ tag: t });
-                  setFiltersOpen(false);
-                }}
-              >
-                {t}
-              </button>
-            ))}
-          </div>
         </div>
-      )}
+      ) : null}
     </div>
   );
 }

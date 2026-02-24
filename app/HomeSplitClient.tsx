@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
@@ -157,18 +157,6 @@ export default function HomeSplitClient({ events }: Props) {
   const q = sp.get("q") || "";
   const type = sp.get("type") || "";
 
-  // Event type filter options (derived from data so we don't depend on hard-coded enums)
-  const EVENT_TYPE_CANDIDATES = useMemo(() => {
-    const set = new Set<string>();
-    for (const e of events || []) {
-      const t = typeof e.event_type === "string" ? e.event_type.trim() : "";
-      if (t) set.add(t);
-    }
-    const dynamic = Array.from(set).sort((a, b) => a.localeCompare(b));
-    // Keep Weekly Overview available alongside types
-    return [WEEKLY_KEY, ...dynamic];
-  }, [events]);
-
   // default selection = weekly overview
   const selectedParam = sp.get("event");
   // URL drives selection, but on mobile we keep an optimistic client key so the
@@ -179,9 +167,6 @@ export default function HomeSplitClient({ events }: Props) {
   const [mounted, setMounted] = useState(false);
   // Hydration-safe: start false so SSR and first client render match.
   const [isMobile, setIsMobile] = useState(false);
-  const [filtersOpen, setFiltersOpen] = useState(false);
-  const [leftScrolled, setLeftScrolled] = useState(false);
-  const leftScrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -357,16 +342,6 @@ export default function HomeSplitClient({ events }: Props) {
 
   const effectiveIsMobile = mounted ? isMobile : false;
 
-  useEffect(() => {
-    if (!effectiveIsMobile) return;
-    const el = leftScrollRef.current;
-    if (!el) return;
-    const onScroll = () => setLeftScrolled(el.scrollTop > 8);
-    onScroll();
-    el.addEventListener("scroll", onScroll, { passive: true });
-    return () => el.removeEventListener("scroll", onScroll as any);
-  }, [effectiveIsMobile]);
-
   const showLeft = true;
 
   // Desktop shows the split detail pane; mobile uses an overlay for details.
@@ -397,12 +372,12 @@ export default function HomeSplitClient({ events }: Props) {
 
   return (
     <div className="pageShell">
-      <div className="tagline taglineDesktop">A calendar of events, specials, and pop-ups in Lancaster, PA.</div>
+      <div className="tagline">A calendar of events, specials, and pop-ups in Lancaster, PA.</div>
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
           <aside className="pane paneLeft">
-            <div className="scroll" ref={leftScrollRef}>
+            <div className="scroll">
               <div className="leftSticky">
                 <div className="tabs" aria-label="Primary navigation">
                   <button
@@ -431,27 +406,13 @@ export default function HomeSplitClient({ events }: Props) {
                   </button>
                 </div>
 
-                <div className={"tagline taglineMobile" + (leftScrolled ? " isCollapsed" : "")}>
-                  A calendar of events, specials, and pop-ups in Lancaster, PA.
-                </div>
-
                 <div className="leftControls">
-                  <div className="searchRow">
-                    <input
-                      className="searchInput"
-
+                  <input
+                    className="searchInput"
                     placeholder="Search events…"
                     value={q}
                     onChange={(e) => setParam("q", e.target.value)}
-                  />
-                    {effectiveIsMobile ? (
-                      <button type="button" className="filtersBtn" onClick={() => setFiltersOpen(true)}>
-                        Filters
-                      </button>
-                    ) : null}
-                  </div>
-
-                  {(q || type) ? (
+                  />{(q || type) ? (
                     <button
                       className="clearBtn"
                       onClick={() => {
@@ -465,7 +426,7 @@ export default function HomeSplitClient({ events }: Props) {
                   ) : null}
                 </div>
 
-                <div className={"typePills" + (effectiveIsMobile ? " mobileHidden" : "")} role="group" aria-label="Event type filters">
+                <div className="typePills" role="group" aria-label="Event type filters">
                   <button
                     type="button"
                     className="typePill"
@@ -960,45 +921,4 @@ export default function HomeSplitClient({ events }: Props) {
 
 </div>
   );
-
-                {effectiveIsMobile && filtersOpen ? (
-                  <div className="filtersOverlay" role="dialog" aria-modal="true">
-                    <div className="filtersPanel">
-                      <div className="filtersPanelHeader">
-                        <div className="filtersPanelTitle">Filters</div>
-                        <button type="button" className="filtersClose" aria-label="Close filters" onClick={() => setFiltersOpen(false)}>
-                          ×
-                        </button>
-                      </div>
-
-                      <div className="typePills" role="group" aria-label="Event type filters">
-                        <button
-                          type="button"
-                          className="pill"
-                          data-active={!type ? "true" : "false"}
-                          onClick={() => {
-                            setParam("type", null);
-                            setFiltersOpen(false);
-                          }}
-                        >
-                          All
-                        </button>
-                        {EVENT_TYPE_CANDIDATES.filter((t) => t !== WEEKLY_KEY).map((t) => (
-                          <button
-                            key={t}
-                            type="button"
-                            className="pill"
-                            data-active={norm(type) === norm(t) ? "true" : "false"}
-                            onClick={() => {
-                              setParam("type", t);
-                              setFiltersOpen(false);
-                            }}
-                          >
-                            {t}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                ) : null}
 }

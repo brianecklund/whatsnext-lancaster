@@ -241,11 +241,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 @media (max-width: 980px){
-  :root{ --headerH: 64px; --gutter: 16px; }
   .topNav{ display:none; }
-  .hamburgerBtn{ display:inline-flex; width:40px; height:40px; border-radius: 12px; }
-  .siteHeader{ padding: 10px var(--gutter) 0 var(--gutter); align-items:center; }
-  .brand{ font-size: var(--fs-title); }
+  .hamburgerBtn{ display:inline-flex; }
   .brandFull{ display:none; }
   .brandShort{ display:inline; }
 
@@ -1445,99 +1442,3 @@ html{ scroll-behavior: smooth; }
   .weeklyMobilePanel{ margin-top: 10px; }
   .weekSummaryMiniValue{ font-size: 17px; }
 }
-
-
-/* Mobile search + filters row */
-.searchRow{
-  display:flex;
-  align-items:center;
-  gap: 10px;
-}
-
-.filtersBtn{
-  height: 44px;
-  padding: 0 14px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #fff;
-  font-weight: var(--fw-medium);
-  font-size: var(--fs-meta);
-  white-space: nowrap;
-}
-
-.filtersOverlay{
-  position: fixed;
-  inset: 0;
-  z-index: 80;
-  background: rgba(0,0,0,0.45);
-  display:flex;
-  align-items:flex-end;
-  justify-content:center;
-}
-
-.filtersPanel{
-  width: 100%;
-  max-width: 720px;
-  background: #fff;
-  border-top-left-radius: 18px;
-  border-top-right-radius: 18px;
-  padding: 14px 16px 18px 16px;
-  border-top: 1px solid var(--border);
-}
-
-.filtersPanelHeader{
-  display:flex;
-  align-items:center;
-  justify-content: space-between;
-  padding-bottom: 10px;
-}
-
-.filtersPanelTitle{
-  font-weight: var(--fw-medium);
-  font-size: var(--fs-subhead);
-}
-
-.filtersClose{
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: #fff;
-  font-weight: var(--fw-medium);
-}
-
-/* Collapsible mobile tagline */
-.taglineMobile{
-  transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out), max-height var(--dur-2) var(--ease-out), margin var(--dur-2) var(--ease-out), padding var(--dur-2) var(--ease-out);
-  max-height: 120px;
-  overflow:hidden;
-}
-
-.taglineMobile.isCollapsed{
-  opacity: 0;
-  transform: translateY(-8px);
-  max-height: 0px;
-  margin: 0;
-  padding: 0;
-}
-
-/* Make leftSticky truly sticky and keep search row sticky under header */
-.leftSticky{
-  position: sticky;
-  top: 0;
-  background: var(--bg);
-  z-index: 5;
-}
-
-@media (max-width: 980px){
-  /* keep the left sticky controls visible under the site header */
-  .paneLeft .leftSticky{
-    top: 0;
-    padding-top: 10px;
-  }
-
-  /* hide inline pill rows; use overlay */
-  .typePills.mobileHidden{ display:none; }
-}
-
-@media (max-width: 980px){ .taglineDesktop{ display:none; } }
