@@ -171,6 +171,9 @@ export default function HomeSplitClient({ events }: Props) {
   // Mobile-only filter overlay state (used to show/hide filter pills on small screens)
   const [filterOpen, setFilterOpen] = useState(false);
 
+  // Mobile-only: hide the subhead tagline when the user starts scrolling the left list.
+  const [taglineHidden, setTaglineHidden] = useState(false);
+
   useEffect(() => {
     setMounted(true);
     const mq = window.matchMedia("(max-width: 980px)");
@@ -350,6 +353,11 @@ export default function HomeSplitClient({ events }: Props) {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
 
+  // Ensure tagline is visible again when leaving mobile.
+  useEffect(() => {
+    if (!effectiveIsMobile) setTaglineHidden(false);
+  }, [effectiveIsMobile]);
+
   const showLeft = true;
 
   // Desktop shows the split detail pane; mobile uses an overlay for details.
@@ -380,12 +388,21 @@ export default function HomeSplitClient({ events }: Props) {
 
   return (
     <div className="pageShell">
-      <div className="tagline">A calendar of events, specials, and pop-ups in Lancaster, PA.</div>
+      <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>
+        A calendar of events, specials, and pop-ups in Lancaster, PA.
+      </div>
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
           <aside className="pane paneLeft">
-            <div className="scroll">
+            <div
+              className="scroll"
+              onScroll={(e) => {
+                if (!effectiveIsMobile) return;
+                const st = (e.currentTarget as HTMLDivElement).scrollTop;
+                setTaglineHidden(st > 2);
+              }}
+            >
               <div className="leftSticky">
                 <div className="tabs" aria-label="Primary navigation">
                   <button

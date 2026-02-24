@@ -35,7 +35,7 @@ export default function SiteHeader() {
       <a className="brand" href="/" aria-label="What’s Next Lancaster">
         <span className="brandFull">What’s Next Lancaster</span>
         <span className="brandShort" aria-hidden>
-          WNL
+          What’s Next Lancaster
         </span>
       </a>
 
