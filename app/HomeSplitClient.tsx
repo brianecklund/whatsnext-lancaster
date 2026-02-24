@@ -168,6 +168,9 @@ export default function HomeSplitClient({ events }: Props) {
   // Hydration-safe: start false so SSR and first client render match.
   const [isMobile, setIsMobile] = useState(false);
 
+  // Mobile-only filter overlay state (used to show/hide filter pills on small screens)
+  const [filterOpen, setFilterOpen] = useState(false);
+
   useEffect(() => {
     setMounted(true);
     const mq = window.matchMedia("(max-width: 980px)");
