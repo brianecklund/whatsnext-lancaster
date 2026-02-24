@@ -1393,3 +1393,52 @@ html{ scroll-behavior: smooth; }
   opacity: 1;
   transform: translateY(0);
 }
+
+
+/* Mobile: show weekly overview inline with a compact summary strip */
+.weeklyMobilePanel{
+  margin: 12px 0 18px;
+  padding: 12px;
+  border: 1px solid rgba(255,255,255,.14);
+  border-radius: 14px;
+  background: rgba(255,255,255,.03);
+}
+
+.weekSummaryMiniTitle{
+  font-size: var(--fs-meta);
+  font-weight: var(--fw-medium);
+  opacity: .9;
+  margin-bottom: 10px;
+}
+
+.weekSummaryMiniGrid{
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.weekSummaryMiniCard{
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 12px;
+  padding: 10px 10px 9px;
+  background: rgba(0,0,0,.15);
+}
+
+.weekSummaryMiniKicker{
+  font-size: 12px;
+  letter-spacing: .02em;
+  opacity: .75;
+  margin-bottom: 6px;
+}
+
+.weekSummaryMiniValue{
+  font-size: 18px;
+  font-weight: var(--fw-semibold);
+  line-height: 1;
+}
+
+@media (max-width: 860px){
+  .weeklyMobilePanel{ margin-top: 10px; }
+  .weekSummaryMiniValue{ font-size: 17px; }
+}
