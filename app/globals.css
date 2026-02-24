@@ -643,7 +643,14 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .heroImage{
   width: 100%;
+  /*
+    IMPORTANT:
+    This element uses a CSS background-image (not an <img>), so it needs an
+    explicit height/aspect-ratio to be visible.
+  */
+  aspect-ratio: 16 / 9;
   height: auto;
+  display: block;
   background: var(--panel);
   border-radius: 12px;
   margin: 18px 0;
