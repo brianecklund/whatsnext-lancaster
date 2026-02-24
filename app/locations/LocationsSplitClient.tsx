@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
@@ -13,6 +13,7 @@ type LocationRow = LocationLite & { key: string };
 
 export default function LocationsSplitClient({ locations }: { locations: LocationRow[] }) {
   useSmoothWheel(".scroll");
+  const leftScrollRef = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
