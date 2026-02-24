@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 type EventLite = {
@@ -148,6 +149,7 @@ function pickDescriptionText(e: EventLite): string | null {
 }
 
 export default function HomeSplitClient({ events }: Props) {
+  useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
@@ -536,9 +538,14 @@ export default function HomeSplitClient({ events }: Props) {
 
               {selectedKey === WEEKLY_KEY ? (
                 <div className="rightHeader">
-                  <div className="rightDayLabel">Weekly Overview</div>
+                  <div
+                    className="rightDayLabel fadeInItem"
+                    style={{ animationDelay: "260ms" }}
+                  >
+                    Weekly Overview
+                  </div>
 
-                  <div className="weekSummary">
+                  <div className="weekSummary fadeInItem" style={{ animationDelay: "320ms" }}>
                     <h3 className="weekSummaryTitle">Week of {weekLabel}</h3>
                     <p className="weekSummarySubhead">
                       A quick snapshot of what&apos;s happening on the calendar this week.
@@ -564,7 +571,11 @@ export default function HomeSplitClient({ events }: Props) {
                   {weekEventsCount === 0 ? (
                     <div className="emptyRight">No events scheduled for the rest of this week.</div>
                   ) : effectiveIsMobile ? (
-                    <div className="weeklyCondensed" aria-label="Weekly overview (condensed)">
+                    <div
+                      className="weeklyCondensed fadeInItem"
+                      style={{ animationDelay: "380ms" }}
+                      aria-label="Weekly overview (condensed)"
+                    >
                       {weekGroups.map((g) => (
                         <div key={dayKey(g.date)}>
                           <div className="weeklyCondensedDayTitle">{formatDayHeading(g.date)}</div>
@@ -604,7 +615,7 @@ export default function HomeSplitClient({ events }: Props) {
                       ))}
                     </div>
                   ) : (
-                    <div className="weeklyCards">
+                    <div className="weeklyCards fadeInItem" style={{ animationDelay: "380ms" }}>
                       {weekGroups.map((g) => (
                         <div key={dayKey(g.date)} className="weeklyDayGroup">
                           <div className="dayTitle">{formatDayHeading(g.date)}</div>
@@ -629,10 +640,15 @@ export default function HomeSplitClient({ events }: Props) {
                               >
                                 <div className="weeklyCardMedia">
                                   {img ? (
-                                    // eslint-disable-next-line @next/next/no-img-element
-                                    <img className="weeklyThumb" src={img} alt="" />
+                                    <div className="media16x9">
+                                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                                      <img className="weeklyThumb" src={img} alt="" />
+                                      {e.descriptionText ? (
+                                        <div className="mediaDescBtn">{String(e.descriptionText).slice(0, 110)}</div>
+                                      ) : null}
+                                    </div>
                                   ) : (
-                                    <div className="weeklyThumbPlaceholder" aria-hidden />
+                                    <div className="media16x9 weeklyThumbPlaceholder" aria-hidden />
                                   )}
                                 </div>
 
@@ -683,11 +699,18 @@ export default function HomeSplitClient({ events }: Props) {
                 <div className="emptyRight">Select an event.</div>
               ) : (
                 <div className="rightHeader">
-                  <div className="rightDayLabel">{selectedEvent.event_type || "Event"}</div>
+                  <div
+                    className="rightDayLabel fadeInItem"
+                    style={{ animationDelay: "260ms" }}
+                  >
+                    {selectedEvent.event_type || "Event"}
+                  </div>
 
-                  <h1 className="detailTitle">{selectedEvent.title || "Untitled event"}</h1>
+                  <h1 className="detailTitle fadeInItem" style={{ animationDelay: "320ms" }}>
+                    {selectedEvent.title || "Untitled event"}
+                  </h1>
 
-                  <div className="detailMeta">
+                  <div className="detailMeta fadeInItem" style={{ animationDelay: "360ms" }}>
                     <span>{selectedTime}</span>
                     {selectedEvent.locationName ? (
                       <>
@@ -800,18 +823,11 @@ export default function HomeSplitClient({ events }: Props) {
                 {selectedEvent.event_type ? <span className="badge">{selectedEvent.event_type}</span> : null}
               </div>
               {selectedImg ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img
-                  src={selectedImg}
-                  alt=""
-                  style={{
-                    width: "100%",
-                    height: 220,
-                    objectFit: "cover",
-                    borderRadius: 12,
-                    marginTop: 14,
-                  }}
-                />
+                <div className="media16x9" style={{ marginTop: 14 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={selectedImg} alt="" />
+                  {selectedDesc ? <div className="mediaDescBtn">{selectedDesc.slice(0, 120)}</div> : null}
+                </div>
               ) : null}
               {selectedDesc ? (
                 <div className="detailBody" style={{ marginTop: 14 }}>

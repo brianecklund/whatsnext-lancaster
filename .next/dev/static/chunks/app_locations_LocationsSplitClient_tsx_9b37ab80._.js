@@ -25,7 +25,6 @@ function LocationsSplitClient({ locations }) {
     const selectedKey = searchParams.get("location");
     const q = searchParams.get("q") ?? "";
     const cat = searchParams.get("cat") ?? "";
-    const [filterOpen, setFilterOpen] = (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$index$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useState"])(false);
     function navigate(params) {
         const qs = params.toString();
         router.replace(qs ? `/locations?${qs}` : "/locations");
@@ -121,7 +120,7 @@ function LocationsSplitClient({ locations }) {
                 children: "A directory of places in Lancaster to explore."
             }, void 0, false, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                lineNumber: 91,
+                lineNumber: 89,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -147,7 +146,7 @@ function LocationsSplitClient({ locations }) {
                                                     children: "Calendar"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                    lineNumber: 99,
+                                                    lineNumber: 97,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -158,7 +157,7 @@ function LocationsSplitClient({ locations }) {
                                                     children: "Directory"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                    lineNumber: 107,
+                                                    lineNumber: 105,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -169,13 +168,13 @@ function LocationsSplitClient({ locations }) {
                                                     children: "Updates"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                    lineNumber: 115,
+                                                    lineNumber: 113,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                            lineNumber: 98,
+                                            lineNumber: 96,
                                             columnNumber: 15
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -189,39 +188,55 @@ function LocationsSplitClient({ locations }) {
                                                     "aria-label": "Search locations"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                    lineNumber: 126,
+                                                    lineNumber: 124,
                                                     columnNumber: 17
                                                 }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                    className: "filterBtn",
-                                                    type: "button",
-                                                    onClick: ()=>setFilterOpen(true),
-                                                    children: "Filter"
-                                                }, void 0, false, {
+                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                                                    className: "typePills",
+                                                    role: "group",
+                                                    "aria-label": "Directory filters",
+                                                    children: [
+                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                            type: "button",
+                                                            className: "typePill",
+                                                            "data-active": !cat ? "true" : "false",
+                                                            onClick: ()=>setCategory(null),
+                                                            children: "All"
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/locations/LocationsSplitClient.tsx",
+                                                            lineNumber: 133,
+                                                            columnNumber: 3
+                                                        }, this),
+                                                        categories.map((t)=>{
+                                                            const on = normalize(cat ?? "") === normalize(t);
+                                                            return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
+                                                                type: "button",
+                                                                className: "typePill",
+                                                                "data-active": on ? "true" : "false",
+                                                                onClick: ()=>setCategory(on ? null : t),
+                                                                children: t
+                                                            }, t, false, {
+                                                                fileName: "[project]/app/locations/LocationsSplitClient.tsx",
+                                                                lineNumber: 144,
+                                                                columnNumber: 7
+                                                            }, this);
+                                                        })
+                                                    ]
+                                                }, void 0, true, {
                                                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                    lineNumber: 133,
-                                                    columnNumber: 17
-                                                }, this),
-                                                cat ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                    className: "clearBtn",
-                                                    type: "button",
-                                                    onClick: ()=>setCategory(null),
-                                                    children: "Clear"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                    lineNumber: 138,
-                                                    columnNumber: 19
-                                                }, this) : null
+                                                    lineNumber: 132,
+                                                    columnNumber: 1
+                                                }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                            lineNumber: 125,
+                                            lineNumber: 123,
                                             columnNumber: 15
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                    lineNumber: 97,
+                                    lineNumber: 95,
                                     columnNumber: 13
                                 }, this),
                                 filtered.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -229,7 +244,7 @@ function LocationsSplitClient({ locations }) {
                                     children: "No listings yet."
                                 }, void 0, false, {
                                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                    lineNumber: 146,
+                                    lineNumber: 161,
                                     columnNumber: 15
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     style: {
@@ -248,7 +263,7 @@ function LocationsSplitClient({ locations }) {
                                                     children: l.name ?? "Untitled listing"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                    lineNumber: 159,
+                                                    lineNumber: 174,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -258,7 +273,7 @@ function LocationsSplitClient({ locations }) {
                                                             children: l.category
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                            lineNumber: 161,
+                                                            lineNumber: 176,
                                                             columnNumber: 39
                                                         }, this) : null,
                                                         l.address ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -266,120 +281,43 @@ function LocationsSplitClient({ locations }) {
                                                             children: "•"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                            lineNumber: 162,
+                                                            lineNumber: 177,
                                                             columnNumber: 38
                                                         }, this) : null,
                                                         l.address ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: l.address
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                            lineNumber: 163,
+                                                            lineNumber: 178,
                                                             columnNumber: 38
                                                         }, this) : null
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                    lineNumber: 160,
+                                                    lineNumber: 175,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, l.id, true, {
                                             fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                            lineNumber: 152,
+                                            lineNumber: 167,
                                             columnNumber: 21
                                         }, this);
                                     })
                                 }, void 0, false, {
                                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                    lineNumber: 148,
+                                    lineNumber: 163,
                                     columnNumber: 15
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "leftOverlay",
-                                    "data-open": filterOpen ? "true" : "false",
-                                    "aria-hidden": !filterOpen,
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "leftOverlayHeader",
-                                            children: [
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                                    className: "leftOverlayTitle",
-                                                    children: "Filter directory"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                    lineNumber: 178,
-                                                    columnNumber: 17
-                                                }, this),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                    className: "overlayClose",
-                                                    type: "button",
-                                                    onClick: ()=>setFilterOpen(false),
-                                                    children: "×"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                    lineNumber: 179,
-                                                    columnNumber: 17
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                            lineNumber: 177,
-                                            columnNumber: 15
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                            className: "filterGrid",
-                                            children: [
-                                                categories.map((t)=>{
-                                                    const active = normalize(cat) === normalize(t);
-                                                    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                        className: "pillBtn",
-                                                        "data-active": active ? "true" : "false",
-                                                        type: "button",
-                                                        onClick: ()=>{
-                                                            setCategory(t);
-                                                            setFilterOpen(false);
-                                                        },
-                                                        children: t
-                                                    }, t, false, {
-                                                        fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                        lineNumber: 188,
-                                                        columnNumber: 21
-                                                    }, this);
-                                                }),
-                                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
-                                                    className: "pillBtn pillBtnSecondary",
-                                                    type: "button",
-                                                    onClick: ()=>{
-                                                        setCategory(null);
-                                                        setFilterOpen(false);
-                                                    },
-                                                    children: "Show all"
-                                                }, void 0, false, {
-                                                    fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                                    lineNumber: 203,
-                                                    columnNumber: 17
-                                                }, this)
-                                            ]
-                                        }, void 0, true, {
-                                            fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                            lineNumber: 184,
-                                            columnNumber: 15
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                    lineNumber: 172,
-                                    columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                            lineNumber: 96,
+                            lineNumber: 94,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                        lineNumber: 95,
+                        lineNumber: 93,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -391,29 +329,29 @@ function LocationsSplitClient({ locations }) {
                                 children: "Select a listing to see details."
                             }, void 0, false, {
                                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                lineNumber: 222,
+                                lineNumber: 193,
                                 columnNumber: 15
                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(LocationDetail, {
                                 location: selectedDesktop
                             }, void 0, false, {
                                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                lineNumber: 224,
+                                lineNumber: 195,
                                 columnNumber: 15
                             }, this)
                         }, void 0, false, {
                             fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                            lineNumber: 220,
+                            lineNumber: 191,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                        lineNumber: 219,
+                        lineNumber: 190,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                lineNumber: 93,
+                lineNumber: 91,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -426,7 +364,7 @@ function LocationsSplitClient({ locations }) {
                         children: "Calendar"
                     }, void 0, false, {
                         fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                        lineNumber: 232,
+                        lineNumber: 203,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -436,7 +374,7 @@ function LocationsSplitClient({ locations }) {
                         children: "Directory"
                     }, void 0, false, {
                         fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                        lineNumber: 233,
+                        lineNumber: 204,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -445,13 +383,13 @@ function LocationsSplitClient({ locations }) {
                         children: "Updates"
                     }, void 0, false, {
                         fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                        lineNumber: 234,
+                        lineNumber: 205,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                lineNumber: 231,
+                lineNumber: 202,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -469,7 +407,7 @@ function LocationsSplitClient({ locations }) {
                                 children: "Back"
                             }, void 0, false, {
                                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                lineNumber: 244,
+                                lineNumber: 215,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -477,13 +415,13 @@ function LocationsSplitClient({ locations }) {
                                 children: "Listing"
                             }, void 0, false, {
                                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                                lineNumber: 247,
+                                lineNumber: 218,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                        lineNumber: 243,
+                        lineNumber: 214,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -495,28 +433,28 @@ function LocationsSplitClient({ locations }) {
                             location: selectedMobile
                         }, void 0, false, {
                             fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                            lineNumber: 250,
+                            lineNumber: 221,
                             columnNumber: 29
                         }, this) : null
                     }, void 0, false, {
                         fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                        lineNumber: 249,
+                        lineNumber: 220,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                lineNumber: 238,
+                lineNumber: 209,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-        lineNumber: 90,
+        lineNumber: 88,
         columnNumber: 5
     }, this);
 }
-_s(LocationsSplitClient, "hQuy66Omc7Evdxe0T0KZdqjBACc=", false, function() {
+_s(LocationsSplitClient, "3IjghENT3U8sA1JG7pJlYRLmsI4=", false, function() {
     return [
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["useRouter"],
         __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$navigation$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["usePathname"],
@@ -533,7 +471,7 @@ function LocationDetail({ location }) {
                 children: location.name ?? "Untitled listing"
             }, void 0, false, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                lineNumber: 260,
+                lineNumber: 231,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -544,7 +482,7 @@ function LocationDetail({ location }) {
                         children: location.category
                     }, void 0, false, {
                         fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                        lineNumber: 263,
+                        lineNumber: 234,
                         columnNumber: 30
                     }, this) : null,
                     location.address ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -552,13 +490,13 @@ function LocationDetail({ location }) {
                         children: location.address
                     }, void 0, false, {
                         fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                        lineNumber: 264,
+                        lineNumber: 235,
                         columnNumber: 29
                     }, this) : null
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                lineNumber: 262,
+                lineNumber: 233,
                 columnNumber: 7
             }, this),
             location.website ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -573,12 +511,12 @@ function LocationDetail({ location }) {
                     children: "Website"
                 }, void 0, false, {
                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                    lineNumber: 269,
+                    lineNumber: 240,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                lineNumber: 268,
+                lineNumber: 239,
                 columnNumber: 9
             }, this) : null,
             location.description ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -590,12 +528,12 @@ function LocationDetail({ location }) {
                     children: location.description
                 }, void 0, false, {
                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                    lineNumber: 277,
+                    lineNumber: 248,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                lineNumber: 276,
+                lineNumber: 247,
                 columnNumber: 9
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "detailBody",
@@ -607,18 +545,18 @@ function LocationDetail({ location }) {
                     children: "No description yet."
                 }, void 0, false, {
                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                    lineNumber: 281,
+                    lineNumber: 252,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                lineNumber: 280,
+                lineNumber: 251,
                 columnNumber: 9
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-        lineNumber: 259,
+        lineNumber: 230,
         columnNumber: 5
     }, this);
 }

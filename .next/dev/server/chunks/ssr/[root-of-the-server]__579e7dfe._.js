@@ -1,0 +1,156 @@
+module.exports = [
+"[externals]/next/dist/shared/lib/no-fallback-error.external.js [external] (next/dist/shared/lib/no-fallback-error.external.js, cjs)", ((__turbopack_context__, module, exports) => {
+
+const mod = __turbopack_context__.x("next/dist/shared/lib/no-fallback-error.external.js", () => require("next/dist/shared/lib/no-fallback-error.external.js"));
+
+module.exports = mod;
+}),
+"[project]/app/layout.tsx [app-rsc] (ecmascript, Next.js Server Component)", ((__turbopack_context__) => {
+
+__turbopack_context__.n(__turbopack_context__.i("[project]/app/layout.tsx [app-rsc] (ecmascript)"));
+}),
+"[project]/prismicio.ts [app-rsc] (ecmascript) <locals>", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "accessToken",
+    ()=>accessToken,
+    "createClient",
+    ()=>createClient,
+    "repositoryName",
+    ()=>repositoryName
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$prismicio$2f$client$2f$dist$2f$index$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@prismicio/client/dist/index.js [app-rsc] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$prismicio$2f$client$2f$dist$2f$getRepositoryEndpoint$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@prismicio/client/dist/getRepositoryEndpoint.js [app-rsc] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$prismicio$2f$client$2f$dist$2f$createClient$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/@prismicio/client/dist/createClient.js [app-rsc] (ecmascript)");
+;
+const repositoryName = process.env.PRISMIC_REPO_NAME || process.env.NEXT_PUBLIC_PRISMIC_REPO_NAME;
+const accessToken = process.env.PRISMIC_ACCESS_TOKEN || process.env.PRISMIC_TOKEN;
+const createClient = ()=>{
+    if (!repositoryName) {
+        throw new Error([
+            "Missing Prismic repository name.",
+            "Set PRISMIC_REPO_NAME in Vercel → Project → Settings → Environment Variables (and in .env.local for local dev).",
+            "Example: PRISMIC_REPO_NAME=your-repo-name"
+        ].join(" "));
+    }
+    const endpoint = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$prismicio$2f$client$2f$dist$2f$getRepositoryEndpoint$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getRepositoryEndpoint"](repositoryName);
+    return __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$prismicio$2f$client$2f$dist$2f$createClient$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["createClient"](endpoint, {
+        accessToken
+    });
+};
+;
+}),
+"[project]/app/locations/LocationsSplitClient.tsx [app-rsc] (ecmascript)", ((__turbopack_context__, module, exports) => {
+
+const e = new Error("Could not parse module '[project]/app/locations/LocationsSplitClient.tsx'\n\nUnexpected token. Did you mean `{'}'}` or `&rbrace;`?");
+e.code = 'MODULE_UNPARSABLE';
+throw e;
+}),
+"[project]/app/locations/page.tsx [app-rsc] (ecmascript)", ((__turbopack_context__) => {
+"use strict";
+
+__turbopack_context__.s([
+    "default",
+    ()=>LocationsPage,
+    "dynamic",
+    ()=>dynamic
+]);
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/rsc/react-jsx-dev-runtime.js [app-rsc] (ecmascript)");
+var __TURBOPACK__imported__module__$5b$project$5d2f$prismicio$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$locals$3e$__ = __turbopack_context__.i("[project]/prismicio.ts [app-rsc] (ecmascript) <locals>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$prismicio$2f$client$2f$dist$2f$index$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__prismic$3e$__ = __turbopack_context__.i("[project]/node_modules/@prismicio/client/dist/index.js [app-rsc] (ecmascript) <export * as prismic>");
+var __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$locations$2f$LocationsSplitClient$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/app/locations/LocationsSplitClient.tsx [app-rsc] (ecmascript)");
+;
+;
+;
+const dynamic = "force-dynamic";
+async function LocationsPage() {
+    const client = (0, __TURBOPACK__imported__module__$5b$project$5d2f$prismicio$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$locals$3e$__["createClient"])();
+    let docs = [];
+    let prismicError = null;
+    try {
+        docs = await client.getAllByType("location");
+    } catch (e) {
+        prismicError = e?.message ? String(e.message) : "Unknown error fetching locations";
+        docs = [];
+    }
+    const locations = docs.map((doc)=>{
+        const desc = doc.data?.description;
+        const descText = typeof desc === "string" ? desc : Array.isArray(desc) && desc.length > 0 ? __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$prismicio$2f$client$2f$dist$2f$index$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__prismic$3e$__["prismic"].asText(desc) : null;
+        const websiteUrl = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$prismicio$2f$client$2f$dist$2f$index$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__prismic$3e$__["prismic"].asLink(doc.data?.website);
+        return {
+            id: doc.id,
+            key: doc.uid ?? doc.id,
+            uid: doc.uid ?? null,
+            name: doc.data?.name ?? null,
+            address: doc.data?.address ?? null,
+            category: doc.data?.category ?? null,
+            website: websiteUrl ?? null,
+            description: descText ?? null
+        };
+    });
+    // Simple alpha sort
+    locations.sort((a, b)=>(a.name ?? "").localeCompare(b.name ?? ""));
+    if (prismicError) {
+        return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+            className: "pageShell",
+            children: [
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "tagline",
+                    children: "Directory"
+                }, void 0, false, {
+                    fileName: "[project]/app/locations/page.tsx",
+                    lineNumber: 52,
+                    columnNumber: 9
+                }, this),
+                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                    className: "emptyRight",
+                    children: [
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            style: {
+                                fontWeight: 600,
+                                marginBottom: 8
+                            },
+                            children: "Couldn’t load locations from Prismic."
+                        }, void 0, false, {
+                            fileName: "[project]/app/locations/page.tsx",
+                            lineNumber: 54,
+                            columnNumber: 11
+                        }, this),
+                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
+                            className: "muted",
+                            children: prismicError
+                        }, void 0, false, {
+                            fileName: "[project]/app/locations/page.tsx",
+                            lineNumber: 55,
+                            columnNumber: 11
+                        }, this)
+                    ]
+                }, void 0, true, {
+                    fileName: "[project]/app/locations/page.tsx",
+                    lineNumber: 53,
+                    columnNumber: 9
+                }, this)
+            ]
+        }, void 0, true, {
+            fileName: "[project]/app/locations/page.tsx",
+            lineNumber: 51,
+            columnNumber: 7
+        }, this);
+    }
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$locations$2f$LocationsSplitClient$2e$tsx__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["default"], {
+        locations: locations
+    }, void 0, false, {
+        fileName: "[project]/app/locations/page.tsx",
+        lineNumber: 61,
+        columnNumber: 10
+    }, this);
+}
+}),
+"[project]/app/locations/page.tsx [app-rsc] (ecmascript, Next.js Server Component)", ((__turbopack_context__) => {
+
+__turbopack_context__.n(__turbopack_context__.i("[project]/app/locations/page.tsx [app-rsc] (ecmascript)"));
+}),
+];
+
+//# sourceMappingURL=%5Broot-of-the-server%5D__579e7dfe._.js.map

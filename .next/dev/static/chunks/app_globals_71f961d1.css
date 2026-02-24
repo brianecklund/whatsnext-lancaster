@@ -50,8 +50,8 @@ html {
 
 @font-face {
   font-family: Gabarito;
-  src: url("/fonts/Gabarito-Black.ttf") format("truetype");
-  font-weight: 900;
+  src: url("/fonts/Gabarito-SemiBold.ttf") format("truetype");
+  font-weight: 600;
   font-style: normal;
   font-display: swap;
 }
@@ -185,7 +185,7 @@ a:hover {
   border-radius: 14px;
   width: 40px;
   height: 40px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .menuCloseBtn:hover {
@@ -343,7 +343,7 @@ a:hover {
 }
 
 .weeklyCondTitle {
-  font-weight: 900;
+  font-weight: 600;
   font-size: var(--fs-body);
   letter-spacing: -.01em;
 }
@@ -370,19 +370,19 @@ a:hover {
 
 .weeklyThumb {
   object-fit: cover;
-  border: 1px solid var(--border);
-  border-radius: 14px;
+  border: 0;
+  border-radius: 0;
   width: 100%;
-  height: 128px;
+  height: 100%;
   display: block;
 }
 
 .weeklyThumbPlaceholder {
-  border: 1px solid var(--border);
   background: var(--panel);
-  border-radius: 14px;
+  border: 0;
+  border-radius: 0;
   width: 100%;
-  height: 128px;
+  height: 100%;
 }
 
 .weeklyCardContent {
@@ -473,7 +473,11 @@ a:hover {
   }
 
   .weeklyThumb, .weeklyThumbPlaceholder {
-    height: 84px;
+    background: var(--panel);
+    border: 0;
+    border-radius: 0;
+    width: 100%;
+    height: 100%;
   }
 
   .weeklyCardTitle {
@@ -503,14 +507,14 @@ a:hover {
 }
 
 .tabBtn {
-  border-radius: var(--radius);
   background: var(--btnBg);
   width: 100%;
   min-width: 0;
   height: 46px;
-  font-weight: var(--fw-medium);
+  font-weight: 600;
   font-size: var(--fs-body);
   letter-spacing: -.01em;
+  border-radius: 10px;
   justify-content: center;
   align-items: center;
   padding: 0 18px;
@@ -678,9 +682,9 @@ a:hover {
   background: var(--panel);
   background-position: center;
   background-size: cover;
-  border-radius: 6px;
+  border-radius: 12px;
   width: 100%;
-  height: 340px;
+  height: auto;
   margin: 18px 0;
 }
 
@@ -864,7 +868,7 @@ a:hover {
   }
 
   .tagline {
-    padding-bottom: 64px;
+    padding-bottom: 20px;
   }
 
   .leftSticky .tabs {
@@ -996,7 +1000,7 @@ a:hover {
 .typePill {
   border: 1px solid var(--border);
   height: 36px;
-  font-weight: var(--fw-medium);
+  font-weight: 600;
   font-size: var(--fs-meta);
   white-space: nowrap;
   background: #fff;
@@ -1126,7 +1130,7 @@ a:hover {
   font-size: var(--fs-hero);
   letter-spacing: -.03em;
   margin: 0;
-  font-weight: 900;
+  font-weight: 600;
   line-height: 1.02;
 }
 
@@ -1146,7 +1150,7 @@ a:hover {
   font-size: var(--fs-title);
   letter-spacing: -.01em;
   margin: 0 0 8px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .aboutStoryBody p {
@@ -1191,7 +1195,7 @@ a:hover {
   font-size: var(--fs-subhead);
   letter-spacing: -.01em;
   margin: 12px 0 6px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .aboutCardBody {
@@ -1238,7 +1242,7 @@ a:hover {
 }
 
 .weekSummaryTitle {
-  font-weight: 900;
+  font-weight: 600;
   font-size: var(--fs-subhead);
   letter-spacing: -.02em;
   margin: 0;
@@ -1273,7 +1277,7 @@ a:hover {
 }
 
 .weekSummaryValue {
-  font-weight: 900;
+  font-weight: 600;
   font-size: var(--fs-subhead);
   letter-spacing: -.01em;
   margin-top: 6px;
@@ -1292,7 +1296,7 @@ a:hover {
 }
 
 .simpleHeroTitle {
-  font-weight: 900;
+  font-weight: 600;
   font-size: var(--fs-hero);
   letter-spacing: -.03em;
   margin: 0;
@@ -1360,7 +1364,7 @@ a:hover {
   border: 1px solid var(--border);
   background: var(--btnBg);
   height: 46px;
-  font-weight: 900;
+  font-weight: 600;
   font-size: var(--fs-body);
   cursor: pointer;
   border-radius: 16px;
@@ -1385,7 +1389,7 @@ a:hover {
 }
 
 .calloutTitle {
-  font-weight: 900;
+  font-weight: 600;
   font-size: var(--fs-body);
   margin: 0;
 }
@@ -1399,7 +1403,7 @@ a:hover {
 
 .calloutLink {
   margin-top: 10px;
-  font-weight: 900;
+  font-weight: 600;
   text-decoration: underline;
   display: inline-block;
 }
@@ -1456,6 +1460,133 @@ strong, b {
 
 .muted, .meta, .subtle, .badge, .chip {
   font-size: var(--fs-meta);
+}
+
+.media16x9 {
+  aspect-ratio: 16 / 9;
+  background: #e9e9e9;
+  border-radius: 12px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+.media16x9 img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.mediaDescBtn {
+  color: #fff;
+  max-width: calc(100% - 20px);
+  font-size: var(--fs-meta);
+  line-height: var(--lh-tight);
+  letter-spacing: -.01em;
+  text-align: left;
+  background: #00000080;
+  border-radius: 10px;
+  padding: 8px 10px;
+  display: none;
+  position: absolute;
+  bottom: 10px;
+  left: 10px;
+}
+
+.media16x9:hover .mediaDescBtn, .media16x9:focus-within .mediaDescBtn {
+  display: inline-flex;
+}
+
+.weeklyCardTitle, .eventRowTitle, .detailTitle, .weeklyTitle, .tabBtn, .typePill {
+  font-weight: 600;
+}
+
+:root {
+  --ease-out: cubic-bezier(.2, .8, .2, 1);
+  --ease-snap: cubic-bezier(.16, 1, .3, 1);
+  --dur-1: .2s;
+  --dur-2: .52s;
+  --dur-3: .92s;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+
+  html {
+    scroll-behavior: auto !important;
+  }
+}
+
+.pageShell {
+  animation: pageFade var(--dur-3) var(--ease-out) both;
+}
+
+@keyframes pageFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.split .paneLeft {
+  opacity: 0;
+  animation: paneFade .9s var(--ease-out) both;
+  animation-delay: 40ms;
+}
+
+.split .paneRight {
+  opacity: 0;
+  animation: paneFade .9s var(--ease-out) both;
+  animation-delay: .26s;
+}
+
+@keyframes paneFade {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.fadeInItem {
+  opacity: 0;
+  animation: itemFade .52s var(--ease-out) forwards;
+}
+
+@keyframes itemFade {
+  to {
+    opacity: 1;
+  }
+}
+
+.eventRow, .locationRow, .updateRow, .weeklyItem, .card {
+  transition: transform var(--dur-1) var(--ease-out);
+}
+
+.eventRow:hover, .locationRow:hover, .updateRow:hover, .weeklyItem:hover, .card:hover {
+  transform: translateY(-2px);
+}
+
+.imageOverlayBtn {
+  transition: opacity var(--dur-1) var(--ease-out), transform var(--dur-1) var(--ease-out);
+}
+
+.media16x9:hover .imageOverlayBtn {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /*# sourceMappingURL=app_globals_71f961d1.css.map*/

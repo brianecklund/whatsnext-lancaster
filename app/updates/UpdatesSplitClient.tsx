@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export type UpdateLite = {
@@ -21,11 +22,13 @@ function norm(v: string) {
 }
 
 export default function UpdatesSplitClient({ updates }: Props) {
+  useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
 
   const q = sp.get("q") || "";
+  const tag = sp.get("tag") || "";
   const selectedKey = sp.get("u") || "";
 
   const [isMobile, setIsMobile] = useState(false);
@@ -51,14 +54,31 @@ export default function UpdatesSplitClient({ updates }: Props) {
     if (isMobile) setMobileTab("detail");
   }
 
+  // Available tag filters (unique, sorted)
+  const tags = useMemo(() => {
+    const s = new Set<string>();
+    for (const u of updates) {
+      for (const t of u.tags || []) {
+        const tt = (t || "").trim();
+        if (tt) s.add(tt);
+      }
+    }
+    return Array.from(s).sort((a, b) => a.localeCompare(b));
+  }, [updates]);
+
   const filtered = useMemo(() => {
     const nq = norm(q);
-    if (!nq) return updates;
+    const nt = norm(tag);
     return updates.filter((u) => {
+      if (nt) {
+        const utags = (u.tags || []).map((t) => norm(t));
+        if (!utags.includes(nt)) return false;
+      }
+      if (!nq) return true;
       const hay = norm([u.title, ...(u.tags || []), u.body || ""].join(" "));
       return hay.includes(nq);
     });
-  }, [updates, q]);
+  }, [updates, q, tag]);
 
   const selectedDesktop = useMemo(() => {
     if (!filtered.length) return null;
@@ -122,11 +142,40 @@ export default function UpdatesSplitClient({ updates }: Props) {
                     aria-label="Search updates"
                   />
                   {q ? (
-                    <button className="clearBtn" type="button" onClick={() => setParam("q", null)}>
+                    <button className="clearBtn" type="button" onClick={() => {
+                        setParam("q", null);
+                        setParam("tag", null);
+                      }}>
                       Clear
                     </button>
                   ) : null}
-                </div>
+                
+<div className="typePills" role="group" aria-label="Update filters">
+  <button
+    type="button"
+    className="typePill"
+    data-active={!tag ? "true" : "false"}
+    onClick={() => setParam("tag", null)}
+  >
+    All
+  </button>
+  {tags.map((t) => {
+    const on = norm(tag) === norm(t);
+    return (
+      <button
+        key={t}
+        type="button"
+        className="typePill"
+        data-active={on ? "true" : "false"}
+        onClick={() => setParam("tag", on ? null : t)}
+      >
+        {t}
+      </button>
+    );
+  })}
+</div>
+
+</div>
               </div>
 
               {filtered.length === 0 ? (
@@ -175,8 +224,10 @@ export default function UpdatesSplitClient({ updates }: Props) {
                 <div className="detailCard">
                   <div className="detailHeader">
                     <div>
-                      <div className="detailTitle">{selected.title}</div>
-                      <div className="detailMeta">
+                      <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
+                        {selected.title}
+                      </div>
+                      <div className="detailMeta fadeInItem" style={{ animationDelay: "320ms" }}>
                         {selected.date ? <span>{selected.date}</span> : null}
                       </div>
                     </div>
@@ -192,7 +243,11 @@ export default function UpdatesSplitClient({ updates }: Props) {
                     </div>
                   ) : null}
 
-                  {selected.body ? <div className="detailDesc">{selected.body}</div> : null}
+                  {selected.body ? (
+                    <div className="detailDesc fadeInItem" style={{ animationDelay: "360ms" }}>
+                      {selected.body}
+                    </div>
+                  ) : null}
 
                   {selected.link ? (
                     <div className="detailLinks">

@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
 
@@ -11,6 +12,7 @@ function normalize(v: string) {
 type LocationRow = LocationLite & { key: string };
 
 export default function LocationsSplitClient({ locations }: { locations: LocationRow[] }) {
+  useSmoothWheel(".scroll");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -18,8 +20,6 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   const selectedKey = searchParams.get("location");
   const q = searchParams.get("q") ?? "";
   const cat = searchParams.get("cat") ?? "";
-
-  const [filterOpen, setFilterOpen] = useState(false);
 
   function navigate(params: URLSearchParams) {
     const qs = params.toString();
@@ -130,16 +130,33 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                   placeholder="Search"
                   aria-label="Search locations"
                 />
-                <button className="filterBtn" type="button" onClick={() => setFilterOpen(true)}>
-                  Filter
-                </button>
+              
+<div className="typePills" role="group" aria-label="Directory filters">
+  <button
+    type="button"
+    className="typePill"
+    data-active={!cat ? "true" : "false"}
+    onClick={() => setCategory(null)}
+  >
+    All
+  </button>
+  {categories.map((t) => {
+    const on = normalize(cat ?? "") === normalize(t);
+    return (
+      <button
+        key={t}
+        type="button"
+        className="typePill"
+        data-active={on ? "true" : "false"}
+        onClick={() => setCategory(on ? null : t)}
+      >
+        {t}
+      </button>
+    );
+  })}
+</div>
 
-                {cat ? (
-                  <button className="clearBtn" type="button" onClick={() => setCategory(null)}>
-                    Clear
-                  </button>
-                ) : null}
-              </div>
+</div>
             </div>
 
             {filtered.length === 0 ? (
@@ -168,50 +185,6 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
               </div>
             )}
 
-            {/* Left filter overlay */}
-            <div
-              className="leftOverlay"
-              data-open={filterOpen ? "true" : "false"}
-              aria-hidden={!filterOpen}
-            >
-              <div className="leftOverlayHeader">
-                <div className="leftOverlayTitle">Filter directory</div>
-                <button className="overlayClose" type="button" onClick={() => setFilterOpen(false)}>
-                  ×
-                </button>
-              </div>
-
-              <div className="filterGrid">
-                {categories.map((t) => {
-                  const active = normalize(cat) === normalize(t);
-                  return (
-                    <button
-                      key={t}
-                      className="pillBtn"
-                      data-active={active ? "true" : "false"}
-                      type="button"
-                      onClick={() => {
-                        setCategory(t);
-                        setFilterOpen(false);
-                      }}
-                    >
-                      {t}
-                    </button>
-                  );
-                })}
-
-                <button
-                  className="pillBtn pillBtnSecondary"
-                  type="button"
-                  onClick={() => {
-                    setCategory(null);
-                    setFilterOpen(false);
-                  }}
-                >
-                  Show all
-                </button>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -257,9 +230,11 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 function LocationDetail({ location }: { location: LocationRow }) {
   return (
     <div className="detailCard">
-      <div className="detailTitle">{location.name ?? "Untitled listing"}</div>
+      <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
+        {location.name ?? "Untitled listing"}
+      </div>
 
-      <div className="detailMeta">
+      <div className="detailMeta fadeInItem" style={{ animationDelay: "320ms" }}>
         {location.category ? <span className="badge">{location.category}</span> : null}
         {location.address ? <span className="muted">{location.address}</span> : null}
       </div>
@@ -273,11 +248,11 @@ function LocationDetail({ location }: { location: LocationRow }) {
       ) : null}
 
       {location.description ? (
-        <div className="detailBody" style={{ marginTop: 14 }}>
+        <div className="detailBody fadeInItem" style={{ marginTop: 14, animationDelay: "360ms" }}>
           <p>{location.description}</p>
         </div>
       ) : (
-        <div className="detailBody" style={{ marginTop: 14 }}>
+        <div className="detailBody fadeInItem" style={{ marginTop: 14, animationDelay: "360ms" }}>
           <p className="muted">No description yet.</p>
         </div>
       )}

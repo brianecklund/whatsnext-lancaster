@@ -51,7 +51,7 @@ export default async function LocationsPage() {
       <div className="pageShell">
         <div className="tagline">Directory</div>
         <div className="emptyRight">
-          <div style={{ fontWeight: 900, marginBottom: 8 }}>Couldn’t load locations from Prismic.</div>
+          <div style={{ fontWeight: 600, marginBottom: 8 }}>Couldn’t load locations from Prismic.</div>
           <div className="muted">{prismicError}</div>
         </div>
       </div>
