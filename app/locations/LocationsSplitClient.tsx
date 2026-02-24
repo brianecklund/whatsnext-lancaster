@@ -93,7 +93,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
       <div className="split">
         {/* LEFT */}
         <div className="pane paneLeft">
-          <div className="scroll">
+          <div className="scroll" ref={leftScrollRef}>
             <div className="leftSticky">
               <div className="tabs" aria-label="Primary navigation">
                 <button
@@ -131,7 +131,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                   aria-label="Search locations"
                 />
               
-<div className="typePills" role="group" aria-label="Directory filters">
+<div className={"typePills" + (effectiveIsMobile ? " mobileHidden" : "")} role="group" aria-label="Directory filters">
   <button
     type="button"
     className="typePill"

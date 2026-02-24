@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
@@ -32,6 +32,9 @@ export default function UpdatesSplitClient({ updates }: Props) {
   const selectedKey = sp.get("u") || "";
 
   const [isMobile, setIsMobile] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [leftScrolled, setLeftScrolled] = useState(false);
+  const leftScrollRef = useRef<HTMLDivElement | null>(null);
   const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
 
   useEffect(() => {
@@ -104,7 +107,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
         {/* LEFT */}
         {showLeft ? (
           <aside className="pane paneLeft">
-            <div className="scroll">
+            <div className="scroll" ref={leftScrollRef}>
               <div className="leftSticky">
                 <div className="tabs" aria-label="Primary navigation">
                   <button
@@ -133,14 +136,27 @@ export default function UpdatesSplitClient({ updates }: Props) {
                   </button>
                 </div>
 
+                <div className={"tagline taglineMobile" + (leftScrolled ? " isCollapsed" : "")}>
+                  A calendar of events, specials, and pop-ups in Lancaster, PA.
+                </div>
+
                 <div className="leftControls">
-                  <input
-                    className="searchInput"
+                  <div className="searchRow">
+                    <input
+                      className="searchInput"
+
                     placeholder="Search updates…"
                     value={q}
                     onChange={(e) => setParam("q", e.target.value)}
                     aria-label="Search updates"
                   />
+                    {effectiveIsMobile ? (
+                      <button type="button" className="filtersBtn" onClick={() => setFiltersOpen(true)}>
+                        Filters
+                      </button>
+                    ) : null}
+                  </div>
+
                   {q ? (
                     <button className="clearBtn" type="button" onClick={() => {
                         setParam("q", null);
@@ -150,7 +166,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
                     </button>
                   ) : null}
                 
-<div className="typePills" role="group" aria-label="Update filters">
+<div className={"typePills" + (effectiveIsMobile ? " mobileHidden" : "")} role="group" aria-label="Update filters">
   <button
     type="button"
     className="typePill"

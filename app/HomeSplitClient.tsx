@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
@@ -167,6 +167,9 @@ export default function HomeSplitClient({ events }: Props) {
   const [mounted, setMounted] = useState(false);
   // Hydration-safe: start false so SSR and first client render match.
   const [isMobile, setIsMobile] = useState(false);
+  const [filtersOpen, setFiltersOpen] = useState(false);
+  const [leftScrolled, setLeftScrolled] = useState(false);
+  const leftScrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setMounted(true);
@@ -342,6 +345,16 @@ export default function HomeSplitClient({ events }: Props) {
 
   const effectiveIsMobile = mounted ? isMobile : false;
 
+  useEffect(() => {
+    if (!effectiveIsMobile) return;
+    const el = leftScrollRef.current;
+    if (!el) return;
+    const onScroll = () => setLeftScrolled(el.scrollTop > 8);
+    onScroll();
+    el.addEventListener("scroll", onScroll, { passive: true });
+    return () => el.removeEventListener("scroll", onScroll as any);
+  }, [effectiveIsMobile]);
+
   const showLeft = true;
 
   // Desktop shows the split detail pane; mobile uses an overlay for details.
@@ -372,12 +385,12 @@ export default function HomeSplitClient({ events }: Props) {
 
   return (
     <div className="pageShell">
-      <div className="tagline">A calendar of events, specials, and pop-ups in Lancaster, PA.</div>
+      <div className="tagline taglineDesktop">A calendar of events, specials, and pop-ups in Lancaster, PA.</div>
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
           <aside className="pane paneLeft">
-            <div className="scroll">
+            <div className="scroll" ref={leftScrollRef}>
               <div className="leftSticky">
                 <div className="tabs" aria-label="Primary navigation">
                   <button
@@ -406,13 +419,27 @@ export default function HomeSplitClient({ events }: Props) {
                   </button>
                 </div>
 
+                <div className={"tagline taglineMobile" + (leftScrolled ? " isCollapsed" : "")}>
+                  A calendar of events, specials, and pop-ups in Lancaster, PA.
+                </div>
+
                 <div className="leftControls">
-                  <input
-                    className="searchInput"
+                  <div className="searchRow">
+                    <input
+                      className="searchInput"
+
                     placeholder="Search events…"
                     value={q}
                     onChange={(e) => setParam("q", e.target.value)}
-                  />{(q || type) ? (
+                  />
+                    {effectiveIsMobile ? (
+                      <button type="button" className="filtersBtn" onClick={() => setFiltersOpen(true)}>
+                        Filters
+                      </button>
+                    ) : null}
+                  </div>
+
+                  {(q || type) ? (
                     <button
                       className="clearBtn"
                       onClick={() => {
@@ -426,7 +453,7 @@ export default function HomeSplitClient({ events }: Props) {
                   ) : null}
                 </div>
 
-                <div className="typePills" role="group" aria-label="Event type filters">
+                <div className={"typePills" + (effectiveIsMobile ? " mobileHidden" : "")} role="group" aria-label="Event type filters">
                   <button
                     type="button"
                     className="typePill"
@@ -921,4 +948,45 @@ export default function HomeSplitClient({ events }: Props) {
 
 </div>
   );
+
+                {effectiveIsMobile && filtersOpen ? (
+                  <div className="filtersOverlay" role="dialog" aria-modal="true">
+                    <div className="filtersPanel">
+                      <div className="filtersPanelHeader">
+                        <div className="filtersPanelTitle">Filters</div>
+                        <button type="button" className="filtersClose" aria-label="Close filters" onClick={() => setFiltersOpen(false)}>
+                          ×
+                        </button>
+                      </div>
+
+                      <div className="typePills" role="group" aria-label="Event type filters">
+                        <button
+                          type="button"
+                          className="pill"
+                          data-active={!type ? "true" : "false"}
+                          onClick={() => {
+                            setParam("type", null);
+                            setFiltersOpen(false);
+                          }}
+                        >
+                          All
+                        </button>
+                        {EVENT_TYPE_CANDIDATES.filter((t) => t !== WEEKLY_KEY).map((t) => (
+                          <button
+                            key={t}
+                            type="button"
+                            className="pill"
+                            data-active={norm(type) === norm(t) ? "true" : "false"}
+                            onClick={() => {
+                              setParam("type", t);
+                              setFiltersOpen(false);
+                            }}
+                          >
+                            {t}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
 }
