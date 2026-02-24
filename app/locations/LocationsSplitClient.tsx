@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
 
 function normalize(v: string) {
@@ -12,6 +12,7 @@ type LocationRow = LocationLite & { key: string };
 
 export default function LocationsSplitClient({ locations }: { locations: LocationRow[] }) {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const selectedKey = searchParams.get("location");
@@ -95,9 +96,30 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
           <div className="scroll">
             <div className="leftSticky">
               <div className="tabs" aria-label="Primary navigation">
-                <a className="tabBtn" href="/">Calendar</a>
-                <a className="tabBtn" href="/locations" aria-current="page">Directory</a>
-                <a className="tabBtn" href="/updates">Updates</a>
+                <button
+                  type="button"
+                  className="tabBtn"
+                  data-active={pathname === "/" ? "true" : "false"}
+                  onClick={() => router.push("/")}
+                >
+                  Calendar
+                </button>
+                <button
+                  type="button"
+                  className="tabBtn"
+                  data-active={pathname.startsWith("/locations") ? "true" : "false"}
+                  onClick={() => router.push("/locations")}
+                >
+                  Directory
+                </button>
+                <button
+                  type="button"
+                  className="tabBtn"
+                  data-active={pathname.startsWith("/updates") ? "true" : "false"}
+                  onClick={() => router.push("/updates")}
+                >
+                  Updates
+                </button>
               </div>
 
               <div className="leftControls">

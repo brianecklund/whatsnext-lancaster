@@ -172,7 +172,7 @@ export default async function HomePage() {
   if (prismicError) {
     return (
       <div style={{ padding: 24, maxWidth: 820 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 700, marginBottom: 10 }}>
+        <h1 style={{ fontSize: 22, fontWeight: 500, marginBottom: 10 }}>
           Prismic is not returning events
         </h1>
         <p style={{ marginBottom: 12, opacity: 0.9 }}>
@@ -187,7 +187,7 @@ export default async function HomePage() {
             borderRadius: 12,
           }}
         >
-          <div style={{ fontWeight: 600, marginBottom: 6 }}>Error</div>
+          <div style={{ fontWeight: 500, marginBottom: 6 }}>Error</div>
           <code style={{ whiteSpace: "pre-wrap" }}>{prismicError}</code>
         </div>
         <p style={{ marginTop: 14, opacity: 0.9 }}>

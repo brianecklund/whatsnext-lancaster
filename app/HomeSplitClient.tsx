@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 type EventLite = {
   id: string;
@@ -98,6 +98,13 @@ function formatTimeLabel(d: Date): string {
   });
 }
 
+function formatTimeShort(d: Date): string {
+  return d.toLocaleTimeString(undefined, {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function pickImageUrl(e: any): string | null {
   if (!e) return null;
@@ -143,44 +150,52 @@ function pickDescriptionText(e: EventLite): string | null {
 export default function HomeSplitClient({ events }: Props) {
   const router = useRouter();
   const sp = useSearchParams();
+  const pathname = usePathname();
 
   const q = sp.get("q") || "";
   const type = sp.get("type") || "";
 
   // default selection = weekly overview
   const selectedParam = sp.get("event");
-  const selectedKey = selectedParam ?? WEEKLY_KEY;
-
-  const [overlayOpen, setOverlayOpen] = useState(false);
-
+  // URL drives selection, but on mobile we keep an optimistic client key so the
+  // detail panel can update immediately on tap (before the router finishes).
+  const [clientSelectedKey, setClientSelectedKey] = useState<string | null>(null);
+  const selectedKey = (clientSelectedKey ?? selectedParam) ?? WEEKLY_KEY;
+  // Initialize from matchMedia so the first tap on mobile reliably opens detail.
+  const [mounted, setMounted] = useState(false);
+  // Hydration-safe: start false so SSR and first client render match.
   const [isMobile, setIsMobile] = useState(false);
-  const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
 
   useEffect(() => {
+    setMounted(true);
     const mq = window.matchMedia("(max-width: 980px)");
     const apply = () => setIsMobile(mq.matches);
     apply();
-    mq.addEventListener("change", apply);
-    return () => mq.removeEventListener("change", apply);
+    // Safari < 14 uses addListener/removeListener
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const anyMq: any = mq;
+    if (mq.addEventListener) mq.addEventListener("change", apply);
+    else if (anyMq.addListener) anyMq.addListener(apply);
+    return () => {
+      if (mq.removeEventListener) mq.removeEventListener("change", apply);
+      else if (anyMq.removeListener) anyMq.removeListener(apply);
+    };
   }, []);
 
+  // Keep the optimistic client key in sync with the URL when navigation completes.
   useEffect(() => {
-    function onKey(e: KeyboardEvent) {
-      if (e.key === "Escape") setOverlayOpen(false);
-    }
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
+    setClientSelectedKey(selectedParam);
+  }, [selectedParam]);
 
+  function isMobileNow() {
+    if (typeof window === "undefined") return false;
+    return window.matchMedia("(max-width: 980px)").matches;
+  }
   function setParam(key: string, value: string | null) {
     const params = new URLSearchParams(sp.toString());
     if (!value) params.delete(key);
     else params.set(key, value);
     router.push(`/?${params.toString()}`);
-  }
-
-  function goDetailMobile() {
-    if (isMobile) setMobileTab("detail");
   }
 
   const eventTypes = useMemo(() => {
@@ -261,6 +276,29 @@ export default function HomeSplitClient({ events }: Props) {
 
   const weekEventsCount = weekEvents.length;
 
+  const weekLabel = useMemo(() => {
+    const fmt = (d: Date) => {
+      const m = d.getMonth() + 1;
+      const day = d.getDate();
+      const yy = String(d.getFullYear()).slice(-2);
+      return `${m}/${day}/${yy}`;
+    };
+    return `${fmt(weeklyRange.start)} to ${fmt(weeklyRange.end)}`;
+  }, [weeklyRange]);
+
+  const weekInsights = useMemo(() => {
+    const buckets = { "Live music": 0, "Food & drink": 0, "Community": 0, "Other": 0 };
+    for (const e of weekEvents) {
+      const t = (e.event_type || "").toLowerCase();
+      if (t.includes("music") || t.includes("concert") || t.includes("show")) buckets["Live music"]++;
+      else if (t.includes("food") || t.includes("drink") || t.includes("dining") || t.includes("menu")) buckets["Food & drink"]++;
+      else if (t.includes("community") || t.includes("market") || t.includes("fundraiser") || t.includes("family")) buckets["Community"]++;
+      else buckets["Other"]++;
+    }
+    return buckets;
+  }, [weekEvents]);
+
+
   const weekGroups = useMemo(() => {
     const map = new Map<string, { date: Date; items: EventLite[] }>();
     for (const e of weekEvents) {
@@ -300,8 +338,12 @@ export default function HomeSplitClient({ events }: Props) {
   // stagger counter for left list
   let listAnimIndex = 0;
 
-  const showLeft = !isMobile || mobileTab === "list";
-  const showRight = !isMobile || mobileTab === "detail";
+  const effectiveIsMobile = mounted ? isMobile : false;
+
+  const showLeft = true;
+
+  // Desktop shows the split detail pane; mobile uses an overlay for details.
+  const showRight = !effectiveIsMobile;
 
   // Right pane content helpers
   const selectedImg = selectedEvent ? pickImageUrl(selectedEvent) : null;
@@ -313,31 +355,62 @@ export default function HomeSplitClient({ events }: Props) {
       })()
     : null;
 
+  const mobileDetailOpen =
+    effectiveIsMobile && selectedKey !== WEEKLY_KEY && !!selectedEvent;
+
+  function clearSelected() {
+    setClientSelectedKey(null);
+    setParam("event", null);
+  }
+
+  function openSelected(key: string) {
+    setClientSelectedKey(key);
+    setParam("event", key);
+  }
+
   return (
     <div className="pageShell">
+      <div className="tagline">A calendar of events, specials, and pop-ups in Lancaster, PA.</div>
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
           <aside className="pane paneLeft">
             <div className="scroll">
               <div className="leftSticky">
+                <div className="tabs" aria-label="Primary navigation">
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname === "/" ? "true" : "false"}
+                    onClick={() => router.push("/")}
+                  >
+                    Calendar
+                  </button>
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+                    onClick={() => router.push("/locations")}
+                  >
+                    Directory
+                  </button>
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+                    onClick={() => router.push("/updates")}
+                  >
+                    Updates
+                  </button>
+                </div>
+
                 <div className="leftControls">
                   <input
                     className="searchInput"
                     placeholder="Search events…"
                     value={q}
                     onChange={(e) => setParam("q", e.target.value)}
-                  />
-
-                  <button
-                    className="filterBtn"
-                    onClick={() => setOverlayOpen(true)}
-                    type="button"
-                  >
-                    Filter
-                  </button>
-
-                  {(q || type) ? (
+                  />{(q || type) ? (
                     <button
                       className="clearBtn"
                       onClick={() => {
@@ -350,6 +423,31 @@ export default function HomeSplitClient({ events }: Props) {
                     </button>
                   ) : null}
                 </div>
+
+                <div className="typePills" role="group" aria-label="Event type filters">
+                  <button
+                    type="button"
+                    className="typePill"
+                    data-active={!type ? "true" : "false"}
+                    onClick={() => setParam("type", null)}
+                  >
+                    All
+                  </button>
+                  {eventTypes.map((t) => {
+                    const on = norm(type) === norm(t);
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        className="typePill"
+                        data-active={on ? "true" : "false"}
+                        onClick={() => setParam("type", on ? null : t)}
+                      >
+                        {t}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Weekly Overview (left) */}
@@ -359,8 +457,9 @@ export default function HomeSplitClient({ events }: Props) {
                 style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
                 data-active={selectedKey === WEEKLY_KEY ? "true" : "false"}
                 onClick={() => {
+                  setClientSelectedKey(WEEKLY_KEY);
                   setParam("event", WEEKLY_KEY);
-                  goDetailMobile();
+                  
                 }}
               >
                 <div className="weeklyTitle">Weekly Overview</div>
@@ -395,9 +494,10 @@ export default function HomeSplitClient({ events }: Props) {
                         style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
                         data-active={active ? "true" : "false"}
                         onClick={() => {
-                          if (e.uid) setParam("event", e.uid);
-                          else setParam("event", e.id);
-                          goDetailMobile();
+                          const key = e.uid ?? e.id;
+                          setClientSelectedKey(key);
+                          setParam("event", key);
+                          
                         }}
                         type="button"
                       >
@@ -407,57 +507,24 @@ export default function HomeSplitClient({ events }: Props) {
                           {e.event_type ? <span className="dot">•</span> : null}
                           {e.event_type ? <span>{e.event_type}</span> : null}
                         </div>
+                        {(() => {
+                          const raw =
+                            (e.summary ?? "") || (pickDescriptionText(e) ?? "");
+                          const s = (raw || "").trim();
+                          if (!s) return null;
+                          return (
+                            <div className="eventRowDesc">
+                              {s.length > 180 ? `${s.slice(0, 180).trim()}…` : s}
+                            </div>
+                          );
+                        })()}
+
                       </button>
                     );
                   })}
                 </section>
               ))}
 
-              {/* Left overlay filter */}
-              <div className="leftOverlay" data-open={overlayOpen ? "true" : "false"}>
-                <div className="leftOverlayHeader">
-                  <div className="leftOverlayTitle">Filter</div>
-                  <button
-                    className="overlayClose"
-                    onClick={() => setOverlayOpen(false)}
-                    aria-label="Close"
-                    type="button"
-                  >
-                    ×
-                  </button>
-                </div>
-
-                <div className="filterGrid">
-                  {eventTypes.map((t) => {
-                    const on = norm(type) === norm(t);
-                    return (
-                      <button
-                        key={t}
-                        className="pillBtn"
-                        data-active={on ? "true" : "false"}
-                        onClick={() => {
-                          setParam("type", t);
-                          setOverlayOpen(false);
-                        }}
-                        type="button"
-                      >
-                        {t}
-                      </button>
-                    );
-                  })}
-
-                  <button
-                    className="pillBtn pillBtnSecondary"
-                    onClick={() => {
-                      setParam("type", null);
-                      setOverlayOpen(false);
-                    }}
-                    type="button"
-                  >
-                    Clear filter
-                  </button>
-                </div>
-              </div>
             </div>
           </aside>
         ) : null}
@@ -466,13 +533,75 @@ export default function HomeSplitClient({ events }: Props) {
         {showRight ? (
           <main className="pane paneRight">
             <div className="scroll">
+
               {selectedKey === WEEKLY_KEY ? (
                 <div className="rightHeader">
                   <div className="rightDayLabel">Weekly Overview</div>
 
+                  <div className="weekSummary">
+                    <h3 className="weekSummaryTitle">Week of {weekLabel}</h3>
+                    <p className="weekSummarySubhead">
+                      A quick snapshot of what&apos;s happening on the calendar this week.
+                    </p>
+
+                    <div className="weekSummaryGrid" role="list">
+                      <div className="weekSummaryCard" role="listitem">
+                        <div className="weekSummaryKicker">Total events</div>
+                        <div className="weekSummaryValue">{weekEventsCount}</div>
+                      </div>
+                      <div className="weekSummaryCard" role="listitem">
+                        <div className="weekSummaryKicker">Live music</div>
+                        <div className="weekSummaryValue">{weekInsights["Live music"]}</div>
+                      </div>
+                      <div className="weekSummaryCard" role="listitem">
+                        <div className="weekSummaryKicker">Food &amp; drink</div>
+                        <div className="weekSummaryValue">{weekInsights["Food & drink"]}</div>
+                      </div>
+                    </div>
+                  </div>
+
+
                   {weekEventsCount === 0 ? (
-                    <div className="emptyRight">
-                      No events scheduled for the rest of this week.
+                    <div className="emptyRight">No events scheduled for the rest of this week.</div>
+                  ) : effectiveIsMobile ? (
+                    <div className="weeklyCondensed" aria-label="Weekly overview (condensed)">
+                      {weekGroups.map((g) => (
+                        <div key={dayKey(g.date)}>
+                          <div className="weeklyCondensedDayTitle">{formatDayHeading(g.date)}</div>
+
+                          {g.items.map((e) => {
+                            const title = e.title || "Untitled event";
+                            const d = safeDateFromEvent(e);
+                            const timeLabel = d ? formatTimeShort(d) : "Time TBD";
+
+                            const venueBits = [e.locationName, e.event_type]
+                              .filter(Boolean)
+                              .join(" • ");
+
+                            return (
+                              <button
+                                key={e.id}
+                                type="button"
+                                className="weeklyCondRow"
+                                onClick={() => {
+                                  const key = e.uid ?? e.id;
+                                  setClientSelectedKey(key);
+                                  setParam("event", key);
+                                  
+                                }}
+                              >
+                                <div className="weeklyCondTop">
+                                  <div className="weeklyCondTime">{timeLabel}</div>
+                                  <div className="weeklyCondTitle">{title}</div>
+                                </div>
+                                {venueBits ? (
+                                  <div className="weeklyCondMeta">{venueBits}</div>
+                                ) : null}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      ))}
                     </div>
                   ) : (
                     <div className="weeklyCards">
@@ -485,7 +614,6 @@ export default function HomeSplitClient({ events }: Props) {
                             const d = safeDateFromEvent(e);
                             const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
                             const img = pickImageUrl(e);
-                            const desc = pickDescriptionText(e);
 
                             return (
                               <button
@@ -493,9 +621,10 @@ export default function HomeSplitClient({ events }: Props) {
                                 type="button"
                                 className="weeklyCard weeklyCardSelectable"
                                 onClick={() => {
-                                  if (e.uid) setParam("event", e.uid);
-                                  else setParam("event", e.id);
-                                  goDetailMobile();
+                                  const key = e.uid ?? e.id;
+                                  setClientSelectedKey(key);
+                                  setParam("event", key);
+                                  
                                 }}
                               >
                                 <div className="weeklyCardMedia">
@@ -514,7 +643,7 @@ export default function HomeSplitClient({ events }: Props) {
                                       <div className="weeklyCardTime">{timeLabel}</div>
                                     </div>
 
-                                    {(e.tickets_url || e.website_url) ? (
+                                    {e.tickets_url || e.website_url ? (
                                       <div className="weeklyCardActions">
                                         {e.tickets_url ? (
                                           <a
@@ -541,8 +670,6 @@ export default function HomeSplitClient({ events }: Props) {
                                       </div>
                                     ) : null}
                                   </div>
-
-                                  {desc ? <div className="weeklyCardDesc">{desc}</div> : null}
                                 </div>
                               </button>
                             );
@@ -623,26 +750,97 @@ export default function HomeSplitClient({ events }: Props) {
       </div>
 
       {/* Mobile bottom tabs */}
-      {isMobile ? (
-        <div className="mobileTabs">
+      {effectiveIsMobile ? (
+        <div className="mobileTabs" aria-label="Primary navigation">
           <button
-            className="tabBtn"
-            aria-current={mobileTab === "list" ? "page" : undefined}
-            onClick={() => setMobileTab("list")}
             type="button"
+            className="tabBtn"
+            data-active={pathname === "/" ? "true" : "false"}
+            onClick={() => router.push("/")}
           >
-            List
+            Calendar
           </button>
           <button
-            className="tabBtn"
-            aria-current={mobileTab === "detail" ? "page" : undefined}
-            onClick={() => setMobileTab("detail")}
             type="button"
+            className="tabBtn"
+            data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+            onClick={() => router.push("/locations")}
           >
-            Details
+            Directory
+          </button>
+          <button
+            type="button"
+            className="tabBtn"
+            data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+            onClick={() => router.push("/updates")}
+          >
+            Updates
           </button>
         </div>
       ) : null}
-    </div>
+    
+      {/* Mobile detail overlay (matches Directory/Updates behavior) */}
+      <div
+        className="mobileDetail"
+        data-open={mobileDetailOpen ? "true" : "false"}
+        aria-hidden={!mobileDetailOpen}
+      >
+        <div className="mobileDetailHeader">
+          <button className="backBtn" type="button" onClick={clearSelected}>
+            Back
+          </button>
+          <div className="mobileDetailTitle">Event</div>
+        </div>
+        <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
+          {selectedEvent ? (
+            <div className="detailCard">
+              <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
+              <div className="detailMeta">
+                <span className="muted">{selectedTime ?? "Time TBD"}</span>
+                {selectedEvent.event_type ? <span className="badge">{selectedEvent.event_type}</span> : null}
+              </div>
+              {selectedImg ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={selectedImg}
+                  alt=""
+                  style={{
+                    width: "100%",
+                    height: 220,
+                    objectFit: "cover",
+                    borderRadius: 12,
+                    marginTop: 14,
+                  }}
+                />
+              ) : null}
+              {selectedDesc ? (
+                <div className="detailBody" style={{ marginTop: 14 }}>
+                  <p>{selectedDesc}</p>
+                </div>
+              ) : (
+                <div className="detailBody" style={{ marginTop: 14 }}>
+                  <p className="muted">No description yet.</p>
+                </div>
+              )}
+              {selectedEvent.website_url ? (
+                <p style={{ marginTop: 12 }}>
+                  <a className="link" href={selectedEvent.website_url} target="_blank" rel="noreferrer">
+                    Website
+                  </a>
+                </p>
+              ) : null}
+              {selectedEvent.tickets_url ? (
+                <p style={{ marginTop: 8 }}>
+                  <a className="link" href={selectedEvent.tickets_url} target="_blank" rel="noreferrer">
+                    Tickets
+                  </a>
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+        </div>
+      </div>
+
+</div>
   );
 }

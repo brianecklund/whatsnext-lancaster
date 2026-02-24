@@ -1,10 +1,110 @@
+"use client";
+
+import { useState, type FormEvent } from "react";
+
 export default function ContactPage() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [subject, setSubject] = useState("");
+  const [message, setMessage] = useState("");
+
+  function submit(e: FormEvent) {
+    e.preventDefault();
+    const to = "hello@whatsnextlancaster.com";
+    const params = new URLSearchParams({
+      subject: subject || "Website contact",
+      body: `Name: ${name}\nEmail: ${email}\n\n${message}`,
+    });
+    window.location.href = `mailto:${to}?${params.toString()}`;
+  }
+
   return (
-    <div style={{ padding: "24px" }}>
-      <h1 style={{ marginTop: 0, fontWeight: 900, fontSize: 44 }}>Contact</h1>
-      <p style={{ maxWidth: 720, color: "var(--muted)", fontSize: 18, lineHeight: 1.5 }}>
-        Want to add an event or venue? Reach out and we’ll get it in the mix.
-      </p>
+    <div className="simplePage">
+      <header>
+        <h1 className="simpleHeroTitle">Contact</h1>
+        <p className="simpleHeroSubhead">
+          Have an event, venue, or update to share? Send a message and we&apos;ll take a look.
+        </p>
+      </header>
+
+      <form className="contactForm" onSubmit={submit}>
+        <div className="formRow">
+          <div>
+            <label className="label" htmlFor="name">Name</label>
+            <input
+              id="name"
+              className="input"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Your name"
+              required
+            />
+          </div>
+          <div>
+            <label className="label" htmlFor="email">Email</label>
+            <input
+              id="email"
+              className="input"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="you@example.com"
+              required
+            />
+          </div>
+        </div>
+
+        <div className="formRowSingle">
+          <div>
+            <label className="label" htmlFor="subject">Subject</label>
+            <input
+              id="subject"
+              className="input"
+              value={subject}
+              onChange={(e) => setSubject(e.target.value)}
+              placeholder="Partnership, contribution, general question…"
+            />
+          </div>
+        </div>
+
+        <div className="formRowSingle">
+          <div>
+            <label className="label" htmlFor="message">Message</label>
+            <textarea
+              id="message"
+              className="textarea"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              placeholder="Tell us what you&apos;d like to share."
+              required
+            />
+          </div>
+        </div>
+
+        <button className="submitBtn" type="submit">Send message</button>
+      </form>
+
+      <section className="contactCallouts">
+        <div className="calloutCard">
+          <h2 className="calloutTitle">Partnerships</h2>
+          <p className="calloutBody">
+            Venues, sponsors, or organizations looking to collaborate.
+          </p>
+          <a className="calloutLink" href="mailto:partnerships@whatsnextlancaster.com">
+            partnerships@whatsnextlancaster.com
+          </a>
+        </div>
+
+        <div className="calloutCard">
+          <h2 className="calloutTitle">Contributions</h2>
+          <p className="calloutBody">
+            Submitting events, openings, PSAs, or community notices.
+          </p>
+          <a className="calloutLink" href="mailto:contribute@whatsnextlancaster.com">
+            contribute@whatsnextlancaster.com
+          </a>
+        </div>
+      </section>
     </div>
   );
 }
