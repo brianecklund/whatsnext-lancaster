@@ -157,6 +157,18 @@ export default function HomeSplitClient({ events }: Props) {
   const q = sp.get("q") || "";
   const type = sp.get("type") || "";
 
+  // Event type filter options (derived from data so we don't depend on hard-coded enums)
+  const EVENT_TYPE_CANDIDATES = useMemo(() => {
+    const set = new Set<string>();
+    for (const e of events || []) {
+      const t = typeof e.event_type === "string" ? e.event_type.trim() : "";
+      if (t) set.add(t);
+    }
+    const dynamic = Array.from(set).sort((a, b) => a.localeCompare(b));
+    // Keep Weekly Overview available alongside types
+    return [WEEKLY_KEY, ...dynamic];
+  }, [events]);
+
   // default selection = weekly overview
   const selectedParam = sp.get("event");
   // URL drives selection, but on mobile we keep an optimistic client key so the
