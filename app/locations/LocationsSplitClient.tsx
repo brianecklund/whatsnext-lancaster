@@ -239,75 +239,83 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
         </div>
       </div>
 
-      {/* Mobile bottom tabs */}
-      <div className="mobileTabs" aria-label="Primary navigation">
-        <a className="tabBtn" href="/">Calendar</a>
-        <a className="tabBtn" href="/locations" aria-current="page">Directory</a>
-        <a className="tabBtn" href="/updates">Updates</a>
-      </div>
+      {effectiveIsMobile ? (
+        <>
+          {/* Mobile bottom tabs */}
+          <div className="mobileTabs" aria-label="Primary navigation">
+            <a className="tabBtn" href="/">Calendar</a>
+            <a className="tabBtn" href="/locations" aria-current="page">
+              Directory
+            </a>
+            <a className="tabBtn" href="/updates">Updates</a>
+          </div>
 
-      {/* Mobile detail overlay */}
-      <div
-        className="mobileDetail"
-        data-open={mobileDetailOpen ? "true" : "false"}
-        aria-hidden={!mobileDetailOpen}
-      >
-        <div className="mobileDetailHeader">
-          <button className="backBtn" type="button" onClick={clearSelected}>
-            Back
-          </button>
-          <div className="mobileDetailTitle">Listing</div>
-        </div>
-        <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
-          {selectedMobile ? <LocationDetail location={selectedMobile} /> : null}
-        </div>
-      </div>
-      {effectiveIsMobile && filtersOpen ? (
-        <div className="filtersOverlay" role="dialog" aria-modal="true" aria-label="Filters">
-          <div className="filtersOverlayPanel">
-            <div className="filtersOverlayHeader">
-              <div className="filtersOverlayTitle">Filters</div>
-              <button
-                type="button"
-                className="filtersOverlayClose"
-                aria-label="Close filters"
-                onClick={() => setFiltersOpen(false)}
-              >
-                ×
+          {/* Mobile detail overlay */}
+          <div
+            className="mobileDetail"
+            data-open={mobileDetailOpen ? "true" : "false"}
+            aria-hidden={!mobileDetailOpen}
+          >
+            <div className="mobileDetailHeader">
+              <button className="backBtn" type="button" onClick={clearSelected}>
+                Back
               </button>
+              <div className="mobileDetailTitle">Listing</div>
             </div>
-            <div className="filtersOverlayContent" role="group" aria-label="Directory filters">
-              <button
-                type="button"
-                className="typePill"
-                data-active={!cat ? "true" : "false"}
-                onClick={() => {
-                  setCategory(null);
-                  setFiltersOpen(false);
-                }}
-              >
-                All
-              </button>
-              {categories.map((t) => {
-                const on = normalize(cat ?? "") === normalize(t);
-                return (
+            <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
+              {selectedMobile ? <LocationDetail location={selectedMobile} /> : null}
+            </div>
+          </div>
+
+          {/* Mobile filters overlay */}
+          {filtersOpen ? (
+            <div className="filtersOverlay" role="dialog" aria-modal="true" aria-label="Filters">
+              <div className="filtersOverlayPanel">
+                <div className="filtersOverlayHeader">
+                  <div className="filtersOverlayTitle">Filters</div>
                   <button
-                    key={t}
+                    type="button"
+                    className="filtersOverlayClose"
+                    aria-label="Close filters"
+                    onClick={() => setFiltersOpen(false)}
+                  >
+                    ×
+                  </button>
+                </div>
+                <div className="filtersOverlayContent" role="group" aria-label="Directory filters">
+                  <button
                     type="button"
                     className="typePill"
-                    data-active={on ? "true" : "false"}
+                    data-active={!cat ? "true" : "false"}
                     onClick={() => {
-                      setCategory(on ? null : t);
+                      setCategory(null);
                       setFiltersOpen(false);
                     }}
                   >
-                    {t}
+                    All
                   </button>
-                );
-              })}
+                  {categories.map((t) => {
+                    const on = normalize(cat ?? "") === normalize(t);
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        className="typePill"
+                        data-active={on ? "true" : "false"}
+                        onClick={() => {
+                          setCategory(on ? null : t);
+                          setFiltersOpen(false);
+                        }}
+                      >
+                        {t}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
+          ) : null}
+        </>
       ) : null}
 
     </div>

@@ -281,9 +281,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
         ) : null}
       </div>
 
-      {/* Mobile bottom tabs */}
-      {isMobile ? (
-
+      {/* Mobile filters overlay */}
       {isMobile && filtersOpen ? (
         <div className="filtersOverlay" role="dialog" aria-modal="true" aria-label="Filters">
           <div className="filtersOverlayPanel">
@@ -332,6 +330,8 @@ export default function UpdatesSplitClient({ updates }: Props) {
         </div>
       ) : null}
 
+      {/* Mobile bottom tabs */}
+      {isMobile ? (
         <div className="mobileTabs" role="tablist" aria-label="Updates view">
           <button
             type="button"
