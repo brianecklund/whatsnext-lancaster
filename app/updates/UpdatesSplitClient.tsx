@@ -32,6 +32,8 @@ export default function UpdatesSplitClient({ updates }: Props) {
   const selectedKey = sp.get("u") || "";
 
   const [isMobile, setIsMobile] = useState(false);
+  const [taglineHidden, setTaglineHidden] = useState(false);
+
   const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -103,13 +105,16 @@ export default function UpdatesSplitClient({ updates }: Props) {
 
   return (
     <div className="pageShell">
-      <div className="tagline">Updates, openings, menu changes, PSAs, and quick announcements.</div>
+      <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>Updates, openings, menu changes, PSAs, and quick announcements.</div>
 
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
           <aside className="pane paneLeft">
-            <div className="scroll">
+            <div className="scroll" onScroll={(e) => {
+            const top = (e.currentTarget as HTMLDivElement).scrollTop;
+            setTaglineHidden(top > 2);
+          }}>
               <div className="leftSticky">
                 <div className="tabs" aria-label="Primary navigation">
                   <button
@@ -319,7 +324,10 @@ export default function UpdatesSplitClient({ updates }: Props) {
         {/* RIGHT */}
         {showRight ? (
           <section className="pane paneRight">
-            <div className="scroll">
+            <div className="scroll" onScroll={(e) => {
+            const top = (e.currentTarget as HTMLDivElement).scrollTop;
+            setTaglineHidden(top > 2);
+          }}>
               {!selected ? (
                 <div className="emptyRight">Select an update to view details.</div>
               ) : (

@@ -70,6 +70,22 @@ html{ font-size: var(--baseSize); }
 
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
+
+/* Reset interactive elements to avoid mobile (iOS) default blue text */
+button, input, select, textarea{
+  font: inherit;
+  color: inherit;
+}
+button{
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+button:focus{ outline: none; }
+button:focus-visible{
+  outline: 2px solid var(--border);
+  outline-offset: 2px;
+}
 body{
   margin:0;
   /* Ensure calendar + directory list typography never falls back to a default */
@@ -848,6 +864,16 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     border-bottom: 1px solid var(--border);
     padding: 10px 0 12px 0;
   }
+
+  /* Prevent content from sitting underneath sticky bottom tabs */
+  .paneLeft .scroll{
+    padding-bottom: calc(92px + env(safe-area-inset-bottom));
+  }
+  /* Mobile weekly panel also needs breathing room */
+  .weeklyMobilePanel{
+    padding-bottom: calc(92px + env(safe-area-inset-bottom));
+  }
+
 /* Slide-in detail overlay */
   .mobileDetail{
     display:block;
@@ -877,7 +903,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     border: 0;
     background: transparent;
     font-weight: var(--fw-medium);
-    color: var(--accent);
+    color: var(--text);
     font-size: var(--fs-body);
     padding: 8px 10px;
     border-radius: 10px;
