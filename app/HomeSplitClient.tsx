@@ -254,11 +254,25 @@ export default function HomeSplitClient({ events }: Props) {
     if (typeof window === "undefined") return false;
     return window.matchMedia("(max-width: 980px)").matches;
   }
+  function pushParams(next: URLSearchParams) {
+    const qs = next.toString();
+    router.push(`${pathname}${qs ? `?${qs}` : ""}`);
+  }
+
   function setParam(key: string, value: string | null) {
     const params = new URLSearchParams(sp.toString());
-    if (!value) params.delete(key);
+    if (value == null || value === "") params.delete(key);
     else params.set(key, value);
-    router.push(`/?${params.toString()}`);
+    pushParams(params);
+  }
+
+  function setParams(updates: Record<string, string | null>) {
+    const params = new URLSearchParams(sp.toString());
+    for (const [k, v] of Object.entries(updates)) {
+      if (v == null || v === "") params.delete(k);
+      else params.set(k, v);
+    }
+    pushParams(params);
   }
 
   const eventTypes = useMemo(() => {
@@ -843,10 +857,9 @@ export default function HomeSplitClient({ events }: Props) {
                           const prev = addMonths(monthAnchor, -1);
                           const d = new Date(prev);
                           d.setDate(1);
-                          setParam("day", dayKey(d));
                           // clear selected event so the day list is visible
                           setClientSelectedKey(null);
-                          setParam("event", null);
+                          setParams({ day: dayKey(d), event: null });
                         }}
                       >
                         ‹
@@ -860,9 +873,8 @@ export default function HomeSplitClient({ events }: Props) {
                           const next = addMonths(monthAnchor, 1);
                           const d = new Date(next);
                           d.setDate(1);
-                          setParam("day", dayKey(d));
                           setClientSelectedKey(null);
-                          setParam("event", null);
+                          setParams({ day: dayKey(d), event: null });
                         }}
                       >
                         ›
@@ -886,9 +898,8 @@ export default function HomeSplitClient({ events }: Props) {
                             data-active={active ? "true" : "false"}
                             data-has={c.hasEvents ? "true" : "false"}
                             onClick={() => {
-                              setParam("day", c.ymd);
                               setClientSelectedKey(null);
-                              setParam("event", null);
+                              setParams({ day: c.ymd, event: null });
                             }}
                             aria-label={`Select ${c.ymd}`}
                           >
