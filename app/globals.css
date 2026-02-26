@@ -81,6 +81,20 @@ body{
   overflow-x: hidden;
 }
 
+/* Mobile Safari / iOS: prevent default blue text + native control styling */
+button, input, select, textarea{
+  font: inherit;
+  color: inherit;
+}
+button{
+  -webkit-appearance: none;
+  appearance: none;
+}
+input{
+  -webkit-appearance: none;
+  appearance: none;
+}
+
 /* Prevent any horizontal overflow on mobile */
 .pageShell{
   max-width: 100vw;
@@ -592,6 +606,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   display:flex;
   flex-direction: column;
   gap: 6px;
+  color: var(--text);
 }
 .eventRow:hover{ background: var(--hover); }
 .eventRow[data-active="true"]{
@@ -864,7 +879,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   .mobileDetail{
     display:block;
     position: fixed;
-    inset: 0;
+    /* Keep the main site header (logo + menu) visible above the detail view */
+    inset: var(--headerH) 0 0 0;
     background: var(--bg);
     z-index: 40;
     transform: translateX(100%);
@@ -889,7 +905,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     border: 0;
     background: transparent;
     font-weight: var(--fw-medium);
-    color: var(--accent);
+    color: var(--text);
     font-size: var(--fs-body);
     padding: 8px 10px;
     border-radius: 10px;
@@ -1687,7 +1703,7 @@ html{ scroll-behavior: smooth; }
 
 .weekSummaryMiniGrid{
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 8px;
   margin-bottom: 14px;
 }
@@ -1697,6 +1713,7 @@ html{ scroll-behavior: smooth; }
   border-radius: 12px;
   padding: 10px 10px 9px;
   background: rgba(0,0,0,.15);
+  min-width: 0;
 }
 
 .weekSummaryMiniKicker{
@@ -2155,8 +2172,9 @@ a:hover{
   .searchRow > *{ min-width: 0; }
   .searchInput{ min-width: 0; flex: 1 1 auto; }
   .viewBtn{ margin-left: 0 !important; padding: 10px 10px; border-radius: 12px; }
-  .filterBtn{ padding: 0 12px; }
-  .viewBtn, .filterBtn{ flex: 0 0 auto; }
+  .filterBtn{ padding: 0 10px; font-size: 12px; max-width: 92px; }
+  /* Allow the control buttons to shrink instead of forcing horizontal overflow */
+  .viewBtn, .filterBtn{ flex: 0 1 auto; }
   /* Prevent long headings from widening rows */
   .monthHeader h3, .monthHeader .monthTitle{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 }
