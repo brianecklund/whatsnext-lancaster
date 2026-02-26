@@ -1970,3 +1970,30 @@ a:hover{
     scroll-behavior: auto !important;
   }
 }
+
+
+/* --- Media Row / Grid slices (2-up / 3-up) --- */
+.mediaRowGrid{
+  display: grid;
+  gap: 12px;
+}
+.mediaRowGrid.cols2{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.mediaRowGrid.cols3{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+@media (max-width: 980px){
+  .mediaRowGrid.cols3{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 620px){
+  .mediaRowGrid.cols2,
+  .mediaRowGrid.cols3{ grid-template-columns: 1fr; }
+}
+
+.mediaCell .mbCaption{ margin-top: 8px; }
+
+/* Keep embeds/videos nicely constrained in grids */
+.mediaCell .embedWrap,
+.mediaCell .videoWrap{
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1px var(--border) inset;
+}

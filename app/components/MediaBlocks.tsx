@@ -156,7 +156,87 @@ export default function MediaBlocks({ slices }: Props) {
           );
         }
 
-        // --- Embed ---
+        
+// --- Media Row / Grid (2-up / 3-up mixed media) ---
+if (type.includes("media_row") || type.includes("mediarow") || type.includes("media-grid") || type.includes("mediagrid") || type.includes("media_row_grid") || type.includes("row_grid")) {
+  const layoutRaw = String(primary?.layout ?? primary?.columns ?? primary?.grid ?? "").toLowerCase();
+  const cols = layoutRaw.includes("3") || layoutRaw.includes("three") ? 3 : 2;
+
+  const cells = items
+    .map((it: any) => {
+      const caption = asText(it?.caption ?? it?.title ?? "");
+      // Embed (YouTube/Vimeo/etc)
+      const embedHtml = safeHtml(it?.embed ?? it?.oembed ?? it?.video ?? it?.content);
+      if (embedHtml) return { kind: "embed", embedHtml, caption };
+
+      // Video file (mp4/webm)
+      const fileUrl = asUrl(it?.video_file ?? it?.file ?? it?.video ?? it?.media);
+      const posterUrl = asUrl(it?.poster ?? it?.poster_image ?? it?.thumbnail);
+      if (fileUrl && String(fileUrl).match(/\.(mp4|webm|mov)(\?|#|$)/i)) {
+        return { kind: "video", fileUrl, posterUrl, caption };
+      }
+
+      // Image / GIF
+      const imgUrl = asUrl(it?.image ?? it?.gif ?? it?.img ?? it?.photo ?? it?.media);
+      if (imgUrl) return { kind: "image", imgUrl, caption };
+
+      return null;
+    })
+    .filter(Boolean);
+
+  if (!cells.length) return null;
+
+  return (
+    <section className="mbSection" key={`${type}-${idx}`}>
+      <div className={`mediaRowGrid cols${cols}`}>
+        {cells.map((c: any, j: number) => {
+          if (c.kind === "embed") {
+            return (
+              <div key={`${idx}-mr-${j}`} className="mediaCell embedCell">
+                <div
+                  className="embedWrap"
+                  // eslint-disable-next-line react/no-danger
+                  dangerouslySetInnerHTML={{ __html: c.embedHtml }}
+                />
+                {c.caption ? <div className="mbCaption">{c.caption}</div> : null}
+              </div>
+            );
+          }
+
+          if (c.kind === "video") {
+            return (
+              <div key={`${idx}-mr-${j}`} className="mediaCell videoCell">
+                <div className="videoWrap">
+                  <video controls playsInline preload="metadata" poster={c.posterUrl ?? undefined}>
+                    <source src={c.fileUrl} />
+                  </video>
+                </div>
+                {c.caption ? <div className="mbCaption">{c.caption}</div> : null}
+              </div>
+            );
+          }
+
+          return (
+            <div key={`${idx}-mr-${j}`} className="mediaCell imageCell">
+              <button
+                type="button"
+                className="singleMedia"
+                onClick={() => setLightboxSrc(c.imgUrl)}
+                aria-label={c.caption ? `Open image: ${c.caption}` : "Open image"}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={c.imgUrl} alt={c.caption || ""} loading="lazy" />
+              </button>
+              {c.caption ? <div className="mbCaption">{c.caption}</div> : null}
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
+
+// --- Embed ---
         if (type.includes("embed")) {
           const embedHtml = safeHtml(primary?.embed ?? primary?.content ?? primary?.oembed);
           const caption = asText(primary?.caption ?? "");
