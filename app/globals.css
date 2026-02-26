@@ -2099,3 +2099,33 @@ a:hover{
 .galleryGrid.hoverReveal .galleryItem{ position:relative; }
 .galleryGrid.hoverReveal .galleryItem img{ transition: transform 260ms ease, filter 260ms ease; }
 .galleryGrid.hoverReveal .galleryItem:hover img{ transform: scale(1.02); filter: contrast(1.04) saturate(1.04); }
+
+
+/* --- Mobile: Month calendar view should never overflow viewport --- */
+@media (max-width: 720px){
+  .monthWrap{ padding: 10px 10px 8px; max-width: 100%; }
+  .monthHeader{ gap: 8px; }
+  .monthTitle{ font-size: 14px; }
+  .monthNavBtn{ width: 34px; height: 34px; border-radius: 12px; }
+
+  .weekdayRow{
+    width: 100%;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+    font-size: 10px;
+  }
+
+  .monthGrid{
+    width: 100%;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+  }
+
+  .monthCell{
+    min-width: 0;
+    padding: 6px;
+    border-radius: 12px;
+  }
+
+  .monthDayNum{ font-size: 12px; }
+}
