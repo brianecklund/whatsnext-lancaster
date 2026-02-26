@@ -442,7 +442,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   cursor: pointer;
 }
 .weeklyCardSelectable:hover{
-  background: #f3f3f3;
+  background: var(--hover);
 }
 .weeklyCardSelectable:focus-visible{
   outline: 2px solid var(--accent);
@@ -1872,4 +1872,101 @@ html{ scroll-behavior: smooth; }
   margin-top: 4px;
   font-size: 12px;
   opacity: 0.75;
+}
+
+
+
+/* -------------------------------------------------------
+   Motion + button micro-interactions (sitewide)
+--------------------------------------------------------*/
+:where(a, button, [role="button"], .weeklyCardSelectable, .weekSummaryCard, .weekSummaryMiniCard, .aboutCard, .calloutCard, .detailCard){
+  -webkit-tap-highlight-color: transparent;
+}
+
+:where(button, .tabBtn, .filterBtn, .clearBtn, .viewBtn, .monthNavBtn, .weeklyMiniBtn, .ctaBtn, .backBtn, .filterOverlayClose, .filterOverlayClear, .chip, .typePill){
+  transition:
+    transform var(--dur-1) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    background-color var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out),
+    color var(--dur-2) var(--ease-out),
+    opacity var(--dur-2) var(--ease-out),
+    filter var(--dur-2) var(--ease-out);
+  will-change: transform;
+}
+
+/* Button hover + press */
+@media (hover: hover){
+  :where(button, .tabBtn, .filterBtn, .clearBtn, .viewBtn, .monthNavBtn, .weeklyMiniBtn, .ctaBtn, .backBtn, .filterOverlayClose, .filterOverlayClear){
+    box-shadow: var(--shadow-inset);
+  }
+  :where(button, .tabBtn, .filterBtn, .clearBtn, .viewBtn, .monthNavBtn, .weeklyMiniBtn, .ctaBtn, .backBtn, .filterOverlayClose, .filterOverlayClear):hover{
+    transform: var(--lift-1);
+    box-shadow: var(--shadow-1);
+    filter: brightness(1.02);
+  }
+}
+:where(button, .tabBtn, .filterBtn, .clearBtn, .viewBtn, .monthNavBtn, .weeklyMiniBtn, .ctaBtn, .backBtn, .filterOverlayClose, .filterOverlayClear):active{
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+  filter: brightness(0.98);
+}
+
+/* Click “pulse” animation for primary-ish CTAs */
+@keyframes btnPop{
+  0%{ transform: translateY(0) scale(1); }
+  55%{ transform: translateY(0) scale(0.96); }
+  100%{ transform: translateY(0) scale(1); }
+}
+:where(.ctaBtn, .filterOverlayClear):active{
+  animation: btnPop var(--dur-3) var(--ease-out);
+}
+
+/* Cards/list items hover motion */
+:where(.weeklyCardSelectable, .weekSummaryCard, .weekSummaryMiniCard, .aboutCard, .calloutCard, .detailCard){
+  transition:
+    transform var(--dur-2) var(--ease-out),
+    box-shadow var(--dur-2) var(--ease-out),
+    background-color var(--dur-2) var(--ease-out),
+    border-color var(--dur-2) var(--ease-out);
+}
+@media (hover: hover){
+  :where(.weeklyCardSelectable, .weekSummaryCard, .weekSummaryMiniCard, .aboutCard, .calloutCard):hover{
+    transform: var(--lift-2);
+    box-shadow: var(--shadow-1);
+  }
+}
+
+/* Month cells: make them feel tappable */
+.monthCell{
+  box-shadow: var(--shadow-inset);
+}
+@media (hover: hover){
+  .monthCell:hover{
+    transform: var(--lift-1);
+    box-shadow: var(--shadow-1);
+  }
+}
+.monthCell:active{
+  transform: translateY(0) scale(0.98);
+  box-shadow: 0 3px 10px rgba(0,0,0,0.10);
+}
+
+/* Links: subtle underline animation */
+a{
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color var(--dur-2) var(--ease-out), text-decoration-color var(--dur-2) var(--ease-out);
+}
+a:hover{
+  text-decoration-color: currentColor;
+}
+
+/* Respect reduced-motion */
+@media (prefers-reduced-motion: reduce){
+  :where(*){
+    transition-duration: 1ms !important;
+    animation-duration: 1ms !important;
+    scroll-behavior: auto !important;
+  }
 }
