@@ -45,48 +45,48 @@
 
 html.theme-ink{
   /* Monochrome ink + cool accent */
-  --bg: #fbfbfb;
-  --panel: #f1f2f4;
-  --hover: #eef0f3;
-  --text: #101418;
-  --muted: #4b5563;
-  --border: rgba(16,20,24,0.12);
+  --bg: #eef2f6;
+  --panel: #ffffff;
+  --hover: #f7f9fc;
+  --text: #1b2430;
+  --muted: #4a5a6a;
+  --border: #d7dee8;
   --accent: #1f3a5f;
   --accentSoft: rgba(31,58,95,0.14);
 }
 
 html.theme-moss{
   /* Duotone moss + charcoal */
-  --bg: #fbfbfa;
-  --panel: #f2f3ef;
-  --hover: #eef0ea;
-  --text: #141814;
-  --muted: #4b5a4b;
-  --border: rgba(20,24,20,0.14);
+  --bg: #edf3ef;
+  --panel: #ffffff;
+  --hover: #f5faf6;
+  --text: #1c2a23;
+  --muted: #4e6557;
+  --border: #d3e0d7;
   --accent: #2f5d3a;
   --accentSoft: rgba(47,93,58,0.14);
 }
 
 html.theme-plum{
   /* Duotone plum + graphite */
-  --bg: #fbfafc;
-  --panel: #f2eff6;
-  --hover: #efeaf5;
-  --text: #15121a;
-  --muted: #5a5263;
-  --border: rgba(21,18,26,0.14);
+  --bg: #f3eef6;
+  --panel: #ffffff;
+  --hover: #faf6fc;
+  --text: #2b1f33;
+  --muted: #6a5473;
+  --border: #e0d6e6;
   --accent: #5a2a6e;
   --accentSoft: rgba(90,42,110,0.14);
 }
 
 html.theme-amber{
   /* Warm mono/duo with deep brown */
-  --bg: #fcfbf8;
-  --panel: #f3f0e7;
-  --hover: #efe7d8;
-  --text: #1a140f;
-  --muted: #6b5a4a;
-  --border: rgba(26,20,15,0.14);
+  --bg: #faf3e9;
+  --panel: #ffffff;
+  --hover: #fff8f0;
+  --text: #332417;
+  --muted: #6b5035;
+  --border: #ead9c6;
   --accent: #7a4b12;
   --accentSoft: rgba(122,75,18,0.16);
 }
