@@ -37,6 +37,7 @@
 
   /* Typography scale (increase to make type bigger globally) */
 }
+*{box-sizing:border-box;}*::before,*::after{box-sizing:border-box;}
 
 html{ font-size: var(--fs-body); }
 
@@ -1720,7 +1721,7 @@ html{ scroll-behavior: smooth; }
 
 /* Calendar month view (left) */
 .viewBtn{
-  margin-left: 10px;
+  margin-left: 0;
   padding: 10px 12px;
   border-radius: 12px;
   border: 1px solid rgba(0,0,0,0.14);
@@ -2144,4 +2145,18 @@ a:hover{
   }
 
   .monthDayNum{ font-size: 12px; }
+}
+
+
+/* --- Mobile overflow hardening --- */
+@media (max-width: 520px){
+  .pageShell, .main, .left, .right, .scroll, .leftSticky { max-width: 100%; }
+  .searchRow{ gap: 8px; }
+  .searchRow > *{ min-width: 0; }
+  .searchInput{ min-width: 0; flex: 1 1 auto; }
+  .viewBtn{ margin-left: 0 !important; padding: 10px 10px; border-radius: 12px; }
+  .filterBtn{ padding: 0 12px; }
+  .viewBtn, .filterBtn{ flex: 0 0 auto; }
+  /* Prevent long headings from widening rows */
+  .monthHeader h3, .monthHeader .monthTitle{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 }
