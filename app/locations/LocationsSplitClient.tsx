@@ -18,8 +18,6 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   const searchParams = useSearchParams();
 
   const [mounted, setMounted] = useState(false);
-  const [taglineHidden, setTaglineHidden] = useState(false);
-
   const [isMobile, setIsMobile] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
 
@@ -115,15 +113,12 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
   return (
     <div className="pageShell">
-      <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>A directory of places in Lancaster to explore.</div>
+      <div className="tagline">A directory of places in Lancaster to explore.</div>
 
       <div className="split">
         {/* LEFT */}
         <div className="pane paneLeft">
-          <div className="scroll" onScroll={(e) => {
-            const top = (e.currentTarget as HTMLDivElement).scrollTop;
-            setTaglineHidden(top > 2);
-          }}>
+          <div className="scroll">
             <div className="leftSticky">
               <div className="tabs" aria-label="Primary navigation">
                 <button
@@ -325,10 +320,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
         {/* RIGHT (desktop) */}
         <div className="pane paneRight">
-          <div className="scroll" onScroll={(e) => {
-            const top = (e.currentTarget as HTMLDivElement).scrollTop;
-            setTaglineHidden(top > 2);
-          }}>
+          <div className="scroll">
             {!selectedDesktop ? (
               <div className="emptyRight">Select a listing to see details.</div>
             ) : (

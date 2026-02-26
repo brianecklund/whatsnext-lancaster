@@ -86,6 +86,38 @@ function dayKey(d: Date): string {
   return `${y}-${m}-${dd}`;
 }
 
+
+function parseDayKey(ymd: string): Date | null {
+  if (!ymd) return null;
+  // Interpret as local date.
+  const d = new Date(`${ymd}T00:00:00`);
+  return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function monthKey(d: Date): string {
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  return `${y}-${m}`;
+}
+
+function addMonths(d: Date, delta: number): Date {
+  const x = new Date(d);
+  const day = x.getDate();
+  x.setDate(1);
+  x.setMonth(x.getMonth() + delta);
+  const dim = new Date(x.getFullYear(), x.getMonth() + 1, 0).getDate();
+  x.setDate(Math.min(day, dim));
+  return x;
+}
+
+function formatMonthYear(d: Date): string {
+  const months = [
+    "January","February","March","April","May","June",
+    "July","August","September","October","November","December"
+  ];
+  return `${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
 function formatDayHeading(d: Date): string {
   return d.toLocaleDateString(undefined, {
     weekday: "long",
@@ -161,6 +193,8 @@ export default function HomeSplitClient({ events }: Props) {
 
   const q = sp.get("q") || "";
   const type = sp.get("type") || "";
+  const view = sp.get("view") || "list";
+  const dayParam = sp.get("day");
 
   // default selection = weekly overview
   const selectedParam = sp.get("event");
@@ -175,6 +209,22 @@ export default function HomeSplitClient({ events }: Props) {
 
   // Mobile-only filter overlay state (used to show/hide filter pills on small screens)
   const [filterOpen, setFilterOpen] = useState(false);
+
+  const viewMode: "list" | "month" = view === "month" ? "month" : "list";
+
+  const selectedDay = useMemo(() => {
+    const parsed = dayParam ? parseDayKey(dayParam) : null;
+    return parsed ?? startOfToday();
+  }, [dayParam]);
+
+  const selectedDayStr = dayKey(selectedDay);
+  const monthAnchor = useMemo(() => {
+    const d = new Date(selectedDay);
+    d.setDate(1);
+    d.setHours(0, 0, 0, 0);
+    return d;
+  }, [selectedDayStr]);
+
 
   // Mobile-only: hide the subhead tagline when the user starts scrolling the left list.
   const [taglineHidden, setTaglineHidden] = useState(false);
@@ -239,6 +289,53 @@ export default function HomeSplitClient({ events }: Props) {
       return matchesSearch && matchesType;
     });
   }, [events, q, type]);
+
+  const dayEvents = useMemo(() => {
+    const key = selectedDayStr;
+    return filteredEvents.filter((e) => {
+      const d = safeDateFromEvent(e);
+      return d ? dayKey(d) === key : false;
+    });
+  }, [filteredEvents, selectedDayStr]);
+
+  const monthGrid = useMemo(() => {
+    const first = new Date(monthAnchor);
+    const startWeekday = first.getDay(); // 0=Sun..6=Sat
+    const daysInMonth = new Date(first.getFullYear(), first.getMonth() + 1, 0).getDate();
+
+    const cells: Array<{ ymd: string | null; hasEvents: boolean }> = [];
+    for (let i = 0; i < startWeekday; i++) cells.push({ ymd: null, hasEvents: false });
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const dt = new Date(first);
+      dt.setDate(d);
+      const ymd = dayKey(dt);
+      const hasEvents = filteredEvents.some((e) => {
+        const ed = safeDateFromEvent(e);
+        return ed ? dayKey(ed) === ymd : false;
+      });
+      cells.push({ ymd, hasEvents });
+    }
+
+    // Pad to complete weeks (multiples of 7)
+    while (cells.length % 7 !== 0) cells.push({ ymd: null, hasEvents: false });
+
+    return { first, cells };
+  }, [monthAnchor, filteredEvents]);
+
+  useEffect(() => {
+    if (viewMode !== "month") return;
+    if (dayEvents.length !== 1) return;
+
+    const only = dayEvents[0];
+    const key = only.uid ?? only.id;
+    if (selectedKey === key) return;
+
+    setClientSelectedKey(key);
+    setParam("event", key);
+  }, [viewMode, selectedDayStr, dayEvents, selectedKey]);
+
+
 
   const leftDayGroups = useMemo(() => {
     const map = new Map<string, { date: Date; items: EventLite[] }>();
@@ -448,6 +545,14 @@ export default function HomeSplitClient({ events }: Props) {
                       />
                       <button
                         type="button"
+                        className="viewBtn"
+                        aria-label={viewMode === "month" ? "Switch to list view" : "Switch to calendar view"}
+                        onClick={() => setParam("view", viewMode === "month" ? "list" : "month")}
+                      >
+                        {viewMode === "month" ? "List" : "Cal"}
+                      </button>
+                      <button
+                        type="button"
                         className="filterBtn"
                         aria-label={filterOpen ? "Close filters" : "Open filters"}
                         aria-expanded={filterOpen ? "true" : "false"}
@@ -464,6 +569,14 @@ export default function HomeSplitClient({ events }: Props) {
                         value={q}
                         onChange={(e) => setParam("q", e.target.value)}
                       />
+                      <button
+                        type="button"
+                        className="viewBtn"
+                        onClick={() => setParam("view", viewMode === "month" ? "list" : "month")}
+                        aria-label={viewMode === "month" ? "Switch to list view" : "Switch to calendar view"}
+                      >
+                        {viewMode === "month" ? "List view" : "Calendar view"}
+                      </button>
                       {(q || type) ? (
                         <button
                           className="clearBtn"
@@ -579,6 +692,8 @@ export default function HomeSplitClient({ events }: Props) {
                 </div>
               ) : null}
 
+              {viewMode === "list" ? (
+                <>
               {/* Weekly Overview (left) */}
               <button
                 type="button"
@@ -715,6 +830,118 @@ export default function HomeSplitClient({ events }: Props) {
                   })}
                 </section>
               ))}
+                </>
+              ) : (
+                <>
+                  <div className="monthWrap">
+                    <div className="monthHeader">
+                      <button
+                        type="button"
+                        className="monthNavBtn"
+                        aria-label="Previous month"
+                        onClick={() => {
+                          const prev = addMonths(monthAnchor, -1);
+                          const d = new Date(prev);
+                          d.setDate(1);
+                          setParam("day", dayKey(d));
+                          // clear selected event so the day list is visible
+                          setClientSelectedKey(null);
+                          setParam("event", null);
+                        }}
+                      >
+                        ‹
+                      </button>
+                      <div className="monthTitle">{formatMonthYear(monthGrid.first)}</div>
+                      <button
+                        type="button"
+                        className="monthNavBtn"
+                        aria-label="Next month"
+                        onClick={() => {
+                          const next = addMonths(monthAnchor, 1);
+                          const d = new Date(next);
+                          d.setDate(1);
+                          setParam("day", dayKey(d));
+                          setClientSelectedKey(null);
+                          setParam("event", null);
+                        }}
+                      >
+                        ›
+                      </button>
+                    </div>
+
+                    <div className="weekdayRow" aria-hidden="true">
+                      <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                    </div>
+
+                    <div className="monthGrid" role="grid" aria-label="Calendar month view">
+                      {monthGrid.cells.map((c, i) => {
+                        if (!c.ymd) return <div key={`e-${i}`} className="monthCell empty" />;
+                        const dayNum = Number(c.ymd.split("-")[2]);
+                        const active = c.ymd === selectedDayStr;
+                        return (
+                          <button
+                            key={c.ymd}
+                            type="button"
+                            className="monthCell"
+                            data-active={active ? "true" : "false"}
+                            data-has={c.hasEvents ? "true" : "false"}
+                            onClick={() => {
+                              setParam("day", c.ymd);
+                              setClientSelectedKey(null);
+                              setParam("event", null);
+                            }}
+                            aria-label={`Select ${c.ymd}`}
+                          >
+                            <span className="monthDayNum">{dayNum}</span>
+                            {c.hasEvents ? <span className="monthDot" aria-hidden="true" /> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {effectiveIsMobile ? (
+                    <div className="dayEventsMobile">
+                      <div className="dayEventsHeader">
+                        <div className="dayEventsTitle">{formatDayHeading(selectedDay)}</div>
+                        <div className="dayEventsCount">
+                          {dayEvents.length} event{dayEvents.length === 1 ? "" : "s"}
+                        </div>
+                      </div>
+
+                      {dayEvents.length === 0 ? (
+                        <div className="emptyList">No events on this day.</div>
+                      ) : (
+                        <div className="dayEventsList">
+                          {dayEvents.map((e) => {
+                            const key = e.uid ?? e.id;
+                            const title = e.title || "Untitled event";
+                            const d = safeDateFromEvent(e);
+                            const timeLabel = d ? formatTimeShort(d) : "Time TBD";
+                            const venueBits = [e.locationName, e.event_type].filter(Boolean).join(" • ");
+                            return (
+                              <button
+                                key={key}
+                                type="button"
+                                className="eventCard"
+                                onClick={() => {
+                                  setClientSelectedKey(key);
+                                  setParam("event", key);
+                                }}
+                              >
+                                <div className="eventCardTitle">{title}</div>
+                                <div className="eventMeta">{timeLabel}{venueBits ? ` • ${venueBits}` : ""}</div>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
+                </>
+              )}
+
+
 
             </div>
           </aside>
@@ -725,7 +952,58 @@ export default function HomeSplitClient({ events }: Props) {
           <main className="pane paneRight">
             <div className="scroll">
 
-              {selectedKey === WEEKLY_KEY ? (
+
+              {viewMode === "month" ? (
+                <div className="dayRight">
+                  <div className="dayRightHeader">
+                    <div className="rightDayLabel">{formatDayHeading(selectedDay)}</div>
+                    <div className="dayRightCount">
+                      {dayEvents.length} event{dayEvents.length === 1 ? "" : "s"}
+                    </div>
+                  </div>
+
+                  {dayEvents.length === 0 ? (
+                    <div className="emptyList">No events on this day.</div>
+                  ) : (
+                    <div className="dayRightList" role="list">
+                      {dayEvents.map((e) => {
+                        const key = e.uid ?? e.id;
+                        const active =
+                          selectedEvent?.id === e.id ||
+                          (selectedEvent?.uid && e.uid && selectedEvent.uid === e.uid);
+
+                        const title = e.title || "Untitled event";
+                        const d = safeDateFromEvent(e);
+                        const timeLabel = d ? formatTimeShort(d) : "Time TBD";
+                        const venueBits = [e.locationName, e.event_type].filter(Boolean).join(" • ");
+
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            className="dayRightRow"
+                            data-active={active ? "true" : "false"}
+                            onClick={() => {
+                              setClientSelectedKey(key);
+                              setParam("event", key);
+                            }}
+                            role="listitem"
+                          >
+                            <div className="dayRightTop">
+                              <div className="dayRightTitle">{title}</div>
+                              <div className="dayRightTime">{timeLabel}</div>
+                            </div>
+                            {venueBits ? <div className="dayRightMeta">{venueBits}</div> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ) : null}
+
+
+              {viewMode === "list" && selectedKey === WEEKLY_KEY ? (
                 <div className="rightHeader">
                   <div
                     className="rightDayLabel fadeInItem"
@@ -885,7 +1163,7 @@ export default function HomeSplitClient({ events }: Props) {
                   )}
                 </div>
               ) : !selectedEvent ? (
-                <div className="emptyRight">Select an event.</div>
+                viewMode === "month" ? null : <div className="emptyRight">Select an event.</div>
               ) : (
                 <div className="rightHeader">
                   <div
