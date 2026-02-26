@@ -210,6 +210,8 @@ export default function HomeSplitClient({ events }: Props) {
   // Mobile-only filter overlay state (used to show/hide filter pills on small screens)
   const [filterOpen, setFilterOpen] = useState(false);
 
+  const effectiveIsMobile = mounted ? isMobile : false;
+
   const viewMode: "list" | "month" = view === "month" ? "month" : "list";
 
   const selectedDay = useMemo(() => {
@@ -338,6 +340,9 @@ export default function HomeSplitClient({ events }: Props) {
   }, [monthAnchor, filteredEvents]);
 
   useEffect(() => {
+    // Auto-open the only event for a selected day on desktop.
+    // On mobile, this can feel "trappy" (Back immediately re-opens), so we skip it.
+    if (effectiveIsMobile) return;
     if (viewMode !== "month") return;
     if (dayEvents.length !== 1) return;
 
@@ -347,7 +352,7 @@ export default function HomeSplitClient({ events }: Props) {
 
     setClientSelectedKey(key);
     setParam("event", key);
-  }, [viewMode, selectedDayStr, dayEvents, selectedKey]);
+  }, [effectiveIsMobile, viewMode, selectedDayStr, dayEvents, selectedKey]);
 
 
 
@@ -462,12 +467,18 @@ export default function HomeSplitClient({ events }: Props) {
   // stagger counter for left list
   let listAnimIndex = 0;
 
-  const effectiveIsMobile = mounted ? isMobile : false;
-
   // Close filter overlay when leaving mobile.
   useEffect(() => {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
+
+  // On mobile, ensure route switches (Calendar/Directory/Updates) never carry a stuck detail overlay.
+  useEffect(() => {
+    if (!effectiveIsMobile) return;
+    setClientSelectedKey(null);
+    if (sp.get("event")) setParam("event", null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   // Ensure tagline is visible again when leaving mobile.
   useEffect(() => {
@@ -561,7 +572,12 @@ export default function HomeSplitClient({ events }: Props) {
                         type="button"
                         className="viewBtn"
                         aria-label={viewMode === "month" ? "Switch to list view" : "Switch to calendar view"}
-                        onClick={() => setParam("view", viewMode === "month" ? "list" : "month")}
+                        onClick={() => {
+                          // Switching views should never leave a stuck detail overlay on mobile.
+                          clearSelected();
+                          setFilterOpen(false);
+                          setParam("view", viewMode === "month" ? "list" : "month");
+                        }}
                       >
                         {viewMode === "month" ? "List" : "Cal"}
                       </button>

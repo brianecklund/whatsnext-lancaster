@@ -176,6 +176,129 @@
             }
           ]
         }
+      },
+      "content_blocks": {
+        "type": "Slices",
+        "fieldset": "Content Blocks",
+        "config": {
+          "label": "Content Blocks",
+          "choices": {
+            "showcase_hero": {
+              "type": "Slice",
+              "fieldset": "Showcase Hero",
+              "description": "Large hero media (image/video/embed)",
+              "icon": "image",
+              "display": "list",
+              "non-repeat": {
+                "style": { "type": "Select", "config": { "label": "Style", "options": ["clean", "poster", "glow"] } },
+                "media_image": { "type": "Image", "config": { "label": "Image", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
+                "media_video_file": { "type": "Link", "config": { "label": "Video file (mp4/webm)", "select": "media", "allowTargetBlank": false } },
+                "media_embed": { "type": "Embed", "config": { "label": "Embed" } },
+                "poster": { "type": "Image", "config": { "label": "Poster (optional)", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
+                "caption": { "type": "Text", "config": { "label": "Caption" } }
+              },
+              "repeat": {}
+            },
+            "showcase_text": {
+              "type": "Slice",
+              "fieldset": "Showcase Text",
+              "description": "Text block (supports marquee kicker)",
+              "icon": "text_fields",
+              "display": "list",
+              "non-repeat": {
+                "kicker": { "type": "Text", "config": { "label": "Kicker" } },
+                "heading": { "type": "Text", "config": { "label": "Heading" } },
+                "body": { "type": "StructuredText", "config": { "label": "Body", "multi": "paragraph,strong,em,hyperlink" } },
+                "style": { "type": "Select", "config": { "label": "Style", "options": ["plain", "marquee"] } },
+                "align": { "type": "Select", "config": { "label": "Align", "options": ["left", "center"] } }
+              },
+              "repeat": {}
+            },
+            "showcase_row": {
+              "type": "Slice",
+              "fieldset": "Showcase Row",
+              "description": "2-up / 3-up media row",
+              "icon": "view_column",
+              "display": "grid",
+              "non-repeat": {
+                "layout": { "type": "Select", "config": { "label": "Layout", "options": ["2", "3"] } }
+              },
+              "repeat": {
+                "image": { "type": "Image", "config": { "label": "Image/GIF", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
+                "video_file": { "type": "Link", "config": { "label": "Video file (mp4/webm)", "select": "media", "allowTargetBlank": false } },
+                "embed": { "type": "Embed", "config": { "label": "Embed" } },
+                "poster": { "type": "Image", "config": { "label": "Poster (optional)", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
+                "caption": { "type": "Text", "config": { "label": "Caption" } },
+                "behavior": { "type": "Select", "config": { "label": "Behavior", "options": ["none", "tilt", "parallax"] } }
+              }
+            },
+            "showcase_gallery": {
+              "type": "Slice",
+              "fieldset": "Showcase Gallery",
+              "description": "Image grid gallery",
+              "icon": "photo_library",
+              "display": "grid",
+              "non-repeat": {
+                "hover": { "type": "Select", "config": { "label": "Hover style", "options": ["zoom", "reveal"] } }
+              },
+              "repeat": {
+                "image": { "type": "Image", "config": { "label": "Image", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
+                "caption": { "type": "Text", "config": { "label": "Caption" } }
+              }
+            },
+            "showcase_video": {
+              "type": "Slice",
+              "fieldset": "Showcase Video",
+              "description": "Video embed or file",
+              "icon": "ondemand_video",
+              "display": "list",
+              "non-repeat": {
+                "video": { "type": "Embed", "config": { "label": "Video embed" } },
+                "video_file": { "type": "Link", "config": { "label": "Video file (mp4/webm)", "select": "media", "allowTargetBlank": false } },
+                "poster": { "type": "Image", "config": { "label": "Poster (optional)", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
+                "caption": { "type": "Text", "config": { "label": "Caption" } }
+              },
+              "repeat": {}
+            },
+            "showcase_gif": {
+              "type": "Slice",
+              "fieldset": "Showcase GIF",
+              "description": "Single GIF/image",
+              "icon": "gif",
+              "display": "list",
+              "non-repeat": {
+                "gif": { "type": "Image", "config": { "label": "GIF", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
+                "caption": { "type": "Text", "config": { "label": "Caption" } }
+              },
+              "repeat": {}
+            },
+            "showcase_embed": {
+              "type": "Slice",
+              "fieldset": "Showcase Embed",
+              "description": "Embed (maps, widgets, etc.)",
+              "icon": "code",
+              "display": "list",
+              "non-repeat": {
+                "embed": { "type": "Embed", "config": { "label": "Embed" } },
+                "caption": { "type": "Text", "config": { "label": "Caption" } }
+              },
+              "repeat": {}
+            },
+            "showcase_cta": {
+              "type": "Slice",
+              "fieldset": "Showcase CTA",
+              "description": "Button row",
+              "icon": "call_to_action",
+              "display": "list",
+              "non-repeat": {},
+              "repeat": {
+                "label": { "type": "Text", "config": { "label": "Label" } },
+                "url": { "type": "Link", "config": { "label": "URL", "select": "web", "allowTargetBlank": true } },
+                "variant": { "type": "Select", "config": { "label": "Variant", "options": ["ghost", "primary"] } }
+              }
+            }
+          }
+        }
       }
     }
   },

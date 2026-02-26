@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState, type MouseEvent } from "react";
 
 type Props = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,9 +40,36 @@ function safeHtml(v: any): string | null {
 
 export default function MediaBlocks({ slices }: Props) {
   const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+  const tiltRaf = useRef<number | null>(null);
 
   const normalized = useMemo(() => (Array.isArray(slices) ? slices : []), [slices]);
   if (!normalized.length) return null;
+
+  function onTiltMove(e: MouseEvent<HTMLElement>) {
+    const el = e.currentTarget as HTMLElement;
+    if (el.dataset.tilt !== "true") return;
+    const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    if (reduce) return;
+
+    const rect = el.getBoundingClientRect();
+    const px = (e.clientX - rect.left) / Math.max(1, rect.width);
+    const py = (e.clientY - rect.top) / Math.max(1, rect.height);
+    const rx = (py - 0.5) * -8;
+    const ry = (px - 0.5) * 10;
+
+    if (tiltRaf.current) cancelAnimationFrame(tiltRaf.current);
+    tiltRaf.current = requestAnimationFrame(() => {
+      el.style.setProperty("--tilt-rx", `${rx.toFixed(2)}deg`);
+      el.style.setProperty("--tilt-ry", `${ry.toFixed(2)}deg`);
+    });
+  }
+
+  function onTiltLeave(e: MouseEvent<HTMLElement>) {
+    const el = e.currentTarget as HTMLElement;
+    if (el.dataset.tilt !== "true") return;
+    el.style.setProperty("--tilt-rx", `0deg`);
+    el.style.setProperty("--tilt-ry", `0deg`);
+  }
 
   return (
     <div className="mediaBlocks">
@@ -52,9 +79,59 @@ export default function MediaBlocks({ slices }: Props) {
         const type: string = String(slice?.slice_type ?? slice?.type ?? "").toLowerCase();
         const primary = slice?.primary ?? {};
         const items = Array.isArray(slice?.items) ? slice.items : [];
+        const variation: string = String(slice?.variation ?? "").toLowerCase();
 
-        // --- Gallery ---
-        if (type.includes("gallery")) {
+        // --- Showcase Hero ---
+        if (type.includes("showcase_hero")) {
+          const style = String(primary?.style ?? "clean").toLowerCase();
+          const caption = asText(primary?.caption ?? "");
+          const embedHtml = safeHtml(primary?.media_embed ?? primary?.embed ?? primary?.oembed);
+          const fileUrl = asUrl(primary?.media_video_file ?? primary?.video_file ?? primary?.file);
+          const imgUrl = asUrl(primary?.media_image ?? primary?.image ?? primary?.photo);
+          const posterUrl = asUrl(primary?.poster ?? primary?.poster_image ?? primary?.thumbnail);
+
+          if (!embedHtml && !fileUrl && !imgUrl) return null;
+
+          return (
+            <section className="mbSection mbHero" key={`${type}-${idx}`}>
+              <div
+                className={`showcaseHero ${style} motionReveal`}
+                data-tilt={style === "glow" || style === "poster" ? "true" : "false"}
+                onMouseMove={onTiltMove}
+                onMouseLeave={onTiltLeave}
+              >
+                {embedHtml ? (
+                  <div
+                    className="embedWrap"
+                    // eslint-disable-next-line react/no-danger
+                    dangerouslySetInnerHTML={{ __html: embedHtml }}
+                  />
+                ) : fileUrl ? (
+                  <div className="videoWrap">
+                    <video controls playsInline preload="metadata" poster={posterUrl ?? undefined}>
+                      <source src={fileUrl as string} />
+                    </video>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="singleMedia"
+                    onClick={() => setLightboxSrc(imgUrl)}
+                    aria-label="Open media"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img src={imgUrl as string} alt={caption || ""} loading="lazy" />
+                  </button>
+                )}
+              </div>
+              {caption ? <div className="mbCaption">{caption}</div> : null}
+            </section>
+          );
+        }
+
+        // --- Showcase Gallery / Gallery ---
+        if (type.includes("showcase_gallery") || type.includes("gallery")) {
+          const hoverStyle = String(primary?.hover ?? "zoom").toLowerCase();
           const imgs = items
             .map((it: any) => ({
               url: asUrl(it?.image ?? it?.img ?? it?.photo ?? it?.media),
@@ -66,7 +143,7 @@ export default function MediaBlocks({ slices }: Props) {
 
           return (
             <section className="mbSection" key={`${type}-${idx}`}>
-              <div className="galleryGrid">
+              <div className={`galleryGrid motionReveal ${hoverStyle === "reveal" ? "hoverReveal" : "hoverZoom"}`}>
                 {imgs.map((im: any, j: number) => (
                   <button
                     key={`${idx}-g-${j}`}
@@ -84,8 +161,25 @@ export default function MediaBlocks({ slices }: Props) {
           );
         }
 
-        // --- Video (embed or file) ---
-        if (type.includes("video")) {
+        // --- Showcase Embed ---
+        if (type.includes("showcase_embed")) {
+          const embedHtml = safeHtml(primary?.embed ?? primary?.content ?? primary?.oembed);
+          const caption = asText(primary?.caption ?? "");
+          if (!embedHtml) return null;
+          return (
+            <section className="mbSection motionReveal" key={`${type}-${idx}`}>
+              <div
+                className="embedWrap"
+                // eslint-disable-next-line react/no-danger
+                dangerouslySetInnerHTML={{ __html: embedHtml }}
+              />
+              {caption ? <div className="mbCaption">{caption}</div> : null}
+            </section>
+          );
+        }
+
+        // --- Showcase Video (embed or file) ---
+        if (type.includes("showcase_video") || type.includes("video")) {
           const embedHtml = safeHtml(primary?.video ?? primary?.embed ?? primary?.oembed);
           const fileUrl = asUrl(primary?.video_file ?? primary?.file ?? primary?.media);
           const posterUrl = asUrl(primary?.poster ?? primary?.poster_image ?? primary?.thumbnail);
@@ -94,7 +188,7 @@ export default function MediaBlocks({ slices }: Props) {
           if (!embedHtml && !fileUrl) return null;
 
           return (
-            <section className="mbSection" key={`${type}-${idx}`}>
+            <section className="mbSection motionReveal" key={`${type}-${idx}`}>
               {embedHtml ? (
                 <div
                   className="embedWrap"
@@ -114,13 +208,13 @@ export default function MediaBlocks({ slices }: Props) {
           );
         }
 
-        // --- GIF ---
-        if (type.includes("gif")) {
+        // --- Showcase GIF / GIF ---
+        if (type.includes("showcase_gif") || type.includes("gif")) {
           const gifUrl = asUrl(primary?.gif ?? primary?.image ?? primary?.media);
           const caption = asText(primary?.caption ?? "");
           if (!gifUrl) return null;
           return (
-            <section className="mbSection" key={`${type}-${idx}`}>
+            <section className="mbSection motionReveal" key={`${type}-${idx}`}>
               <button
                 type="button"
                 className="singleMedia"
@@ -135,13 +229,13 @@ export default function MediaBlocks({ slices }: Props) {
           );
         }
 
-        // --- Single image ---
-        if (type.includes("image") || type.includes("photo")) {
+        // --- Showcase Image / Single image ---
+        if (type.includes("showcase_image") || type.includes("image") || type.includes("photo")) {
           const imgUrl = asUrl(primary?.image ?? primary?.photo ?? primary?.media);
           const caption = asText(primary?.caption ?? "");
           if (!imgUrl) return null;
           return (
-            <section className="mbSection" key={`${type}-${idx}`}>
+            <section className="mbSection motionReveal" key={`${type}-${idx}`}>
               <button
                 type="button"
                 className="singleMedia"
@@ -157,28 +251,44 @@ export default function MediaBlocks({ slices }: Props) {
         }
 
         
-// --- Media Row / Grid (2-up / 3-up mixed media) ---
-if (type.includes("media_row") || type.includes("mediarow") || type.includes("media-grid") || type.includes("mediagrid") || type.includes("media_row_grid") || type.includes("row_grid")) {
+// --- Showcase Row (2-up / 3-up mixed media) ---
+if (
+  type.includes("showcase_row") ||
+  type.includes("media_row") ||
+  type.includes("mediarow") ||
+  type.includes("media-grid") ||
+  type.includes("mediagrid") ||
+  type.includes("media_row_grid") ||
+  type.includes("row_grid")
+) {
   const layoutRaw = String(primary?.layout ?? primary?.columns ?? primary?.grid ?? "").toLowerCase();
-  const cols = layoutRaw.includes("3") || layoutRaw.includes("three") ? 3 : 2;
+  const cols =
+    variation.includes("three") || variation.includes("3")
+      ? 3
+      : variation.includes("two") || variation.includes("2")
+      ? 2
+      : layoutRaw.includes("3") || layoutRaw.includes("three")
+      ? 3
+      : 2;
 
   const cells = items
     .map((it: any) => {
       const caption = asText(it?.caption ?? it?.title ?? "");
+      const behavior = String(it?.behavior ?? "none").toLowerCase();
       // Embed (YouTube/Vimeo/etc)
       const embedHtml = safeHtml(it?.embed ?? it?.oembed ?? it?.video ?? it?.content);
-      if (embedHtml) return { kind: "embed", embedHtml, caption };
+      if (embedHtml) return { kind: "embed", embedHtml, caption, behavior };
 
       // Video file (mp4/webm)
       const fileUrl = asUrl(it?.video_file ?? it?.file ?? it?.video ?? it?.media);
       const posterUrl = asUrl(it?.poster ?? it?.poster_image ?? it?.thumbnail);
       if (fileUrl && String(fileUrl).match(/\.(mp4|webm|mov)(\?|#|$)/i)) {
-        return { kind: "video", fileUrl, posterUrl, caption };
+        return { kind: "video", fileUrl, posterUrl, caption, behavior };
       }
 
       // Image / GIF
       const imgUrl = asUrl(it?.image ?? it?.gif ?? it?.img ?? it?.photo ?? it?.media);
-      if (imgUrl) return { kind: "image", imgUrl, caption };
+      if (imgUrl) return { kind: "image", imgUrl, caption, behavior };
 
       return null;
     })
@@ -187,12 +297,15 @@ if (type.includes("media_row") || type.includes("mediarow") || type.includes("me
   if (!cells.length) return null;
 
   return (
-    <section className="mbSection" key={`${type}-${idx}`}>
+    <section className="mbSection motionReveal" key={`${type}-${idx}`}>
       <div className={`mediaRowGrid cols${cols}`}>
         {cells.map((c: any, j: number) => {
           if (c.kind === "embed") {
             return (
-              <div key={`${idx}-mr-${j}`} className="mediaCell embedCell">
+              <div
+                key={`${idx}-mr-${j}`}
+                className={`mediaCell embedCell ${c.behavior === "parallax" ? "parallax" : ""}`}
+              >
                 <div
                   className="embedWrap"
                   // eslint-disable-next-line react/no-danger
@@ -205,7 +318,10 @@ if (type.includes("media_row") || type.includes("mediarow") || type.includes("me
 
           if (c.kind === "video") {
             return (
-              <div key={`${idx}-mr-${j}`} className="mediaCell videoCell">
+              <div
+                key={`${idx}-mr-${j}`}
+                className={`mediaCell videoCell ${c.behavior === "parallax" ? "parallax" : ""}`}
+              >
                 <div className="videoWrap">
                   <video controls playsInline preload="metadata" poster={c.posterUrl ?? undefined}>
                     <source src={c.fileUrl} />
@@ -217,7 +333,13 @@ if (type.includes("media_row") || type.includes("mediarow") || type.includes("me
           }
 
           return (
-            <div key={`${idx}-mr-${j}`} className="mediaCell imageCell">
+            <div
+              key={`${idx}-mr-${j}`}
+              className={`mediaCell imageCell ${c.behavior === "tilt" ? "tilt" : ""} ${c.behavior === "parallax" ? "parallax" : ""}`}
+              data-tilt={c.behavior === "tilt" ? "true" : "false"}
+              onMouseMove={onTiltMove}
+              onMouseLeave={onTiltLeave}
+            >
               <button
                 type="button"
                 className="singleMedia"
@@ -236,13 +358,13 @@ if (type.includes("media_row") || type.includes("mediarow") || type.includes("me
   );
 }
 
-// --- Embed ---
+        // --- Embed (legacy) ---
         if (type.includes("embed")) {
           const embedHtml = safeHtml(primary?.embed ?? primary?.content ?? primary?.oembed);
           const caption = asText(primary?.caption ?? "");
           if (!embedHtml) return null;
           return (
-            <section className="mbSection" key={`${type}-${idx}`}>
+            <section className="mbSection motionReveal" key={`${type}-${idx}`}>
               <div
                 className="embedWrap"
                 // eslint-disable-next-line react/no-danger
@@ -253,31 +375,56 @@ if (type.includes("media_row") || type.includes("mediarow") || type.includes("me
           );
         }
 
-        // --- Rich text ---
-        if (type.includes("rich") || type.includes("text")) {
+        // --- Showcase Text / Rich text ---
+        if (type.includes("showcase_text") || type.includes("rich") || type.includes("text")) {
+          const kicker = asText(primary?.kicker ?? "");
+          const heading = asText(primary?.heading ?? primary?.title ?? "");
           const body = asText(primary?.body ?? primary?.text ?? primary?.content);
-          if (!body) return null;
+          const style = String(primary?.style ?? "plain").toLowerCase();
+          const align = String(primary?.align ?? "left").toLowerCase();
+          if (!kicker && !heading && !body) return null;
           return (
-            <section className="mbSection" key={`${type}-${idx}`}>
-              <div className="mbRich">{body}</div>
+            <section className={`mbSection motionReveal showcaseText ${align}`} key={`${type}-${idx}`}>
+              {kicker ? (
+                style === "marquee" ? (
+                  <div className="marquee" aria-label={kicker}>
+                    <div className="marqueeTrack">
+                      <span>{kicker}</span>
+                      <span aria-hidden="true">{kicker}</span>
+                      <span aria-hidden="true">{kicker}</span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="kicker">{kicker}</div>
+                )
+              ) : null}
+              {heading ? <div className="mbHeading">{heading}</div> : null}
+              {body ? <div className={`mbRich ${style}`}>{body}</div> : null}
             </section>
           );
         }
 
-        // --- Buttons / links ---
-        if (type.includes("button") || type.includes("link")) {
+        // --- Showcase CTA / Buttons / links ---
+        if (type.includes("showcase_cta") || type.includes("button") || type.includes("link")) {
           const links = items
             .map((it: any) => ({
               label: String(it?.label ?? it?.text ?? it?.title ?? "").trim(),
               url: asUrl(it?.url ?? it?.link ?? it?.href),
+              variant: String(it?.variant ?? "ghost").toLowerCase(),
             }))
             .filter((x: any) => x.label && x.url);
           if (!links.length) return null;
           return (
-            <section className="mbSection" key={`${type}-${idx}`}>
+            <section className="mbSection motionReveal" key={`${type}-${idx}`}>
               <div className="mbButtons">
                 {links.map((l: any, j: number) => (
-                  <a key={`${idx}-b-${j}`} className="mbBtn" href={l.url} target="_blank" rel="noreferrer">
+                  <a
+                    key={`${idx}-b-${j}`}
+                    className={`mbBtn ${l.variant === "primary" ? "primary" : ""}`}
+                    href={l.url}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     {l.label}
                   </a>
                 ))}
