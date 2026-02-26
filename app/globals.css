@@ -25,6 +25,11 @@
   --accent: #2563eb;
   --accentSoft: rgba(37, 99, 235, 0.12);
 
+  /* Depth */
+  --shadow-sm: 0 8px 24px rgba(0,0,0,0.08);
+  --shadow-md: 0 14px 40px rgba(0,0,0,0.12);
+  --shadow-inset: 0 0 0 1px rgba(0,0,0,0.04) inset;
+
   /* Layout */
   --headerH: 86px;
   --gutter: 24px;
@@ -37,6 +42,55 @@
 
   /* Typography scale (increase to make type bigger globally) */
 }
+
+html.theme-ink{
+  /* Monochrome ink + cool accent */
+  --bg: #fbfbfb;
+  --panel: #f1f2f4;
+  --hover: #eef0f3;
+  --text: #101418;
+  --muted: #4b5563;
+  --border: rgba(16,20,24,0.12);
+  --accent: #1f3a5f;
+  --accentSoft: rgba(31,58,95,0.14);
+}
+
+html.theme-moss{
+  /* Duotone moss + charcoal */
+  --bg: #fbfbfa;
+  --panel: #f2f3ef;
+  --hover: #eef0ea;
+  --text: #141814;
+  --muted: #4b5a4b;
+  --border: rgba(20,24,20,0.14);
+  --accent: #2f5d3a;
+  --accentSoft: rgba(47,93,58,0.14);
+}
+
+html.theme-plum{
+  /* Duotone plum + graphite */
+  --bg: #fbfafc;
+  --panel: #f2eff6;
+  --hover: #efeaf5;
+  --text: #15121a;
+  --muted: #5a5263;
+  --border: rgba(21,18,26,0.14);
+  --accent: #5a2a6e;
+  --accentSoft: rgba(90,42,110,0.14);
+}
+
+html.theme-amber{
+  /* Warm mono/duo with deep brown */
+  --bg: #fcfbf8;
+  --panel: #f3f0e7;
+  --hover: #efe7d8;
+  --text: #1a140f;
+  --muted: #6b5a4a;
+  --border: rgba(26,20,15,0.14);
+  --accent: #7a4b12;
+  --accentSoft: rgba(122,75,18,0.16);
+}
+
 
 html{ font-size: var(--fs-body); }
 
@@ -111,6 +165,10 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   justify-content: space-between;
   padding: 18px var(--gutter) 0 var(--gutter);
   border-bottom: 1px solid var(--border);
+
+  box-shadow: var(--shadow-sm);
+
+  background: var(--bg);
 }
 
 .brand{
@@ -125,13 +183,46 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .brandFull{ display:inline; }
 .brandShort{ display:none; }
 
+
+
+.paletteBtn{
+  display:inline-flex;
+  align-items:center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text);
+  box-shadow: var(--shadow-sm);
+  margin-top: 2px;
+}
+.paletteBtn:hover{ background: var(--hover); }
+.paletteDot{
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  background: var(--accent);
+  box-shadow: 0 0 0 3px var(--accentSoft);
+}
+.paletteLabel{ font-size: var(--fs-meta); font-weight: var(--fw-medium); }
+
+@media (max-width: 920px){
+  .paletteBtn{
+    padding: 0 12px;
+    height: 42px;
+  }
+  .paletteLabel{ display:none; }
+}
+
 .hamburgerBtn{
   display:none;
   width: 46px;
   height: 46px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--bg);
   align-items:center;
   justify-content:center;
   margin-top: 2px;
@@ -167,7 +258,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .menuOverlayInner{
   width: min(420px, 100%);
-  background: #fff;
+  background: var(--bg);
   border-radius: 22px;
   border: 1px solid var(--border);
   box-shadow: 0 12px 40px rgba(0,0,0,0.14);
@@ -193,7 +284,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   height: 40px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--bg);
   font-weight: 600;
 }
 .menuCloseBtn:hover{ background: var(--hover); }
@@ -212,7 +303,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   font-weight: var(--fw-medium);
   font-size: var(--fs-body);
   text-decoration:none;
-  background: #fff;
+  background: var(--bg);
 }
 
 .menuOverlayLink:hover{ background: var(--hover); }
@@ -329,11 +420,13 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   text-align: left;
   border: 1px solid var(--border);
   border-radius: 16px;
-  background: #fff;
+  background: var(--bg);
   padding: 12px 12px;
   display:flex;
   flex-direction: column;
   gap: 6px;
+
+  box-shadow: var(--shadow-sm);
 }
 
 .weeklyCondRow:hover{ background: var(--hover); }
@@ -370,7 +463,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: var(--bg);
 }
 
 .weeklyCardMedia{
@@ -508,6 +601,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   background: var(--bg);
   padding: 10px 0 12px 0;
   border-bottom: 1px solid var(--border);
+
+  box-shadow: var(--shadow-sm);
 }
 
 /* Primary navigation tabs: 3 equal-width buttons spanning the left pane */
@@ -941,7 +1036,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 0 14px;
   font-size: var(--fs-body);
   font-weight: var(--fw-medium);
-  background: #fff;
+  background: var(--bg);
 }
 
 .filterBtn, .clearBtn{
@@ -968,7 +1063,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .filterOverlayPanel{
   width: min(560px, 100%);
-  background: #fff;
+  background: var(--bg);
   border: 1px solid var(--border);
   border-radius: 22px;
   box-shadow: 0 12px 40px rgba(0,0,0,0.14);
@@ -990,7 +1085,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   height: 38px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--bg);
 }
 .filterOverlayClose:hover{ background: var(--hover); }
 
@@ -1019,7 +1114,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 0 12px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--bg);
   font-weight: 600;
   font-size: var(--fs-meta);
   line-height: 36px;
@@ -1088,7 +1183,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 0 14px;
   border-radius: var(--pill);
   border: 1px solid var(--border);
-  background: #fff;
+  background: var(--bg);
   font-weight: var(--fw-medium);
 }
 .pillBtn[data-active="true"]{
@@ -1161,7 +1256,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .aboutCard{
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: var(--bg);
   padding: 16px;
 }
 
@@ -1214,7 +1309,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 16px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: var(--bg);
 }
 .weekSummaryTitle{
   margin: 0;
@@ -1281,7 +1376,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 18px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: var(--bg);
 }
 .formRow{
   display:grid;
@@ -1309,7 +1404,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   font-family: inherit;
   font-size: var(--fs-body);
   outline: none;
-  background: #fff;
+  background: var(--bg);
 }
 .textarea{ min-height: 140px; resize: vertical; }
 .input:focus, .textarea:focus{
@@ -1337,7 +1432,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 16px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: var(--bg);
 }
 .calloutTitle{
   margin: 0;
@@ -1386,7 +1481,7 @@ strong, b{ font-weight: var(--fw-medium); }
   aspect-ratio: 16 / 9;
   overflow: hidden;
   border-radius: 12px;
-  background: #e9e9e9;
+  background: var(--panel);
 }
 .media16x9 img{
   width: 100%;
@@ -1487,6 +1582,8 @@ html{ scroll-behavior: smooth; }
 .weeklyItem,
 .card{
   transition: transform var(--dur-1) var(--ease-out);
+
+  box-shadow: var(--shadow-sm);
 }
 .eventRow:hover,
 .locationRow:hover,
