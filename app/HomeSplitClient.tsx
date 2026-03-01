@@ -979,6 +979,9 @@ export default function HomeSplitClient({ events }: Props) {
           <main className="pane paneRight">
             <div className="scroll">
 
+              <div className="documentStage">
+                <div className="documentPaper">
+
 
               {viewMode === "month" ? (
                 <div className="dayRight">
@@ -1264,6 +1267,9 @@ export default function HomeSplitClient({ events }: Props) {
                   ) : null}
                 </div>
               )}
+                </div>
+              </div>
+            </div>
             </div>
           </main>
         ) : null}

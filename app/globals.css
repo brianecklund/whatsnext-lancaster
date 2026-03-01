@@ -365,8 +365,121 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .paneRight{
-  border-left: 1px solid var(--border);
-  padding-left: var(--gutter);
+  border-left: 0;
+  padding-left: 0;
+}
+
+/* --- File Cabinet Layout (Desktop) --- */
+@media (min-width: 981px){
+  .split{
+    gap: 22px;
+    padding: 18px var(--gutter);
+  }
+
+  .paneLeft{
+    background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.32));
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    box-shadow: var(--shadowInset);
+    overflow: hidden;
+  }
+
+  .paneLeft .scroll{
+    padding: 0 14px 18px 14px;
+  }
+
+  /* Make the list feel like stacked folders */
+  .eventList{
+    gap: 10px;
+  }
+
+  .eventRow,
+  .weeklyCondRow{
+    position: relative;
+    border: 1px solid rgba(10,10,10,0.14);
+    background: rgba(255,255,255,0.86);
+    border-radius: 16px;
+    box-shadow: var(--shadowInset);
+  }
+
+  /* Folder tab */
+  .eventRow::before,
+  .weeklyCondRow::before{
+    content: "";
+    position: absolute;
+    top: -9px;
+    left: 14px;
+    width: 44%;
+    height: 14px;
+    border-radius: 12px 12px 0 0;
+    border: 1px solid rgba(10,10,10,0.14);
+    border-bottom: 0;
+    background: rgba(255,255,255,0.92);
+    box-shadow: var(--shadowInset);
+  }
+
+  /* subtle alternating tab positions */
+  .eventRow:nth-child(3n)::before{ left: 18px; width: 40%; }
+  .eventRow:nth-child(3n+2)::before{ left: 28px; width: 46%; }
+
+  .eventRow:hover,
+  .weeklyCondRow:hover{
+    box-shadow: var(--shadow1);
+  }
+
+  .eventRow[data-active="true"],
+  .weeklyCondRow[data-active="true"]{
+    transform: translateX(6px);
+    background: linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.84));
+    box-shadow: 0 0 0 2px var(--accentStroke) inset, var(--shadow1);
+  }
+
+  /* Right pane becomes a "desk" with a paper document */
+  .paneRight{
+    background: linear-gradient(180deg, rgba(255,255,255,0.20), rgba(255,255,255,0.06));
+    border-radius: 22px;
+    border: 1px solid rgba(10,10,10,0.10);
+    box-shadow: var(--shadowInset);
+    overflow: hidden;
+  }
+
+  .paneRight .scroll{
+    padding: 18px 18px 18px 18px;
+  }
+
+  .documentStage{
+    display:flex;
+    justify-content:center;
+  }
+
+  .documentPaper{
+    width: min(880px, 100%);
+    background: rgba(255,255,255,0.92);
+    border: 1px solid rgba(10,10,10,0.12);
+    border-radius: 20px;
+    box-shadow: var(--shadow2);
+    padding: 22px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* subtle document texture */
+  .documentPaper::after{
+    content:"";
+    position:absolute;
+    inset:0;
+    pointer-events:none;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.03), transparent 28%),
+      repeating-linear-gradient(180deg, rgba(10,10,10,0.025) 0px, rgba(10,10,10,0.025) 1px, transparent 1px, transparent 22px);
+    opacity: 0.18;
+    mix-blend-mode: multiply;
+  }
+
+  .documentPaper > *{
+    position: relative;
+    z-index: 1;
+  }
 }
 
 /* Weekly Overview cards (Right Pane) */
