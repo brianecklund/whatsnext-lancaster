@@ -1270,7 +1270,6 @@ export default function HomeSplitClient({ events }: Props) {
                 </div>
               </div>
             </div>
-            </div>
           </main>
         ) : null}
       </div>
