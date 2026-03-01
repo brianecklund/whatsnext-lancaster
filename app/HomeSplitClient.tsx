@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -464,13 +464,52 @@ export default function HomeSplitClient({ events }: Props) {
     return byUid || byId || null;
   }, [filteredEvents, selectedKey]);
 
-  // stagger counter for left list
+  
+  const paperRef = useRef<HTMLDivElement | null>(null);
+  const listRef = useRef<HTMLDivElement | null>(null);
+// stagger counter for left list
   let listAnimIndex = 0;
 
   // Close filter overlay when leaving mobile.
   useEffect(() => {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
+// GSAP: Stagger list items and animate document paper on selection.
+useEffect(() => {
+  if (typeof window === "undefined") return;
+  const gsap = (window as any).gsap;
+  if (!gsap) return;
+
+  // list stagger
+  const listEl = listRef.current;
+  if (listEl) {
+    const items = Array.from(listEl.querySelectorAll<HTMLElement>("[data-fileitem='true']"));
+    if (items.length) {
+      gsap.killTweensOf(items);
+      gsap.fromTo(
+        items,
+        { opacity: 0, y: 10 },
+        { opacity: 1, y: 0, duration: 0.35, ease: "power2.out", stagger: 0.03 }
+      );
+    }
+  }
+}, [viewMode, selectedKey, searchQuery, activeType]);
+
+useEffect(() => {
+  if (typeof window === "undefined") return;
+  const gsap = (window as any).gsap;
+  if (!gsap) return;
+
+  const paper = paperRef.current;
+  if (!paper) return;
+
+  gsap.killTweensOf(paper);
+  gsap.fromTo(
+    paper,
+    { opacity: 0.65, y: 14 },
+    { opacity: 1, y: 0, duration: 0.38, ease: "power2.out" }
+  );
+}, [selectedKey, viewMode]);
 
   // On mobile, ensure route switches (Calendar/Directory/Updates) never carry a stuck detail overlay.
   useEffect(() => {
@@ -782,7 +821,7 @@ export default function HomeSplitClient({ events }: Props) {
                             <button
                               key={e.id}
                               type="button"
-                              className="weeklyCondRow"
+                              className="weeklyCondRow" data-fileitem="true"
                               onClick={() => {
                                 const key = e.uid ?? e.id;
                                 setClientSelectedKey(key);
@@ -980,7 +1019,7 @@ export default function HomeSplitClient({ events }: Props) {
             <div className="scroll">
 
               <div className="documentStage">
-                <div className="documentPaper">
+                <div className="documentPaper" ref={paperRef}>
 
 
               {viewMode === "month" ? (
@@ -1090,7 +1129,7 @@ export default function HomeSplitClient({ events }: Props) {
                               <button
                                 key={e.id}
                                 type="button"
-                                className="weeklyCondRow"
+                                className="weeklyCondRow" data-fileitem="true"
                                 onClick={() => {
                                   const key = e.uid ?? e.id;
                                   setClientSelectedKey(key);
@@ -1269,6 +1308,7 @@ export default function HomeSplitClient({ events }: Props) {
               )}
                 </div>
               </div>
+            </div>
             </div>
           </main>
         ) : null}

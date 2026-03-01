@@ -390,7 +390,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
   /* Make the list feel like stacked folders */
   .eventList{
-    gap: 10px;
+    gap: 8px;
   }
 
   .eventRow,
@@ -398,7 +398,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     position: relative;
     border: 1px solid rgba(10,10,10,0.14);
     background: rgba(255,255,255,0.86);
-    border-radius: 16px;
+    border-radius: 14px;
     box-shadow: var(--shadowInset);
   }
 
@@ -486,7 +486,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .weeklyCards{
   display:flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   margin-top: 16px;
 }
 
@@ -494,7 +494,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .weeklyCondensed{
   display:flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 10px;
   margin-top: 14px;
 }
 
