@@ -97,6 +97,8 @@ export default function UpdatesSplitClient({ updates }: Props) {
   }, [filtered, selectedKey]);
 
   const selected = isMobile ? selectedMobile : selectedDesktop;
+  const detailFlashKey = selected?.id ?? selected?.title ?? selected?.date ?? "detail";
+
 
   const showLeft = !isMobile || mobileTab === "list";
   const showRight = !isMobile || mobileTab === "detail";
@@ -323,7 +325,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
               {!selected ? (
                 <div className="emptyRight">Select an update to view details.</div>
               ) : (
-                <div className="detailCard">
+                <div key={detailFlashKey} className="detailCard detailFlash">
                   <div className="detailHeader">
                     <div>
                       <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>

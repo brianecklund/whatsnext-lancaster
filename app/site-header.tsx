@@ -14,10 +14,15 @@ const LINKS = [
 export default function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [flashKey, setFlashKey] = useState(0);
+
 
   // Close the overlay on route changes
   useEffect(() => {
     setOpen(false);
+    // Trigger a re-mount on the 3 primary buttons only (Calendar/Directory/Updates)
+    // so only those "flash in" on route changes.
+    setFlashKey((k) => k + 1);
   }, [pathname]);
 
   // Prevent background scroll when overlay is open
@@ -41,10 +46,10 @@ export default function SiteHeader() {
 
       {/* Desktop nav */}
       <nav className="topNav" aria-label="Primary">
-        {LINKS.map((l) => (
+        {LINKS.map((l, idx) => (
           <a
-            key={l.href}
-            className="navLink"
+            key={idx < 3 ? `${l.href}-${flashKey}` : l.href}
+            className={idx < 3 ? "navLink navFlash" : "navLink"}
             href={l.href}
             data-active={pathname === l.href ? "true" : "false"}
           >
@@ -96,7 +101,7 @@ export default function SiteHeader() {
             </div>
 
             <nav className="menuOverlayNav" aria-label="Mobile primary">
-              {LINKS.map((l) => (
+              {LINKS.map((l, idx) => (
                 <a
                   key={l.href}
                   className="menuOverlayLink"

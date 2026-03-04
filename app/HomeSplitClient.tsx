@@ -196,6 +196,34 @@ export default function HomeSplitClient({ events }: Props) {
   const view = sp.get("view") || "list";
   const dayParam = sp.get("day");
 
+  const listRef = useRef<HTMLDivElement | null>(null);
+
+  // Staged intro animation (runs once per session): UI first, then list + right content.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const KEY = "wnl_intro_done_v1";
+    if (window.sessionStorage?.getItem(KEY)) return;
+    window.sessionStorage?.setItem(KEY, "1");
+
+    document.body.classList.add("wnl-intro");
+
+    // Assign indices for CSS-staggered animation.
+    const listEl = listRef.current;
+    if (listEl) {
+      const items = listEl.querySelectorAll<HTMLElement>(
+        'button.eventRow, button.weeklyCondRow, button.weeklyOverview'
+      );
+      items.forEach((el, i) => el.style.setProperty("--i", String(i)));
+    }
+
+    const t = window.setTimeout(() => {
+      document.body.classList.remove("wnl-intro");
+    }, 1400);
+
+    return () => window.clearTimeout(t);
+  }, []);
+
   // default selection = weekly overview
   const selectedParam = sp.get("event");
   // URL drives selection, but on mobile we keep an optimistic client key so the
@@ -465,8 +493,11 @@ export default function HomeSplitClient({ events }: Props) {
   }, [filteredEvents, selectedKey]);
 
   
-  const paperRef = useRef<HTMLDivElement | null>(null);
-  const listRef = useRef<HTMLDivElement | null>(null);
+  const detailFlashKey = useMemo(() => {
+    if (!selectedEvent) return "none";
+    return `${selectedEvent.uid ?? selectedEvent.id ?? "event"}|${selectedKey}|${viewMode}|${q}|${type}`;
+  }, [selectedEvent, selectedKey, viewMode, q, type]);
+
 // stagger counter for left list
   let listAnimIndex = 0;
 
@@ -474,96 +505,6 @@ export default function HomeSplitClient({ events }: Props) {
   useEffect(() => {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
-// GSAP: Stagger list items and animate document paper on selection.
-useEffect(() => {
-  if (typeof window === "undefined") return;
-  const gsap = (window as any).gsap;
-  if (!gsap) return;
-
-  const KEY = "wnl_intro_v1_done";
-  const state = sessionStorage.getItem(KEY);
-
-  // Run only once per session.
-  if (state === "done") return;
-
-  // Mark as running so other animations can wait.
-  sessionStorage.setItem(KEY, "running");
-
-  const uiTargets: HTMLElement[] = Array.from(
-    document.querySelectorAll<HTMLElement>(
-      ".leftSticky, .leftTop, .tagline, .searchRow"
-    )
-  );
-
-  const listEl = listRef.current;
-  const itemTargets: HTMLElement[] = listEl
-    ? Array.from(
-        listEl.querySelectorAll<HTMLElement>(
-          "button.eventRow, button.weeklyCondRow, button.weeklyOverview, [data-fileitem='true']"
-        )
-      )
-    : [];
-
-  const paper = paperRef.current;
-
-  gsap.set(uiTargets, { opacity: 0, y: 10 });
-  gsap.set(itemTargets, { opacity: 0, y: 10 });
-  if (paper) gsap.set(paper, { opacity: 0, y: 14 });
-
-  const tl = gsap.timeline({
-    defaults: { ease: "power2.out" },
-    onComplete: () => sessionStorage.setItem(KEY, "done"),
-  });
-
-  // UI first.
-  tl.to(uiTargets, { opacity: 1, y: 0, duration: 0.34, stagger: 0.04 });
-
-  // Then list + paper.
-  tl.to(itemTargets, { opacity: 1, y: 0, duration: 0.34, stagger: 0.02 }, "-=0.10");
-  if (paper) tl.to(paper, { opacity: 1, y: 0, duration: 0.34 }, "-=0.22");
-}, []);
-
-useEffect(() => {
-  if (typeof window === "undefined") return;
-  const gsap = (window as any).gsap;
-  if (!gsap) return;
-
-  const introState = sessionStorage.getItem("wnl_intro_v1_done");
-  if (introState !== "done") return;
-
-  // list stagger
-  const listEl = listRef.current;
-  if (listEl) {
-    const items = Array.from(listEl.querySelectorAll<HTMLElement>("[data-fileitem='true']"));
-    if (items.length) {
-      gsap.killTweensOf(items);
-      gsap.fromTo(
-        items,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.35, ease: "power2.out", stagger: 0.03 }
-      );
-    }
-  }
-}, [viewMode, selectedKey, q, type]);
-
-useEffect(() => {
-  if (typeof window === "undefined") return;
-  const gsap = (window as any).gsap;
-  if (!gsap) return;
-
-  const introState = sessionStorage.getItem("wnl_intro_v1_done");
-  if (introState !== "done") return;
-
-  const paper = paperRef.current;
-  if (!paper) return;
-
-  gsap.killTweensOf(paper);
-  gsap.fromTo(
-    paper,
-    { opacity: 0.65, y: 14 },
-    { opacity: 1, y: 0, duration: 0.38, ease: "power2.out" }
-  );
-}, [selectedKey, viewMode]);
 
   // On mobile, ensure route switches (Calendar/Directory/Updates) never carry a stuck detail overlay.
   useEffect(() => {
@@ -617,6 +558,7 @@ useEffect(() => {
           <aside className="pane paneLeft">
             <div
               className="scroll"
+              ref={listRef}
               onScroll={(e) => {
                 if (!effectiveIsMobile) return;
                 const st = (e.currentTarget as HTMLDivElement).scrollTop;
@@ -875,7 +817,7 @@ useEffect(() => {
                             <button
                               key={e.id}
                               type="button"
-                              className="weeklyCondRow" data-fileitem="true"
+                              className="weeklyCondRow"
                               onClick={() => {
                                 const key = e.uid ?? e.id;
                                 setClientSelectedKey(key);
@@ -1072,9 +1014,6 @@ useEffect(() => {
           <main className="pane paneRight">
             <div className="scroll">
 
-              <div className="documentStage">
-                <div className="documentPaper" ref={paperRef}>
-
 
               {viewMode === "month" ? (
                 <div className="dayRight">
@@ -1183,7 +1122,7 @@ useEffect(() => {
                               <button
                                 key={e.id}
                                 type="button"
-                                className="weeklyCondRow" data-fileitem="true"
+                                className="weeklyCondRow"
                                 onClick={() => {
                                   const key = e.uid ?? e.id;
                                   setClientSelectedKey(key);
@@ -1360,8 +1299,6 @@ useEffect(() => {
                   ) : null}
                 </div>
               )}
-                </div>
-              </div>
             </div>
           </main>
         ) : null}
@@ -1411,7 +1348,7 @@ useEffect(() => {
         </div>
         <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
           {selectedEvent ? (
-            <div className="detailCard">
+            <div key={detailFlashKey} className="detailCard detailFlash">
               <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
               <div className="detailMeta">
                 <span className="muted">{selectedTime ?? "Time TBD"}</span>
