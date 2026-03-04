@@ -2353,3 +2353,166 @@ a:hover{
 /* GSAP ScrollSmoother wrappers */
 #smooth-wrapper{ position: fixed; inset: 0; overflow: hidden; }
 #smooth-content{ width: 100%; will-change: transform; }
+
+
+
+/* ------------------------------------------------------------
+   Visual Overhaul Adjustments (v2)
+   - No pane containers / no folder tabs
+   - Softer shadows + more color
+   - No global route-change fades (prevents flashing)
+   - Minimal cross-browser scrollbar styling
+------------------------------------------------------------ */
+
+:root{
+  /* Softer, consistent shadow tokens (also back-compat for older variable names) */
+  --shadow-1: 0 8px 22px rgba(0,0,0,0.08);
+  --shadow-2: 0 14px 40px rgba(0,0,0,0.10);
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.85), inset 0 0 0 1px rgba(0,0,0,0.06);
+
+  --shadow1: var(--shadow-1);
+  --shadow2: var(--shadow-2);
+  --shadowInset: var(--shadow-inset);
+
+  /* A little more color (subtle) */
+  --accent2: #7c3aed;   /* violet */
+  --accent3: #14b8a6;   /* teal */
+  --tintA: rgba(37, 99, 235, 0.08);
+  --tintB: rgba(124, 58, 237, 0.08);
+  --tintC: rgba(20, 184, 166, 0.07);
+
+  /* Scrollbar */
+  --scrollbar-thumb: rgba(10,10,10,0.22);
+  --scrollbar-thumb-hover: rgba(10,10,10,0.30);
+}
+
+body{
+  /* Subtle global color wash without reducing contrast */
+  background:
+    radial-gradient(900px 460px at 18% 0%, var(--tintA), transparent 65%),
+    radial-gradient(900px 520px at 78% 12%, var(--tintB), transparent 62%),
+    radial-gradient(800px 520px at 80% 92%, var(--tintC), transparent 60%),
+    var(--bg);
+}
+
+/* Prevent “UI flashing” on navigation: disable global fade systems */
+.pageFade,
+.split .paneLeft,
+.split .paneRight{
+  opacity: 1 !important;
+  animation: none !important;
+}
+.fadeInItem{
+  opacity: 1 !important;
+  animation: none !important;
+}
+
+/* Remove pane containers entirely to maximize usable space */
+@media (min-width: 981px){
+  .split{
+    padding: 14px var(--gutter) 18px var(--gutter);
+    gap: 18px;
+  }
+}
+.paneLeft,
+.paneRight{
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+}
+.paneLeft .scroll,
+.paneRight .scroll{
+  padding: 0 !important;
+}
+
+/* Kill the “folder tab” pseudo elements + stacked folder treatment */
+.eventRow::before,
+.weeklyCondRow::before,
+.locationRow::before,
+.updateRow::before{
+  content: none !important;
+}
+.eventRow,
+.weeklyCondRow,
+.locationRow,
+.updateRow{
+  border-radius: 12px !important;
+  box-shadow: none !important;
+  background: rgba(255,255,255,0.72) !important;
+  border: 1px solid rgba(10,10,10,0.10) !important;
+}
+.eventRow[data-active="true"],
+.weeklyCondRow[data-active="true"],
+.locationRow[data-active="true"],
+.updateRow[data-active="true"]{
+  background: rgba(255,255,255,0.92) !important;
+  border-color: rgba(37, 99, 235, 0.28) !important;
+}
+
+/* Make nav buttons feel colorful but not “folder tabs” */
+.tabs{
+  background: transparent !important;
+  border: 0 !important;
+  padding: 0 !important;
+  gap: 10px !important;
+}
+.tabBtn{
+  border-radius: 12px !important;
+  border: 1px solid rgba(10,10,10,0.12) !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.88), rgba(255,255,255,0.70)) !important;
+  box-shadow: none !important;
+}
+.tabBtn[data-active="true"]{
+  border-color: rgba(37, 99, 235, 0.40) !important;
+  background:
+    radial-gradient(120% 120% at 0% 0%, rgba(37,99,235,0.12), transparent 60%),
+    linear-gradient(180deg, rgba(255,255,255,0.94), rgba(255,255,255,0.74)) !important;
+}
+
+/* Soften drop shadows globally (where they still exist) */
+.card,
+.menuOverlayInner{
+  box-shadow: var(--shadow-1) !important;
+}
+
+/* Right-side content should not live in a rounded container */
+.detailCard{
+  background: transparent !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* ------------------------------------------------------------
+   Minimal scrollbar (cross-browser-ish)
+   Note: iOS overlay scrollbars can’t be fully forced, but this
+   covers Chrome/Safari/Edge + Firefox.
+------------------------------------------------------------ */
+html, body{
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+*{
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) transparent;
+}
+*::-webkit-scrollbar{
+  width: 10px;
+  height: 10px;
+}
+*::-webkit-scrollbar-track{
+  background: transparent;
+}
+*::-webkit-scrollbar-thumb{
+  background-color: var(--scrollbar-thumb);
+  border-radius: 999px;
+  border: 3px solid transparent;
+  background-clip: content-box;
+}
+*::-webkit-scrollbar-thumb:hover{
+  background-color: var(--scrollbar-thumb-hover);
+}

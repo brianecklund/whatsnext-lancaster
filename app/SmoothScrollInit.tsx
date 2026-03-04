@@ -1,19 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 
 /**
- * Enables GSAP ScrollSmoother (smooth scrolling + effects) in a way that won't
- * break core functionality if GSAP isn't available (e.g., script blocked).
+ * Enables GSAP ScrollSmoother (smooth scrolling + effects) while minimizing
+ * route-change "flashes". We create the smoother ONCE and only refresh on
+ * navigation.
  */
 export default function SmoothScrollInit() {
   const pathname = usePathname();
+  const didInit = useRef(false);
 
+  // Create once
   useEffect(() => {
     if (typeof window === "undefined") return;
 
-    // Respect reduced-motion
     const reduce =
       window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
@@ -27,22 +29,42 @@ export default function SmoothScrollInit() {
     try {
       gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
-      // Avoid duplicates on route transitions / fast refresh.
+      // Avoid duplicates on fast refresh
       const existing = ScrollSmoother.get && ScrollSmoother.get();
-      if (existing) existing.kill();
+      if (existing) {
+        didInit.current = true;
+        return;
+      }
 
       ScrollSmoother.create({
         wrapper: "#smooth-wrapper",
         content: "#smooth-content",
-        smooth: 1.1, // 0.8–1.6 range
+        smooth: 1.05,
         effects: true,
         normalizeScroll: true,
         ignoreMobileResize: true,
       });
 
+      didInit.current = true;
       ScrollTrigger.refresh();
     } catch {
-      // no-op: never hard-fail the app if the plugin can't init
+      // no-op
+    }
+  }, []);
+
+  // Refresh on route changes (no re-init / no kill)
+  useEffect(() => {
+    if (!didInit.current) return;
+    const ScrollTrigger = (window as any).ScrollTrigger;
+    const ScrollSmoother = (window as any).ScrollSmoother;
+
+    try {
+      // Keep scroll position stable; just recompute measurements.
+      ScrollTrigger && ScrollTrigger.refresh && ScrollTrigger.refresh();
+      const s = ScrollSmoother && ScrollSmoother.get && ScrollSmoother.get();
+      s && s.refresh && s.refresh();
+    } catch {
+      // no-op
     }
   }, [pathname]);
 
