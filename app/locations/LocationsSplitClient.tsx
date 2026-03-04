@@ -359,7 +359,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
 function LocationDetail({ location }: { location: LocationRow }) {
   return (
-    <div className="detailCard">
+    <div key={detailFlashKey} className="detailCard detailFlash">
       <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
         {location.name ?? "Untitled listing"}
       </div>

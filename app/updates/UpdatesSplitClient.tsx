@@ -323,7 +323,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
               {!selected ? (
                 <div className="emptyRight">Select an update to view details.</div>
               ) : (
-                <div className="detailCard">
+                <div key={detailFlashKey} className="detailCard detailFlash">
                   <div className="detailHeader">
                     <div>
                       <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>

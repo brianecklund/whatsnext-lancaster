@@ -464,7 +464,13 @@ export default function HomeSplitClient({ events }: Props) {
     return byUid || byId || null;
   }, [filteredEvents, selectedKey]);
 
-  // stagger counter for left list
+  
+  const detailFlashKey = useMemo(() => {
+    if (!selectedEvent) return "none";
+    return `${selectedEvent.uid ?? selectedEvent.id ?? "event"}|${selectedKey}|${viewMode}|${q}|${type}`;
+  }, [selectedEvent, selectedKey, viewMode, q, type]);
+
+// stagger counter for left list
   let listAnimIndex = 0;
 
   // Close filter overlay when leaving mobile.
@@ -1313,7 +1319,7 @@ export default function HomeSplitClient({ events }: Props) {
         </div>
         <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
           {selectedEvent ? (
-            <div className="detailCard">
+            <div key={detailFlashKey} className="detailCard detailFlash">
               <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
               <div className="detailMeta">
                 <span className="muted">{selectedTime ?? "Time TBD"}</span>

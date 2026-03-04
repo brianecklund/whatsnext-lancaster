@@ -1510,38 +1510,32 @@ html{ scroll-behavior: smooth; }
   html{ scroll-behavior: auto !important; }
 }
 
-/* Page shell subtle load-in */
-.pageShell{
-  animation: pageFade var(--dur-3) var(--ease-out) both;
-}
-@keyframes pageFade{
-  from{ opacity: 0; }
-  to{ opacity: 1; }
+/* Targeted flashes (only these should animate on navigation/selection) */
+@keyframes wnlFlash{
+  0%{ opacity: 0; transform: translateY(6px); filter: blur(2px); }
+  100%{ opacity: 1; transform: translateY(0); filter: blur(0); }
 }
 
-/* Split panes: left fades in first, right follows */
-.split .paneLeft{
-  opacity: 0;
-  animation: paneFade 900ms var(--ease-out) both;
-  animation-delay: 40ms;
-}
-.split .paneRight{
-  opacity: 0;
-  animation: paneFade 900ms var(--ease-out) both;
-  animation-delay: 260ms;
-}
-@keyframes paneFade{
-  from{ opacity: 0; }
-  to{ opacity: 1; }
+.navFlash{ animation: wnlFlash 320ms var(--ease-out) both; }
+.detailFlash{ animation: wnlFlash 420ms var(--ease-out) both; }
+
 }
 
-/* Stagger-friendly item fade */
-.fadeInItem{
-  opacity: 0;
-  animation: itemFade 520ms var(--ease-out) forwards;
+/* Page shell: no route fade (avoid flashing). */
+.pageShell{ animation: none; }
+
+to{ opacity: 1; }
 }
-@keyframes itemFade{
-  to{ opacity: 1; }
+
+/* Split panes: no mount fade (avoid flashing). */
+.split .paneLeft, .split .paneRight{ opacity: 1; animation: none; }
+
+to{ opacity: 1; }
+}
+
+/* Item fade disabled globally (avoid flashing on navigation). */
+.fadeInItem{ opacity: 1; animation: none; }
+
 }
 
 /* Micro-interactions */
