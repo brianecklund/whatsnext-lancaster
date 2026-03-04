@@ -209,6 +209,8 @@ export default function HomeSplitClient({ events }: Props) {
   const selectedKey = (clientSelectedKey ?? selectedParam) ?? WEEKLY_KEY;
 
   useEffect(() => {
+    const isMobileNow = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 980px)").matches;
+
     if (typeof window === "undefined") return;
 
     const KEY = "wnl_intro_done_v1";
@@ -269,14 +271,14 @@ export default function HomeSplitClient({ events }: Props) {
       });
     }
 
-    if (!effectiveIsMobile && rightDocRef.current && selectedKey !== WEEKLY_KEY) {
+    if (!isMobileNow && rightDocRef.current && selectedKey !== WEEKLY_KEY) {
       gsap.fromTo(
         rightDocRef.current,
         { x: 22, opacity: 0 },
         { x: 0, opacity: 1, duration: 0.26, ease: "power2.out" }
       );
     }
-  }, [selectedKey, effectiveIsMobile, viewMode]);
+  }, [selectedKey, viewMode]);
 
   
   // Initialize from matchMedia so the first tap on mobile reliably opens detail.
