@@ -24,6 +24,10 @@
   /* Accent (primary pop) */
   --accent: #2563eb;
   --accentSoft: rgba(37, 99, 235, 0.12);
+  --accent2: #a855f7;
+  --accent2Soft: rgba(168, 85, 247, 0.12);
+  --sun: #f97316;
+  --sunSoft: rgba(249, 115, 22, 0.10);
 
   /* Layout */
   --headerH: 78px;
@@ -34,8 +38,8 @@
   /* Depth */
   --accentStroke: rgba(37, 99, 235, 0.35);
   --shadow-inset: 0 0 0 1px rgba(10,10,10,0.06) inset, 0 1px 0 rgba(255,255,255,0.72) inset;
-  --shadow-1: 0 10px 26px rgba(0,0,0,0.14), 0 3px 10px rgba(0,0,0,0.10);
-  --shadow-2: 0 22px 70px rgba(0,0,0,0.18), 0 10px 24px rgba(0,0,0,0.12);
+  --shadow-1: 0 8px 18px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.07);
+  --shadow-2: 0 18px 48px rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08);
 
   /* Back-compat (older variable names used across the file) */
   --shadowInset: var(--shadow-inset);
@@ -395,7 +399,10 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   }
 
   .paneLeft{
-    background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.32));
+    background:
+      radial-gradient(1200px 600px at 10% 0%, var(--accentSoft), transparent 55%),
+      radial-gradient(900px 520px at 95% 18%, var(--accent2Soft), transparent 50%),
+      linear-gradient(180deg, rgba(255,255,255,0.60), rgba(255,255,255,0.34));
     border: 1px solid var(--border);
     border-radius: 20px;
     box-shadow: var(--shadowInset);
@@ -406,7 +413,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
   /* Make the list feel like stacked folders */
   .eventList{
-    gap: 8px;
+    gap: 0px;
   }
 
   .eventRow,
@@ -450,9 +457,53 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     box-shadow: 0 0 0 2px var(--accentStroke) inset, var(--shadow1);
   }
 
+
+  /* Condensed "file stack" behavior */
+  .eventRow{
+    margin-top: -10px;
+    padding-top: 12px;
+    transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease, border-color 220ms ease;
+  }
+  .eventRow:first-child{ margin-top: 0; }
+
+  .eventRow::before{
+    opacity: 0.92;
+  }
+
+  .eventRow[data-active="true"]{
+    position: sticky;
+    top: 0;
+    z-index: 6;
+    transform: translateX(10px) translateY(0px) scale(1.01);
+    border-color: rgba(37,99,235,0.35);
+    background:
+      radial-gradient(800px 220px at 0% 0%, var(--accentSoft), transparent 60%),
+      linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.86));
+    box-shadow: 0 0 0 2px rgba(37,99,235,0.22) inset, var(--shadow-1);
+  }
+  .eventRow[data-active="true"]::before{
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.90));
+    border-color: rgba(37,99,235,0.35);
+  }
+
+  /* Keep non-active rows tucked "behind" */
+  .eventRow:not([data-active="true"]){
+    z-index: 1;
+  }
+  .eventRow:not([data-active="true"]):hover{
+    transform: translateX(4px);
+    box-shadow: var(--shadow-1);
+    border-color: rgba(10,10,10,0.18);
+  }
+
+
   /* Right pane becomes a "desk" with a paper document */
   .paneRight{
-    background: linear-gradient(180deg, rgba(255,255,255,0.20), rgba(255,255,255,0.06));
+    background:
+      radial-gradient(1000px 520px at 12% 0%, var(--sunSoft), transparent 55%),
+      radial-gradient(900px 520px at 88% 10%, var(--accentSoft), transparent 55%),
+      linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.08));
     border-radius: 22px;
     border: 1px solid rgba(10,10,10,0.10);
     box-shadow: var(--shadowInset);
@@ -473,7 +524,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     background: rgba(255,255,255,0.92);
     border: 1px solid rgba(10,10,10,0.12);
     border-radius: 20px;
-    box-shadow: var(--shadow2);
+    box-shadow: var(--shadow-2);
     padding: 18px;
     position: relative;
     overflow: hidden;
