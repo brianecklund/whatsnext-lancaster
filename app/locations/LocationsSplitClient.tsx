@@ -111,53 +111,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
   const mobileDetailOpen = Boolean(selectedKey);
 
-  
-
-  // Only animate what you asked for:
-  // - the 3 primary nav buttons (Calendar/Directory/Updates)
-  // - the currently selected item's content on the right
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const reduce =
-      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
-
-    const gsap = (window as any).gsap;
-    if (!gsap) return;
-
-    const btns = document.querySelectorAll(".tabs .tabBtn");
-    if (!btns || btns.length === 0) return;
-
-    gsap.killTweensOf(btns);
-    gsap.fromTo(
-      btns,
-      { opacity: 0, y: 6 },
-      { opacity: 1, y: 0, duration: 0.28, ease: "power2.out", stagger: 0.04 }
-    );
-  }, [pathname]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const reduce =
-      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
-
-    const gsap = (window as any).gsap;
-    if (!gsap) return;
-
-    const target = document.querySelector(".detailCard");
-    if (!target) return;
-
-    gsap.killTweensOf(target);
-    gsap.fromTo(
-      target,
-      { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: 0.32, ease: "power2.out" }
-    );
-  }, [selectedKey]);
-
-
-return (
+  return (
     <div className="pageShell">
       <div className="tagline">A directory of places in Lancaster to explore.</div>
 

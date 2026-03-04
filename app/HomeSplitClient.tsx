@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -464,52 +464,13 @@ export default function HomeSplitClient({ events }: Props) {
     return byUid || byId || null;
   }, [filteredEvents, selectedKey]);
 
-  
-  const paperRef = useRef<HTMLDivElement | null>(null);
-  const listRef = useRef<HTMLDivElement | null>(null);
-// stagger counter for left list
+  // stagger counter for left list
   let listAnimIndex = 0;
 
   // Close filter overlay when leaving mobile.
   useEffect(() => {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
-// GSAP: Stagger list items and animate document paper on selection.
-useEffect(() => {
-  if (typeof window === "undefined") return;
-  const gsap = (window as any).gsap;
-  if (!gsap) return;
-
-  // list stagger
-  const listEl = listRef.current;
-  if (listEl) {
-    const items = Array.from(listEl.querySelectorAll<HTMLElement>("[data-fileitem='true']"));
-    if (items.length) {
-      gsap.killTweensOf(items);
-      gsap.fromTo(
-        items,
-        { opacity: 0, y: 10 },
-        { opacity: 1, y: 0, duration: 0.35, ease: "power2.out", stagger: 0.03 }
-      );
-    }
-  }
-}, [viewMode, selectedKey, q, type]);
-
-useEffect(() => {
-  if (typeof window === "undefined") return;
-  const gsap = (window as any).gsap;
-  if (!gsap) return;
-
-  const paper = paperRef.current;
-  if (!paper) return;
-
-  gsap.killTweensOf(paper);
-  gsap.fromTo(
-    paper,
-    { opacity: 0.65, y: 14 },
-    { opacity: 1, y: 0, duration: 0.38, ease: "power2.out" }
-  );
-}, [selectedKey, viewMode]);
 
   // On mobile, ensure route switches (Calendar/Directory/Updates) never carry a stuck detail overlay.
   useEffect(() => {
@@ -552,53 +513,7 @@ useEffect(() => {
     setParam("event", key);
   }
 
-  
-
-  // Only animate what you asked for:
-  // - the 3 primary nav buttons (Calendar/Directory/Updates)
-  // - the currently selected item's content on the right
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const reduce =
-      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
-
-    const gsap = (window as any).gsap;
-    if (!gsap) return;
-
-    const btns = document.querySelectorAll(".tabs .tabBtn");
-    if (!btns || btns.length === 0) return;
-
-    gsap.killTweensOf(btns);
-    gsap.fromTo(
-      btns,
-      { opacity: 0, y: 6 },
-      { opacity: 1, y: 0, duration: 0.28, ease: "power2.out", stagger: 0.04 }
-    );
-  }, [pathname]);
-
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    const reduce =
-      window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
-
-    const gsap = (window as any).gsap;
-    if (!gsap) return;
-
-    const target = document.querySelector(".detailCard");
-    if (!target) return;
-
-    gsap.killTweensOf(target);
-    gsap.fromTo(
-      target,
-      { opacity: 0, y: 10 },
-      { opacity: 1, y: 0, duration: 0.32, ease: "power2.out" }
-    );
-  }, [selectedKey]);
-
-
-return (
+  return (
     <div className="pageShell">
       <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>
         A calendar of events, specials, and pop-ups in Lancaster, PA.
@@ -867,7 +782,7 @@ return (
                             <button
                               key={e.id}
                               type="button"
-                              className="weeklyCondRow" data-fileitem="true"
+                              className="weeklyCondRow"
                               onClick={() => {
                                 const key = e.uid ?? e.id;
                                 setClientSelectedKey(key);
@@ -1064,9 +979,6 @@ return (
           <main className="pane paneRight">
             <div className="scroll">
 
-              <div className="documentStage">
-                <div className="documentPaper" ref={paperRef}>
-
 
               {viewMode === "month" ? (
                 <div className="dayRight">
@@ -1175,7 +1087,7 @@ return (
                               <button
                                 key={e.id}
                                 type="button"
-                                className="weeklyCondRow" data-fileitem="true"
+                                className="weeklyCondRow"
                                 onClick={() => {
                                   const key = e.uid ?? e.id;
                                   setClientSelectedKey(key);
@@ -1352,8 +1264,6 @@ return (
                   ) : null}
                 </div>
               )}
-                </div>
-              </div>
             </div>
           </main>
         ) : null}
