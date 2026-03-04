@@ -507,7 +507,7 @@ useEffect(() => {
       );
     }
   }
-}, [viewMode, selectedKey, q, activeType]);
+}, [viewMode, selectedKey, q, type]);
 
 useEffect(() => {
   if (typeof window === "undefined") return;
