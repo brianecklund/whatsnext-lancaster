@@ -225,6 +225,70 @@ export default function HomeSplitClient({ events }: Props) {
 
     return () => window.clearTimeout(t);
   }, []);
+// Calendar-only: pull-out animation for the selected item + slide-in for right pane.
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (viewMode !== "list") return;
+
+    const gsap = (window as any).gsap;
+    if (!gsap) return;
+
+    const content = listRef.current;
+    if (!content) return;
+
+    const cards = Array.from(
+      content.querySelectorAll<HTMLElement>("button.eventRow")
+    );
+
+    cards.forEach((c) => {
+      if (c.getAttribute("data-active") !== "true") {
+        gsap.to(c, { x: 0, rotateZ: 0, scale: 1, duration: 0.18, ease: "power2.out" });
+        const peek = c.querySelector<HTMLElement>(".stackPeek");
+        if (peek) gsap.to(peek, { opacity: 0, height: 0, paddingBottom: 0, duration: 0.18, ease: "power2.out" });
+      }
+    });
+
+    const active = cards.find((c) => c.getAttribute("data-active") === "true");
+    if (active) {
+      const peek = active.querySelector<HTMLElement>(".stackPeek");
+      if (peek) gsap.to(peek, { opacity: 1, height: "auto", paddingBottom: 10, duration: 0.22, ease: "power2.out" });
+
+      gsap.to(active, {
+        x: 14,
+        rotateZ: -0.25,
+        scale: 1.01,
+        duration: 0.22,
+        ease: "power2.out",
+      });
+    }
+
+    if (!effectiveIsMobile && rightDocRef.current && selectedKey !== WEEKLY_KEY) {
+      gsap.fromTo(
+        rightDocRef.current,
+        { x: 22, opacity: 0 },
+        { x: 0, opacity: 1, duration: 0.26, ease: "power2.out" }
+      );
+    }
+  }, [clientSelectedKey, selectedKey, effectiveIsMobile, viewMode]);
+
+  // default selection = weekly overview
+  const selectedParam = sp.get("event");
+  // URL drives selection, but on mobile we keep an optimistic client key so the
+  // detail panel can update immediately on tap (before the router finishes).
+  const [clientSelectedKey, setClientSelectedKey] = useState<string | null>(null);
+  const selectedKey = (clientSelectedKey ?? selectedParam) ?? WEEKLY_KEY;
+  // Initialize from matchMedia so the first tap on mobile reliably opens detail.
+  const [mounted, setMounted] = useState(false);
+  // Hydration-safe: start false so SSR and first client render match.
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile-only filter overlay state (used to show/hide filter pills on small screens)
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  const effectiveIsMobile = mounted ? isMobile : false;
+
+  const viewMode: "list" | "month" = view === "month" ? "month" : "list";
+
 
 
   // Calendar-only: CodePen-style stacked accordion + ScrollSmoother on desktop list view.
@@ -345,70 +409,7 @@ export default function HomeSplitClient({ events }: Props) {
     };
   }, [viewMode, selectedKey, q, type, events.length]);
 
-  // Calendar-only: pull-out animation for the selected item + slide-in for right pane.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (viewMode !== "list") return;
-
-    const gsap = (window as any).gsap;
-    if (!gsap) return;
-
-    const content = listRef.current;
-    if (!content) return;
-
-    const cards = Array.from(
-      content.querySelectorAll<HTMLElement>("button.eventRow")
-    );
-
-    cards.forEach((c) => {
-      if (c.getAttribute("data-active") !== "true") {
-        gsap.to(c, { x: 0, rotateZ: 0, scale: 1, duration: 0.18, ease: "power2.out" });
-        const peek = c.querySelector<HTMLElement>(".stackPeek");
-        if (peek) gsap.to(peek, { opacity: 0, height: 0, paddingBottom: 0, duration: 0.18, ease: "power2.out" });
-      }
-    });
-
-    const active = cards.find((c) => c.getAttribute("data-active") === "true");
-    if (active) {
-      const peek = active.querySelector<HTMLElement>(".stackPeek");
-      if (peek) gsap.to(peek, { opacity: 1, height: "auto", paddingBottom: 10, duration: 0.22, ease: "power2.out" });
-
-      gsap.to(active, {
-        x: 14,
-        rotateZ: -0.25,
-        scale: 1.01,
-        duration: 0.22,
-        ease: "power2.out",
-      });
-    }
-
-    if (!effectiveIsMobile && rightDocRef.current && selectedKey !== WEEKLY_KEY) {
-      gsap.fromTo(
-        rightDocRef.current,
-        { x: 22, opacity: 0 },
-        { x: 0, opacity: 1, duration: 0.26, ease: "power2.out" }
-      );
-    }
-  }, [clientSelectedKey, selectedKey, effectiveIsMobile, viewMode]);
-
-  // default selection = weekly overview
-  const selectedParam = sp.get("event");
-  // URL drives selection, but on mobile we keep an optimistic client key so the
-  // detail panel can update immediately on tap (before the router finishes).
-  const [clientSelectedKey, setClientSelectedKey] = useState<string | null>(null);
-  const selectedKey = (clientSelectedKey ?? selectedParam) ?? WEEKLY_KEY;
-  // Initialize from matchMedia so the first tap on mobile reliably opens detail.
-  const [mounted, setMounted] = useState(false);
-  // Hydration-safe: start false so SSR and first client render match.
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Mobile-only filter overlay state (used to show/hide filter pills on small screens)
-  const [filterOpen, setFilterOpen] = useState(false);
-
-  const effectiveIsMobile = mounted ? isMobile : false;
-
-  const viewMode: "list" | "month" = view === "month" ? "month" : "list";
-
+  
   const selectedDay = useMemo(() => {
     const parsed = dayParam ? parseDayKey(dayParam) : null;
     return parsed ?? startOfToday();
