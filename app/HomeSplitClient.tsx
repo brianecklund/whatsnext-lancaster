@@ -241,6 +241,10 @@ export default function HomeSplitClient({ events }: Props) {
     const reduce = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     if (reduce) return;
 
+    // Calendar-only stacked scroll is desktop-focused; skip on mobile to avoid fighting native scroll.
+    const isMobileNow = window.matchMedia?.("(max-width: 980px)")?.matches;
+    if (isMobileNow) return;
+
     gsap.registerPlugin(ScrollTrigger, ScrollSmoother);
 
     const wrapper = listWrapperRef.current;
@@ -339,7 +343,7 @@ export default function HomeSplitClient({ events }: Props) {
         smoother.kill();
       } catch {}
     };
-  }, [effectiveIsMobile, viewMode, selectedKey, q, type, events.length]);
+  }, [viewMode, selectedKey, q, type, events.length]);
 
   // Calendar-only: pull-out animation for the selected item + slide-in for right pane.
   useEffect(() => {
