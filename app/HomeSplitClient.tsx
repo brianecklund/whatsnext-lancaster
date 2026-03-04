@@ -207,6 +207,18 @@ export default function HomeSplitClient({ events }: Props) {
   // detail panel can update immediately on tap (before the router finishes).
   const [clientSelectedKey, setClientSelectedKey] = useState<string | null>(null);
   const selectedKey = (clientSelectedKey ?? selectedParam) ?? WEEKLY_KEY;
+// Initialize from matchMedia so the first tap on mobile reliably opens detail.
+  const [mounted, setMounted] = useState(false);
+  // Hydration-safe: start false so SSR and first client render match.
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Mobile-only filter overlay state (used to show/hide filter pills on small screens)
+  const [filterOpen, setFilterOpen] = useState(false);
+
+  const effectiveIsMobile = mounted ? isMobile : false;
+
+  const viewMode: "list" | "month" = view === "month" ? "month" : "list";
+
 
   useEffect(() => {
     const isMobileNow = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 980px)").matches;
@@ -281,17 +293,7 @@ export default function HomeSplitClient({ events }: Props) {
   }, [selectedKey, viewMode]);
 
   
-  // Initialize from matchMedia so the first tap on mobile reliably opens detail.
-  const [mounted, setMounted] = useState(false);
-  // Hydration-safe: start false so SSR and first client render match.
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Mobile-only filter overlay state (used to show/hide filter pills on small screens)
-  const [filterOpen, setFilterOpen] = useState(false);
-
-  const effectiveIsMobile = mounted ? isMobile : false;
-
-  const viewMode: "list" | "month" = view === "month" ? "month" : "list";
+  
 
 
 
