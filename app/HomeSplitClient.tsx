@@ -186,7 +186,7 @@ function pickDescriptionText(e: EventLite): string | null {
 }
 
 export default function HomeSplitClient({ events }: Props) {
-  useSmoothWheel(".scroll:not(.calScroll)");
+  useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
@@ -197,32 +197,9 @@ export default function HomeSplitClient({ events }: Props) {
   const dayParam = sp.get("day");
 
   const listRef = useRef<HTMLDivElement | null>(null);
-  const listWrapperRef = useRef<HTMLDivElement | null>(null);
-  const rightDocRef = useRef<HTMLElement | null>(null);
 
   // Staged intro animation (runs once per session): UI first, then list + right content.
-// default selection = weekly overview
-  const selectedParam = sp.get("event");
-  // URL drives selection, but on mobile we keep an optimistic client key so the
-  // detail panel can update immediately on tap (before the router finishes).
-  const [clientSelectedKey, setClientSelectedKey] = useState<string | null>(null);
-  const selectedKey = (clientSelectedKey ?? selectedParam) ?? WEEKLY_KEY;
-// Initialize from matchMedia so the first tap on mobile reliably opens detail.
-  const [mounted, setMounted] = useState(false);
-  // Hydration-safe: start false so SSR and first client render match.
-  const [isMobile, setIsMobile] = useState(false);
-
-  // Mobile-only filter overlay state (used to show/hide filter pills on small screens)
-  const [filterOpen, setFilterOpen] = useState(false);
-
-  const effectiveIsMobile = mounted ? isMobile : false;
-
-  const viewMode: "list" | "month" = view === "month" ? "month" : "list";
-
-
   useEffect(() => {
-    const isMobileNow = typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 980px)").matches;
-
     if (typeof window === "undefined") return;
 
     const KEY = "wnl_intro_done_v1";
@@ -246,211 +223,26 @@ export default function HomeSplitClient({ events }: Props) {
 
     return () => window.clearTimeout(t);
   }, []);
-// Calendar-only: pull-out animation for the selected item + slide-in for right pane.
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (viewMode !== "list") return;
 
-    const gsap = (window as any).gsap;
-    if (!gsap) return;
+  // default selection = weekly overview
+  const selectedParam = sp.get("event");
+  // URL drives selection, but on mobile we keep an optimistic client key so the
+  // detail panel can update immediately on tap (before the router finishes).
+  const [clientSelectedKey, setClientSelectedKey] = useState<string | null>(null);
+  const selectedKey = (clientSelectedKey ?? selectedParam) ?? WEEKLY_KEY;
+  // Initialize from matchMedia so the first tap on mobile reliably opens detail.
+  const [mounted, setMounted] = useState(false);
+  // Hydration-safe: start false so SSR and first client render match.
+  const [isMobile, setIsMobile] = useState(false);
 
-    const content = listRef.current;
-    if (!content) return;
+  // Mobile-only filter overlay state (used to show/hide filter pills on small screens)
+  const [filterOpen, setFilterOpen] = useState(false);
 
-    const cards = Array.from(
-      content.querySelectorAll<HTMLElement>("button.eventRow")
-    );
+  const effectiveIsMobile = mounted ? isMobile : false;
 
-    cards.forEach((c) => {
-      if (c.getAttribute("data-active") !== "true") {
-        gsap.to(c, { x: 0, rotateZ: 0, scale: 1, duration: 0.18, ease: "power2.out" });
-        const peek = c.querySelector<HTMLElement>(".stackPeek");
-        if (peek) gsap.to(peek, { opacity: 0, height: 0, paddingBottom: 0, duration: 0.18, ease: "power2.out" });
-      }
-    });
+  const viewMode: "list" | "month" = view === "month" ? "month" : "list";
 
-    const active = cards.find((c) => c.getAttribute("data-active") === "true");
-    if (active) {
-      const peek = active.querySelector<HTMLElement>(".stackPeek");
-      if (peek) gsap.to(peek, { opacity: 1, height: "auto", paddingBottom: 10, duration: 0.22, ease: "power2.out" });
-
-      gsap.to(active, {
-        x: 14,
-        rotateZ: -0.25,
-        scale: 1.01,
-        duration: 0.22,
-        ease: "power2.out",
-      });
-    }
-
-    if (!isMobileNow && rightDocRef.current && selectedKey !== WEEKLY_KEY) {
-      gsap.fromTo(
-        rightDocRef.current,
-        { x: 22, opacity: 0 },
-        { x: 0, opacity: 1, duration: 0.26, ease: "power2.out" }
-      );
-    }
-  }, [selectedKey, viewMode]);
-
-  // Calendar-only: CodePen-like stacked accordion + buttery scroll (desktop list view).
-  useEffect(() => {
-    if (typeof window === "undefined") return;
-    if (viewMode !== "list") return;
-
-    const gsap = (window as any).gsap;
-    const ScrollTrigger = (window as any).ScrollTrigger;
-    if (!gsap || !ScrollTrigger) return;
-
-    const reduce =
-      window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false;
-    if (reduce) return;
-
-    // Desktop-only: don't fight touch scrolling.
-    const isMobileNow =
-      window.matchMedia?.("(max-width: 980px)")?.matches ?? false;
-    if (isMobileNow) return;
-
-    gsap.registerPlugin(ScrollTrigger);
-
-    const wrapper = listWrapperRef.current;
-    const content = listRef.current;
-    if (!wrapper || !content) return;
-
-    const accordions =
-      content.querySelector<HTMLElement>(".calAccordions") ?? null;
-    if (!accordions) return;
-
-    // ---------- Buttery scroll (wheel lerp) inside left pane ----------
-    let target = wrapper.scrollTop;
-    let current = wrapper.scrollTop;
-    let raf = 0;
-
-    const tick = () => {
-      current += (target - current) * 0.16;
-      if (Math.abs(target - current) < 0.5) current = target;
-      wrapper.scrollTop = current;
-      raf = window.requestAnimationFrame(tick);
-    };
-
-    const onWheel = (e: WheelEvent) => {
-      e.preventDefault();
-      target = Math.max(
-        0,
-        Math.min(wrapper.scrollHeight - wrapper.clientHeight, target + e.deltaY)
-      );
-      if (!raf) raf = window.requestAnimationFrame(tick);
-    };
-
-    wrapper.addEventListener("wheel", onWheel, { passive: false });
-
-    // ---------- Stacked accordion timeline (CodePen-like) ----------
-    const cards = Array.from(
-      accordions.querySelectorAll<HTMLElement>("button.eventRow")
-    );
-    if (!cards.length) return;
-
-    cards.forEach((c, i) => (c.style.zIndex = String(2000 - i)));
-
-    const nonActiveCards = () =>
-      cards.filter((c) => c.getAttribute("data-active") !== "true");
-    const nonActivePeeks = () =>
-      nonActiveCards()
-        .map((c) => c.querySelector<HTMLElement>(".stackPeek"))
-        .filter(Boolean) as HTMLElement[];
-
-    // Kill previous triggers created by this block
-    const prev = (wrapper as any).__wnlStackTriggers as any[] | undefined;
-    if (prev?.length) {
-      prev.forEach((t) => {
-        try {
-          t.kill();
-        } catch {}
-      });
-    }
-    (wrapper as any).__wnlStackTriggers = [];
-
-    const endDist = () =>
-      Math.max(300, accordions.scrollHeight - wrapper.clientHeight);
-
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: accordions,
-        scroller: wrapper,
-        start: "top top",
-        end: () => `+=${endDist()}`,
-        scrub: 1,
-        pin: true,
-        pinType: "transform",
-        invalidateOnRefresh: true,
-      },
-    });
-
-    (wrapper as any).__wnlStackTriggers.push(tl.scrollTrigger);
-
-    tl.to(nonActivePeeks(), {
-      height: 0,
-      paddingBottom: 0,
-      opacity: 0,
-      stagger: 0.45,
-      ease: "none",
-    });
-
-    tl.to(
-      nonActiveCards(),
-      {
-        marginBottom: -16,
-        stagger: 0.45,
-        ease: "none",
-      },
-      "<"
-    );
-
-    // Depth feel while scrolling
-    nonActiveCards().forEach((card, i) => {
-      const st = ScrollTrigger.create({
-        trigger: card,
-        scroller: wrapper,
-        start: "top 80%",
-        end: "top 30%",
-        scrub: true,
-        onUpdate: (self: any) => {
-          const p = self.progress;
-          gsap.set(card, {
-            transformPerspective: 900,
-            rotateX: 0.6 * p,
-            y: -i * 6 * p,
-            scale: 1 - i * 0.006 * p,
-          });
-        },
-      });
-      (wrapper as any).__wnlStackTriggers.push(st);
-    });
-
-    const refreshTimer = window.setTimeout(() => {
-      try {
-        ScrollTrigger.refresh();
-      } catch {}
-    }, 50);
-
-    return () => {
-      window.clearTimeout(refreshTimer);
-      wrapper.removeEventListener("wheel", onWheel as any);
-      if (raf) window.cancelAnimationFrame(raf);
-      raf = 0;
-
-      const arr = (wrapper as any).__wnlStackTriggers as any[] | undefined;
-      if (arr?.length) {
-        arr.forEach((t) => {
-          try {
-            t.kill();
-          } catch {}
-        });
-      }
-      (wrapper as any).__wnlStackTriggers = [];
-    };
-  }, [viewMode, selectedKey, q, type, events.length]);
-
-const selectedDay = useMemo(() => {
+  const selectedDay = useMemo(() => {
     const parsed = dayParam ? parseDayKey(dayParam) : null;
     return parsed ?? startOfToday();
   }, [dayParam]);
@@ -765,16 +557,14 @@ const selectedDay = useMemo(() => {
         {showLeft ? (
           <aside className="pane paneLeft">
             <div
-              className="scroll calScroll"
-              id="calWrapper"
-              ref={listWrapperRef}
+              className="scroll"
+              ref={listRef}
               onScroll={(e) => {
                 if (!effectiveIsMobile) return;
                 const st = (e.currentTarget as HTMLDivElement).scrollTop;
                 setTaglineHidden(st > 2);
               }}
             >
-              <div className="calContent" id="calContent" ref={listRef}>
               <div className="leftSticky">
                 <div className="tabs" aria-label="Primary navigation">
                   <button
@@ -1055,7 +845,6 @@ const selectedDay = useMemo(() => {
               ) : null}
 
               {/* Left list */}
-              <div className="calAccordions" aria-label="Calendar list">
               {leftDayGroups.map((g) => (
                 <section key={dayKey(g.date)} className="dayBlock">
                   <div className="dayTitle">{formatDayHeading(g.date)}</div>
@@ -1089,11 +878,7 @@ const selectedDay = useMemo(() => {
                           {e.event_type ? <span className="dot">•</span> : null}
                           {e.event_type ? <span>{e.event_type}</span> : null}
                         </div>
-                        <div className="stackPeek">
-                          {e.locationName ? <div className="peekLine">{e.locationName}</div> : null}
-                          {e.address ? <div className="peekLine muted">{e.address}</div> : null}
-                        </div>
-                        {active ? (() => {
+                        {(() => {
                           const raw =
                             (e.summary ?? "") || (pickDescriptionText(e) ?? "");
                           const s = (raw || "").trim();
@@ -1103,14 +888,13 @@ const selectedDay = useMemo(() => {
                               {s.length > 180 ? `${s.slice(0, 180).trim()}…` : s}
                             </div>
                           );
-                        })() : null}
+                        })()}
 
                       </button>
                     );
                   })}
                 </section>
               ))}
-              </div>
                 </>
               ) : (
                 <>
@@ -1221,14 +1005,13 @@ const selectedDay = useMemo(() => {
 
 
 
-              </div>
             </div>
           </aside>
         ) : null}
 
         {/* RIGHT */}
         {showRight ? (
-          <main className="pane paneRight" ref={rightDocRef}>
+          <main className="pane paneRight">
             <div className="scroll">
 
 
