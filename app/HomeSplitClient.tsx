@@ -201,6 +201,13 @@ export default function HomeSplitClient({ events }: Props) {
   const rightDocRef = useRef<HTMLElement | null>(null);
 
   // Staged intro animation (runs once per session): UI first, then list + right content.
+// default selection = weekly overview
+  const selectedParam = sp.get("event");
+  // URL drives selection, but on mobile we keep an optimistic client key so the
+  // detail panel can update immediately on tap (before the router finishes).
+  const [clientSelectedKey, setClientSelectedKey] = useState<string | null>(null);
+  const selectedKey = (clientSelectedKey ?? selectedParam) ?? WEEKLY_KEY;
+
   useEffect(() => {
     if (typeof window === "undefined") return;
 
@@ -271,12 +278,7 @@ export default function HomeSplitClient({ events }: Props) {
     }
   }, [selectedKey, effectiveIsMobile, viewMode]);
 
-  // default selection = weekly overview
-  const selectedParam = sp.get("event");
-  // URL drives selection, but on mobile we keep an optimistic client key so the
-  // detail panel can update immediately on tap (before the router finishes).
-  const [clientSelectedKey, setClientSelectedKey] = useState<string | null>(null);
-  const selectedKey = (clientSelectedKey ?? selectedParam) ?? WEEKLY_KEY;
+  
   // Initialize from matchMedia so the first tap on mobile reliably opens detail.
   const [mounted, setMounted] = useState(false);
   // Hydration-safe: start false so SSR and first client render match.
