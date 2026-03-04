@@ -97,6 +97,8 @@ export default function UpdatesSplitClient({ updates }: Props) {
   }, [filtered, selectedKey]);
 
   const selected = isMobile ? selectedMobile : selectedDesktop;
+  const detailFlashKey = selected?.id ?? selected?.title ?? selected?.date ?? "detail";
+
 
   const showLeft = !isMobile || mobileTab === "list";
   const showRight = !isMobile || mobileTab === "detail";
