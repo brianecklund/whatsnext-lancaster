@@ -24,27 +24,12 @@
   /* Accent (primary pop) */
   --accent: #2563eb;
   --accentSoft: rgba(37, 99, 235, 0.12);
-  --accent2: #a855f7;
-  --accent2Soft: rgba(168, 85, 247, 0.12);
-  --sun: #f97316;
-  --sunSoft: rgba(249, 115, 22, 0.10);
 
   /* Layout */
-  --headerH: 78px;
-  --gutter: 18px;
-  --radius: 16px;
+  --headerH: 86px;
+  --gutter: 24px;
+  --radius: 18px;
   --pill: 999px;
-
-  /* Depth */
-  --accentStroke: rgba(37, 99, 235, 0.35);
-  --shadow-inset: 0 0 0 1px rgba(10,10,10,0.06) inset, 0 1px 0 rgba(255,255,255,0.72) inset;
-  --shadow-1: 0 8px 18px rgba(0,0,0,0.10), 0 2px 8px rgba(0,0,0,0.07);
-  --shadow-2: 0 18px 48px rgba(0,0,0,0.12), 0 8px 18px rgba(0,0,0,0.08);
-
-  /* Back-compat (older variable names used across the file) */
-  --shadowInset: var(--shadow-inset);
-  --shadow1: var(--shadow-1);
-  --shadow2: var(--shadow-2);
 
   /* Buttons */
   --btnBg: #d9d9d9;
@@ -130,19 +115,12 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 /* Site chrome */
 .siteHeader{
-  position: sticky;
-  top: 0;
-  z-index: 50;
   height: var(--headerH);
   display:flex;
   align-items:flex-start;
   justify-content: space-between;
-  padding: 14px var(--gutter) 10px var(--gutter);
-  border-bottom: 1px solid rgba(0,0,0,0.08);
-  background: rgba(255,255,255,0.78);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  box-shadow: 0 10px 34px rgba(0,0,0,0.06);
+  padding: 18px var(--gutter) 0 var(--gutter);
+  border-bottom: 1px solid var(--border);
 }
 
 .brand{
@@ -359,7 +337,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 @media (max-width: 980px){
   :root{ --headerH: 64px; }
-  .siteHeader{ padding: 10px var(--gutter) 10px var(--gutter); align-items: center; }
+  .siteHeader{ padding: 12px var(--gutter) 0 var(--gutter); align-items: center; }
   .hamburgerBtn{ width: 40px; height: 40px; border-radius: 12px; }
   .topNav{ display:none; }
   .hamburgerBtn{ display:inline-flex; }
@@ -394,26 +372,25 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 /* --- File Cabinet Layout (Desktop) --- */
 @media (min-width: 981px){
   .split{
-    gap: 16px;
-    padding: 14px var(--gutter);
+    gap: 22px;
+    padding: 18px var(--gutter);
   }
 
   .paneLeft{
-    background:
-      radial-gradient(1200px 600px at 10% 0%, var(--accentSoft), transparent 55%),
-      radial-gradient(900px 520px at 95% 18%, var(--accent2Soft), transparent 50%),
-      linear-gradient(180deg, rgba(255,255,255,0.60), rgba(255,255,255,0.34));
+    background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.32));
     border: 1px solid var(--border);
-    border-radius: 20px;
+    border-radius: 22px;
     box-shadow: var(--shadowInset);
     overflow: hidden;
   }
 
-  .paneLeft .scroll{ padding: 0 12px 14px 12px; }
+  .paneLeft .scroll{
+    padding: 0 14px 18px 14px;
+  }
 
   /* Make the list feel like stacked folders */
   .eventList{
-    gap: 0px;
+    gap: 8px;
   }
 
   .eventRow,
@@ -457,53 +434,9 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     box-shadow: 0 0 0 2px var(--accentStroke) inset, var(--shadow1);
   }
 
-
-  /* Condensed "file stack" behavior */
-  .eventRow{
-    margin-top: -10px;
-    padding-top: 12px;
-    transition: transform 220ms ease, box-shadow 220ms ease, background 220ms ease, border-color 220ms ease;
-  }
-  .eventRow:first-child{ margin-top: 0; }
-
-  .eventRow::before{
-    opacity: 0.92;
-  }
-
-  .eventRow[data-active="true"]{
-    position: sticky;
-    top: 0;
-    z-index: 6;
-    transform: translateX(10px) translateY(0px) scale(1.01);
-    border-color: rgba(37,99,235,0.35);
-    background:
-      radial-gradient(800px 220px at 0% 0%, var(--accentSoft), transparent 60%),
-      linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,255,255,0.86));
-    box-shadow: 0 0 0 2px rgba(37,99,235,0.22) inset, var(--shadow-1);
-  }
-  .eventRow[data-active="true"]::before{
-    background:
-      linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.90));
-    border-color: rgba(37,99,235,0.35);
-  }
-
-  /* Keep non-active rows tucked "behind" */
-  .eventRow:not([data-active="true"]){
-    z-index: 1;
-  }
-  .eventRow:not([data-active="true"]):hover{
-    transform: translateX(4px);
-    box-shadow: var(--shadow-1);
-    border-color: rgba(10,10,10,0.18);
-  }
-
-
   /* Right pane becomes a "desk" with a paper document */
   .paneRight{
-    background:
-      radial-gradient(1000px 520px at 12% 0%, var(--sunSoft), transparent 55%),
-      radial-gradient(900px 520px at 88% 10%, var(--accentSoft), transparent 55%),
-      linear-gradient(180deg, rgba(255,255,255,0.22), rgba(255,255,255,0.08));
+    background: linear-gradient(180deg, rgba(255,255,255,0.20), rgba(255,255,255,0.06));
     border-radius: 22px;
     border: 1px solid rgba(10,10,10,0.10);
     box-shadow: var(--shadowInset);
@@ -524,8 +457,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     background: rgba(255,255,255,0.92);
     border: 1px solid rgba(10,10,10,0.12);
     border-radius: 20px;
-    box-shadow: var(--shadow-2);
-    padding: 18px;
+    box-shadow: var(--shadow2);
+    padding: 22px;
     position: relative;
     overflow: hidden;
   }
@@ -837,12 +770,12 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   text-align: left;
   border: 0;
   background: transparent;
-  padding: 10px 12px;
-  border-radius: 12px;
+  padding: 12px 14px;
+  border-radius: 10px;
   cursor: pointer;
   display:flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
   color: var(--text);
 }
 .eventRow:hover{ background: var(--hover); }
@@ -1681,10 +1614,6 @@ strong, b{ font-weight: var(--fw-medium); }
   --dur-1: 200ms;
   --dur-2: 520ms;
   --dur-3: 920ms;
-
-  /* Motion helpers */
-  --lift-1: translateY(-1px);
-  --lift-2: translateY(-2px);
 }
 
 html{ scroll-behavior: smooth; }
@@ -2419,3 +2348,8 @@ a:hover{
   /* Prevent long headings from widening rows */
   .monthHeader h3, .monthHeader .monthTitle{ min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 }
+
+
+/* GSAP ScrollSmoother wrappers */
+#smooth-wrapper{ position: fixed; inset: 0; overflow: hidden; }
+#smooth-content{ width: 100%; will-change: transform; }

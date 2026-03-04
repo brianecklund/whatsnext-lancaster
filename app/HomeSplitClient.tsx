@@ -3,7 +3,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
-import { useScrollEffects } from "@/app/components/useScrollEffects";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 type EventLite = {
@@ -468,14 +467,6 @@ export default function HomeSplitClient({ events }: Props) {
   
   const paperRef = useRef<HTMLDivElement | null>(null);
   const listRef = useRef<HTMLDivElement | null>(null);
-  const rightScrollRef = useRef<HTMLDivElement | null>(null);
-  const mobileDetailScrollRef = useRef<HTMLDivElement | null>(null);
-  const [rightScroller, setRightScroller] = useState<HTMLElement | null>(null);
-  const [mobileDetailScroller, setMobileDetailScroller] = useState<HTMLElement | null>(null);
-
-  // Scroll-triggered reveals + subtle parallax (non-invasive).
-  useScrollEffects(rightScroller);
-  useScrollEffects(mobileDetailScroller);
 // stagger counter for left list
   let listAnimIndex = 0;
 
@@ -483,11 +474,6 @@ export default function HomeSplitClient({ events }: Props) {
   useEffect(() => {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
-
-  useEffect(() => {
-    setRightScroller(rightScrollRef.current);
-    setMobileDetailScroller(mobileDetailScrollRef.current);
-  }, []);
 // GSAP: Stagger list items and animate document paper on selection.
 useEffect(() => {
   if (typeof window === "undefined") return;
@@ -1030,7 +1016,7 @@ useEffect(() => {
         {/* RIGHT */}
         {showRight ? (
           <main className="pane paneRight">
-            <div className="scroll" ref={rightScrollRef}>
+            <div className="scroll">
 
               <div className="documentStage">
                 <div className="documentPaper" ref={paperRef}>
@@ -1369,7 +1355,7 @@ useEffect(() => {
           </button>
           <div className="mobileDetailTitle">Event</div>
         </div>
-        <div className="scroll" ref={mobileDetailScrollRef} style={{ padding: "0 16px 84px 16px" }}>
+        <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
           {selectedEvent ? (
             <div className="detailCard">
               <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
