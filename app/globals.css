@@ -1519,24 +1519,18 @@ html{ scroll-behavior: smooth; }
 .navFlash{ animation: wnlFlash 320ms var(--ease-out) both; }
 .detailFlash{ animation: wnlFlash 420ms var(--ease-out) both; }
 
-}
 
 /* Page shell: no route fade (avoid flashing). */
 .pageShell{ animation: none; }
 
-to{ opacity: 1; }
-}
 
 /* Split panes: no mount fade (avoid flashing). */
 .split .paneLeft, .split .paneRight{ opacity: 1; animation: none; }
 
-to{ opacity: 1; }
-}
 
 /* Item fade disabled globally (avoid flashing on navigation). */
 .fadeInItem{ opacity: 1; animation: none; }
 
-}
 
 /* Micro-interactions */
 .eventRow,
