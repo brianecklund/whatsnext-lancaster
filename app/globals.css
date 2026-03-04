@@ -2261,3 +2261,16 @@ a:hover{
     animation: none !important;
   }
 }
+
+
+.eventRow{
+  position: relative;
+  overflow: hidden;
+  transition: transform .25s ease;
+}
+.eventRow[data-active="true"]{
+  transform: scale(1.01);
+}
+.scroll{
+  scroll-behavior: smooth;
+}

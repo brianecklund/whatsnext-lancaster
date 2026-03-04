@@ -1155,7 +1155,52 @@ export default function HomeSplitClient({ events }: Props) {
                             const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
                             const img = pickImageUrl(e);
 
-                            return (
+                            
+
+  // GSAP stacked scroll + accordion
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const gsap = (window as any).gsap;
+    const ScrollTrigger = (window as any).ScrollTrigger;
+    if (!gsap || !ScrollTrigger) return;
+
+    gsap.registerPlugin(ScrollTrigger);
+
+    const container = listRef.current;
+    if (!container) return;
+
+    const items = container.querySelectorAll<HTMLElement>(".eventRow");
+
+    items.forEach((item, i) => {
+      gsap.to(item, {
+        y: -i * 6,
+        scrollTrigger: {
+          trigger: item,
+          start: "top center+=80",
+          end: "bottom center",
+          scrub: true
+        }
+      });
+    });
+  }, []);
+
+  // accordion expand on selection
+  useEffect(() => {
+    const gsap = (window as any).gsap;
+    if (!gsap) return;
+    if (!selectedKey) return;
+
+    const el = document.querySelector(`[data-key="${selectedKey}"]`);
+    if (!el) return;
+
+    gsap.to(el, {
+      height: "auto",
+      duration: 0.35,
+      ease: "power2.out"
+    });
+  }, [selectedKey]);
+
+return (
                               <button
                                 key={e.id}
                                 type="button"
