@@ -86,8 +86,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [locations]);
 
-  /* A-Z filter */
-const filtered = useMemo(() => {
+  const filtered = useMemo(() => {
     const nq = normalize(q);
     const nc = normalize(cat);
 

@@ -356,7 +356,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   min-height: 0;
   display:grid;
   grid-template-columns: 1fr 1.25fr;
-  gap:0;
+  gap: var(--gutter);
 }
 
 .pane{
@@ -561,7 +561,13 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   }
 }
 
-.scroll{overflow:auto;overflow-y:scroll;scrollbar-gutter:stable;padding-bottom:24px;}
+.scroll{
+  height: 100%;
+  overflow: auto;
+  overflow-y: scroll;            /* reserve scrollbar space to prevent layout shift */
+  scrollbar-gutter: stable;      /* modern browsers: keep gutter stable */
+  padding-bottom: 18px;
+}
 
 /* Sticky tabs (desktop left) */
 .leftSticky{

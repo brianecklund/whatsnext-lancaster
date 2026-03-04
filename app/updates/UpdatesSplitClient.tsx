@@ -32,7 +32,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
   const selectedKey = sp.get("u") || "";
 
   const [isMobile, setIsMobile] = useState(false);
-  const [tabBtn, setMobileTab] = useState<"list" | "detail">("list");
+  const [mobileTab, setMobileTab] = useState<"list" | "detail">("list");
   const [filterOpen, setFilterOpen] = useState(false);
 
   useEffect(() => {
@@ -100,8 +100,8 @@ export default function UpdatesSplitClient({ updates }: Props) {
   const detailFlashKey = selected?.id ?? selected?.title ?? selected?.date ?? "detail";
 
 
-  const showLeft = !isMobile || tabBtn === "list";
-  const showRight = !isMobile || tabBtn === "detail";
+  const showLeft = !isMobile || mobileTab === "list";
+  const showRight = !isMobile || mobileTab === "detail";
 
   return (
     <div className="pageShell">
@@ -369,19 +369,19 @@ export default function UpdatesSplitClient({ updates }: Props) {
 
       {/* Mobile bottom tabs */}
       {isMobile ? (
-        <div className="tabBtns" role="tablist" aria-label="Updates view">
+        <div className="mobileTabs" role="tablist" aria-label="Updates view">
           <button
             type="button"
-            className="tabBtn"
-            data-active={tabBtn === "list" ? "true" : "false"}
+            className="mobileTab"
+            data-active={mobileTab === "list" ? "true" : "false"}
             onClick={() => setMobileTab("list")}
           >
             List
           </button>
           <button
             type="button"
-            className="tabBtn"
-            data-active={tabBtn === "detail" ? "true" : "false"}
+            className="mobileTab"
+            data-active={mobileTab === "detail" ? "true" : "false"}
             onClick={() => setMobileTab("detail")}
           >
             Details
