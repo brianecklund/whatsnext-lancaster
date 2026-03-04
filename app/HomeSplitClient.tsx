@@ -269,7 +269,7 @@ export default function HomeSplitClient({ events }: Props) {
         { x: 0, opacity: 1, duration: 0.26, ease: "power2.out" }
       );
     }
-  }, [clientSelectedKey, selectedKey, effectiveIsMobile, viewMode]);
+  }, [selectedKey, effectiveIsMobile, viewMode]);
 
   // default selection = weekly overview
   const selectedParam = sp.get("event");
