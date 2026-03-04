@@ -11,6 +11,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
 
         <Script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js" strategy="beforeInteractive" />
+        {/* ScrollTrigger for subtle scroll-based depth + reveal effects */}
+        <Script
+          src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"
+          strategy="beforeInteractive"
+        />
 
         <main className="main">{children}</main>
       </body>

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
+import { useScrollEffects } from "@/app/components/useScrollEffects";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export type UpdateLite = {
@@ -23,6 +24,11 @@ function norm(v: string) {
 
 export default function UpdatesSplitClient({ updates }: Props) {
   useSmoothWheel(".scroll");
+
+  const rightScrollRef = useRef<HTMLDivElement | null>(null);
+  const [rightScroller, setRightScroller] = useState<HTMLElement | null>(null);
+
+  useScrollEffects(rightScroller);
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
@@ -46,6 +52,10 @@ export default function UpdatesSplitClient({ updates }: Props) {
   useEffect(() => {
     if (!isMobile) setFilterOpen(false);
   }, [isMobile]);
+
+  useEffect(() => {
+    setRightScroller(rightScrollRef.current);
+  }, []);
 
   function setParam(key: string, value: string | null) {
     const params = new URLSearchParams(sp.toString());
@@ -319,7 +329,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
         {/* RIGHT */}
         {showRight ? (
           <section className="pane paneRight">
-            <div className="scroll">
+            <div className="scroll" ref={rightScrollRef}>
               {!selected ? (
                 <div className="emptyRight">Select an update to view details.</div>
               ) : (

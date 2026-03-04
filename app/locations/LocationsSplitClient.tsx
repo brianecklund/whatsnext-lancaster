@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
+import { useScrollEffects } from "@/app/components/useScrollEffects";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
 
@@ -13,6 +14,14 @@ type LocationRow = LocationLite & { key: string };
 
 export default function LocationsSplitClient({ locations }: { locations: LocationRow[] }) {
   useSmoothWheel(".scroll");
+
+  const rightScrollRef = useRef<HTMLDivElement | null>(null);
+  const mobileDetailScrollRef = useRef<HTMLDivElement | null>(null);
+  const [rightScroller, setRightScroller] = useState<HTMLElement | null>(null);
+  const [mobileDetailScroller, setMobileDetailScroller] = useState<HTMLElement | null>(null);
+
+  useScrollEffects(rightScroller);
+  useScrollEffects(mobileDetailScroller);
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -41,6 +50,11 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   useEffect(() => {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
+
+  useEffect(() => {
+    setRightScroller(rightScrollRef.current);
+    setMobileDetailScroller(mobileDetailScrollRef.current);
+  }, []);
 
   const selectedKey = searchParams.get("location");
   const q = searchParams.get("q") ?? "";
@@ -320,7 +334,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
         {/* RIGHT (desktop) */}
         <div className="pane paneRight">
-          <div className="scroll">
+          <div className="scroll" ref={rightScrollRef}>
             {!selectedDesktop ? (
               <div className="emptyRight">Select a listing to see details.</div>
             ) : (
@@ -349,7 +363,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
           </button>
           <div className="mobileDetailTitle">Listing</div>
         </div>
-        <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
+        <div className="scroll" ref={mobileDetailScrollRef} style={{ padding: "0 16px 84px 16px" }}>
           {selectedMobile ? <LocationDetail location={selectedMobile} /> : null}
         </div>
       </div>

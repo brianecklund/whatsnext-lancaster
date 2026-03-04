@@ -26,10 +26,21 @@
   --accentSoft: rgba(37, 99, 235, 0.12);
 
   /* Layout */
-  --headerH: 86px;
-  --gutter: 24px;
-  --radius: 18px;
+  --headerH: 78px;
+  --gutter: 18px;
+  --radius: 16px;
   --pill: 999px;
+
+  /* Depth */
+  --accentStroke: rgba(37, 99, 235, 0.35);
+  --shadow-inset: 0 0 0 1px rgba(10,10,10,0.06) inset, 0 1px 0 rgba(255,255,255,0.72) inset;
+  --shadow-1: 0 10px 26px rgba(0,0,0,0.14), 0 3px 10px rgba(0,0,0,0.10);
+  --shadow-2: 0 22px 70px rgba(0,0,0,0.18), 0 10px 24px rgba(0,0,0,0.12);
+
+  /* Back-compat (older variable names used across the file) */
+  --shadowInset: var(--shadow-inset);
+  --shadow1: var(--shadow-1);
+  --shadow2: var(--shadow-2);
 
   /* Buttons */
   --btnBg: #d9d9d9;
@@ -115,12 +126,19 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 /* Site chrome */
 .siteHeader{
+  position: sticky;
+  top: 0;
+  z-index: 50;
   height: var(--headerH);
   display:flex;
   align-items:flex-start;
   justify-content: space-between;
-  padding: 18px var(--gutter) 0 var(--gutter);
-  border-bottom: 1px solid var(--border);
+  padding: 14px var(--gutter) 10px var(--gutter);
+  border-bottom: 1px solid rgba(0,0,0,0.08);
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 10px 34px rgba(0,0,0,0.06);
 }
 
 .brand{
@@ -337,7 +355,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 @media (max-width: 980px){
   :root{ --headerH: 64px; }
-  .siteHeader{ padding: 12px var(--gutter) 0 var(--gutter); align-items: center; }
+  .siteHeader{ padding: 10px var(--gutter) 10px var(--gutter); align-items: center; }
   .hamburgerBtn{ width: 40px; height: 40px; border-radius: 12px; }
   .topNav{ display:none; }
   .hamburgerBtn{ display:inline-flex; }
@@ -372,21 +390,19 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 /* --- File Cabinet Layout (Desktop) --- */
 @media (min-width: 981px){
   .split{
-    gap: 22px;
-    padding: 18px var(--gutter);
+    gap: 16px;
+    padding: 14px var(--gutter);
   }
 
   .paneLeft{
     background: linear-gradient(180deg, rgba(255,255,255,0.55), rgba(255,255,255,0.32));
     border: 1px solid var(--border);
-    border-radius: 22px;
+    border-radius: 20px;
     box-shadow: var(--shadowInset);
     overflow: hidden;
   }
 
-  .paneLeft .scroll{
-    padding: 0 14px 18px 14px;
-  }
+  .paneLeft .scroll{ padding: 0 12px 14px 12px; }
 
   /* Make the list feel like stacked folders */
   .eventList{
@@ -458,7 +474,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     border: 1px solid rgba(10,10,10,0.12);
     border-radius: 20px;
     box-shadow: var(--shadow2);
-    padding: 22px;
+    padding: 18px;
     position: relative;
     overflow: hidden;
   }
@@ -770,12 +786,12 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   text-align: left;
   border: 0;
   background: transparent;
-  padding: 12px 14px;
-  border-radius: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
   cursor: pointer;
   display:flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   color: var(--text);
 }
 .eventRow:hover{ background: var(--hover); }
@@ -1614,6 +1630,10 @@ strong, b{ font-weight: var(--fw-medium); }
   --dur-1: 200ms;
   --dur-2: 520ms;
   --dur-3: 920ms;
+
+  /* Motion helpers */
+  --lift-1: translateY(-1px);
+  --lift-2: translateY(-2px);
 }
 
 html{ scroll-behavior: smooth; }
