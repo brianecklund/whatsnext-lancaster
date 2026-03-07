@@ -356,7 +356,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   min-height: 0;
   display:grid;
   grid-template-columns: 1fr 1.25fr;
-  gap:0;
+  gap: var(--gutter);
 }
 
 .pane{
@@ -561,7 +561,13 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   }
 }
 
-.scroll{overflow:auto;overflow-y:scroll;scrollbar-gutter:stable;padding-bottom:24px;}
+.scroll{
+  height: 100%;
+  overflow: auto;
+  overflow-y: scroll;            /* reserve scrollbar space to prevent layout shift */
+  scrollbar-gutter: stable;      /* modern browsers: keep gutter stable */
+  padding-bottom: 18px;
+}
 
 /* Sticky tabs (desktop left) */
 .leftSticky{
@@ -2254,4 +2260,50 @@ a:hover{
     transform: none !important;
     animation: none !important;
   }
+}
+
+
+/* === Calendar stacked accordion (GSAP) === */
+
+/* Scope to the calendar left pane only */
+.calContent{
+  perspective: 900px;
+  transform-style: preserve-3d;
+}
+
+.calAccordions{
+  transform-style: preserve-3d;
+}
+
+/* Prevent our JS smoother from fighting CSS smooth scroll */
+.calScroll{
+  scroll-behavior: auto;
+}
+
+.eventRow{
+  position: relative;
+  transform-style: preserve-3d;
+  will-change: transform;
+  margin-bottom: 18px;
+  border-radius: 14px;
+  box-shadow: 0 18px 28px rgba(0,0,0,.10);
+}
+
+.eventRow[data-active="true"]{
+  box-shadow: 0 26px 40px rgba(0,0,0,.16);
+}
+
+.stackPeek{
+  overflow: hidden;
+  padding-bottom: 10px;
+  opacity: 1;
+}
+
+.peekLine{
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.peekLine.muted{
+  opacity: .72;
 }
