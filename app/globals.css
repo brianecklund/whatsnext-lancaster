@@ -2614,3 +2614,129 @@ a:hover{
   .filterBtn, .clearBtn, .viewBtn{ height: 40px; }
   .paneRight > .scroll{ padding: 12px 6px 22px 0; }
 }
+
+
+/* Directory filter dropdown */
+.filterBtn[data-active="true"]{
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+}
+
+.filterDropdown{
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms ease, opacity 220ms ease, margin-top 220ms ease;
+  opacity: 0;
+  margin-top: 0;
+}
+
+.filterDropdown[data-open="true"]{
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 10px;
+}
+
+.filterDropdownInner{
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+  padding: 0 12px;
+}
+
+.filterDropdown[data-open="true"] .filterDropdownInner{
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.filterDropdownClear{
+  width: 100%;
+  margin-top: 10px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--btnBg);
+  font-weight: var(--fw-medium);
+}
+.filterDropdownClear:hover{ background: var(--btnBgHover); }
+
+/* Mobile calendar controls */
+.calendarSearchRowMobile{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+}
+
+@media (max-width: 980px){
+  .calendarToolbar{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dayJumpRail{
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    overflow: visible;
+    width: 100%;
+  }
+
+  .calendarSearchRowMobile .searchInput{
+    min-width: 0;
+  }
+
+  .calendarSearchRowMobile .viewBtn,
+  .calendarSearchRowMobile .filterBtn{
+    white-space: nowrap;
+  }
+
+  .filterOverlay{
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .filterOverlayPanel{
+    width: 100%;
+    max-width: calc(100vw - 20px);
+    overflow-x: hidden;
+  }
+
+  .filterOverlayPanel .typePills{
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .filterOverlayPanel .typePill{
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 520px){
+  .calendarSearchRowMobile{
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .dayJumpRail{
+    gap: 4px;
+  }
+
+  .dayJumpBtn{
+    width: 100%;
+    min-width: 0;
+  }
+
+  .calendarSearchRowMobile .viewBtn{
+    padding: 0 10px;
+  }
+
+  .calendarSearchRowMobile .filterBtn{
+    max-width: none;
+    padding: 0 10px;
+  }
+
+  .filterDropdownInner{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}

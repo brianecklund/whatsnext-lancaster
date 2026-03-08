@@ -45,6 +45,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   const selectedKey = searchParams.get("location");
   const q = searchParams.get("q") ?? "";
   const cat = searchParams.get("cat") ?? "";
+  const activeFilterLabel = cat ? `Filter: ${cat}` : "Filter";
 
   function navigate(params: URLSearchParams) {
     const qs = params.toString();
@@ -159,11 +160,12 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                   <button
                     type="button"
                     className="filterBtn"
+                    data-active={filterOpen || !!cat ? "true" : "false"}
                     aria-label={filterOpen ? "Close filters" : "Open filters"}
                     aria-expanded={filterOpen ? "true" : "false"}
                     onClick={() => setFilterOpen((v) => !v)}
                   >
-                    Filter
+                    {activeFilterLabel}
                   </button>
                   {!effectiveIsMobile && (q || cat) ? (
                     <button
@@ -181,74 +183,58 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
               </div>
             </div>
 
-            {filterOpen ? (
-              <div
-                className="filterOverlay"
-                role="dialog"
-                aria-modal="true"
-                aria-label="Filters"
-                onClick={() => setFilterOpen(false)}
-              >
-                <div className="filterOverlayPanel" onClick={(e) => e.stopPropagation()}>
-                  <div className="filterOverlayHeader">
-                    <div className="filterOverlayTitle">Filters</div>
-                    <button
-                      type="button"
-                      className="filterOverlayClose"
-                      onClick={() => setFilterOpen(false)}
-                      aria-label="Close filters"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  {(q || cat) ? (
-                    <button
-                      type="button"
-                      className="filterOverlayClear"
-                      onClick={() => {
-                        setQuery("");
-                        setCategory(null);
-                        setFilterOpen(false);
-                      }}
-                    >
-                      Clear search & filters
-                    </button>
-                  ) : null}
-
-                  <div className="typePills" role="group" aria-label="Directory filters">
-                    <button
-                      type="button"
-                      className="typePill"
-                      data-active={!cat ? "true" : "false"}
-                      onClick={() => {
-                        setCategory(null);
-                        setFilterOpen(false);
-                      }}
-                    >
-                      All
-                    </button>
-                    {categories.map((t) => {
-                      const on = normalize(cat ?? "") === normalize(t);
-                      return (
-                        <button
-                          key={t}
-                          type="button"
-                          className="typePill"
-                          data-active={on ? "true" : "false"}
-                          onClick={() => {
-                            setCategory(on ? null : t);
-                            setFilterOpen(false);
-                          }}
-                        >
-                          {t}
-                        </button>
-                      );
-                    })}
-                  </div>
+            <div
+              className="filterDropdown"
+              data-open={filterOpen ? "true" : "false"}
+              aria-hidden={filterOpen ? "false" : "true"}
+            >
+              <div className="filterDropdownInner">
+                <div className="typePills" role="group" aria-label="Directory filters">
+                  <button
+                    type="button"
+                    className="typePill"
+                    data-active={!cat ? "true" : "false"}
+                    onClick={() => {
+                      setCategory(null);
+                      setFilterOpen(false);
+                    }}
+                  >
+                    All
+                  </button>
+                  {categories.map((t) => {
+                    const on = normalize(cat ?? "") === normalize(t);
+                    return (
+                      <button
+                        key={t}
+                        type="button"
+                        className="typePill"
+                        data-active={on ? "true" : "false"}
+                        onClick={() => {
+                          setCategory(on ? null : t);
+                          setFilterOpen(false);
+                        }}
+                      >
+                        {t}
+                      </button>
+                    );
+                  })}
                 </div>
+
+                {(q || cat) ? (
+                  <button
+                    type="button"
+                    className="filterDropdownClear"
+                    onClick={() => {
+                      setQuery("");
+                      setCategory(null);
+                      setFilterOpen(false);
+                    }}
+                  >
+                    Clear search & filters
+                  </button>
+                ) : null}
               </div>
-            ) : null}
+            </div>
 
             {filtered.length === 0 ? (
               <div className="emptyList">No listings yet.</div>

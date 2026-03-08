@@ -792,7 +792,7 @@ export default function HomeSplitClient({ events }: Props) {
                       })}
                     </div>
 
-                    <div className="searchRow">
+                    <div className={`searchRow calendarSearchRow${effectiveIsMobile ? " calendarSearchRowMobile" : ""}`}>
                       <input
                         className="searchInput"
                         placeholder="Search events…"
