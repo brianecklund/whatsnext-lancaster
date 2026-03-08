@@ -1093,8 +1093,7 @@ export default function HomeSplitClient({ events }: Props) {
                                 <div className="weeklyCondMeta">{venueBits}</div>
                               ) : null}
                             </button>
-                          );
-                        })}
+                          ))}
                       </div>
                     ))}
                   </div>
@@ -1493,8 +1492,8 @@ export default function HomeSplitClient({ events }: Props) {
                               );
                             })}
                           </div>
-                        );
-                        })}
+                        ))}
+
                       </div>
                     </div>
                   )}
