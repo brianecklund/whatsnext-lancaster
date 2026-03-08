@@ -1044,7 +1044,7 @@ export default function HomeSplitClient({ events }: Props) {
               </button>
 
               
-              {effectiveIsMobile && (selectedWeekBucket ?? defaultWeekBucket) ? (
+              {(effectiveIsMobile && (selectedWeekBucket ?? defaultWeekBucket)) ? (
                 <div className="weeklyMobilePanel fadeInItem" style={{ animationDelay: "320ms" }}>
                   <div className="weekSummaryMini">
                     <div className="weekSummaryMiniTitle">Week of {(selectedWeekBucket ?? defaultWeekBucket)?.rangeLabel}</div>
@@ -1093,7 +1093,8 @@ export default function HomeSplitClient({ events }: Props) {
                                 <div className="weeklyCondMeta">{venueBits}</div>
                               ) : null}
                             </button>
-                          ))}
+                          );
+                        })}
                       </div>
                     ))}
                   </div>
@@ -1493,7 +1494,6 @@ export default function HomeSplitClient({ events }: Props) {
                             })}
                           </div>
                         ))}
-
                       </div>
                     </div>
                   )}
