@@ -73,6 +73,19 @@ function endOfSundayFromToday(): Date {
   return end;
 }
 
+function startOfWeekSundayFromDate(d: Date): Date {
+  const x = startOfDay(d);
+  x.setDate(x.getDate() - x.getDay());
+  return x;
+}
+
+function endOfWeekSaturdayFromStart(start: Date): Date {
+  const x = new Date(start);
+  x.setDate(x.getDate() + 6);
+  x.setHours(23, 59, 59, 999);
+  return x;
+}
+
 function startOfWeekFromDate(d: Date): Date {
   const x = startOfDay(d);
   const day = x.getDay();
@@ -550,19 +563,24 @@ export default function HomeSplitClient({ events }: Props) {
     return [...groups.slice(anchorIndex), ...groups.slice(0, anchorIndex)];
   }, [filteredEvents, selectedDayStr]);
 
+  const currentWeekDayGroups = useMemo(() => {
+    const start = currentWeekRange.start;
+    const end = currentWeekRange.end;
+    return leftDayGroups.filter((group) => group.date.getTime() >= start.getTime() && group.date.getTime() <= end.getTime());
+  }, [currentWeekRange, leftDayGroups]);
+
   const dayJumpDates = useMemo(() => {
-    const weekStart = startOfWeekFromDate(selectedDay);
-    return Array.from({ length: 7 }, (_, offset) => {
-      const date = addDays(weekStart, offset);
-      const key = dayKey(date);
-      const hasGroup = leftDayGroups.some((group) => dayKey(group.date) === key);
-      return {
-        label: DAY_ABBR[date.getDay()],
-        index: date.getDay(),
-        date: hasGroup ? date : null,
-      };
-    });
-  }, [leftDayGroups, selectedDayStr]);
+    const map = new Map<number, Date>();
+    for (const group of currentWeekDayGroups) {
+      map.set(group.date.getDay(), group.date);
+    }
+    return DAY_ABBR.map((label, idx) => ({
+      label,
+      index: idx,
+      date: addDays(currentWeekRange.start, idx),
+      hasEvents: map.has(idx),
+    }));
+  }, [currentWeekDayGroups, currentWeekRange]);
 
   function getListScrollOffset() {
     const stickyH = leftStickyRef.current?.offsetHeight ?? 0;
@@ -628,19 +646,18 @@ export default function HomeSplitClient({ events }: Props) {
   }
 
   const currentWeekRange = useMemo(() => {
-    const start = startOfToday();
-    const end = endOfSundayFromToday();
+    const today = startOfToday();
+    const start = startOfWeekSundayFromDate(today);
+    const end = endOfWeekSaturdayFromStart(start);
     return { start, end };
   }, []);
 
   const weekBuckets = useMemo<WeekBucket[]>(() => {
     const currentStart = currentWeekRange.start;
-    const currentEnd = currentWeekRange.end;
-    const nextWeekStart = addDays(startOfWeekFromDate(currentStart), 7);
 
     return Array.from({ length: 5 }, (_, index) => {
-      const start = index === 0 ? currentStart : addDays(nextWeekStart, (index - 1) * 7);
-      const end = index === 0 ? currentEnd : endOfWeekFromStart(start);
+      const start = addDays(currentStart, index * 7);
+      const end = endOfWeekSaturdayFromStart(start);
       const eventsInRange = filteredEvents
         .map((e) => ({ e, d: safeDateFromEvent(e) }))
         .filter(({ d }) => d && d.getTime() >= start.getTime() && d.getTime() <= end.getTime())
@@ -832,9 +849,9 @@ export default function HomeSplitClient({ events }: Props) {
                             type="button"
                             className="dayJumpBtn"
                             data-active={isActive ? "true" : "false"}
-                            disabled={!entry.date}
-                            onClick={() => entry.date && jumpToDay(entry.date)}
-                            aria-label={entry.date ? `Jump to ${entry.label}` : `${entry.label} has no events`}
+                            disabled={!entry.hasEvents}
+                            onClick={() => jumpToDay(entry.date)}
+                            aria-label={entry.hasEvents ? `Jump to ${entry.label}` : `${entry.label} has no events this week`}
                           >
                             {entry.label.slice(0, 1)}
                           </button>
@@ -1336,7 +1353,7 @@ export default function HomeSplitClient({ events }: Props) {
                     Weekly Overview
                   </div>
 
-                  <div className="weekSelectorRail fadeInItem" style={{ animationDelay: "300ms" }}>
+                  <div className="weekSelectorRail fadeInItem" style={{ animationDelay: "320ms" }}>
                     {weekBuckets.map((bucket) => (
                       <button
                         key={bucket.key}
@@ -1363,7 +1380,7 @@ export default function HomeSplitClient({ events }: Props) {
                       <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
                     </div>
 
-                    <div className="weekSummaryGrid" role="list">
+                    <div className="weekSummaryGrid weekSummaryGridFour" role="list">
                       <div className="weekSummaryCard" role="listitem">
                         <div className="weekSummaryKicker">Total events</div>
                         <div className="weekSummaryValue">{weekEventsCount}</div>
@@ -1379,17 +1396,6 @@ export default function HomeSplitClient({ events }: Props) {
                       <div className="weekSummaryCard" role="listitem">
                         <div className="weekSummaryKicker">Community</div>
                         <div className="weekSummaryValue">{weekInsights["Community"]}</div>
-                      </div>
-                    </div>
-
-                    <div className="weekSummaryGrid weekSummaryGridSecondary" role="list">
-                      <div className="weekSummaryCard" role="listitem">
-                        <div className="weekSummaryKicker">Busiest day</div>
-                        <div className="weekSummaryValueSmall">{selectedWeekBucket.busiestDayLabel}</div>
-                      </div>
-                      <div className="weekSummaryCard" role="listitem">
-                        <div className="weekSummaryKicker">Peak time</div>
-                        <div className="weekSummaryValueSmall">{selectedWeekBucket.peakWindowLabel}</div>
                       </div>
                     </div>
                   </div>

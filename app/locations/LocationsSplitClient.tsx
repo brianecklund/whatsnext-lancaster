@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
-import { DIRECTORY_CATEGORIES, normalizeDirectoryCategory } from "@/lib/directoryCategories";
 
 function normalize(v: string) {
   return (v || "").toLowerCase().trim();
@@ -108,11 +107,11 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   }
 
   const categories = useMemo(() => {
-    const discovered = new Set<string>(DIRECTORY_CATEGORIES);
+    const set = new Set<string>();
     for (const l of locations) {
-      if (l.category) discovered.add(normalizeDirectoryCategory(l.category));
+      if (l.category) set.add(l.category);
     }
-    return Array.from(discovered).sort((a, b) => a.localeCompare(b));
+    return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [locations]);
 
   const filtered = useMemo(() => {
@@ -122,7 +121,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
     return locations.filter((l) => {
       const hay = normalize([l.name ?? "", l.address ?? "", l.category ?? "", l.description ?? ""].filter(Boolean).join(" "));
       const matchesSearch = !nq || hay.includes(nq);
-      const matchesCat = !nc || normalize(normalizeDirectoryCategory(l.category)) === nc;
+      const matchesCat = !nc || normalize(l.category ?? "") === nc;
       return matchesSearch && matchesCat;
     });
   }, [locations, q, cat]);
@@ -137,36 +136,6 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
     if (!selectedKey) return null;
     return filtered.find((l) => l.key === selectedKey) ?? null;
   }, [filtered, selectedKey]);
-
-
-  const categoryCounts = useMemo(() => {
-    const counts = new Map<string, number>();
-    for (const l of filtered) {
-      const key = normalizeDirectoryCategory(l.category);
-      counts.set(key, (counts.get(key) ?? 0) + 1);
-    }
-    return counts;
-  }, [filtered]);
-
-  const trendingCategories = useMemo(() => {
-    return Array.from(categoryCounts.entries())
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 3);
-  }, [categoryCounts]);
-
-  const relatedLocations = useMemo(() => {
-    if (!selectedDesktop) return [] as LocationRow[];
-    const canonical = normalizeDirectoryCategory(selectedDesktop.category);
-    return filtered
-      .filter((l) => l.key !== selectedDesktop.key)
-      .sort((a, b) => {
-        const aSame = normalizeDirectoryCategory(a.category) === canonical ? 1 : 0;
-        const bSame = normalizeDirectoryCategory(b.category) === canonical ? 1 : 0;
-        if (aSame !== bSame) return bSame - aSame;
-        return (a.name ?? "").localeCompare(b.name ?? "");
-      })
-      .slice(0, 4);
-  }, [filtered, selectedDesktop]);
 
   const mobileDetailOpen = Boolean(selectedKey);
 
@@ -339,7 +308,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                     >
                       <span className="eventRowTitle">{l.name ?? "Untitled listing"}</span>
                       <span className="eventRowMeta">
-                        {l.category ? <span>{normalizeDirectoryCategory(l.category)}</span> : null}
+                        {l.category ? <span>{l.category}</span> : null}
                         {l.address ? <span className="dot">•</span> : null}
                         {l.address ? <span>{l.address}</span> : null}
                       </span>
@@ -358,14 +327,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
             {!selectedDesktop ? (
               <div className="emptyRight">Select a listing to see details.</div>
             ) : (
-              <LocationDetail
-                location={selectedDesktop}
-                relatedLocations={relatedLocations}
-                totalVisible={filtered.length}
-                categoryTotal={categoryCounts.get(normalizeDirectoryCategory(selectedDesktop.category)) ?? 0}
-                trendingCategories={trendingCategories}
-                onSelectRelated={setSelected}
-              />
+              <LocationDetail location={selectedDesktop} />
             )}
           </div>
         </div>
@@ -391,64 +353,24 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
           <div className="mobileDetailTitle">Listing</div>
         </div>
         <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
-          {selectedMobile ? (
-            <LocationDetail
-              location={selectedMobile}
-              relatedLocations={filtered.filter((l) => l.key !== selectedMobile.key).slice(0, 4)}
-              totalVisible={filtered.length}
-              categoryTotal={categoryCounts.get(normalizeDirectoryCategory(selectedMobile.category)) ?? 0}
-              trendingCategories={trendingCategories}
-              onSelectRelated={setSelected}
-            />
-          ) : null}
+          {selectedMobile ? <LocationDetail location={selectedMobile} /> : null}
         </div>
       </div>
     </div>
   );
 }
 
-function LocationDetail({
-  location,
-  relatedLocations,
-  totalVisible,
-  categoryTotal,
-  trendingCategories,
-  onSelectRelated,
-}: {
-  location: LocationRow;
-  relatedLocations: LocationRow[];
-  totalVisible: number;
-  categoryTotal: number;
-  trendingCategories: Array<[string, number]>;
-  onSelectRelated: (key: string) => void;
-}) {
+function LocationDetail({ location }: { location: LocationRow }) {
   const detailFlashKey = location.id ?? location.uid ?? location.name ?? "detail";
-  const canonicalCategory = normalizeDirectoryCategory(location.category);
-
   return (
-    <div key={detailFlashKey} className="detailCard detailFlash locationDiscoveryCard">
+    <div key={detailFlashKey} className="detailCard detailFlash">
       <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
         {location.name ?? "Untitled listing"}
       </div>
 
       <div className="detailMeta fadeInItem" style={{ animationDelay: "320ms" }}>
-        <span className="badge">{canonicalCategory}</span>
+        {location.category ? <span className="badge">{location.category}</span> : null}
         {location.address ? <span className="muted">{location.address}</span> : null}
-      </div>
-
-      <div className="locationIntelGrid fadeInItem" style={{ animationDelay: "340ms" }}>
-        <div className="locationIntelCard">
-          <div className="locationIntelLabel">Visible now</div>
-          <div className="locationIntelValue">{totalVisible}</div>
-        </div>
-        <div className="locationIntelCard">
-          <div className="locationIntelLabel">In this category</div>
-          <div className="locationIntelValue">{categoryTotal}</div>
-        </div>
-        <div className="locationIntelCard">
-          <div className="locationIntelLabel">Type</div>
-          <div className="locationIntelValue locationIntelValueSmall">{canonicalCategory}</div>
-        </div>
       </div>
 
       {location.website ? (
@@ -459,46 +381,15 @@ function LocationDetail({
         </p>
       ) : null}
 
-      <div className="detailBody fadeInItem" style={{ marginTop: 14, animationDelay: "360ms" }}>
-        <p>{location.description || "No description yet."}</p>
-      </div>
-
-      {trendingCategories.length ? (
-        <div className="locationTrendBlock fadeInItem" style={{ animationDelay: "390ms" }}>
-          <div className="rightDayLabel">Trending categories</div>
-          <div className="typePills" role="list">
-            {trendingCategories.map(([name, count]) => (
-              <span key={name} className="typePill" role="listitem" data-active={name === canonicalCategory ? "true" : "false"}>
-                {name} · {count}
-              </span>
-            ))}
-          </div>
+      {location.description ? (
+        <div className="detailBody fadeInItem" style={{ marginTop: 14, animationDelay: "360ms" }}>
+          <p>{location.description}</p>
         </div>
-      ) : null}
-
-      {relatedLocations.length ? (
-        <div className="locationTrendBlock fadeInItem" style={{ animationDelay: "420ms" }}>
-          <div className="rightDayLabel">Related places</div>
-          <div className="dayRightList" role="list">
-            {relatedLocations.map((item) => (
-              <button
-                key={item.key}
-                type="button"
-                className="dayRightRow"
-                onClick={() => onSelectRelated(item.key)}
-                role="listitem"
-              >
-                <div className="dayRightTop">
-                  <div className="dayRightTitle">{item.name ?? "Untitled listing"}</div>
-                </div>
-                <div className="dayRightMeta">
-                  {normalizeDirectoryCategory(item.category)}{item.address ? ` • ${item.address}` : ""}
-                </div>
-              </button>
-            ))}
-          </div>
+      ) : (
+        <div className="detailBody fadeInItem" style={{ marginTop: 14, animationDelay: "360ms" }}>
+          <p className="muted">No description yet.</p>
         </div>
-      ) : null}
+      )}
     </div>
   );
 }
