@@ -14,16 +14,16 @@
 
 
   /* Core */
-  --bg: #ffffff;
-  --text: #0a0a0a;
-  --muted: #5f5f5f;
-  --border: #d9d9d9;
-  --panel: #f0f0f0;
-  --hover: #f5f5f5;
+  --bg: #f7f7f5;
+  --text: #111111;
+  --muted: #666666;
+  --border: #d7d7d2;
+  --panel: #efefeb;
+  --hover: #ecece7;
 
-  /* Accent (primary pop) */
-  --accent: #2563eb;
-  --accentSoft: rgba(37, 99, 235, 0.12);
+  /* Accent (monotone) */
+  --accent: #1a1a1a;
+  --accentSoft: rgba(17, 17, 17, 0.08);
 
   /* Layout */
   --headerH: 86px;
@@ -32,8 +32,14 @@
   --pill: 999px;
 
   /* Buttons */
-  --btnBg: #d9d9d9;
-  --btnBgHover: #cfcfcf;
+  --btnBg: #e7e7e2;
+  --btnBgHover: #ddddd7;
+
+  /* Depth */
+  --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.75), inset 0 0 0 1px rgba(17,17,17,0.04);
+  --shadow-1: 0 8px 20px rgba(17,17,17,0.08), 0 1px 0 rgba(255,255,255,0.65) inset;
+  --lift-1: translateY(-1px);
+  --lift-2: translateY(-2px);
 
   /* Typography scale (increase to make type bigger globally) */
 }
@@ -115,12 +121,16 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 /* Site chrome */
 .siteHeader{
+  position: relative;
+  z-index: 1100;
   height: var(--headerH);
   display:flex;
   align-items:flex-start;
   justify-content: space-between;
   padding: 18px var(--gutter) 0 var(--gutter);
   border-bottom: 1px solid var(--border);
+  background: rgba(247,247,245,0.94);
+  backdrop-filter: blur(10px);
 }
 
 .brand{
@@ -141,7 +151,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   height: 46px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: #fafaf8;
   align-items:center;
   justify-content:center;
   margin-top: 2px;
@@ -167,7 +177,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .menuOverlay{
   position: fixed;
   inset: 0;
-  z-index: 999;
+  z-index: 1300;
   background: rgba(0,0,0,0.35);
   display:flex;
   align-items:flex-start;
@@ -177,7 +187,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .menuOverlayInner{
   width: min(420px, 100%);
-  background: #fff;
+  background: #fafaf8;
   border-radius: 22px;
   border: 1px solid var(--border);
   box-shadow: 0 12px 40px rgba(0,0,0,0.14);
@@ -203,7 +213,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   height: 40px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: #fafaf8;
   font-weight: 600;
 }
 .menuCloseBtn:hover{ background: var(--hover); }
@@ -222,7 +232,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   font-weight: var(--fw-medium);
   font-size: var(--fs-body);
   text-decoration:none;
-  background: #fff;
+  background: #fafaf8;
 }
 
 .menuOverlayLink:hover{ background: var(--hover); }
@@ -276,7 +286,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 @media (hover: hover) and (pointer: fine){
   .topNav .navLink:hover{
     background: var(--hover);
-    border-color: rgba(37, 99, 235, 0.38);
+    border-color: rgba(17, 17, 17, 0.16);
     box-shadow: 0 10px 28px rgba(0,0,0,0.10);
     transform: translateY(-1px);
   }
@@ -295,8 +305,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .topNav .navLink[data-active="true"]{
   background: var(--accentSoft);
-  border-color: rgba(37, 99, 235, 0.45);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.22) inset;
+  border-color: rgba(17, 17, 17, 0.22);
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.12) inset;
 }
 
 @keyframes navIconPop{
@@ -396,7 +406,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   text-align: left;
   border: 1px solid var(--border);
   border-radius: 16px;
-  background: #fff;
+  background: #fafaf8;
   padding: 12px 12px;
   display:flex;
   flex-direction: column;
@@ -437,7 +447,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: #fafaf8;
 }
 
 .weeklyCardMedia{
@@ -622,13 +632,13 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   width: 100%;
   text-align: left;
   border: 1px solid var(--border);
-  background: #f4f4f4;
+  background: #efefeb;
   border-radius: 14px;
   padding: 14px 14px;
   margin: 14px 0 8px 0;
   cursor: pointer;
 }
-.weeklyOverview:hover{ background: #efefef; }
+.weeklyOverview:hover{ background: #e8e8e3; }
 .weeklyOverview[data-active="true"]{
   box-shadow: 0 0 0 2px var(--accent) inset;
 }
@@ -670,7 +680,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .eventRow:hover{ background: var(--hover); }
 .eventRow[data-active="true"]{
   background: var(--accentSoft);
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35) inset;
+  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.14) inset;
 }
 .eventRowTitle{
   font-weight: var(--fw-medium);
@@ -737,7 +747,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   background: #e8e8e8;
 }
 .pillSoft{
-  background: #f1f1f1;
+  background: #f3f3ef;
   font-weight: var(--fw-medium);
 }
 .pillWarn{
@@ -822,7 +832,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   border-radius: var(--pill);
   font-weight: var(--fw-medium);
   font-size: var(--fs-subhead);
-  background: #d9d9d9;
+  background: #e7e7e2;
   text-decoration: none;
 }
 .ctaBtn:hover{ background: var(--btnBgHover); text-decoration:none; }
@@ -910,10 +920,11 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 30;
-    background: rgba(255,255,255,0.92);
+    z-index: 60;
+    background: rgba(247,247,245,0.92);
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--border);
+    box-shadow: 0 -10px 24px rgba(17,17,17,0.06);
     padding: 10px 16px;
     gap: 12px;
     justify-content: space-between;
@@ -941,7 +952,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     /* Keep the main site header (logo + menu) visible above the detail view */
     inset: var(--headerH) 0 0 0;
     background: var(--bg);
-    z-index: 40;
+    z-index: 900;
+    box-shadow: -16px 0 32px rgba(17,17,17,0.08);
     transform: translateX(100%);
     transition: transform 220ms ease;
   }
@@ -957,7 +969,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     justify-content: space-between;
     padding: 14px 16px;
     border-bottom: 1px solid var(--border);
-    background: rgba(255,255,255,0.92);
+    background: rgba(247,247,245,0.92);
     backdrop-filter: blur(10px);
   }
   .backBtn{
@@ -1007,7 +1019,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 0 14px;
   font-size: var(--fs-body);
   font-weight: var(--fw-medium);
-  background: #fff;
+  background: #fafaf8;
 }
 
 .filterBtn, .clearBtn{
@@ -1034,7 +1046,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .filterOverlayPanel{
   width: min(560px, 100%);
-  background: #fff;
+  background: #fafaf8;
   border: 1px solid var(--border);
   border-radius: 22px;
   box-shadow: 0 12px 40px rgba(0,0,0,0.14);
@@ -1056,7 +1068,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   height: 38px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: #fafaf8;
 }
 .filterOverlayClose:hover{ background: var(--hover); }
 
@@ -1085,7 +1097,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 0 12px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: #fff;
+  background: #fafaf8;
   font-weight: 600;
   font-size: var(--fs-meta);
   line-height: 36px;
@@ -1154,7 +1166,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 0 14px;
   border-radius: var(--pill);
   border: 1px solid var(--border);
-  background: #fff;
+  background: #fafaf8;
   font-weight: var(--fw-medium);
 }
 .pillBtn[data-active="true"]{
@@ -1227,7 +1239,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .aboutCard{
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: #fafaf8;
   padding: 16px;
 }
 
@@ -1280,7 +1292,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 16px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: #fafaf8;
 }
 .weekSummaryTitle{
   margin: 0;
@@ -1347,7 +1359,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 18px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: #fafaf8;
 }
 .formRow{
   display:grid;
@@ -1375,11 +1387,11 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   font-family: inherit;
   font-size: var(--fs-body);
   outline: none;
-  background: #fff;
+  background: #fafaf8;
 }
 .textarea{ min-height: 140px; resize: vertical; }
 .input:focus, .textarea:focus{
-  border-color: rgba(37, 99, 235, 0.55);
+  border-color: rgba(17, 17, 17, 0.22);
   box-shadow: 0 0 0 3px var(--accentSoft);
 }
 .submitBtn{
@@ -1403,7 +1415,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 16px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fff;
+  background: #fafaf8;
 }
 .calloutTitle{
   margin: 0;
@@ -2259,270 +2271,5 @@ a:hover{
     opacity: 1 !important;
     transform: none !important;
     animation: none !important;
-  }
-}
-
-
-/* =========================
-   Duotone palette + softer motion
-========================= */
-:root{
-  --bg: #eef3ef;
-  --text: #10211f;
-  --muted: #56706b;
-  --border: #b8cac3;
-  --panel: #dde7e2;
-  --hover: #e7efeb;
-
-  --accent: #255c52;
-  --accentSoft: rgba(37, 92, 82, 0.14);
-  --accentStrong: #173c35;
-  --accentAlt: #6f8f88;
-  --accentAltSoft: #d4dfdb;
-
-  --btnBg: linear-gradient(180deg, #f5f8f6 0%, #dce8e3 100%);
-  --btnBgHover: linear-gradient(180deg, #ffffff 0%, #e2ece7 100%);
-
-  --shadowSoft: 0 10px 30px rgba(16, 33, 31, 0.08);
-  --shadowLift: 0 16px 40px rgba(16, 33, 31, 0.12);
-
-  --ease-out: cubic-bezier(.16,1,.3,1);
-  --dur-1: 240ms;
-  --dur-2: 780ms;
-  --dur-3: 1400ms;
-}
-
-html, body{
-  background:
-    radial-gradient(circle at top left, rgba(111, 143, 136, 0.10), transparent 34%),
-    linear-gradient(180deg, #f4f8f6 0%, #eef3ef 44%, #e7eeea 100%);
-}
-
-body{
-  color: var(--text);
-}
-
-.siteHeader,
-.menuOverlayInner,
-.filterOverlayPanel,
-.contactForm,
-.calloutCard,
-.aboutCard,
-.weekSummary,
-.detailCard,
-.dayRightRow,
-.eventRow,
-.locationRow,
-.updateRow,
-.weeklyCard,
-.weeklyCondRow,
-.eventCard,
-.searchInput,
-.filterBtn,
-.clearBtn,
-.typePill,
-.tabBtn,
-.pillBtn,
-.viewBtn,
-.monthNavBtn,
-.weeklyMiniBtn,
-.hamburgerBtn,
-.menuCloseBtn,
-.input,
-.textarea,
-.submitBtn{
-  box-shadow: var(--shadowSoft);
-}
-
-.siteHeader{
-  background: rgba(244, 248, 246, 0.86);
-  backdrop-filter: blur(18px);
-  border-bottom-color: rgba(111, 143, 136, 0.26);
-}
-
-.menuOverlay{ background: rgba(16, 33, 31, 0.32); }
-.menuOverlayInner,
-.filterOverlayPanel,
-.detailCard,
-.weekSummary,
-.aboutCard,
-.contactForm,
-.calloutCard,
-.dayRightRow,
-.weeklyCard,
-.weeklyCondRow,
-.eventCard{
-  background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(236,242,239,0.96) 100%);
-  border-color: rgba(111, 143, 136, 0.28);
-}
-
-.brand,
-.detailTitle,
-.weekSummaryTitle,
-.weeklyCardTitle,
-.eventRowTitle,
-.aboutHeroTitle,
-.aboutStoryTitle,
-.simpleHeroTitle{
-  color: var(--accentStrong);
-}
-
-.navLink,
-.menuOverlayLink,
-.tabBtn,
-.typePill,
-.filterBtn,
-.clearBtn,
-.viewBtn,
-.monthNavBtn,
-.weeklyMiniBtn,
-.pillBtn,
-.submitBtn,
-.hamburgerBtn,
-.menuCloseBtn,
-.filterOverlayClose,
-.filterOverlayClear{
-  position: relative;
-  overflow: hidden;
-  border-color: rgba(37, 92, 82, 0.18);
-  background: var(--btnBg);
-  color: var(--accentStrong);
-}
-
-.navLink::before,
-.menuOverlayLink::before,
-.tabBtn::before,
-.typePill::before,
-.filterBtn::before,
-.clearBtn::before,
-.viewBtn::before,
-.monthNavBtn::before,
-.weeklyMiniBtn::before,
-.pillBtn::before,
-.submitBtn::before,
-.hamburgerBtn::before,
-.menuCloseBtn::before,
-.filterOverlayClose::before,
-.filterOverlayClear::before{
-  content: "";
-  position: absolute;
-  inset: 1px;
-  border-radius: inherit;
-  background: linear-gradient(180deg, rgba(255,255,255,0.58), rgba(255,255,255,0));
-  opacity: 0.9;
-  pointer-events: none;
-}
-
-.navLink:hover,
-.menuOverlayLink:hover,
-.tabBtn:hover,
-.typePill:hover,
-.filterBtn:hover,
-.clearBtn:hover,
-.viewBtn:hover,
-.monthNavBtn:hover,
-.weeklyMiniBtn:hover,
-.pillBtn:hover,
-.submitBtn:hover,
-.hamburgerBtn:hover,
-.menuCloseBtn:hover,
-.filterOverlayClose:hover,
-.filterOverlayClear:hover{
-  background: var(--btnBgHover);
-  border-color: rgba(37, 92, 82, 0.28);
-  box-shadow: var(--shadowLift);
-  text-decoration: none;
-}
-
-.navLink[data-active="true"],
-.menuOverlayLink[data-active="true"],
-.tabBtn[data-active="true"],
-.typePill[data-active="true"],
-.viewBtn[data-active="true"],
-.weeklyMiniBtn[data-active="true"],
-.dayRightRow[data-active="true"]{
-  background: linear-gradient(180deg, #2f6c61 0%, #1f4e46 100%);
-  color: #eef7f4;
-  border-color: rgba(31, 78, 70, 0.78);
-}
-
-.navLink[data-active="true"] .navLinkIcon,
-.tabBtn[data-active="true"],
-.typePill[data-active="true"],
-.viewBtn[data-active="true"],
-.weeklyMiniBtn[data-active="true"]{
-  color: #eef7f4;
-}
-
-.searchInput,
-.input,
-.textarea{
-  background: rgba(250,252,251,0.9);
-  border-color: rgba(111, 143, 136, 0.22);
-}
-.searchInput:focus,
-.input:focus,
-.textarea:focus{
-  border-color: rgba(37, 92, 82, 0.46);
-  box-shadow: 0 0 0 4px rgba(37, 92, 82, 0.10);
-}
-
-.pill,
-.tagChip,
-.badge,
-.pillSoft{
-  background: linear-gradient(180deg, rgba(111, 143, 136, 0.14), rgba(111, 143, 136, 0.07));
-  border: 1px solid rgba(111, 143, 136, 0.18);
-  color: var(--accentStrong);
-}
-
-.heroImage,
-.media16x9,
-.aboutCardImg{
-  box-shadow: var(--shadowSoft);
-}
-
-.summary,
-.detailBody,
-.weekSummarySubhead,
-.aboutHeroLead,
-.aboutCardBody,
-.calloutBody,
-.simpleHeroSubhead{
-  color: var(--muted);
-}
-
-.rightHeader,
-.dayRight,
-.detailCard,
-.weekSummary,
-.dayRightRow,
-.weeklyCard,
-.weeklyDayGroup,
-.weeklyCondensedDayTitle{
-  will-change: transform, opacity, filter;
-}
-
-.detailFlash{
-  animation: none;
-}
-
-.fadeInItem{ opacity: 1; animation: none; }
-
-@media (prefers-reduced-motion: no-preference){
-  .weeklyDayGroup,
-  .eventCard,
-  .locationRow,
-  .updateRow,
-  .dayRightRow{
-    transition: transform 380ms var(--ease-out), box-shadow 380ms var(--ease-out), border-color 380ms var(--ease-out), background-color 380ms var(--ease-out);
-  }
-
-  .weeklyDayGroup:hover,
-  .eventCard:hover,
-  .locationRow:hover,
-  .updateRow:hover,
-  .dayRightRow:hover{
-    transform: translateY(-3px);
   }
 }
