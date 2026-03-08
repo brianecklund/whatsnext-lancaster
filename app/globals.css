@@ -14,15 +14,18 @@
 
 
   /* Core */
-  --bg: #f7f7f5;
-  --text: #111111;
-  --muted: #666666;
-  --border: #d7d7d2;
-  --panel: #efefeb;
-  --hover: #ecece7;
+  --bg: #ffffff;
+  --text: #0a0a0a;
+  --muted: #5f5f5f;
+  --border: #d9d9d9;
+  --panel: #f2f2f2;
+  --hover: #f7f7f7;
+  --panelStrong: #ebebeb;
+  --shadowSoft: 0 8px 24px rgba(0,0,0,0.06);
+  --shadowCard: 0 14px 32px rgba(0,0,0,0.08);
 
-  /* Accent (monotone) */
-  --accent: #1a1a1a;
+  /* Accent (monochrome) */
+  --accent: #111111;
   --accentSoft: rgba(17, 17, 17, 0.08);
 
   /* Layout */
@@ -32,14 +35,8 @@
   --pill: 999px;
 
   /* Buttons */
-  --btnBg: #e7e7e2;
-  --btnBgHover: #ddddd7;
-
-  /* Depth */
-  --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.75), inset 0 0 0 1px rgba(17,17,17,0.04);
-  --shadow-1: 0 8px 20px rgba(17,17,17,0.08), 0 1px 0 rgba(255,255,255,0.65) inset;
-  --lift-1: translateY(-1px);
-  --lift-2: translateY(-2px);
+  --btnBg: #d9d9d9;
+  --btnBgHover: #cfcfcf;
 
   /* Typography scale (increase to make type bigger globally) */
 }
@@ -122,15 +119,15 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 /* Site chrome */
 .siteHeader{
   position: relative;
-  z-index: 1100;
+  z-index: 130;
   height: var(--headerH);
   display:flex;
   align-items:flex-start;
   justify-content: space-between;
   padding: 18px var(--gutter) 0 var(--gutter);
   border-bottom: 1px solid var(--border);
-  background: rgba(247,247,245,0.94);
-  backdrop-filter: blur(10px);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px);
 }
 
 .brand{
@@ -146,15 +143,19 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .brandShort{ display:none; }
 
 .hamburgerBtn{
+  position: relative;
+  z-index: 150;
   display:none;
   width: 46px;
   height: 46px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: #fafaf8;
+  background: #fff;
+  box-shadow: var(--shadowSoft);
   align-items:center;
   justify-content:center;
   margin-top: 2px;
+  transition: transform 320ms var(--ease-snap), background-color 320ms ease, box-shadow 320ms ease;
 }
 
 .hamburgerBtn:hover{ background: var(--hover); }
@@ -176,29 +177,32 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .menuOverlay{
   position: fixed;
-  inset: 0;
-  z-index: 1300;
-  background: rgba(0,0,0,0.35);
-  display:flex;
-  align-items:flex-start;
-  justify-content:flex-end;
-  padding: 16px;
+  inset: var(--headerH) 0 0 0;
+  z-index: 145;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(18px);
+  display:block;
+  overflow: hidden;
+  animation: menuOverlayFade 560ms var(--ease-out) both;
 }
 
 .menuOverlayInner{
-  width: min(420px, 100%);
-  background: #fafaf8;
-  border-radius: 22px;
-  border: 1px solid var(--border);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.14);
-  padding: 14px;
+  width: 100%;
+  min-height: 100%;
+  background: transparent;
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
+  padding: 18px 22px 32px 22px;
+  transform-origin: top center;
+  animation: menuOverlayDrop 700ms var(--ease-snap) both;
 }
 
 .menuOverlayHeader{
   display:flex;
   align-items:center;
   justify-content: space-between;
-  padding: 6px 6px 10px 6px;
+  padding: 2px 2px 18px 2px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -213,7 +217,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   height: 40px;
   border-radius: 14px;
   border: 1px solid var(--border);
-  background: #fafaf8;
+  background: #fff;
   font-weight: 600;
 }
 .menuCloseBtn:hover{ background: var(--hover); }
@@ -221,18 +225,27 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .menuOverlayNav{
   display:flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px 6px 6px 6px;
+  gap: 12px;
+  padding: 20px 0 6px 0;
 }
 
 .menuOverlayLink{
-  padding: 14px 14px;
-  border-radius: 16px;
+  display:flex;
+  align-items:center;
+  min-height: 64px;
+  padding: 14px 16px;
+  border-radius: 18px;
   border: 1px solid var(--border);
   font-weight: var(--fw-medium);
-  font-size: var(--fs-body);
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  letter-spacing: -0.02em;
   text-decoration:none;
-  background: #fafaf8;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  box-shadow: var(--shadowSoft);
+  opacity: 0;
+  transform: translateY(24px);
+  animation: menuLinkIn 560ms var(--ease-out) forwards;
+  animation-delay: calc(180ms + (var(--menuIndex, 0) * 80ms));
 }
 
 .menuOverlayLink:hover{ background: var(--hover); }
@@ -286,7 +299,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 @media (hover: hover) and (pointer: fine){
   .topNav .navLink:hover{
     background: var(--hover);
-    border-color: rgba(17, 17, 17, 0.16);
+    border-color: rgba(37, 99, 235, 0.38);
     box-shadow: 0 10px 28px rgba(0,0,0,0.10);
     transform: translateY(-1px);
   }
@@ -305,8 +318,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .topNav .navLink[data-active="true"]{
   background: var(--accentSoft);
-  border-color: rgba(17, 17, 17, 0.22);
-  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.12) inset;
+  border-color: rgba(37, 99, 235, 0.45);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.22) inset;
 }
 
 @keyframes navIconPop{
@@ -318,6 +331,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .main{
   height: calc(100vh - var(--headerH));
   padding: 0 var(--gutter);
+  overflow: hidden;
 }
 
 /* Home */
@@ -325,6 +339,11 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   height: 100%;
   display:flex;
   flex-direction: column;
+}
+
+.routeFrame{
+  height: 100%;
+  animation: routeFadeIn 820ms var(--ease-out) both;
 }
 
 .tagline{
@@ -406,7 +425,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   text-align: left;
   border: 1px solid var(--border);
   border-radius: 16px;
-  background: #fafaf8;
+  background: #fff;
   padding: 12px 12px;
   display:flex;
   flex-direction: column;
@@ -447,7 +466,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 14px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fafaf8;
+  background: #fff;
 }
 
 .weeklyCardMedia{
@@ -577,6 +596,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   overflow-y: scroll;            /* reserve scrollbar space to prevent layout shift */
   scrollbar-gutter: stable;      /* modern browsers: keep gutter stable */
   padding-bottom: 18px;
+  scroll-behavior: smooth;
 }
 
 /* Sticky tabs (desktop left) */
@@ -632,13 +652,13 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   width: 100%;
   text-align: left;
   border: 1px solid var(--border);
-  background: #efefeb;
+  background: #f4f4f4;
   border-radius: 14px;
   padding: 14px 14px;
   margin: 14px 0 8px 0;
   cursor: pointer;
 }
-.weeklyOverview:hover{ background: #e8e8e3; }
+.weeklyOverview:hover{ background: #efefef; }
 .weeklyOverview[data-active="true"]{
   box-shadow: 0 0 0 2px var(--accent) inset;
 }
@@ -680,7 +700,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .eventRow:hover{ background: var(--hover); }
 .eventRow[data-active="true"]{
   background: var(--accentSoft);
-  box-shadow: 0 0 0 2px rgba(17, 17, 17, 0.14) inset;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35) inset;
 }
 .eventRowTitle{
   font-weight: var(--fw-medium);
@@ -747,7 +767,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   background: #e8e8e8;
 }
 .pillSoft{
-  background: #f3f3ef;
+  background: #f1f1f1;
   font-weight: var(--fw-medium);
 }
 .pillWarn{
@@ -832,7 +852,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   border-radius: var(--pill);
   font-weight: var(--fw-medium);
   font-size: var(--fs-subhead);
-  background: #e7e7e2;
+  background: #d9d9d9;
   text-decoration: none;
 }
 .ctaBtn:hover{ background: var(--btnBgHover); text-decoration:none; }
@@ -920,11 +940,10 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 60;
-    background: rgba(247,247,245,0.92);
+    z-index: 30;
+    background: rgba(255,255,255,0.92);
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--border);
-    box-shadow: 0 -10px 24px rgba(17,17,17,0.06);
     padding: 10px 16px;
     gap: 12px;
     justify-content: space-between;
@@ -949,13 +968,11 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   .mobileDetail{
     display:block;
     position: fixed;
-    /* Keep the main site header (logo + menu) visible above the detail view */
     inset: var(--headerH) 0 0 0;
     background: var(--bg);
-    z-index: 900;
-    box-shadow: -16px 0 32px rgba(17,17,17,0.08);
+    z-index: 70;
     transform: translateX(100%);
-    transition: transform 220ms ease;
+    transition: transform 320ms var(--ease-snap);
   }
   .mobileDetail[data-open="true"]{
     transform: translateX(0%);
@@ -969,7 +986,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     justify-content: space-between;
     padding: 14px 16px;
     border-bottom: 1px solid var(--border);
-    background: rgba(247,247,245,0.92);
+    background: rgba(255,255,255,0.92);
     backdrop-filter: blur(10px);
   }
   .backBtn{
@@ -1019,7 +1036,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 0 14px;
   font-size: var(--fs-body);
   font-weight: var(--fw-medium);
-  background: #fafaf8;
+  background: #fff;
 }
 
 .filterBtn, .clearBtn{
@@ -1046,7 +1063,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .filterOverlayPanel{
   width: min(560px, 100%);
-  background: #fafaf8;
+  background: #fff;
   border: 1px solid var(--border);
   border-radius: 22px;
   box-shadow: 0 12px 40px rgba(0,0,0,0.14);
@@ -1068,7 +1085,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   height: 38px;
   border-radius: 12px;
   border: 1px solid var(--border);
-  background: #fafaf8;
+  background: #fff;
 }
 .filterOverlayClose:hover{ background: var(--hover); }
 
@@ -1097,7 +1114,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 0 12px;
   border-radius: 999px;
   border: 1px solid var(--border);
-  background: #fafaf8;
+  background: #fff;
   font-weight: 600;
   font-size: var(--fs-meta);
   line-height: 36px;
@@ -1166,7 +1183,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 0 14px;
   border-radius: var(--pill);
   border: 1px solid var(--border);
-  background: #fafaf8;
+  background: #fff;
   font-weight: var(--fw-medium);
 }
 .pillBtn[data-active="true"]{
@@ -1239,7 +1256,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .aboutCard{
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fafaf8;
+  background: #fff;
   padding: 16px;
 }
 
@@ -1292,7 +1309,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 16px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fafaf8;
+  background: #fff;
 }
 .weekSummaryTitle{
   margin: 0;
@@ -1359,7 +1376,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 18px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fafaf8;
+  background: #fff;
 }
 .formRow{
   display:grid;
@@ -1387,11 +1404,11 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   font-family: inherit;
   font-size: var(--fs-body);
   outline: none;
-  background: #fafaf8;
+  background: #fff;
 }
 .textarea{ min-height: 140px; resize: vertical; }
 .input:focus, .textarea:focus{
-  border-color: rgba(17, 17, 17, 0.22);
+  border-color: rgba(37, 99, 235, 0.55);
   box-shadow: 0 0 0 3px var(--accentSoft);
 }
 .submitBtn{
@@ -1415,7 +1432,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   padding: 16px;
   border: 1px solid var(--border);
   border-radius: 18px;
-  background: #fafaf8;
+  background: #fff;
 }
 .calloutTitle{
   margin: 0;
@@ -2272,4 +2289,81 @@ a:hover{
     transform: none !important;
     animation: none !important;
   }
+}
+
+
+/* Monochrome depth + reveal system */
+.paneRight,
+.leftSticky,
+.weeklyCard,
+.detailCard,
+.filterOverlayPanel,
+.menuOverlayLink,
+.tabBtn,
+.searchInput,
+.filterBtn,
+.clearBtn,
+.typePill,
+.eventRow,
+.weeklyOverview,
+.weeklyCondRow,
+.mobileTabs{
+  box-shadow: var(--shadowSoft);
+}
+
+.detailCard,
+.weeklyCard,
+.filterOverlayPanel,
+.mobileDetailHeader{
+  box-shadow: var(--shadowCard);
+}
+
+.reveal-ready{
+  opacity: 0;
+  transform: translate3d(0, 22px, 0);
+  filter: blur(6px);
+  transition:
+    opacity 900ms var(--ease-out),
+    transform 900ms var(--ease-out),
+    filter 900ms var(--ease-out);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform, opacity, filter;
+}
+
+.reveal-visible{
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: blur(0);
+}
+
+@keyframes routeFadeIn{
+  0%{ opacity: 0; transform: translate3d(0, 20px, 0); filter: blur(10px); }
+  100%{ opacity: 1; transform: translate3d(0, 0, 0); filter: blur(0); }
+}
+
+@keyframes menuOverlayFade{
+  0%{ opacity: 0; }
+  100%{ opacity: 1; }
+}
+
+@keyframes menuOverlayDrop{
+  0%{ opacity: 0; transform: scaleY(0.08) translateY(-24px); }
+  100%{ opacity: 1; transform: scaleY(1) translateY(0); }
+}
+
+@keyframes menuLinkIn{
+  0%{ opacity: 0; transform: translateY(24px); }
+  100%{ opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .routeFrame{ animation: none !important; }
+  .menuOverlay, .menuOverlayInner, .menuOverlayLink{ animation: none !important; }
+  .reveal-ready{ opacity: 1 !important; transform: none !important; filter: none !important; transition: none !important; }
+}
+
+@media (max-width: 980px){
+  .menuOverlay{ inset: var(--headerH) 0 0 0; }
+  .menuOverlayInner{ padding: 16px 16px 28px 16px; }
+  .menuOverlayLink{ min-height: 58px; }
 }

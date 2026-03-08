@@ -44,7 +44,7 @@ export function useSmoothWheel(containerSelector = ".scroll") {
       // More pronounced inertia: amplify wheel input slightly
       // and ease toward the target more slowly in RAF.
       s.target = clamp(
-        s.target + e.deltaY * 1.35,
+        s.target + e.deltaY * 1.12,
         0,
         Math.max(0, el.scrollHeight - el.clientHeight)
       );
@@ -54,7 +54,7 @@ export function useSmoothWheel(containerSelector = ".scroll") {
           const cur = el.scrollTop;
           const diff = s.target - cur;
           // Smaller factor = longer glide
-          el.scrollTop = cur + diff * 0.10;
+          el.scrollTop = cur + diff * 0.075;
 
           if (Math.abs(diff) < 0.25) {
             el.scrollTop = s.target;
