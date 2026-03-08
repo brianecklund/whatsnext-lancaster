@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
+import { mergeDirectoryCategories } from "@/lib/directoryCategories";
 
 function normalize(v: string) {
   return (v || "").toLowerCase().trim();
@@ -106,13 +107,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
     navigate(params);
   }
 
-  const categories = useMemo(() => {
-    const set = new Set<string>();
-    for (const l of locations) {
-      if (l.category) set.add(l.category);
-    }
-    return Array.from(set).sort((a, b) => a.localeCompare(b));
-  }, [locations]);
+  const categories = useMemo(() => mergeDirectoryCategories(locations.map((location) => location.category)), [locations]);
 
   const filtered = useMemo(() => {
     const nq = normalize(q);

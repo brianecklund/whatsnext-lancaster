@@ -21,3 +21,21 @@
 ## If Next says “multiple lockfiles”
 That’s caused by an unrelated `package-lock.json` somewhere above your project folder.
 Make sure you run commands from *inside* this project folder (where this package.json lives).
+
+
+## Automatic venue importing
+
+This repo includes a server-side venue import endpoint at `app/api/venues/import/route.ts`.
+
+Supported providers:
+- Google Places via `GOOGLE_MAPS_API_KEY`
+- Foursquare Places via `FOURSQUARE_API_KEY`
+- Yelp via `YELP_API_KEY`
+
+Example:
+
+```
+GET /api/venues/import?location=Lancaster,%20PA&query=music%20venues%20bars%20coffee%20shops&limit=20
+```
+
+The endpoint dedupes providers and normalizes categories into the site taxonomy used by the directory.

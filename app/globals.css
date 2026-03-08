@@ -1413,7 +1413,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 .weekSummaryGrid{
   display:grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 12px;
 }
 .weekSummaryCard{
@@ -2610,7 +2610,6 @@ a:hover{
   .weekSummaryTopline,
   .weekSelectorRail,
   .weeklyInsightsBar,
-  .weekSummaryGridFour,
   .weekSummaryGridSecondary{
     grid-template-columns: 1fr;
     display:grid;

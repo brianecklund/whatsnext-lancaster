@@ -63,34 +63,18 @@ function startOfToday(): Date {
   return d;
 }
 
-function endOfSundayFromToday(): Date {
-  const today = startOfToday();
-  const day = today.getDay(); // 0=Sun..6=Sat
-  const daysUntilSunday = (7 - day) % 7;
-  const end = new Date(today);
-  end.setDate(today.getDate() + daysUntilSunday);
+function endOfWeekSaturdayFromDate(d: Date): Date {
+  const start = startOfWeekSundayFromDate(d);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
   end.setHours(23, 59, 59, 999);
   return end;
 }
 
 function startOfWeekSundayFromDate(d: Date): Date {
   const x = startOfDay(d);
-  x.setDate(x.getDate() - x.getDay());
-  return x;
-}
-
-function endOfWeekSaturdayFromStart(start: Date): Date {
-  const x = new Date(start);
-  x.setDate(x.getDate() + 6);
-  x.setHours(23, 59, 59, 999);
-  return x;
-}
-
-function startOfWeekFromDate(d: Date): Date {
-  const x = startOfDay(d);
-  const day = x.getDay();
-  const offset = day === 0 ? -6 : 1 - day;
-  x.setDate(x.getDate() + offset);
+  const offset = x.getDay();
+  x.setDate(x.getDate() - offset);
   return x;
 }
 
@@ -534,6 +518,13 @@ export default function HomeSplitClient({ events }: Props) {
 
 
 
+  const currentWeekRange = useMemo(() => {
+    const today = startOfToday();
+    const start = startOfWeekSundayFromDate(today);
+    const end = endOfWeekSaturdayFromDate(today);
+    return { start, end };
+  }, []);
+
   const leftDayGroups = useMemo(() => {
     const map = new Map<string, { date: Date; items: EventLite[] }>();
 
@@ -572,15 +563,11 @@ export default function HomeSplitClient({ events }: Props) {
   const dayJumpDates = useMemo(() => {
     const map = new Map<number, Date>();
     for (const group of currentWeekDayGroups) {
-      map.set(group.date.getDay(), group.date);
+      const idx = group.date.getDay();
+      if (!map.has(idx)) map.set(idx, group.date);
     }
-    return DAY_ABBR.map((label, idx) => ({
-      label,
-      index: idx,
-      date: addDays(currentWeekRange.start, idx),
-      hasEvents: map.has(idx),
-    }));
-  }, [currentWeekDayGroups, currentWeekRange]);
+    return DAY_ABBR.map((label, idx) => ({ label, index: idx, date: map.get(idx) ?? null }));
+  }, [currentWeekDayGroups]);
 
   function getListScrollOffset() {
     const stickyH = leftStickyRef.current?.offsetHeight ?? 0;
@@ -605,9 +592,9 @@ export default function HomeSplitClient({ events }: Props) {
     const root = listRef.current;
     if (!root) return;
     const threshold = scrollTop + getListScrollOffset() + 16;
-    let active = leftDayGroups[0]?.date ? dayKey(leftDayGroups[0].date) : null;
+    let active = currentWeekDayGroups[0]?.date ? dayKey(currentWeekDayGroups[0].date) : null;
 
-    for (const group of leftDayGroups) {
+    for (const group of currentWeekDayGroups) {
       const key = dayKey(group.date);
       const el = daySectionRefs.current[key];
       if (!el) continue;
@@ -645,19 +632,14 @@ export default function HomeSplitClient({ events }: Props) {
     });
   }
 
-  const currentWeekRange = useMemo(() => {
-    const today = startOfToday();
-    const start = startOfWeekSundayFromDate(today);
-    const end = endOfWeekSaturdayFromStart(start);
-    return { start, end };
-  }, []);
-
   const weekBuckets = useMemo<WeekBucket[]>(() => {
     const currentStart = currentWeekRange.start;
+    const currentEnd = currentWeekRange.end;
+    const nextWeekStart = addDays(startOfWeekSundayFromDate(currentStart), 7);
 
     return Array.from({ length: 5 }, (_, index) => {
-      const start = addDays(currentStart, index * 7);
-      const end = endOfWeekSaturdayFromStart(start);
+      const start = index === 0 ? currentStart : addDays(nextWeekStart, (index - 1) * 7);
+      const end = index === 0 ? currentEnd : endOfWeekFromStart(start);
       const eventsInRange = filteredEvents
         .map((e) => ({ e, d: safeDateFromEvent(e) }))
         .filter(({ d }) => d && d.getTime() >= start.getTime() && d.getTime() <= end.getTime())
@@ -849,9 +831,9 @@ export default function HomeSplitClient({ events }: Props) {
                             type="button"
                             className="dayJumpBtn"
                             data-active={isActive ? "true" : "false"}
-                            disabled={!entry.hasEvents}
-                            onClick={() => jumpToDay(entry.date)}
-                            aria-label={entry.hasEvents ? `Jump to ${entry.label}` : `${entry.label} has no events this week`}
+                            disabled={!entry.date}
+                            onClick={() => entry.date && jumpToDay(entry.date)}
+                            aria-label={entry.date ? `Jump to ${entry.label}` : `${entry.label} has no events`}
                           >
                             {entry.label.slice(0, 1)}
                           </button>
@@ -1380,7 +1362,7 @@ export default function HomeSplitClient({ events }: Props) {
                       <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
                     </div>
 
-                    <div className="weekSummaryGrid weekSummaryGridFour" role="list">
+                    <div className="weekSummaryGrid" role="list">
                       <div className="weekSummaryCard" role="listitem">
                         <div className="weekSummaryKicker">Total events</div>
                         <div className="weekSummaryValue">{weekEventsCount}</div>
@@ -1398,6 +1380,17 @@ export default function HomeSplitClient({ events }: Props) {
                         <div className="weekSummaryValue">{weekInsights["Community"]}</div>
                       </div>
                     </div>
+
+                    <div className="weekSummaryGrid weekSummaryGridSecondary" role="list">
+                      <div className="weekSummaryCard" role="listitem">
+                        <div className="weekSummaryKicker">Busiest day</div>
+                        <div className="weekSummaryValueSmall">{selectedWeekBucket.busiestDayLabel}</div>
+                      </div>
+                      <div className="weekSummaryCard" role="listitem">
+                        <div className="weekSummaryKicker">Peak time</div>
+                        <div className="weekSummaryValueSmall">{selectedWeekBucket.peakWindowLabel}</div>
+                      </div>
+                    </div>
                   </div>
 
                   {weekEventsCount === 0 ? (
@@ -1405,7 +1398,9 @@ export default function HomeSplitClient({ events }: Props) {
                   ) : (
                     <div className="weeklyLanding fadeInItem" style={{ animationDelay: "420ms" }}>
                       <div className="weeklyInsightsBar" aria-label="Week visualizations">
-                        {Object.entries(weekInsights).map(([label, count]) => (
+                        {Object.entries(weekInsights).map(([label, rawCount]) => {
+                          const count = Number(rawCount) || 0;
+                          return (
                           <div key={label} className="weeklyInsightMetric">
                             <div className="weeklyInsightTop">
                               <span>{label}</span>
@@ -1420,7 +1415,8 @@ export default function HomeSplitClient({ events }: Props) {
                               />
                             </div>
                           </div>
-                        ))}
+                        );
+                        })}
                       </div>
 
                       <div className="weeklyCards">
@@ -1497,7 +1493,8 @@ export default function HomeSplitClient({ events }: Props) {
                               );
                             })}
                           </div>
-                        ))}
+                        );
+                        })}
                       </div>
                     </div>
                   )}
