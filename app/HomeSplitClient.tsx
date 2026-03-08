@@ -771,6 +771,9 @@ export default function HomeSplitClient({ events }: Props) {
 
   return (
     <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
+      <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>
+        A calendar of events, specials, and pop-ups in Lancaster, PA.
+      </div>
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
@@ -1490,8 +1493,7 @@ export default function HomeSplitClient({ events }: Props) {
                               );
                             })}
                           </div>
-                        );
-                        })}
+                        ))}
                       </div>
                     </div>
                   )}
