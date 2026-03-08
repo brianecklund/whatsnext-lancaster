@@ -157,16 +157,18 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                     placeholder="Search"
                     aria-label="Search locations"
                   />
-                  <button
-                    type="button"
-                    className="filterBtn"
-                    data-active={filterOpen || !!cat ? "true" : "false"}
-                    aria-label={filterOpen ? "Close filters" : "Open filters"}
-                    aria-expanded={filterOpen ? "true" : "false"}
-                    onClick={() => setFilterOpen((v) => !v)}
-                  >
-                    {activeFilterLabel}
-                  </button>
+                  {effectiveIsMobile ? (
+                    <button
+                      type="button"
+                      className="filterBtn"
+                      data-active={filterOpen || !!cat ? "true" : "false"}
+                      aria-label={filterOpen ? "Close filters" : "Open filters"}
+                      aria-expanded={filterOpen ? "true" : "false"}
+                      onClick={() => setFilterOpen((v) => !v)}
+                    >
+                      {activeFilterLabel}
+                    </button>
+                  ) : null}
                   {!effectiveIsMobile && (q || cat) ? (
                     <button
                       className="clearBtn"
@@ -183,58 +185,85 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
               </div>
             </div>
 
-            <div
-              className="filterDropdown"
-              data-open={filterOpen ? "true" : "false"}
-              aria-hidden={filterOpen ? "false" : "true"}
-            >
-              <div className="filterDropdownInner">
-                <div className="typePills" role="group" aria-label="Directory filters">
-                  <button
-                    type="button"
-                    className="typePill"
-                    data-active={!cat ? "true" : "false"}
-                    onClick={() => {
-                      setCategory(null);
-                      setFilterOpen(false);
-                    }}
-                  >
-                    All
-                  </button>
-                  {categories.map((t) => {
-                    const on = normalize(cat ?? "") === normalize(t);
-                    return (
-                      <button
-                        key={t}
-                        type="button"
-                        className="typePill"
-                        data-active={on ? "true" : "false"}
-                        onClick={() => {
-                          setCategory(on ? null : t);
-                          setFilterOpen(false);
-                        }}
-                      >
-                        {t}
-                      </button>
-                    );
-                  })}
-                </div>
+            {effectiveIsMobile ? (
+              <div
+                className="filterDropdown"
+                data-open={filterOpen ? "true" : "false"}
+                aria-hidden={filterOpen ? "false" : "true"}
+              >
+                <div className="filterDropdownInner">
+                  <div className="typePills" role="group" aria-label="Directory filters">
+                    <button
+                      type="button"
+                      className="typePill"
+                      data-active={!cat ? "true" : "false"}
+                      onClick={() => {
+                        setCategory(null);
+                        setFilterOpen(false);
+                      }}
+                    >
+                      All
+                    </button>
+                    {categories.map((t) => {
+                      const on = normalize(cat ?? "") === normalize(t);
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          className="typePill"
+                          data-active={on ? "true" : "false"}
+                          onClick={() => {
+                            setCategory(on ? null : t);
+                            setFilterOpen(false);
+                          }}
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
+                  </div>
 
-                {(q || cat) ? (
-                  <button
-                    type="button"
-                    className="filterDropdownClear"
-                    onClick={() => {
-                      setQuery("");
-                      setCategory(null);
-                      setFilterOpen(false);
-                    }}
-                  >
-                    Clear search & filters
-                  </button>
-                ) : null}
+                  {(q || cat) ? (
+                    <button
+                      type="button"
+                      className="filterDropdownClear"
+                      onClick={() => {
+                        setQuery("");
+                        setCategory(null);
+                        setFilterOpen(false);
+                      }}
+                    >
+                      Clear search & filters
+                    </button>
+                  ) : null}
+                </div>
               </div>
-            </div>
+            ) : (
+              <div className="typePills" role="group" aria-label="Directory filters" style={{ marginTop: 12 }}>
+                <button
+                  type="button"
+                  className="typePill"
+                  data-active={!cat ? "true" : "false"}
+                  onClick={() => setCategory(null)}
+                >
+                  All
+                </button>
+                {categories.map((t) => {
+                  const on = normalize(cat ?? "") === normalize(t);
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      className="typePill"
+                      data-active={on ? "true" : "false"}
+                      onClick={() => setCategory(on ? null : t)}
+                    >
+                      {t}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
             {filtered.length === 0 ? (
               <div className="emptyList">No listings yet.</div>

@@ -623,12 +623,13 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   scrollbar-gutter: stable;
   overscroll-behavior: contain;
   padding-bottom: 18px;
-  scroll-padding-top: 24px;
+  scroll-padding-top: calc(var(--headerH, 86px) + 16px);
   scroll-padding-bottom: 48px;
 }
 
 /* Sticky tabs (desktop left) */
 .leftSticky{
+  --stickySpace: 12px;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -673,6 +674,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .dayBlock{
   padding: 18px 0;
   border-top: 1px solid var(--border);
+  scroll-margin-top: 140px;
 }
 
 /* Weekly Overview (left list header card) */

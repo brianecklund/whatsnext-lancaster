@@ -292,6 +292,7 @@ export default function HomeSplitClient({ events }: Props) {
   const listRef = useRef<HTMLDivElement | null>(null);
   const daySectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [scrollDayKey, setScrollDayKey] = useState<string | null>(null);
+  const leftStickyRef = useRef<HTMLDivElement | null>(null);
   const [didInitialScroll, setDidInitialScroll] = useState(false);
 
   // Staged intro animation (runs once per session): UI first, then list + right content.
@@ -528,6 +529,11 @@ export default function HomeSplitClient({ events }: Props) {
     return DAY_ABBR.map((label, idx) => ({ label, index: idx, date: map.get(idx) ?? null }));
   }, [leftDayGroups]);
 
+  function getListScrollOffset() {
+    const stickyH = leftStickyRef.current?.offsetHeight ?? 0;
+    return Math.max(stickyH + 10, 24);
+  }
+
 
   useEffect(() => {
     const root = listRef.current;
@@ -536,7 +542,7 @@ export default function HomeSplitClient({ events }: Props) {
     const targetKey = selectedDayStr;
     const target = daySectionRefs.current[targetKey];
     if (target) {
-      const top = Math.max(target.offsetTop - 6, 0);
+      const top = Math.max(target.offsetTop - getListScrollOffset(), 0);
       root.scrollTop = top;
       setScrollDayKey(targetKey);
       setDidInitialScroll(true);
@@ -550,7 +556,7 @@ export default function HomeSplitClient({ events }: Props) {
   function syncVisibleDayFromScroll(scrollTop: number) {
     const root = listRef.current;
     if (!root) return;
-    const threshold = scrollTop + 120;
+    const threshold = scrollTop + getListScrollOffset() + 16;
     let active = leftDayGroups[0]?.date ? dayKey(leftDayGroups[0].date) : null;
 
     for (const group of leftDayGroups) {
@@ -573,7 +579,7 @@ export default function HomeSplitClient({ events }: Props) {
       const root = listRef.current;
       const el = daySectionRefs.current[key];
       if (!root || !el) return;
-      root.scrollTo({ top: Math.max(el.offsetTop - 6, 0), behavior: "smooth" });
+      root.scrollTo({ top: Math.max(el.offsetTop - getListScrollOffset(), 0), behavior: "smooth" });
     });
   }
 
@@ -738,7 +744,7 @@ export default function HomeSplitClient({ events }: Props) {
                 syncVisibleDayFromScroll(st);
               }}
             >
-              <div className="leftSticky">
+              <div className="leftSticky" ref={leftStickyRef}>
                 <div className="tabs" aria-label="Primary navigation">
                   <button
                     type="button"
@@ -812,15 +818,17 @@ export default function HomeSplitClient({ events }: Props) {
                       >
                         {viewMode === "month" ? (effectiveIsMobile ? "List" : "List view") : (effectiveIsMobile ? "Cal" : "Calendar view")}
                       </button>
-                      <button
-                        type="button"
-                        className="filterBtn"
-                        aria-label={filterOpen ? "Close filters" : "Open filters"}
-                        aria-expanded={filterOpen ? "true" : "false"}
-                        onClick={() => setFilterOpen((v) => !v)}
-                      >
-                        Filter
-                      </button>
+                      {effectiveIsMobile ? (
+                        <button
+                          type="button"
+                          className="filterBtn"
+                          aria-label={filterOpen ? "Close filters" : "Open filters"}
+                          aria-expanded={filterOpen ? "true" : "false"}
+                          onClick={() => setFilterOpen((v) => !v)}
+                        >
+                          {type ? `Filter: ${type}` : "Filter"}
+                        </button>
+                      ) : null}
                       {!effectiveIsMobile && (q || type) ? (
                         <button
                           className="clearBtn"
