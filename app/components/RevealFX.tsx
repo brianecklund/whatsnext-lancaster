@@ -58,7 +58,7 @@ export default function RevealFX() {
       },
       {
         threshold: 0.14,
-        rootMargin: "0px 0px -8% 0px",
+        rootMargin: "0px 0px -10% 0px",
       }
     );
 
