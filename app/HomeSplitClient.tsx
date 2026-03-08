@@ -73,6 +73,34 @@ function endOfSundayFromToday(): Date {
   return end;
 }
 
+function startOfWeekFromDate(d: Date): Date {
+  const x = startOfDay(d);
+  const day = x.getDay();
+  const offset = day === 0 ? -6 : 1 - day;
+  x.setDate(x.getDate() + offset);
+  return x;
+}
+
+function endOfWeekFromStart(start: Date): Date {
+  const x = new Date(start);
+  x.setDate(x.getDate() + 6);
+  x.setHours(23, 59, 59, 999);
+  return x;
+}
+
+function addDays(d: Date, delta: number): Date {
+  const x = new Date(d);
+  x.setDate(x.getDate() + delta);
+  return x;
+}
+
+function formatWeekRange(start: Date, end: Date): string {
+  const sameMonth = start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear();
+  const startLabel = start.toLocaleDateString(undefined, { month: "short", day: "numeric" });
+  const endLabel = end.toLocaleDateString(undefined, sameMonth ? { day: "numeric" } : { month: "short", day: "numeric" });
+  return `${startLabel}–${endLabel}`;
+}
+
 function startOfDay(d: Date): Date {
   const x = new Date(d);
   x.setHours(0, 0, 0, 0);
@@ -183,6 +211,52 @@ function pickDescriptionText(e: EventLite): string | null {
   }
 
   return null;
+}
+
+type WeekBucket = {
+  key: string;
+  label: string;
+  rangeLabel: string;
+  start: Date;
+  end: Date;
+  events: EventLite[];
+  groups: Array<{ date: Date; items: EventLite[] }>;
+  insights: Record<string, number>;
+  busiestDayLabel: string;
+  peakWindowLabel: string;
+};
+
+function buildWeekInsights(items: EventLite[]) {
+  const buckets = { "Live music": 0, "Food & drink": 0, "Community": 0, "Other": 0 };
+  const timeWindows = { Morning: 0, Afternoon: 0, Evening: 0, Late: 0 };
+  const dayCounts = new Map<string, { date: Date; count: number }>();
+
+  for (const e of items) {
+    const t = (e.event_type || "").toLowerCase();
+    if (t.includes("music") || t.includes("concert") || t.includes("show")) buckets["Live music"]++;
+    else if (t.includes("food") || t.includes("drink") || t.includes("dining") || t.includes("menu")) buckets["Food & drink"]++;
+    else if (t.includes("community") || t.includes("market") || t.includes("fundraiser") || t.includes("family")) buckets["Community"]++;
+    else buckets["Other"]++;
+
+    const d = safeDateFromEvent(e);
+    if (!d) continue;
+    const hour = d.getHours();
+    if (hour < 12) timeWindows.Morning++;
+    else if (hour < 17) timeWindows.Afternoon++;
+    else if (hour < 21) timeWindows.Evening++;
+    else timeWindows.Late++;
+
+    const dk = dayKey(d);
+    if (!dayCounts.has(dk)) dayCounts.set(dk, { date: startOfDay(d), count: 0 });
+    dayCounts.get(dk)!.count += 1;
+  }
+
+  const busiestDay = Array.from(dayCounts.values()).sort((a, b) => b.count - a.count)[0];
+  const busiestDayLabel = busiestDay ? `${formatDayHeading(busiestDay.date)} (${busiestDay.count})` : "No events";
+  const peakWindow = Object.entries(timeWindows).sort((a, b) => b[1] - a[1])[0];
+  const peakWindowLabel = peakWindow && peakWindow[1] > 0 ? `${peakWindow[0]} (${peakWindow[1]})` : "Time TBD";
+
+  return { buckets, busiestDayLabel, peakWindowLabel };
 }
 
 export default function HomeSplitClient({ events }: Props) {
@@ -410,76 +484,69 @@ export default function HomeSplitClient({ events }: Props) {
     return groups;
   }, [filteredEvents]);
 
-  const weeklyRange = useMemo(() => {
+  const currentWeekRange = useMemo(() => {
     const start = startOfToday();
     const end = endOfSundayFromToday();
     return { start, end };
   }, []);
 
-  const weekEvents = useMemo(() => {
-    const { start, end } = weeklyRange;
+  const weekBuckets = useMemo<WeekBucket[]>(() => {
+    const currentStart = currentWeekRange.start;
+    const currentEnd = currentWeekRange.end;
+    const nextWeekStart = addDays(startOfWeekFromDate(currentStart), 7);
 
-    return filteredEvents
-      .map((e) => ({ e, d: safeDateFromEvent(e) }))
-      .filter(
-        ({ d }) =>
-          d &&
-          d.getTime() >= start.getTime() &&
-          d.getTime() <= end.getTime()
-      )
-      .sort((a, b) => a.d!.getTime() - b.d!.getTime())
-      .map(({ e }) => e);
-  }, [filteredEvents, weeklyRange]);
+    return Array.from({ length: 5 }, (_, index) => {
+      const start = index === 0 ? currentStart : addDays(nextWeekStart, (index - 1) * 7);
+      const end = index === 0 ? currentEnd : endOfWeekFromStart(start);
+      const eventsInRange = filteredEvents
+        .map((e) => ({ e, d: safeDateFromEvent(e) }))
+        .filter(({ d }) => d && d.getTime() >= start.getTime() && d.getTime() <= end.getTime())
+        .sort((a, b) => a.d!.getTime() - b.d!.getTime())
+        .map(({ e }) => e);
 
+      const groupsMap = new Map<string, { date: Date; items: EventLite[] }>();
+      for (const e of eventsInRange) {
+        const d = safeDateFromEvent(e);
+        if (!d) continue;
+        const dk = dayKey(d);
+        if (!groupsMap.has(dk)) groupsMap.set(dk, { date: startOfDay(d), items: [] });
+        groupsMap.get(dk)!.items.push(e);
+      }
+
+      const groups = Array.from(groupsMap.values()).sort((a, b) => a.date.getTime() - b.date.getTime());
+      for (const group of groups) {
+        group.items.sort((a, b) => (safeDateFromEvent(a)?.getTime() ?? 0) - (safeDateFromEvent(b)?.getTime() ?? 0));
+      }
+
+      const { buckets, busiestDayLabel, peakWindowLabel } = buildWeekInsights(eventsInRange);
+
+      return {
+        key: `__week__:${dayKey(start)}`,
+        label: index === 0 ? "This Week" : `Week ${index + 1}`,
+        rangeLabel: formatWeekRange(start, end),
+        start,
+        end,
+        events: eventsInRange,
+        groups,
+        insights: buckets,
+        busiestDayLabel,
+        peakWindowLabel,
+      };
+    });
+  }, [filteredEvents, currentWeekRange]);
+
+  const defaultWeekBucket = weekBuckets[0] ?? null;
+  const selectedWeekBucket = useMemo(() => {
+    if (selectedKey === WEEKLY_KEY) return defaultWeekBucket;
+    if (!selectedKey?.startsWith("__week__:")) return null;
+    return weekBuckets.find((bucket) => bucket.key === selectedKey) ?? defaultWeekBucket;
+  }, [defaultWeekBucket, selectedKey, weekBuckets]);
+
+  const weekEvents = selectedWeekBucket?.events ?? [];
   const weekEventsCount = weekEvents.length;
-
-  const weekLabel = useMemo(() => {
-    const fmt = (d: Date) => {
-      const m = d.getMonth() + 1;
-      const day = d.getDate();
-      const yy = String(d.getFullYear()).slice(-2);
-      return `${m}/${day}/${yy}`;
-    };
-    return `${fmt(weeklyRange.start)} to ${fmt(weeklyRange.end)}`;
-  }, [weeklyRange]);
-
-  const weekInsights = useMemo(() => {
-    const buckets = { "Live music": 0, "Food & drink": 0, "Community": 0, "Other": 0 };
-    for (const e of weekEvents) {
-      const t = (e.event_type || "").toLowerCase();
-      if (t.includes("music") || t.includes("concert") || t.includes("show")) buckets["Live music"]++;
-      else if (t.includes("food") || t.includes("drink") || t.includes("dining") || t.includes("menu")) buckets["Food & drink"]++;
-      else if (t.includes("community") || t.includes("market") || t.includes("fundraiser") || t.includes("family")) buckets["Community"]++;
-      else buckets["Other"]++;
-    }
-    return buckets;
-  }, [weekEvents]);
-
-
-  const weekGroups = useMemo(() => {
-    const map = new Map<string, { date: Date; items: EventLite[] }>();
-    for (const e of weekEvents) {
-      const d = safeDateFromEvent(e);
-      if (!d) continue;
-      const dk = dayKey(d);
-      if (!map.has(dk)) map.set(dk, { date: startOfDay(d), items: [] });
-      map.get(dk)!.items.push(e);
-    }
-
-    const groups = Array.from(map.values()).sort(
-      (a, b) => a.date.getTime() - b.date.getTime()
-    );
-
-    for (const g of groups) {
-      g.items.sort((a, b) => {
-        const da = safeDateFromEvent(a)?.getTime() ?? 0;
-        const db = safeDateFromEvent(b)?.getTime() ?? 0;
-        return da - db;
-      });
-    }
-
-    return groups;
-  }, [weekEvents]);
+  const weekLabel = selectedWeekBucket?.rangeLabel ?? defaultWeekBucket?.rangeLabel ?? "";
+  const weekInsights = selectedWeekBucket?.insights ?? ({ "Live music": 0, "Food & drink": 0, "Community": 0, "Other": 0 } as Record<string, number>);
+  const weekGroups = selectedWeekBucket?.groups ?? [];
 
   const selectedEvent = useMemo(() => {
     if (!filteredEvents.length) return null;
@@ -543,6 +610,11 @@ export default function HomeSplitClient({ events }: Props) {
   }
 
   function openSelected(key: string) {
+    setClientSelectedKey(key);
+    setParam("event", key);
+  }
+
+  function openWeek(key: string) {
     setClientSelectedKey(key);
     setParam("event", key);
   }
@@ -764,29 +836,25 @@ export default function HomeSplitClient({ events }: Props) {
                 type="button"
                 className="weeklyOverview fadeInItem"
                 style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
-                data-active={selectedKey === WEEKLY_KEY ? "true" : "false"}
-                onClick={() => {
-                  setClientSelectedKey(WEEKLY_KEY);
-                  setParam("event", WEEKLY_KEY);
-                  
-                }}
+                data-active={selectedWeekBucket ? "true" : "false"}
+                onClick={() => openWeek(WEEKLY_KEY)}
               >
                 <div className="weeklyTitle">Weekly Overview</div>
                 <div className="weeklyCount">
-                  {weekEventsCount} event{weekEventsCount === 1 ? "" : "s"} left
+                  {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left
                   this week
                 </div>
               </button>
 
               
-              {effectiveIsMobile && selectedKey === WEEKLY_KEY ? (
+              {effectiveIsMobile && selectedWeekBucket ? (
                 <div className="weeklyMobilePanel fadeInItem" style={{ animationDelay: "320ms" }}>
                   <div className="weekSummaryMini">
-                    <div className="weekSummaryMiniTitle">Week of {weekLabel}</div>
+                    <div className="weekSummaryMiniTitle">Week of {selectedWeekBucket?.rangeLabel}</div>
                     <div className="weekSummaryMiniGrid" role="list">
                       <div className="weekSummaryMiniCard" role="listitem">
                         <div className="weekSummaryMiniKicker">Total</div>
-                        <div className="weekSummaryMiniValue">{weekEventsCount}</div>
+                        <div className="weekSummaryMiniValue">{selectedWeekBucket?.events.length ?? 0}</div>
                       </div>
                       <div className="weekSummaryMiniCard" role="listitem">
                         <div className="weekSummaryMiniKicker">Live</div>
@@ -818,11 +886,7 @@ export default function HomeSplitClient({ events }: Props) {
                               key={e.id}
                               type="button"
                               className="weeklyCondRow"
-                              onClick={() => {
-                                const key = e.uid ?? e.id;
-                                setClientSelectedKey(key);
-                                setParam("event", key);
-                              }}
+                              onClick={() => openSelected(e.uid ?? e.id)}
                             >
                               <div className="weeklyCondTop">
                                 <div className="weeklyCondTime">{timeLabel}</div>
@@ -1065,8 +1129,8 @@ export default function HomeSplitClient({ events }: Props) {
               ) : null}
 
 
-              {viewMode === "list" && selectedKey === WEEKLY_KEY ? (
-                <div className="rightHeader">
+              {viewMode === "list" && selectedWeekBucket ? (
+                <div className="rightHeader weeklyOverviewLanding">
                   <div
                     className="rightDayLabel fadeInItem"
                     style={{ animationDelay: "260ms" }}
@@ -1075,10 +1139,15 @@ export default function HomeSplitClient({ events }: Props) {
                   </div>
 
                   <div className="weekSummary fadeInItem" style={{ animationDelay: "320ms" }}>
-                    <h3 className="weekSummaryTitle">Week of {weekLabel}</h3>
-                    <p className="weekSummarySubhead">
-                      A quick snapshot of what&apos;s happening on the calendar this week.
-                    </p>
+                    <div className="weekSummaryTopline">
+                      <div>
+                        <h3 className="weekSummaryTitle">{selectedWeekBucket.label}</h3>
+                        <p className="weekSummarySubhead">
+                          Week of {weekLabel}. Browse the current week plus the next four weeks, then open a week for a fuller breakdown.
+                        </p>
+                      </div>
+                      <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
+                    </div>
 
                     <div className="weekSummaryGrid" role="list">
                       <div className="weekSummaryCard" role="listitem">
@@ -1093,134 +1162,139 @@ export default function HomeSplitClient({ events }: Props) {
                         <div className="weekSummaryKicker">Food &amp; drink</div>
                         <div className="weekSummaryValue">{weekInsights["Food & drink"]}</div>
                       </div>
+                      <div className="weekSummaryCard" role="listitem">
+                        <div className="weekSummaryKicker">Community</div>
+                        <div className="weekSummaryValue">{weekInsights["Community"]}</div>
+                      </div>
+                    </div>
+
+                    <div className="weekSummaryGrid weekSummaryGridSecondary" role="list">
+                      <div className="weekSummaryCard" role="listitem">
+                        <div className="weekSummaryKicker">Busiest day</div>
+                        <div className="weekSummaryValueSmall">{selectedWeekBucket.busiestDayLabel}</div>
+                      </div>
+                      <div className="weekSummaryCard" role="listitem">
+                        <div className="weekSummaryKicker">Peak time</div>
+                        <div className="weekSummaryValueSmall">{selectedWeekBucket.peakWindowLabel}</div>
+                      </div>
                     </div>
                   </div>
 
+                  <div className="weekSelectorRail fadeInItem" style={{ animationDelay: "360ms" }}>
+                    {weekBuckets.map((bucket) => (
+                      <button
+                        key={bucket.key}
+                        type="button"
+                        className="weekSelectorCard"
+                        data-active={selectedWeekBucket.key === bucket.key ? "true" : "false"}
+                        onClick={() => openWeek(bucket.key)}
+                      >
+                        <div className="weekSelectorEyebrow">{bucket.label}</div>
+                        <div className="weekSelectorRange">{bucket.rangeLabel}</div>
+                        <div className="weekSelectorMeta">{bucket.events.length} event{bucket.events.length === 1 ? "" : "s"}</div>
+                      </button>
+                    ))}
+                  </div>
 
                   {weekEventsCount === 0 ? (
-                    <div className="emptyRight">No events scheduled for the rest of this week.</div>
-                  ) : effectiveIsMobile ? (
-                    <div
-                      className="weeklyCondensed fadeInItem"
-                      style={{ animationDelay: "380ms" }}
-                      aria-label="Weekly overview (condensed)"
-                    >
-                      {weekGroups.map((g) => (
-                        <div key={dayKey(g.date)}>
-                          <div className="weeklyCondensedDayTitle">{formatDayHeading(g.date)}</div>
-
-                          {g.items.map((e) => {
-                            const title = e.title || "Untitled event";
-                            const d = safeDateFromEvent(e);
-                            const timeLabel = d ? formatTimeShort(d) : "Time TBD";
-
-                            const venueBits = [e.locationName, e.event_type]
-                              .filter(Boolean)
-                              .join(" • ");
-
-                            return (
-                              <button
-                                key={e.id}
-                                type="button"
-                                className="weeklyCondRow"
-                                onClick={() => {
-                                  const key = e.uid ?? e.id;
-                                  setClientSelectedKey(key);
-                                  setParam("event", key);
-                                  
-                                }}
-                              >
-                                <div className="weeklyCondTop">
-                                  <div className="weeklyCondTime">{timeLabel}</div>
-                                  <div className="weeklyCondTitle">{title}</div>
-                                </div>
-                                {venueBits ? (
-                                  <div className="weeklyCondMeta">{venueBits}</div>
-                                ) : null}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ))}
-                    </div>
+                    <div className="emptyRight">No events scheduled for this week yet.</div>
                   ) : (
-                    <div className="weeklyCards fadeInItem" style={{ animationDelay: "380ms" }}>
-                      {weekGroups.map((g) => (
-                        <div key={dayKey(g.date)} className="weeklyDayGroup">
-                          <div className="dayTitle">{formatDayHeading(g.date)}</div>
-
-                          {g.items.map((e) => {
-                            const title = e.title || "Untitled event";
-                            const d = safeDateFromEvent(e);
-                            const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
-                            const img = pickImageUrl(e);
-
-                            return (
-                              <button
-                                key={e.id}
-                                type="button"
-                                className="weeklyCard weeklyCardSelectable"
-                                onClick={() => {
-                                  const key = e.uid ?? e.id;
-                                  setClientSelectedKey(key);
-                                  setParam("event", key);
-                                  
+                    <div className="weeklyLanding fadeInItem" style={{ animationDelay: "420ms" }}>
+                      <div className="weeklyInsightsBar" aria-label="Week visualizations">
+                        {Object.entries(weekInsights).map(([label, count]) => (
+                          <div key={label} className="weeklyInsightMetric">
+                            <div className="weeklyInsightTop">
+                              <span>{label}</span>
+                              <span>{count}</span>
+                            </div>
+                            <div className="weeklyInsightTrack">
+                              <span
+                                className="weeklyInsightFill"
+                                style={{
+                                  width: `${weekEventsCount ? Math.max((count / weekEventsCount) * 100, count > 0 ? 12 : 0) : 0}%`,
                                 }}
-                              >
-                                <div className="weeklyCardMedia">
-                                  {img ? (
-                                    <div className="media16x9">
-                                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                                      <img className="weeklyThumb" src={img} alt="" />
-                                      {e.descriptionText ? (
-                                        <div className="mediaDescBtn">{String(e.descriptionText).slice(0, 110)}</div>
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+
+                      <div className="weeklyCards">
+                        {weekGroups.map((g) => (
+                          <div key={dayKey(g.date)} className="weeklyDayGroup">
+                            <div className="dayTitle">{formatDayHeading(g.date)}</div>
+
+                            {g.items.map((e) => {
+                              const title = e.title || "Untitled event";
+                              const d = safeDateFromEvent(e);
+                              const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
+                              const img = pickImageUrl(e);
+                              const desc = (pickDescriptionText(e) || e.summary || "").trim();
+
+                              return (
+                                <button
+                                  key={e.id}
+                                  type="button"
+                                  className="weeklyCard weeklyCardSelectable"
+                                  onClick={() => openSelected(e.uid ?? e.id)}
+                                >
+                                  <div className="weeklyCardMedia">
+                                    {img ? (
+                                      <div className="media16x9">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img className="weeklyThumb" src={img} alt="" />
+                                      </div>
+                                    ) : (
+                                      <div className="media16x9 weeklyThumbPlaceholder" aria-hidden />
+                                    )}
+                                  </div>
+
+                                  <div className="weeklyCardContent weeklyCardContentExpanded">
+                                    <div className="weeklyCardTop">
+                                      <div className="weeklyCardTitleWrap">
+                                        <div className="weeklyCardTitle">{title}</div>
+                                        <div className="weeklyCardTime">{timeLabel}</div>
+                                      </div>
+
+                                      {e.tickets_url || e.website_url ? (
+                                        <div className="weeklyCardActions">
+                                          {e.tickets_url ? (
+                                            <a
+                                              className="weeklyMiniBtn"
+                                              href={e.tickets_url}
+                                              target="_blank"
+                                              rel="noreferrer"
+                                              onClick={(ev) => ev.stopPropagation()}
+                                            >
+                                              Tickets
+                                            </a>
+                                          ) : null}
+                                          {e.website_url ? (
+                                            <a
+                                              className="weeklyMiniBtn"
+                                              href={e.website_url}
+                                              target="_blank"
+                                              rel="noreferrer"
+                                              onClick={(ev) => ev.stopPropagation()}
+                                            >
+                                              Website
+                                            </a>
+                                          ) : null}
+                                        </div>
                                       ) : null}
                                     </div>
-                                  ) : (
-                                    <div className="media16x9 weeklyThumbPlaceholder" aria-hidden />
-                                  )}
-                                </div>
 
-                                <div className="weeklyCardContent">
-                                  <div className="weeklyCardTop">
-                                    <div className="weeklyCardTitleWrap">
-                                      <div className="weeklyCardTitle">{title}</div>
-                                      <div className="weeklyCardTime">{timeLabel}</div>
+                                    <div className="weeklyCardMetaRow">
+                                      {[e.locationName, e.event_type].filter(Boolean).join(" • ")}
                                     </div>
-
-                                    {e.tickets_url || e.website_url ? (
-                                      <div className="weeklyCardActions">
-                                        {e.tickets_url ? (
-                                          <a
-                                            className="weeklyMiniBtn"
-                                            href={e.tickets_url}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            onClick={(ev) => ev.stopPropagation()}
-                                          >
-                                            Tickets
-                                          </a>
-                                        ) : null}
-                                        {e.website_url ? (
-                                          <a
-                                            className="weeklyMiniBtn"
-                                            href={e.website_url}
-                                            target="_blank"
-                                            rel="noreferrer"
-                                            onClick={(ev) => ev.stopPropagation()}
-                                          >
-                                            Website
-                                          </a>
-                                        ) : null}
-                                      </div>
-                                    ) : null}
+                                    {desc ? <div className="weeklyCardDesc">{desc.length > 200 ? `${desc.slice(0, 200).trim()}…` : desc}</div> : null}
                                   </div>
-                                </div>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ))}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>
