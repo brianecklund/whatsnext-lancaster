@@ -360,18 +360,18 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 function LocationDetail({ location }: { location: LocationRow }) {
   const detailFlashKey = location.id ?? location.uid ?? location.name ?? "detail";
   return (
-    <div key={detailFlashKey} className="detailCard detailFlash">
-      <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
+    <div key={detailFlashKey} className="detailCard detailFlash" data-reveal-group>
+      <div className="detailTitle fadeInItem" data-reveal-item style={{ animationDelay: "260ms" }}>
         {location.name ?? "Untitled listing"}
       </div>
 
-      <div className="detailMeta fadeInItem" style={{ animationDelay: "320ms" }}>
+      <div className="detailMeta fadeInItem" data-reveal-item style={{ animationDelay: "320ms" }}>
         {location.category ? <span className="badge">{location.category}</span> : null}
         {location.address ? <span className="muted">{location.address}</span> : null}
       </div>
 
       {location.website ? (
-        <p style={{ marginTop: 10 }}>
+        <p style={{ marginTop: 10 }} data-reveal-item>
           <a className="link" href={location.website} target="_blank" rel="noreferrer">
             Website
           </a>
@@ -379,11 +379,11 @@ function LocationDetail({ location }: { location: LocationRow }) {
       ) : null}
 
       {location.description ? (
-        <div className="detailBody fadeInItem" style={{ marginTop: 14, animationDelay: "360ms" }}>
+        <div className="detailBody fadeInItem" data-reveal-item style={{ marginTop: 14, animationDelay: "360ms" }}>
           <p>{location.description}</p>
         </div>
       ) : (
-        <div className="detailBody fadeInItem" style={{ marginTop: 14, animationDelay: "360ms" }}>
+        <div className="detailBody fadeInItem" data-reveal-item style={{ marginTop: 14, animationDelay: "360ms" }}>
           <p className="muted">No description yet.</p>
         </div>
       )}

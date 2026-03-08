@@ -50,14 +50,14 @@ export default function GsapButtonFX() {
         const rect = node.getBoundingClientRect();
         const x = event.clientX - rect.left;
         const y = event.clientY - rect.top;
-        const dx = ((x / rect.width) - 0.5) * 10;
-        const dy = ((y / rect.height) - 0.5) * 8;
+        const dx = ((x / rect.width) - 0.5) * 6;
+        const dy = ((y / rect.height) - 0.5) * 5;
 
         gsap.to(node, {
           x: dx,
           y: dy,
-          scale: 1.02,
-          duration: 0.28,
+          scale: 1.014,
+          duration: 0.55,
           ease: "power3.out"
         });
 
@@ -66,7 +66,7 @@ export default function GsapButtonFX() {
             x: x - rect.width / 2,
             y: y - rect.height / 2,
             opacity: 0.95,
-            duration: 0.3,
+            duration: 0.45,
             ease: "power3.out"
           });
         }
@@ -74,16 +74,16 @@ export default function GsapButtonFX() {
 
       const onEnter = () => {
         gsap.to(node, {
-          scale: 1.02,
-          y: -2,
-          duration: 0.28,
+          scale: 1.014,
+          y: -1.5,
+          duration: 0.55,
           ease: "power3.out"
         });
         if (icon) {
-          gsap.to(icon, { x: 4, rotate: -8, duration: 0.28, ease: "power3.out" });
+          gsap.to(icon, { x: 3, rotate: -5, duration: 0.5, ease: "power3.out" });
         }
         if (glow) {
-          gsap.to(glow, { opacity: 0.9, duration: 0.24, ease: "power2.out" });
+          gsap.to(glow, { opacity: 0.82, duration: 0.45, ease: "power2.out" });
         }
       };
 
@@ -92,28 +92,28 @@ export default function GsapButtonFX() {
           x: 0,
           y: 0,
           scale: 1,
-          duration: 0.36,
+          duration: 0.6,
           ease: "power3.out"
         });
         if (icon) {
-          gsap.to(icon, { x: 0, rotate: 0, duration: 0.32, ease: "power3.out" });
+          gsap.to(icon, { x: 0, rotate: 0, duration: 0.55, ease: "power3.out" });
         }
         if (glow) {
-          gsap.to(glow, { opacity: 0.2, x: 0, y: 0, duration: 0.32, ease: "power2.out" });
+          gsap.to(glow, { opacity: 0.18, x: 0, y: 0, duration: 0.55, ease: "power2.out" });
         }
       };
 
       const onDown = () => {
-        gsap.to(node, { scale: 0.97, y: 0, duration: 0.12, ease: "power2.out" });
+        gsap.to(node, { scale: 0.985, y: 0, duration: 0.16, ease: "power2.out" });
         if (glow) {
-          gsap.to(glow, { opacity: 1, scale: 1.12, duration: 0.14, ease: "power2.out" });
+          gsap.to(glow, { opacity: 0.96, scale: 1.06, duration: 0.18, ease: "power2.out" });
         }
       };
 
       const onUp = () => {
-        gsap.to(node, { scale: 1.015, y: -1, duration: 0.18, ease: "back.out(2)" });
+        gsap.to(node, { scale: 1.008, y: -0.5, duration: 0.28, ease: "power3.out" });
         if (glow) {
-          gsap.to(glow, { scale: 1, duration: 0.2, ease: "power2.out" });
+          gsap.to(glow, { scale: 1, duration: 0.26, ease: "power2.out" });
         }
       };
 

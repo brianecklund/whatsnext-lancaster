@@ -972,7 +972,7 @@ export default function HomeSplitClient({ events }: Props) {
                       </div>
 
                       {dayEvents.length === 0 ? (
-                        <div className="emptyList">No events on this day.</div>
+                        <div className="emptyList" data-reveal-item>No events on this day.</div>
                       ) : (
                         <div className="dayEventsList">
                           {dayEvents.map((e) => {
@@ -1016,8 +1016,8 @@ export default function HomeSplitClient({ events }: Props) {
 
 
               {viewMode === "month" ? (
-                <div className="dayRight">
-                  <div className="dayRightHeader">
+                <div className="dayRight" data-reveal-group key={`day-right-${selectedDayStr}-${dayEvents.length}`}>
+                  <div className="dayRightHeader" data-reveal-item>
                     <div className="rightDayLabel">{formatDayHeading(selectedDay)}</div>
                     <div className="dayRightCount">
                       {dayEvents.length} event{dayEvents.length === 1 ? "" : "s"}
@@ -1025,9 +1025,9 @@ export default function HomeSplitClient({ events }: Props) {
                   </div>
 
                   {dayEvents.length === 0 ? (
-                    <div className="emptyList">No events on this day.</div>
+                    <div className="emptyList" data-reveal-item>No events on this day.</div>
                   ) : (
-                    <div className="dayRightList" role="list">
+                    <div className="dayRightList" role="list" data-reveal-item>
                       {dayEvents.map((e) => {
                         const key = e.uid ?? e.id;
                         const active =
@@ -1066,15 +1066,15 @@ export default function HomeSplitClient({ events }: Props) {
 
 
               {viewMode === "list" && selectedKey === WEEKLY_KEY ? (
-                <div className="rightHeader">
+                <div className="rightHeader" data-reveal-group key={`weekly-overview-${weekLabel}-${weekEventsCount}-${effectiveIsMobile ? "m" : "d"}`}>
                   <div
-                    className="rightDayLabel fadeInItem"
+                    className="rightDayLabel fadeInItem" data-reveal-item
                     style={{ animationDelay: "260ms" }}
                   >
                     Weekly Overview
                   </div>
 
-                  <div className="weekSummary fadeInItem" style={{ animationDelay: "320ms" }}>
+                  <div className="weekSummary fadeInItem" data-reveal-item style={{ animationDelay: "320ms" }}>
                     <h3 className="weekSummaryTitle">Week of {weekLabel}</h3>
                     <p className="weekSummarySubhead">
                       A quick snapshot of what&apos;s happening on the calendar this week.
@@ -1101,7 +1101,7 @@ export default function HomeSplitClient({ events }: Props) {
                     <div className="emptyRight">No events scheduled for the rest of this week.</div>
                   ) : effectiveIsMobile ? (
                     <div
-                      className="weeklyCondensed fadeInItem"
+                      className="weeklyCondensed fadeInItem" data-reveal-item
                       style={{ animationDelay: "380ms" }}
                       aria-label="Weekly overview (condensed)"
                     >
@@ -1144,9 +1144,9 @@ export default function HomeSplitClient({ events }: Props) {
                       ))}
                     </div>
                   ) : (
-                    <div className="weeklyCards fadeInItem" style={{ animationDelay: "380ms" }}>
+                    <div className="weeklyCards fadeInItem" data-reveal-item style={{ animationDelay: "380ms" }}>
                       {weekGroups.map((g) => (
-                        <div key={dayKey(g.date)} className="weeklyDayGroup">
+                        <div key={dayKey(g.date)} className="weeklyDayGroup" data-scroll-reveal>
                           <div className="dayTitle">{formatDayHeading(g.date)}</div>
 
                           {g.items.map((e) => {
@@ -1227,19 +1227,19 @@ export default function HomeSplitClient({ events }: Props) {
               ) : !selectedEvent ? (
                 viewMode === "month" ? null : <div className="emptyRight">Select an event.</div>
               ) : (
-                <div className="rightHeader">
+                <div className="rightHeader" data-reveal-group key={detailFlashKey}>
                   <div
-                    className="rightDayLabel fadeInItem"
+                    className="rightDayLabel fadeInItem" data-reveal-item
                     style={{ animationDelay: "260ms" }}
                   >
                     {selectedEvent.event_type || "Event"}
                   </div>
 
-                  <h1 className="detailTitle fadeInItem" style={{ animationDelay: "320ms" }}>
+                  <h1 className="detailTitle fadeInItem" data-reveal-item style={{ animationDelay: "320ms" }}>
                     {selectedEvent.title || "Untitled event"}
                   </h1>
 
-                  <div className="detailMeta fadeInItem" style={{ animationDelay: "360ms" }}>
+                  <div className="detailMeta fadeInItem" data-reveal-item style={{ animationDelay: "360ms" }}>
                     <span>{selectedTime}</span>
                     {selectedEvent.locationName ? (
                       <>
@@ -1257,19 +1257,19 @@ export default function HomeSplitClient({ events }: Props) {
 
                   {/* Always render heroImage for placeholder behavior */}
                   <div
-                    className="heroImage"
+                    className="heroImage" data-reveal-item
                     style={selectedImg ? { backgroundImage: `url(${selectedImg})` } : undefined}
                   />
 
-                  {selectedEvent.summary ? <p className="summary">{selectedEvent.summary}</p> : null}
+                  {selectedEvent.summary ? <p className="summary" data-reveal-item>{selectedEvent.summary}</p> : null}
 
-                  {selectedDesc ? <div className="detailBody">{selectedDesc}</div> : null}
+                  {selectedDesc ? <div className="detailBody" data-reveal-item>{selectedDesc}</div> : null}
 
                   {/* Extra media / rich blocks from Prismic slices (gallery, video, embeds, etc.) */}
-                  <MediaBlocks slices={(selectedEvent as any)?.content_blocks} />
+                  <div data-reveal-item><MediaBlocks slices={(selectedEvent as any)?.content_blocks} /></div>
 
                   {(selectedEvent.website_url || selectedEvent.tickets_url) ? (
-                    <div className="ctaRow">
+                    <div className="ctaRow" data-reveal-item>
                       <a
                         className="ctaBtn"
                         data-disabled={selectedEvent.website_url ? "false" : "true"}
@@ -1348,9 +1348,9 @@ export default function HomeSplitClient({ events }: Props) {
         </div>
         <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
           {selectedEvent ? (
-            <div key={detailFlashKey} className="detailCard detailFlash">
-              <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
-              <div className="detailMeta">
+            <div key={detailFlashKey} className="detailCard detailFlash" data-reveal-group>
+              <div className="detailTitle" data-reveal-item>{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
+              <div className="detailMeta" data-reveal-item>
                 <span className="muted">{selectedTime ?? "Time TBD"}</span>
                 {selectedEvent.event_type ? <span className="badge">{selectedEvent.event_type}</span> : null}
               </div>
@@ -1385,7 +1385,7 @@ export default function HomeSplitClient({ events }: Props) {
                 </p>
               ) : null}
 
-              <MediaBlocks slices={(selectedEvent as any)?.content_blocks} />
+              <div data-reveal-item><MediaBlocks slices={(selectedEvent as any)?.content_blocks} /></div>
             </div>
           ) : null}
         </div>

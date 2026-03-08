@@ -325,20 +325,20 @@ export default function UpdatesSplitClient({ updates }: Props) {
               {!selected ? (
                 <div className="emptyRight">Select an update to view details.</div>
               ) : (
-                <div key={detailFlashKey} className="detailCard detailFlash">
+                <div key={detailFlashKey} className="detailCard detailFlash" data-reveal-group>
                   <div className="detailHeader">
                     <div>
-                      <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
+                      <div className="detailTitle fadeInItem" data-reveal-item style={{ animationDelay: "260ms" }}>
                         {selected.title}
                       </div>
-                      <div className="detailMeta fadeInItem" style={{ animationDelay: "320ms" }}>
+                      <div className="detailMeta fadeInItem" data-reveal-item style={{ animationDelay: "320ms" }}>
                         {selected.date ? <span>{selected.date}</span> : null}
                       </div>
                     </div>
                   </div>
 
                   {selected.tags?.length ? (
-                    <div className="tagRow" style={{ marginTop: 10 }}>
+                    <div className="tagRow" data-reveal-item style={{ marginTop: 10 }}>
                       {selected.tags.map((t) => (
                         <span key={t} className="tagChip">
                           {t}
@@ -348,13 +348,13 @@ export default function UpdatesSplitClient({ updates }: Props) {
                   ) : null}
 
                   {selected.body ? (
-                    <div className="detailDesc fadeInItem" style={{ animationDelay: "360ms" }}>
+                    <div className="detailDesc fadeInItem" data-reveal-item style={{ animationDelay: "360ms" }}>
                       {selected.body}
                     </div>
                   ) : null}
 
                   {selected.link ? (
-                    <div className="detailLinks">
+                    <div className="detailLinks" data-reveal-item>
                       <a className="pillBtn" href={selected.link} target="_blank" rel="noreferrer">
                         Learn more
                       </a>
