@@ -551,13 +551,22 @@ export default function HomeSplitClient({ events }: Props) {
   }, [filteredEvents, selectedDayStr]);
 
   const dayJumpDates = useMemo(() => {
-    const map = new Map<number, Date>();
+    const weekStart = startOfDay(addDays(selectedDay, -selectedDay.getDay()));
+    const byExactDay = new Map<string, Date>();
+
     for (const group of leftDayGroups) {
-      const idx = group.date.getDay();
-      if (!map.has(idx)) map.set(idx, group.date);
+      byExactDay.set(dayKey(group.date), group.date);
     }
-    return DAY_ABBR.map((label, idx) => ({ label, index: idx, date: map.get(idx) ?? null }));
-  }, [leftDayGroups]);
+
+    return DAY_ABBR.map((label, idx) => {
+      const exactDate = startOfDay(addDays(weekStart, idx));
+      return {
+        label,
+        index: idx,
+        date: byExactDay.get(dayKey(exactDate)) ?? null,
+      };
+    });
+  }, [leftDayGroups, selectedDayStr]);
 
   function getListScrollOffset() {
     const stickyH = leftStickyRef.current?.offsetHeight ?? 0;
@@ -597,28 +606,20 @@ export default function HomeSplitClient({ events }: Props) {
 
   function jumpToDay(target: Date) {
     const key = dayKey(target);
-    const scrollNow = () => {
-      const root = listRef.current;
-      const el = daySectionRefs.current[key];
-      if (!root || !el) return false;
-      const top = Math.max(el.offsetTop - getListScrollOffset(), 0);
-      root.scrollTo({ top, behavior: "smooth" });
-      syncVisibleDayFromScroll(top);
-      return true;
-    };
+    const root = listRef.current;
+    const el = daySectionRefs.current[key];
+    if (!root || !el) return;
 
     setDidInitialScroll(true);
     setScrollDayKey(key);
     setClientSelectedKey(null);
+    if (sp.get("event")) setParam("event", null);
 
-    // Scroll immediately against the current DOM so the first tap always works,
-    // then sync the URL and retry once after React/router updates settle.
-    scrollNow();
-    setParams({ day: key, event: null });
+    const top = Math.max(el.offsetTop - getListScrollOffset(), 0);
+    root.scrollTo({ top, behavior: "smooth" });
 
     window.requestAnimationFrame(() => {
-      if (scrollNow()) return;
-      window.setTimeout(scrollNow, 80);
+      syncVisibleDayFromScroll(top);
     });
   }
 
@@ -766,7 +767,7 @@ export default function HomeSplitClient({ events }: Props) {
   }
 
   return (
-    <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
+    <div className="pageShell" data-mobile-detail-open={mobileDetailOpen ? "true" : "false"} style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
       <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>
         A calendar of events, specials, and pop-ups in Lancaster, PA.
       </div>
@@ -811,7 +812,6 @@ export default function HomeSplitClient({ events }: Props) {
                   </button>
                 </div>
 
-                {!(effectiveIsMobile && mobileDetailOpen) ? (
                 <div className="leftControls">
                   <div className="calendarToolbar">
                     <div className="dayJumpRail" aria-label="Jump to day">
@@ -896,11 +896,10 @@ export default function HomeSplitClient({ events }: Props) {
                     </div>
                   </div>
                 </div>
-                ) : null}
 
               </div>
 
-              {!effectiveIsMobile && !(effectiveIsMobile && mobileDetailOpen) ? (
+              {!effectiveIsMobile ? (
                 <div
                   className="filterDropdown"
                   data-open={filterOpen ? "true" : "false"}
@@ -955,7 +954,7 @@ export default function HomeSplitClient({ events }: Props) {
               ) : null}
 
               {/* Mobile filter overlay */}
-              {effectiveIsMobile && filterOpen && !mobileDetailOpen ? (
+              {effectiveIsMobile && filterOpen ? (
                 <div
                   className="filterOverlay"
                   role="dialog"

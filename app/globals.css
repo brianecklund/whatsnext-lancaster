@@ -2815,3 +2815,28 @@ a:hover{
     max-width: none;
   }
 }
+
+
+/* Calendar mobile detail state */
+@media (max-width: 980px){
+  .pageShell[data-mobile-detail-open="true"] .tagline,
+  .pageShell[data-mobile-detail-open="true"] .split,
+  .pageShell[data-mobile-detail-open="true"] .mobileTabs{
+    visibility: hidden;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail{
+    visibility: visible;
+    transform: translateX(0%);
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetailHeader,
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail > .scroll{
+    visibility: visible;
+  }
+
+  .mobileDetail .detailCard{
+    margin-top: 0;
+    padding-top: 0;
+  }
+}
