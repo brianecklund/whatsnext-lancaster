@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -334,10 +334,12 @@ export default function HomeSplitClient({ events }: Props) {
 
   // Mobile-only filter overlay state (used to show/hide filter pills on small screens)
   const [filterOpen, setFilterOpen] = useState(false);
+  const [mobileOverlayOffset, setMobileOverlayOffset] = useState(0);
 
   const effectiveIsMobile = mounted ? isMobile : false;
 
   const viewMode: "list" | "month" = view === "month" ? "month" : "list";
+  const selectedDisplayKey = selectedKey ?? (!effectiveIsMobile && viewMode === "list" ? WEEKLY_KEY : null);
 
   const selectedDay = useMemo(() => {
     const parsed = dayParam ? parseDayKey(dayParam) : null;
@@ -384,6 +386,31 @@ export default function HomeSplitClient({ events }: Props) {
       else if (anyMq.removeListener) anyMq.removeListener(apply);
     };
   }, []);
+
+  useEffect(() => {
+    if (!effectiveIsMobile) {
+      setMobileOverlayOffset(0);
+      return;
+    }
+
+    const updateOffset = () => {
+      setMobileOverlayOffset(leftStickyRef.current?.offsetHeight ?? 0);
+    };
+
+    updateOffset();
+    window.addEventListener("resize", updateOffset);
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined" && leftStickyRef.current) {
+      ro = new ResizeObserver(() => updateOffset());
+      ro.observe(leftStickyRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateOffset);
+      ro?.disconnect();
+    };
+  }, [effectiveIsMobile, q, type, viewMode, filterOpen]);
 
   // Keep the optimistic client key in sync with the URL when navigation completes.
   useEffect(() => {
@@ -486,11 +513,11 @@ export default function HomeSplitClient({ events }: Props) {
 
     const only = dayEvents[0];
     const key = only.uid ?? only.id;
-    if (selectedKey === key) return;
+    if (selectedDisplayKey === key) return;
 
     setClientSelectedKey(key);
     setParam("event", key);
-  }, [effectiveIsMobile, viewMode, selectedDayStr, dayEvents, selectedKey]);
+  }, [effectiveIsMobile, viewMode, selectedDayStr, dayEvents, selectedDisplayKey]);
 
 
 
@@ -517,8 +544,11 @@ export default function HomeSplitClient({ events }: Props) {
       });
     }
 
-    return groups;
-  }, [filteredEvents]);
+    const anchorIndex = groups.findIndex((g) => dayKey(g.date) === selectedDayStr);
+    if (anchorIndex <= 0) return groups;
+
+    return [...groups.slice(anchorIndex), ...groups.slice(0, anchorIndex)];
+  }, [filteredEvents, selectedDayStr]);
 
   const dayJumpDates = useMemo(() => {
     const map = new Map<number, Date>();
@@ -539,14 +569,9 @@ export default function HomeSplitClient({ events }: Props) {
     const root = listRef.current;
     if (!root || didInitialScroll || viewMode !== "list" || !leftDayGroups.length) return;
 
-    const targetKey = selectedDayStr;
-    const target = daySectionRefs.current[targetKey];
-    if (target) {
-      const top = Math.max(target.offsetTop - getListScrollOffset(), 0);
-      root.scrollTop = top;
-      setScrollDayKey(targetKey);
-      setDidInitialScroll(true);
-    }
+    root.scrollTop = 0;
+    setScrollDayKey(selectedDayStr);
+    setDidInitialScroll(true);
   }, [didInitialScroll, leftDayGroups, selectedDayStr, viewMode]);
 
   useEffect(() => {
@@ -636,10 +661,10 @@ export default function HomeSplitClient({ events }: Props) {
 
   const defaultWeekBucket = weekBuckets[0] ?? null;
   const selectedWeekBucket = useMemo(() => {
-    if (selectedKey === WEEKLY_KEY) return defaultWeekBucket;
-    if (!selectedKey?.startsWith("__week__:")) return null;
-    return weekBuckets.find((bucket) => bucket.key === selectedKey) ?? defaultWeekBucket;
-  }, [defaultWeekBucket, selectedKey, weekBuckets]);
+    if (selectedDisplayKey === WEEKLY_KEY) return defaultWeekBucket;
+    if (!selectedDisplayKey?.startsWith("__week__:")) return null;
+    return weekBuckets.find((bucket) => bucket.key === selectedDisplayKey) ?? defaultWeekBucket;
+  }, [defaultWeekBucket, selectedDisplayKey, weekBuckets]);
 
   const weekEvents = selectedWeekBucket?.events ?? [];
   const weekEventsCount = weekEvents.length;
@@ -649,14 +674,14 @@ export default function HomeSplitClient({ events }: Props) {
 
   const selectedEvent = useMemo(() => {
     if (!filteredEvents.length) return null;
-    if (selectedKey === WEEKLY_KEY) return null;
+    if (selectedDisplayKey === WEEKLY_KEY) return null;
 
     const byUid =
-      selectedKey && filteredEvents.find((e) => e.uid && e.uid === selectedKey);
-    const byId = selectedKey && filteredEvents.find((e) => e.id === selectedKey);
+      selectedDisplayKey && filteredEvents.find((e) => e.uid && e.uid === selectedDisplayKey);
+    const byId = selectedDisplayKey && filteredEvents.find((e) => e.id === selectedDisplayKey);
 
     return byUid || byId || null;
-  }, [filteredEvents, selectedKey]);
+  }, [filteredEvents, selectedDisplayKey]);
 
   const currentDisplayDayKey = useMemo(() => {
     if (selectedEvent) {
@@ -669,8 +694,8 @@ export default function HomeSplitClient({ events }: Props) {
   
   const detailFlashKey = useMemo(() => {
     if (!selectedEvent) return "none";
-    return `${selectedEvent.uid ?? selectedEvent.id ?? "event"}|${selectedKey}|${viewMode}|${q}|${type}`;
-  }, [selectedEvent, selectedKey, viewMode, q, type]);
+    return `${selectedEvent.uid ?? selectedEvent.id ?? "event"}|${selectedDisplayKey}|${viewMode}|${q}|${type}`;
+  }, [selectedEvent, selectedDisplayKey, viewMode, q, type]);
 
 // stagger counter for left list
   let listAnimIndex = 0;
@@ -727,7 +752,7 @@ export default function HomeSplitClient({ events }: Props) {
   }
 
   return (
-    <div className="pageShell">
+    <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
       <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>
         A calendar of events, specials, and pop-ups in Lancaster, PA.
       </div>
@@ -824,11 +849,23 @@ export default function HomeSplitClient({ events }: Props) {
                           className="filterBtn"
                           aria-label={filterOpen ? "Close filters" : "Open filters"}
                           aria-expanded={filterOpen ? "true" : "false"}
+                          data-active={filterOpen || !!type ? "true" : "false"}
                           onClick={() => setFilterOpen((v) => !v)}
                         >
                           {type ? `Filter: ${type}` : "Filter"}
                         </button>
-                      ) : null}
+                      ) : (
+                        <button
+                          type="button"
+                          className="filterBtn filterBtnSquare"
+                          aria-label={filterOpen ? "Close filters" : "Open filters"}
+                          aria-expanded={filterOpen ? "true" : "false"}
+                          data-active={filterOpen || !!type ? "true" : "false"}
+                          onClick={() => setFilterOpen((v) => !v)}
+                        >
+                          {type ? "F*" : "F"}
+                        </button>
+                      )}
                       {!effectiveIsMobile && (q || type) ? (
                         <button
                           className="clearBtn"
@@ -845,34 +882,61 @@ export default function HomeSplitClient({ events }: Props) {
                   </div>
                 </div>
 
-                {/* Desktop pills */}
-                {!effectiveIsMobile ? (
-                  <div className="typePills" role="group" aria-label="Event type filters">
-                    <button
-                      type="button"
-                      className="typePill"
-                      data-active={!type ? "true" : "false"}
-                      onClick={() => setParam("type", null)}
-                    >
-                      All
-                    </button>
-                    {eventTypes.map((t) => {
-                      const on = norm(type) === norm(t);
-                      return (
-                        <button
-                          key={t}
-                          type="button"
-                          className="typePill"
-                          data-active={on ? "true" : "false"}
-                          onClick={() => setParam("type", on ? null : t)}
-                        >
-                          {t}
-                        </button>
-                      );
-                    })}
-                  </div>
-                ) : null}
               </div>
+
+              {!effectiveIsMobile ? (
+                <div
+                  className="filterDropdown"
+                  data-open={filterOpen ? "true" : "false"}
+                  aria-hidden={filterOpen ? "false" : "true"}
+                >
+                  <div className="filterDropdownInner">
+                    <div className="typePills" role="group" aria-label="Event type filters">
+                      <button
+                        type="button"
+                        className="typePill"
+                        data-active={!type ? "true" : "false"}
+                        onClick={() => {
+                          setParam("type", null);
+                          setFilterOpen(false);
+                        }}
+                      >
+                        All
+                      </button>
+                      {eventTypes.map((t) => {
+                        const on = norm(type) === norm(t);
+                        return (
+                          <button
+                            key={t}
+                            type="button"
+                            className="typePill"
+                            data-active={on ? "true" : "false"}
+                            onClick={() => {
+                              setParam("type", on ? null : t);
+                              setFilterOpen(false);
+                            }}
+                          >
+                            {t}
+                          </button>
+                        );
+                      })}
+                    </div>
+                    {(q || type) ? (
+                      <button
+                        type="button"
+                        className="filterDropdownClear"
+                        onClick={() => {
+                          setParam("q", null);
+                          setParam("type", null);
+                          setFilterOpen(false);
+                        }}
+                      >
+                        Clear search & filters
+                      </button>
+                    ) : null}
+                  </div>
+                </div>
+              ) : null}
 
               {/* Mobile filter overlay */}
               {effectiveIsMobile && filterOpen ? (
@@ -951,7 +1015,7 @@ export default function HomeSplitClient({ events }: Props) {
                 type="button"
                 className="weeklyOverview fadeInItem"
                 style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
-                data-active={selectedKey === WEEKLY_KEY ? "true" : "false"}
+                data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
                 onClick={() => openWeek(WEEKLY_KEY)}
               >
                 <div className="weeklyTitle">Weekly Overview</div>
@@ -962,14 +1026,14 @@ export default function HomeSplitClient({ events }: Props) {
               </button>
 
               
-              {effectiveIsMobile && selectedWeekBucket ? (
+              {effectiveIsMobile && (selectedWeekBucket ?? defaultWeekBucket) ? (
                 <div className="weeklyMobilePanel fadeInItem" style={{ animationDelay: "320ms" }}>
                   <div className="weekSummaryMini">
-                    <div className="weekSummaryMiniTitle">Week of {selectedWeekBucket?.rangeLabel}</div>
+                    <div className="weekSummaryMiniTitle">Week of {(selectedWeekBucket ?? defaultWeekBucket)?.rangeLabel}</div>
                     <div className="weekSummaryMiniGrid" role="list">
                       <div className="weekSummaryMiniCard" role="listitem">
                         <div className="weekSummaryMiniKicker">Total</div>
-                        <div className="weekSummaryMiniValue">{selectedWeekBucket?.events.length ?? 0}</div>
+                        <div className="weekSummaryMiniValue">{(selectedWeekBucket ?? defaultWeekBucket)?.events.length ?? 0}</div>
                       </div>
                       <div className="weekSummaryMiniCard" role="listitem">
                         <div className="weekSummaryMiniKicker">Live</div>

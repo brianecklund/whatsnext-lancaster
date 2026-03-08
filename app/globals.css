@@ -2742,3 +2742,55 @@ a:hover{
     padding-right: 10px;
   }
 }
+
+
+/* --- March 2026 follow-up fixes --- */
+.filterBtnSquare{
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+  justify-content: center;
+}
+
+@media (min-width: 981px){
+  .paneLeft > .scroll{
+    padding-top: 0;
+  }
+}
+
+/* Make anchor targets land below sticky controls */
+.dayBlock{
+  scroll-margin-top: 220px;
+}
+
+/* Remove content-area shadows on right/detail surfaces */
+.paneRight .detailCard,
+.mobileDetail .detailCard,
+.mobileDetailHeader,
+.paneRight .scroll,
+.mobileDetail{
+  box-shadow: none !important;
+}
+
+/* Ensure mobile detail overlays start below sticky search/filter UI */
+@media (max-width: 980px){
+  .mobileDetail{
+    inset: calc(var(--headerH) + var(--mobileOverlayOffset, 0px)) 0 0 0;
+  }
+
+  .mobileDetailHeader{
+    top: 0;
+  }
+
+  .calendarToolbar{
+    gap: 8px;
+  }
+
+  .calendarSearchRowMobile{
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .calendarSearchRowMobile .filterBtn{
+    max-width: none;
+  }
+}

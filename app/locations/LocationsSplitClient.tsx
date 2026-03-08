@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
@@ -20,6 +20,12 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [mobileOverlayOffset, setMobileOverlayOffset] = useState(0);
+  const leftStickyRef = useRef<HTMLDivElement | null>(null);
+
+  const selectedKey = searchParams.get("location");
+  const q = searchParams.get("q") ?? "";
+  const cat = searchParams.get("cat") ?? "";
 
   useEffect(() => {
     setMounted(true);
@@ -41,10 +47,31 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   useEffect(() => {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
+  useEffect(() => {
+    if (!effectiveIsMobile) {
+      setMobileOverlayOffset(0);
+      return;
+    }
 
-  const selectedKey = searchParams.get("location");
-  const q = searchParams.get("q") ?? "";
-  const cat = searchParams.get("cat") ?? "";
+    const updateOffset = () => {
+      setMobileOverlayOffset(leftStickyRef.current?.offsetHeight ?? 0);
+    };
+
+    updateOffset();
+    window.addEventListener("resize", updateOffset);
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined" && leftStickyRef.current) {
+      ro = new ResizeObserver(() => updateOffset());
+      ro.observe(leftStickyRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateOffset);
+      ro?.disconnect();
+    };
+  }, [effectiveIsMobile, q, cat, filterOpen]);
+
   const activeFilterLabel = cat ? `Filter: ${cat}` : "Filter";
 
   function navigate(params: URLSearchParams) {
@@ -113,14 +140,14 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   const mobileDetailOpen = Boolean(selectedKey);
 
   return (
-    <div className="pageShell">
+    <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
       <div className="tagline">A directory of places in Lancaster to explore.</div>
 
       <div className="split">
         {/* LEFT */}
         <div className="pane paneLeft">
           <div className="scroll">
-            <div className="leftSticky">
+            <div className="leftSticky" ref={leftStickyRef}>
               <div className="tabs" aria-label="Primary navigation">
                 <button
                   type="button"
