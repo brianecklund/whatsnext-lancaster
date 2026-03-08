@@ -551,19 +551,15 @@ export default function HomeSplitClient({ events }: Props) {
   }, [filteredEvents, selectedDayStr]);
 
   const dayJumpDates = useMemo(() => {
-    const weekStart = startOfDay(addDays(selectedDay, -selectedDay.getDay()));
-    const byExactDay = new Map<string, Date>();
-
-    for (const group of leftDayGroups) {
-      byExactDay.set(dayKey(group.date), group.date);
-    }
-
-    return DAY_ABBR.map((label, idx) => {
-      const exactDate = startOfDay(addDays(weekStart, idx));
+    const weekStart = startOfWeekFromDate(selectedDay);
+    return Array.from({ length: 7 }, (_, offset) => {
+      const date = addDays(weekStart, offset);
+      const key = dayKey(date);
+      const hasGroup = leftDayGroups.some((group) => dayKey(group.date) === key);
       return {
-        label,
-        index: idx,
-        date: byExactDay.get(dayKey(exactDate)) ?? null,
+        label: DAY_ABBR[date.getDay()],
+        index: date.getDay(),
+        date: hasGroup ? date : null,
       };
     });
   }, [leftDayGroups, selectedDayStr]);
@@ -606,20 +602,28 @@ export default function HomeSplitClient({ events }: Props) {
 
   function jumpToDay(target: Date) {
     const key = dayKey(target);
-    const root = listRef.current;
-    const el = daySectionRefs.current[key];
-    if (!root || !el) return;
+    const scrollNow = () => {
+      const root = listRef.current;
+      const el = daySectionRefs.current[key];
+      if (!root || !el) return false;
+      const top = Math.max(el.offsetTop - getListScrollOffset(), 0);
+      root.scrollTo({ top, behavior: "smooth" });
+      syncVisibleDayFromScroll(top);
+      return true;
+    };
 
     setDidInitialScroll(true);
     setScrollDayKey(key);
     setClientSelectedKey(null);
-    if (sp.get("event")) setParam("event", null);
 
-    const top = Math.max(el.offsetTop - getListScrollOffset(), 0);
-    root.scrollTo({ top, behavior: "smooth" });
+    // Scroll immediately against the current DOM so the first tap always works,
+    // then sync the URL and retry once after React/router updates settle.
+    scrollNow();
+    setParams({ day: key, event: null });
 
     window.requestAnimationFrame(() => {
-      syncVisibleDayFromScroll(top);
+      if (scrollNow()) return;
+      window.setTimeout(scrollNow, 80);
     });
   }
 
@@ -767,7 +771,7 @@ export default function HomeSplitClient({ events }: Props) {
   }
 
   return (
-    <div className="pageShell" data-mobile-detail-open={mobileDetailOpen ? "true" : "false"} style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
+    <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
       <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>
         A calendar of events, specials, and pop-ups in Lancaster, PA.
       </div>
@@ -1332,7 +1336,23 @@ export default function HomeSplitClient({ events }: Props) {
                     Weekly Overview
                   </div>
 
-                  <div className="weekSummary fadeInItem" style={{ animationDelay: "320ms" }}>
+                  <div className="weekSelectorRail fadeInItem" style={{ animationDelay: "300ms" }}>
+                    {weekBuckets.map((bucket) => (
+                      <button
+                        key={bucket.key}
+                        type="button"
+                        className="weekSelectorCard"
+                        data-active={selectedWeekBucket.key === bucket.key ? "true" : "false"}
+                        onClick={() => openWeek(bucket.key)}
+                      >
+                        <div className="weekSelectorEyebrow">{bucket.label}</div>
+                        <div className="weekSelectorRange">{bucket.rangeLabel}</div>
+                        <div className="weekSelectorMeta">{bucket.events.length} event{bucket.events.length === 1 ? "" : "s"}</div>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="weekSummary fadeInItem" style={{ animationDelay: "360ms" }}>
                     <div className="weekSummaryTopline">
                       <div>
                         <h3 className="weekSummaryTitle">{selectedWeekBucket.label}</h3>
@@ -1372,22 +1392,6 @@ export default function HomeSplitClient({ events }: Props) {
                         <div className="weekSummaryValueSmall">{selectedWeekBucket.peakWindowLabel}</div>
                       </div>
                     </div>
-                  </div>
-
-                  <div className="weekSelectorRail fadeInItem" style={{ animationDelay: "360ms" }}>
-                    {weekBuckets.map((bucket) => (
-                      <button
-                        key={bucket.key}
-                        type="button"
-                        className="weekSelectorCard"
-                        data-active={selectedWeekBucket.key === bucket.key ? "true" : "false"}
-                        onClick={() => openWeek(bucket.key)}
-                      >
-                        <div className="weekSelectorEyebrow">{bucket.label}</div>
-                        <div className="weekSelectorRange">{bucket.rangeLabel}</div>
-                        <div className="weekSelectorMeta">{bucket.events.length} event{bucket.events.length === 1 ? "" : "s"}</div>
-                      </button>
-                    ))}
                   </div>
 
                   {weekEventsCount === 0 ? (

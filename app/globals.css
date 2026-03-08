@@ -1014,12 +1014,9 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   .mobileDetail{
     display:block;
     position: fixed;
-    top: var(--headerH);
-    left: 0;
-    right: 0;
-    bottom: 0;
+    inset: var(--headerH) 0 0 0;
     background: var(--bg);
-    z-index: 500;
+    z-index: 210;
     transform: translateX(100%);
     transition: transform 320ms var(--ease-snap);
     will-change: transform;
@@ -1036,8 +1033,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     justify-content: space-between;
     padding: 14px 16px;
     border-bottom: 1px solid var(--border);
-    background: var(--bg);
-    backdrop-filter: none;
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(10px);
   }
   .backBtn{
     border: 0;
@@ -2606,7 +2603,7 @@ a:hover{
   }
 
   .mobileDetail > .scroll{
-    padding: 0 16px 110px 16px !important;
+    padding: 12px 16px 110px 16px !important;
     box-sizing: border-box;
   }
 
@@ -2817,26 +2814,47 @@ a:hover{
 }
 
 
-/* Calendar mobile detail state */
+/* Directory evolution */
+.locationDiscoveryCard{
+  padding: 4px 0 24px 0;
+}
+
+.locationIntelGrid{
+  display:grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.locationIntelCard{
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fff;
+  padding: 14px;
+}
+
+.locationIntelLabel{
+  font-size: var(--fs-meta);
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.locationIntelValue{
+  font-size: var(--fs-subhead);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.locationIntelValueSmall{
+  font-size: var(--fs-body);
+}
+
+.locationTrendBlock{
+  margin-top: 20px;
+}
+
 @media (max-width: 980px){
-  .pageShell[data-mobile-detail-open="true"] .tagline,
-  .pageShell[data-mobile-detail-open="true"] .split,
-  .pageShell[data-mobile-detail-open="true"] .mobileTabs{
-    visibility: hidden;
-  }
-
-  .pageShell[data-mobile-detail-open="true"] .mobileDetail{
-    visibility: visible;
-    transform: translateX(0%);
-  }
-
-  .pageShell[data-mobile-detail-open="true"] .mobileDetailHeader,
-  .pageShell[data-mobile-detail-open="true"] .mobileDetail > .scroll{
-    visibility: visible;
-  }
-
-  .mobileDetail .detailCard{
-    margin-top: 0;
-    padding-top: 0;
+  .locationIntelGrid{
+    grid-template-columns: 1fr;
   }
 }
