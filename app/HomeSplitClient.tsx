@@ -811,6 +811,7 @@ export default function HomeSplitClient({ events }: Props) {
                   </button>
                 </div>
 
+                {!(effectiveIsMobile && mobileDetailOpen) ? (
                 <div className="leftControls">
                   <div className="calendarToolbar">
                     <div className="dayJumpRail" aria-label="Jump to day">
@@ -895,10 +896,11 @@ export default function HomeSplitClient({ events }: Props) {
                     </div>
                   </div>
                 </div>
+                ) : null}
 
               </div>
 
-              {!effectiveIsMobile ? (
+              {!effectiveIsMobile && !(effectiveIsMobile && mobileDetailOpen) ? (
                 <div
                   className="filterDropdown"
                   data-open={filterOpen ? "true" : "false"}
@@ -953,7 +955,7 @@ export default function HomeSplitClient({ events }: Props) {
               ) : null}
 
               {/* Mobile filter overlay */}
-              {effectiveIsMobile && filterOpen ? (
+              {effectiveIsMobile && filterOpen && !mobileDetailOpen ? (
                 <div
                   className="filterOverlay"
                   role="dialog"
