@@ -5,8 +5,13 @@ import { useEffect } from "react";
 declare global {
   interface Window {
     gsap?: {
-      to: (target: unknown, vars: Record<string, unknown>) => unknown;
       set: (target: unknown, vars: Record<string, unknown>) => unknown;
+      to: (target: unknown, vars: Record<string, unknown>) => unknown;
+      fromTo?: (
+        target: unknown,
+        fromVars: Record<string, unknown>,
+        toVars: Record<string, unknown>
+      ) => unknown;
       killTweensOf?: (target: unknown) => unknown;
     };
   }
