@@ -365,9 +365,6 @@ export default function HomeSplitClient({ events }: Props) {
   }, [selectedDayStr]);
 
 
-  // Mobile-only: hide the subhead tagline when the user starts scrolling the left list.
-  const [taglineHidden, setTaglineHidden] = useState(false);
-
   useEffect(() => {
     setMounted(true);
     const mq = window.matchMedia("(max-width: 980px)");
@@ -731,10 +728,6 @@ export default function HomeSplitClient({ events }: Props) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
-  // Ensure tagline is visible again when leaving mobile.
-  useEffect(() => {
-    if (!effectiveIsMobile) setTaglineHidden(false);
-  }, [effectiveIsMobile]);
 
   const showLeft = true;
 
@@ -771,9 +764,6 @@ export default function HomeSplitClient({ events }: Props) {
 
   return (
     <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
-      <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>
-        A calendar of events, specials, and pop-ups in Lancaster, PA.
-      </div>
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
@@ -783,7 +773,6 @@ export default function HomeSplitClient({ events }: Props) {
               ref={listRef}
               onScroll={(e) => {
                 const st = (e.currentTarget as HTMLDivElement).scrollTop;
-                if (effectiveIsMobile) setTaglineHidden(st > 2);
                 syncVisibleDayFromScroll(st);
               }}
             >
