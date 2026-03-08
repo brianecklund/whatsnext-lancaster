@@ -597,24 +597,29 @@ export default function HomeSplitClient({ events }: Props) {
 
   function jumpToDay(target: Date) {
     const key = dayKey(target);
-    setScrollDayKey(key);
-    setClientSelectedKey(null);
-    setDidInitialScroll(true);
-
-    const scrollToTarget = () => {
+    const scrollNow = () => {
       const root = listRef.current;
       const el = daySectionRefs.current[key];
-      if (!root || !el) return;
-      root.scrollTo({ top: Math.max(el.offsetTop - getListScrollOffset(), 0), behavior: "smooth" });
+      if (!root || !el) return false;
+      const top = Math.max(el.offsetTop - getListScrollOffset(), 0);
+      root.scrollTo({ top, behavior: "smooth" });
+      syncVisibleDayFromScroll(top);
+      return true;
     };
 
-    scrollToTarget();
-    window.requestAnimationFrame(() => {
-      scrollToTarget();
-      window.requestAnimationFrame(scrollToTarget);
-    });
+    setDidInitialScroll(true);
+    setScrollDayKey(key);
+    setClientSelectedKey(null);
 
+    // Scroll immediately against the current DOM so the first tap always works,
+    // then sync the URL and retry once after React/router updates settle.
+    scrollNow();
     setParams({ day: key, event: null });
+
+    window.requestAnimationFrame(() => {
+      if (scrollNow()) return;
+      window.setTimeout(scrollNow, 80);
+    });
   }
 
   const currentWeekRange = useMemo(() => {
@@ -691,28 +696,6 @@ export default function HomeSplitClient({ events }: Props) {
 
     return byUid || byId || null;
   }, [filteredEvents, selectedDisplayKey]);
-
-  const mobileEventSequence = useMemo(() => {
-    return [...filteredEvents]
-      .map((event) => ({ event, date: safeDateFromEvent(event) }))
-      .filter((item): item is { event: EventLite; date: Date } => !!item.date)
-      .sort((a, b) => a.date.getTime() - b.date.getTime())
-      .map(({ event }) => event);
-  }, [filteredEvents]);
-
-  const mobileSelectedIndex = useMemo(() => {
-    if (!selectedEvent) return -1;
-    return mobileEventSequence.findIndex((event) => {
-      if (selectedEvent.uid && event.uid) return selectedEvent.uid === event.uid;
-      return selectedEvent.id === event.id;
-    });
-  }, [mobileEventSequence, selectedEvent]);
-
-  const mobilePrevEvent = mobileSelectedIndex > 0 ? mobileEventSequence[mobileSelectedIndex - 1] : null;
-  const mobileNextEvent =
-    mobileSelectedIndex >= 0 && mobileSelectedIndex < mobileEventSequence.length - 1
-      ? mobileEventSequence[mobileSelectedIndex + 1]
-      : null;
 
   const currentDisplayDayKey = useMemo(() => {
     if (selectedEvent) {
@@ -1667,7 +1650,7 @@ export default function HomeSplitClient({ events }: Props) {
           </button>
           <div className="mobileDetailTitle">Event</div>
         </div>
-        <div className="scroll" style={{ padding: "0 16px 140px 16px" }}>
+        <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
           {selectedEvent ? (
             <div key={detailFlashKey} className="detailCard detailFlash">
               <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
@@ -1710,27 +1693,6 @@ export default function HomeSplitClient({ events }: Props) {
             </div>
           ) : null}
         </div>
-
-        {selectedEvent ? (
-          <div className="mobileDetailNav">
-            <button
-              type="button"
-              className="mobileDetailNavBtn"
-              onClick={() => mobilePrevEvent && openSelected(mobilePrevEvent.uid ?? mobilePrevEvent.id)}
-              disabled={!mobilePrevEvent}
-            >
-              Previous
-            </button>
-            <button
-              type="button"
-              className="mobileDetailNavBtn"
-              onClick={() => mobileNextEvent && openSelected(mobileNextEvent.uid ?? mobileNextEvent.id)}
-              disabled={!mobileNextEvent}
-            >
-              Next
-            </button>
-          </div>
-        ) : null}
       </div>
 
 </div>

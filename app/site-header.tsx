@@ -74,6 +74,7 @@ export default function SiteHeader() {
       <button
         type="button"
         className="hamburgerBtn"
+        data-open={open ? "true" : "false"}
         aria-label={open ? "Close menu" : "Open menu"}
         aria-expanded={open ? "true" : "false"}
         onClick={() => setOpen((v) => !v)}
@@ -87,8 +88,8 @@ export default function SiteHeader() {
 
       {/* Mobile overlay */}
       {open ? (
-        <div className="menuOverlay" role="dialog" aria-modal="true">
-          <div className="menuOverlayInner">
+        <div className="menuOverlay" role="dialog" aria-modal="true" onClick={() => setOpen(false)}>
+          <div className="menuOverlayInner" onClick={(e) => e.stopPropagation()}>
             <div className="menuOverlayHeader">
               <div className="menuOverlayTitle">Menu</div>
               <button
