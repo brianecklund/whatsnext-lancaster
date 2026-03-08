@@ -411,7 +411,10 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .paneRight > .scroll{
-  padding: 10px 2px 40px 0;
+  padding: 16px 10px 28px 0;
+  overflow-y: auto;
+  overflow-x: visible;
+  overscroll-behavior: contain;
 }
 
 .paneLeft > .scroll{
@@ -987,7 +990,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     z-index: 20;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
-    padding: 10px 0 12px 0;
+    padding: 8px 0 8px 0;
   }
 /* Slide-in detail overlay */
   .mobileDetail{
@@ -1040,6 +1043,46 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   gap: 12px;
   align-items: center;
   min-width: 0;
+}
+
+.calendarToolbar{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.dayJumpRail{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  min-width: max-content;
+}
+
+.dayJumpBtn{
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.dayJumpBtn[data-active="true"]{
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+}
+
+.dayJumpBtn:disabled{
+  opacity: 0.32;
 }
 
 .searchRow{
@@ -2318,7 +2361,6 @@ a:hover{
 
 
 /* Monochrome depth + reveal system */
-.paneRight,
 .leftSticky,
 .weeklyCard,
 .detailCard,
@@ -2559,4 +2601,16 @@ a:hover{
     flex-direction:column;
     align-items:flex-start;
   }
+}
+
+
+@media (max-width: 980px){
+  .leftControls{ margin-top: 8px; }
+  .calendarToolbar{ gap: 8px; }
+  .dayJumpRail{ gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+  .dayJumpBtn{ width: 30px; height: 30px; font-size: 10px; }
+  .searchRow{ gap: 8px; }
+  .searchInput{ height: 40px; }
+  .filterBtn, .clearBtn, .viewBtn{ height: 40px; }
+  .paneRight > .scroll{ padding: 12px 6px 22px 0; }
 }

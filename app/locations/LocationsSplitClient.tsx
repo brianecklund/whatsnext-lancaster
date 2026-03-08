@@ -148,79 +148,40 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
               </div>
 
               <div className="leftControls">
-                {effectiveIsMobile ? (
-                  <div className="searchRow">
-                    <input
-                      className="searchInput"
-                      value={q}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Search"
-                      aria-label="Search locations"
-                    />
-                    <button
-                      type="button"
-                      className="filterBtn"
-                      aria-label={filterOpen ? "Close filters" : "Open filters"}
-                      aria-expanded={filterOpen ? "true" : "false"}
-                      onClick={() => setFilterOpen((v) => !v)}
-                    >
-                      Filter
-                    </button>
-                  </div>
-                ) : (
-                  <>
-                    <input
-                      className="searchInput"
-                      value={q}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Search"
-                      aria-label="Search locations"
-                    />
-                    {(q || cat) ? (
-                      <button
-                        className="clearBtn"
-                        type="button"
-                        onClick={() => {
-                          setQuery("");
-                          setCategory(null);
-                        }}
-                      >
-                        Clear
-                      </button>
-                    ) : null}
-                  </>
-                )}
-              </div>
-
-              {!effectiveIsMobile ? (
-                <div className="typePills" role="group" aria-label="Directory filters">
+                <div className="searchRow">
+                  <input
+                    className="searchInput"
+                    value={q}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search"
+                    aria-label="Search locations"
+                  />
                   <button
                     type="button"
-                    className="typePill"
-                    data-active={!cat ? "true" : "false"}
-                    onClick={() => setCategory(null)}
+                    className="filterBtn"
+                    aria-label={filterOpen ? "Close filters" : "Open filters"}
+                    aria-expanded={filterOpen ? "true" : "false"}
+                    onClick={() => setFilterOpen((v) => !v)}
                   >
-                    All
+                    Filter
                   </button>
-                  {categories.map((t) => {
-                    const on = normalize(cat ?? "") === normalize(t);
-                    return (
-                      <button
-                        key={t}
-                        type="button"
-                        className="typePill"
-                        data-active={on ? "true" : "false"}
-                        onClick={() => setCategory(on ? null : t)}
-                      >
-                        {t}
-                      </button>
-                    );
-                  })}
+                  {!effectiveIsMobile && (q || cat) ? (
+                    <button
+                      className="clearBtn"
+                      type="button"
+                      onClick={() => {
+                        setQuery("");
+                        setCategory(null);
+                      }}
+                    >
+                      Clear
+                    </button>
+                  ) : null}
                 </div>
-              ) : null}
+              </div>
             </div>
 
-            {effectiveIsMobile && filterOpen ? (
+            {filterOpen ? (
               <div
                 className="filterOverlay"
                 role="dialog"

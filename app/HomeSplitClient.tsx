@@ -114,6 +114,25 @@ function dayKey(d: Date): string {
   return `${y}-${m}-${dd}`;
 }
 
+const DAY_ABBR = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
+
+function nearestDayWithEvents(events: EventLite[]): Date {
+  const today = startOfToday();
+  const dated = events
+    .map((e) => safeDateFromEvent(e))
+    .filter((d): d is Date => !!d)
+    .sort((a, b) => a.getTime() - b.getTime());
+
+  if (!dated.length) return today;
+
+  const todayMatch = dated.find((d) => dayKey(d) === dayKey(today));
+  if (todayMatch) return startOfDay(todayMatch);
+
+  const upcoming = dated.find((d) => d.getTime() >= today.getTime());
+  if (upcoming) return startOfDay(upcoming);
+
+  return startOfDay(dated[dated.length - 1]);
+}
 
 function parseDayKey(ymd: string): Date | null {
   if (!ymd) return null;
@@ -271,6 +290,9 @@ export default function HomeSplitClient({ events }: Props) {
   const dayParam = sp.get("day");
 
   const listRef = useRef<HTMLDivElement | null>(null);
+  const daySectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const [scrollDayKey, setScrollDayKey] = useState<string | null>(null);
+  const [didInitialScroll, setDidInitialScroll] = useState(false);
 
   // Staged intro animation (runs once per session): UI first, then list + right content.
   useEffect(() => {
@@ -303,7 +325,7 @@ export default function HomeSplitClient({ events }: Props) {
   // URL drives selection, but on mobile we keep an optimistic client key so the
   // detail panel can update immediately on tap (before the router finishes).
   const [clientSelectedKey, setClientSelectedKey] = useState<string | null>(null);
-  const selectedKey = (clientSelectedKey ?? selectedParam) ?? WEEKLY_KEY;
+  const selectedKey = clientSelectedKey ?? selectedParam ?? null;
   // Initialize from matchMedia so the first tap on mobile reliably opens detail.
   const [mounted, setMounted] = useState(false);
   // Hydration-safe: start false so SSR and first client render match.
@@ -318,8 +340,21 @@ export default function HomeSplitClient({ events }: Props) {
 
   const selectedDay = useMemo(() => {
     const parsed = dayParam ? parseDayKey(dayParam) : null;
-    return parsed ?? startOfToday();
-  }, [dayParam]);
+    if (parsed) return parsed;
+
+    const source = events.filter((e) => {
+      const hay = norm(
+        [e.title ?? "", e.summary ?? "", e.locationName ?? "", e.address ?? "", e.event_type ?? ""]
+          .filter(Boolean)
+          .join(" ")
+      );
+      const matchesSearch = !norm(q) || hay.includes(norm(q));
+      const matchesType = !norm(type) || norm(e.event_type ?? "") === norm(type);
+      return matchesSearch && matchesType;
+    });
+
+    return nearestDayWithEvents(source);
+  }, [dayParam, events, q, type]);
 
   const selectedDayStr = dayKey(selectedDay);
   const monthAnchor = useMemo(() => {
@@ -484,6 +519,64 @@ export default function HomeSplitClient({ events }: Props) {
     return groups;
   }, [filteredEvents]);
 
+  const dayJumpDates = useMemo(() => {
+    const map = new Map<number, Date>();
+    for (const group of leftDayGroups) {
+      const idx = group.date.getDay();
+      if (!map.has(idx)) map.set(idx, group.date);
+    }
+    return DAY_ABBR.map((label, idx) => ({ label, index: idx, date: map.get(idx) ?? null }));
+  }, [leftDayGroups]);
+
+
+  useEffect(() => {
+    const root = listRef.current;
+    if (!root || didInitialScroll || viewMode !== "list" || !leftDayGroups.length) return;
+
+    const targetKey = selectedDayStr;
+    const target = daySectionRefs.current[targetKey];
+    if (target) {
+      const top = Math.max(target.offsetTop - 6, 0);
+      root.scrollTop = top;
+      setScrollDayKey(targetKey);
+      setDidInitialScroll(true);
+    }
+  }, [didInitialScroll, leftDayGroups, selectedDayStr, viewMode]);
+
+  useEffect(() => {
+    if (dayParam) setDidInitialScroll(true);
+  }, [dayParam]);
+
+  function syncVisibleDayFromScroll(scrollTop: number) {
+    const root = listRef.current;
+    if (!root) return;
+    const threshold = scrollTop + 120;
+    let active = leftDayGroups[0]?.date ? dayKey(leftDayGroups[0].date) : null;
+
+    for (const group of leftDayGroups) {
+      const key = dayKey(group.date);
+      const el = daySectionRefs.current[key];
+      if (!el) continue;
+      if (el.offsetTop <= threshold) active = key;
+      else break;
+    }
+
+    if (active && active !== scrollDayKey) setScrollDayKey(active);
+  }
+
+  function jumpToDay(target: Date) {
+    const key = dayKey(target);
+    setScrollDayKey(key);
+    setParams({ day: key, event: null });
+
+    window.requestAnimationFrame(() => {
+      const root = listRef.current;
+      const el = daySectionRefs.current[key];
+      if (!root || !el) return;
+      root.scrollTo({ top: Math.max(el.offsetTop - 6, 0), behavior: "smooth" });
+    });
+  }
+
   const currentWeekRange = useMemo(() => {
     const start = startOfToday();
     const end = endOfSundayFromToday();
@@ -559,6 +652,14 @@ export default function HomeSplitClient({ events }: Props) {
     return byUid || byId || null;
   }, [filteredEvents, selectedKey]);
 
+  const currentDisplayDayKey = useMemo(() => {
+    if (selectedEvent) {
+      const d = safeDateFromEvent(selectedEvent);
+      if (d) return dayKey(d);
+    }
+    return scrollDayKey ?? selectedDayStr;
+  }, [scrollDayKey, selectedDayStr, selectedEvent]);
+
   
   const detailFlashKey = useMemo(() => {
     if (!selectedEvent) return "none";
@@ -602,7 +703,7 @@ export default function HomeSplitClient({ events }: Props) {
     : null;
 
   const mobileDetailOpen =
-    effectiveIsMobile && selectedKey !== WEEKLY_KEY && !!selectedEvent;
+    effectiveIsMobile && !!selectedEvent;
 
   function clearSelected() {
     setClientSelectedKey(null);
@@ -632,9 +733,9 @@ export default function HomeSplitClient({ events }: Props) {
               className="scroll"
               ref={listRef}
               onScroll={(e) => {
-                if (!effectiveIsMobile) return;
                 const st = (e.currentTarget as HTMLDivElement).scrollTop;
-                setTaglineHidden(st > 2);
+                if (effectiveIsMobile) setTaglineHidden(st > 2);
+                syncVisibleDayFromScroll(st);
               }}
             >
               <div className="leftSticky">
@@ -666,7 +767,31 @@ export default function HomeSplitClient({ events }: Props) {
                 </div>
 
                 <div className="leftControls">
-                  {effectiveIsMobile ? (
+                  <div className="calendarToolbar">
+                    <div className="dayJumpRail" aria-label="Jump to day">
+                      {dayJumpDates.map((entry) => {
+                        const isActive = currentDisplayDayKey
+                          ? entry.date
+                            ? dayKey(entry.date) === currentDisplayDayKey
+                            : entry.index === parseDayKey(currentDisplayDayKey)?.getDay()
+                          : false;
+
+                        return (
+                          <button
+                            key={entry.label}
+                            type="button"
+                            className="dayJumpBtn"
+                            data-active={isActive ? "true" : "false"}
+                            disabled={!entry.date}
+                            onClick={() => entry.date && jumpToDay(entry.date)}
+                            aria-label={entry.date ? `Jump to ${entry.label}` : `${entry.label} has no events`}
+                          >
+                            {entry.label.slice(0, 1)}
+                          </button>
+                        );
+                      })}
+                    </div>
+
                     <div className="searchRow">
                       <input
                         className="searchInput"
@@ -680,13 +805,12 @@ export default function HomeSplitClient({ events }: Props) {
                         className="viewBtn"
                         aria-label={viewMode === "month" ? "Switch to list view" : "Switch to calendar view"}
                         onClick={() => {
-                          // Switching views should never leave a stuck detail overlay on mobile.
                           clearSelected();
                           setFilterOpen(false);
                           setParam("view", viewMode === "month" ? "list" : "month");
                         }}
                       >
-                        {viewMode === "month" ? "List" : "Cal"}
+                        {viewMode === "month" ? (effectiveIsMobile ? "List" : "List view") : (effectiveIsMobile ? "Cal" : "Calendar view")}
                       </button>
                       <button
                         type="button"
@@ -697,24 +821,7 @@ export default function HomeSplitClient({ events }: Props) {
                       >
                         Filter
                       </button>
-                    </div>
-                  ) : (
-                    <>
-                      <input
-                        className="searchInput"
-                        placeholder="Search events…"
-                        value={q}
-                        onChange={(e) => setParam("q", e.target.value)}
-                      />
-                      <button
-                        type="button"
-                        className="viewBtn"
-                        onClick={() => setParam("view", viewMode === "month" ? "list" : "month")}
-                        aria-label={viewMode === "month" ? "Switch to list view" : "Switch to calendar view"}
-                      >
-                        {viewMode === "month" ? "List view" : "Calendar view"}
-                      </button>
-                      {(q || type) ? (
+                      {!effectiveIsMobile && (q || type) ? (
                         <button
                           className="clearBtn"
                           onClick={() => {
@@ -726,8 +833,8 @@ export default function HomeSplitClient({ events }: Props) {
                           Clear
                         </button>
                       ) : null}
-                    </>
-                  )}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Desktop pills */}
@@ -836,7 +943,7 @@ export default function HomeSplitClient({ events }: Props) {
                 type="button"
                 className="weeklyOverview fadeInItem"
                 style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
-                data-active={selectedWeekBucket ? "true" : "false"}
+                data-active={selectedKey === WEEKLY_KEY ? "true" : "false"}
                 onClick={() => openWeek(WEEKLY_KEY)}
               >
                 <div className="weeklyTitle">Weekly Overview</div>
@@ -910,7 +1017,7 @@ export default function HomeSplitClient({ events }: Props) {
 
               {/* Left list */}
               {leftDayGroups.map((g) => (
-                <section key={dayKey(g.date)} className="dayBlock">
+                <section key={dayKey(g.date)} className="dayBlock" ref={(el) => { daySectionRefs.current[dayKey(g.date)] = el; }}>
                   <div className="dayTitle">{formatDayHeading(g.date)}</div>
 
                   {g.items.map((e) => {
@@ -1299,7 +1406,44 @@ export default function HomeSplitClient({ events }: Props) {
                   )}
                 </div>
               ) : !selectedEvent ? (
-                viewMode === "month" ? null : <div className="emptyRight">Select an event.</div>
+                <div className="dayRight">
+                  <div className="dayRightHeader">
+                    <div className="rightDayLabel">{formatDayHeading(selectedDay)}</div>
+                    <div className="dayRightCount">
+                      {dayEvents.length} event{dayEvents.length === 1 ? "" : "s"}
+                    </div>
+                  </div>
+
+                  {dayEvents.length === 0 ? (
+                    <div className="emptyList">No events on this day.</div>
+                  ) : (
+                    <div className="dayRightList" role="list">
+                      {dayEvents.map((e) => {
+                        const key = e.uid ?? e.id;
+                        const title = e.title || "Untitled event";
+                        const d = safeDateFromEvent(e);
+                        const timeLabel = d ? formatTimeShort(d) : "Time TBD";
+                        const venueBits = [e.locationName, e.event_type].filter(Boolean).join(" • ");
+
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            className="dayRightRow"
+                            onClick={() => openSelected(key)}
+                            role="listitem"
+                          >
+                            <div className="dayRightTop">
+                              <div className="dayRightTitle">{title}</div>
+                              <div className="dayRightTime">{timeLabel}</div>
+                            </div>
+                            {venueBits ? <div className="dayRightMeta">{venueBits}</div> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               ) : (
                 <div className="rightHeader">
                   <div
