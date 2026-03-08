@@ -7,7 +7,11 @@ declare global {
     gsap?: {
       set: (target: unknown, vars: Record<string, unknown>) => unknown;
       to: (target: unknown, vars: Record<string, unknown>) => unknown;
-      fromTo: (target: unknown, fromVars: Record<string, unknown>, toVars: Record<string, unknown>) => unknown;
+      fromTo?: (
+        target: unknown,
+        fromVars: Record<string, unknown>,
+        toVars: Record<string, unknown>
+      ) => unknown;
       killTweensOf?: (target: unknown) => unknown;
     };
   }
@@ -25,7 +29,7 @@ function animateGroup(group: HTMLElement) {
     opacity: 0,
     y: 28,
     filter: "blur(12px)",
-    willChange: "transform, opacity, filter"
+    willChange: "transform, opacity, filter",
   });
 
   items.forEach((item, index) => {
@@ -36,7 +40,7 @@ function animateGroup(group: HTMLElement) {
       duration: 1.35,
       delay: 0.18 + index * 0.15,
       ease: "power3.out",
-      clearProps: "willChange"
+      clearProps: "willChange",
     });
   });
 }
@@ -60,7 +64,7 @@ function revealScrollItem(el: HTMLElement) {
     filter: "blur(0px)",
     duration: 1.45,
     ease: "power3.out",
-    clearProps: "willChange"
+    clearProps: "willChange",
   });
 }
 
@@ -98,16 +102,20 @@ export default function GsapPageFX() {
           if (!(node instanceof HTMLElement)) return;
 
           if (node.matches?.("[data-reveal-group]")) animateGroup(node);
-          if (node.querySelectorAll) node.querySelectorAll<HTMLElement>("[data-reveal-group]").forEach(animateGroup);
+          if (node.querySelectorAll) {
+            node.querySelectorAll<HTMLElement>("[data-reveal-group]").forEach(animateGroup);
+          }
 
           if (node.matches?.("[data-scroll-reveal]")) {
             prepareScrollItem(node);
             observer.observe(node);
           }
-          if (node.querySelectorAll) node.querySelectorAll<HTMLElement>("[data-scroll-reveal]").forEach((el) => {
-            prepareScrollItem(el);
-            observer.observe(el);
-          });
+          if (node.querySelectorAll) {
+            node.querySelectorAll<HTMLElement>("[data-scroll-reveal]").forEach((el) => {
+              prepareScrollItem(el);
+              observer.observe(el);
+            });
+          }
         });
       });
     });
