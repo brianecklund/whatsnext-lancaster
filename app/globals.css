@@ -18,12 +18,15 @@
   --text: #0a0a0a;
   --muted: #5f5f5f;
   --border: #d9d9d9;
-  --panel: #f0f0f0;
-  --hover: #f5f5f5;
+  --panel: #f2f2f2;
+  --hover: #f7f7f7;
+  --panelStrong: #ebebeb;
+  --shadowSoft: 0 8px 24px rgba(0,0,0,0.06);
+  --shadowCard: 0 14px 32px rgba(0,0,0,0.08);
 
-  /* Accent (primary pop) */
-  --accent: #2563eb;
-  --accentSoft: rgba(37, 99, 235, 0.12);
+  /* Accent (monochrome) */
+  --accent: #111111;
+  --accentSoft: rgba(17, 17, 17, 0.08);
 
   /* Layout */
   --headerH: 86px;
@@ -115,12 +118,16 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 /* Site chrome */
 .siteHeader{
+  position: relative;
+  z-index: 130;
   height: var(--headerH);
   display:flex;
   align-items:flex-start;
   justify-content: space-between;
   padding: 18px var(--gutter) 0 var(--gutter);
   border-bottom: 1px solid var(--border);
+  background: rgba(255,255,255,0.92);
+  backdrop-filter: blur(16px);
 }
 
 .brand{
@@ -136,15 +143,19 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .brandShort{ display:none; }
 
 .hamburgerBtn{
+  position: relative;
+  z-index: 150;
   display:none;
   width: 46px;
   height: 46px;
   border-radius: 14px;
   border: 1px solid var(--border);
   background: #fff;
+  box-shadow: var(--shadowSoft);
   align-items:center;
   justify-content:center;
   margin-top: 2px;
+  transition: transform 320ms var(--ease-snap), background-color 320ms ease, box-shadow 320ms ease;
 }
 
 .hamburgerBtn:hover{ background: var(--hover); }
@@ -166,29 +177,32 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .menuOverlay{
   position: fixed;
-  inset: 0;
-  z-index: 999;
-  background: rgba(0,0,0,0.35);
-  display:flex;
-  align-items:flex-start;
-  justify-content:flex-end;
-  padding: 16px;
+  inset: var(--headerH) 0 0 0;
+  z-index: 145;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(18px);
+  display:block;
+  overflow: hidden;
+  animation: menuOverlayFade 560ms var(--ease-out) both;
 }
 
 .menuOverlayInner{
-  width: min(420px, 100%);
-  background: #fff;
-  border-radius: 22px;
-  border: 1px solid var(--border);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.14);
-  padding: 14px;
+  width: 100%;
+  min-height: 100%;
+  background: transparent;
+  border-radius: 0;
+  border: 0;
+  box-shadow: none;
+  padding: 18px 22px 32px 22px;
+  transform-origin: top center;
+  animation: menuOverlayDrop 700ms var(--ease-snap) both;
 }
 
 .menuOverlayHeader{
   display:flex;
   align-items:center;
   justify-content: space-between;
-  padding: 6px 6px 10px 6px;
+  padding: 2px 2px 18px 2px;
   border-bottom: 1px solid var(--border);
 }
 
@@ -211,18 +225,27 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .menuOverlayNav{
   display:flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px 6px 6px 6px;
+  gap: 12px;
+  padding: 20px 0 6px 0;
 }
 
 .menuOverlayLink{
-  padding: 14px 14px;
-  border-radius: 16px;
+  display:flex;
+  align-items:center;
+  min-height: 64px;
+  padding: 14px 16px;
+  border-radius: 18px;
   border: 1px solid var(--border);
   font-weight: var(--fw-medium);
-  font-size: var(--fs-body);
+  font-size: clamp(1.2rem, 4vw, 1.8rem);
+  letter-spacing: -0.02em;
   text-decoration:none;
-  background: #fff;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  box-shadow: var(--shadowSoft);
+  opacity: 0;
+  transform: translateY(24px);
+  animation: menuLinkIn 560ms var(--ease-out) forwards;
+  animation-delay: calc(180ms + (var(--menuIndex, 0) * 80ms));
 }
 
 .menuOverlayLink:hover{ background: var(--hover); }
@@ -308,6 +331,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .main{
   height: calc(100vh - var(--headerH));
   padding: 0 var(--gutter);
+  overflow: hidden;
 }
 
 /* Home */
@@ -315,6 +339,11 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   height: 100%;
   display:flex;
   flex-direction: column;
+}
+
+.routeFrame{
+  height: 100%;
+  animation: routeFadeIn 820ms var(--ease-out) both;
 }
 
 .tagline{
@@ -362,11 +391,34 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .pane{
   min-height: 0;
   border-left: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .paneRight{
   border-left: 1px solid var(--border);
   padding-left: var(--gutter);
+  min-height: 0;
+}
+
+
+.paneRight > .scroll,
+.paneLeft > .scroll,
+.mobileDetail > .scroll{
+  flex: 1 1 auto;
+  min-height: 0;
+  box-sizing: border-box;
+}
+
+.paneRight > .scroll{
+  padding: 16px 10px 28px 0;
+  overflow-y: auto;
+  overflow-x: visible;
+  overscroll-behavior: contain;
+}
+
+.paneLeft > .scroll{
+  padding: 0 0 36px 0;
 }
 
 /* Weekly Overview cards (Right Pane) */
@@ -562,15 +614,22 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .scroll{
+  flex: 1 1 auto;
+  min-height: 0;
   height: 100%;
-  overflow: auto;
-  overflow-y: scroll;            /* reserve scrollbar space to prevent layout shift */
-  scrollbar-gutter: stable;      /* modern browsers: keep gutter stable */
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
   padding-bottom: 18px;
+  scroll-padding-top: calc(var(--headerH, 86px) + 16px);
+  scroll-padding-bottom: 48px;
 }
 
 /* Sticky tabs (desktop left) */
 .leftSticky{
+  --stickySpace: 12px;
   position: sticky;
   top: 0;
   z-index: 10;
@@ -615,6 +674,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .dayBlock{
   padding: 18px 0;
   border-top: 1px solid var(--border);
+  scroll-margin-top: 140px;
 }
 
 /* Weekly Overview (left list header card) */
@@ -932,18 +992,17 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     z-index: 20;
     background: var(--bg);
     border-bottom: 1px solid var(--border);
-    padding: 10px 0 12px 0;
+    padding: 8px 0 8px 0;
   }
 /* Slide-in detail overlay */
   .mobileDetail{
     display:block;
     position: fixed;
-    /* Keep the main site header (logo + menu) visible above the detail view */
     inset: var(--headerH) 0 0 0;
     background: var(--bg);
-    z-index: 1200;
+    z-index: 70;
     transform: translateX(100%);
-    transition: transform 220ms ease;
+    transition: transform 320ms var(--ease-snap);
   }
   .mobileDetail[data-open="true"]{
     transform: translateX(0%);
@@ -974,14 +1033,9 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     font-weight: var(--fw-medium);
     font-size: var(--fs-body);
   }
-  .mobileDetailBody{
-    height: calc(100dvh - var(--headerH) - 64px - 84px);
-    padding: 0 16px 104px 16px;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
+
   .mobileDetailNav{
-    position: absolute;
+    position: sticky;
     left: 0;
     right: 0;
     bottom: 0;
@@ -992,8 +1046,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     padding: 12px 16px calc(12px + env(safe-area-inset-bottom, 0px));
     border-top: 1px solid var(--border);
     background: rgba(255,255,255,0.96);
-    backdrop-filter: blur(10px);
   }
+
   .mobileDetailNavBtn{
     height: 48px;
     border-radius: 14px;
@@ -1001,10 +1055,9 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     background: var(--btnBg);
     font-weight: var(--fw-medium);
   }
-  .mobileDetailNavBtn:hover{ background: var(--btnBgHover); }
+
   .mobileDetailNavBtn:disabled{
-    opacity: 0.45;
-    cursor: default;
+    opacity: 0.4;
   }
 }
 
@@ -1018,6 +1071,46 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   gap: 12px;
   align-items: center;
   min-width: 0;
+}
+
+.calendarToolbar{
+  display:flex;
+  align-items:center;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+}
+
+.dayJumpRail{
+  display:flex;
+  align-items:center;
+  gap: 8px;
+  min-width: max-content;
+}
+
+.dayJumpBtn{
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #fff;
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 700;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  transition: background-color 180ms ease, color 180ms ease, border-color 180ms ease, transform 180ms ease;
+}
+
+.dayJumpBtn[data-active="true"]{
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+}
+
+.dayJumpBtn:disabled{
+  opacity: 0.32;
 }
 
 .searchRow{
@@ -1537,7 +1630,7 @@ strong, b{ font-weight: var(--fw-medium); }
   --dur-3: 920ms;
 }
 
-html{ scroll-behavior: smooth; }
+html{ scroll-behavior: auto; }
 
 @media (prefers-reduced-motion: reduce){
   *{ animation: none !important; transition: none !important; }
@@ -1546,8 +1639,8 @@ html{ scroll-behavior: smooth; }
 
 /* Targeted flashes (only these should animate on navigation/selection) */
 @keyframes wnlFlash{
-  0%{ opacity: 0; transform: translateY(6px); filter: blur(2px); }
-  100%{ opacity: 1; transform: translateY(0); filter: blur(0); }
+  0%{ opacity: 0; transform: translateY(6px); }
+  100%{ opacity: 1; transform: translateY(0); }
 }
 
 .navFlash{ animation: wnlFlash 320ms var(--ease-out) both; }
@@ -2132,8 +2225,8 @@ a:hover{
 }
 
 @keyframes wnl-reveal{
-  from{ opacity:0; transform: translateY(10px); filter: blur(2px); }
-  to{ opacity:1; transform: translateY(0); filter: blur(0); }
+  from{ opacity:0; transform: translateY(10px); }
+  to{ opacity:1; transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -2291,5 +2384,439 @@ a:hover{
     opacity: 1 !important;
     transform: none !important;
     animation: none !important;
+  }
+}
+
+
+/* Monochrome depth + reveal system */
+.leftSticky,
+.weeklyCard,
+.detailCard,
+.filterOverlayPanel,
+.menuOverlayLink,
+.tabBtn,
+.searchInput,
+.filterBtn,
+.clearBtn,
+.typePill,
+.eventRow,
+.weeklyOverview,
+.weeklyCondRow,
+.mobileTabs{
+  box-shadow: var(--shadowSoft);
+}
+
+.detailCard,
+.weeklyCard,
+.filterOverlayPanel,
+.mobileDetailHeader{
+  box-shadow: var(--shadowCard);
+}
+
+.reveal-ready{
+  opacity: 0;
+  transform: translate3d(0, 18px, 0);
+  transition:
+    opacity 720ms cubic-bezier(.22,1,.36,1),
+    transform 720ms cubic-bezier(.22,1,.36,1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform, opacity;
+}
+
+.reveal-visible{
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@keyframes routeFadeIn{
+  0%{ opacity: 0; transform: translate3d(0, 14px, 0); }
+  100%{ opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+@keyframes menuOverlayFade{
+  0%{ opacity: 0; }
+  100%{ opacity: 1; }
+}
+
+@keyframes menuOverlayDrop{
+  0%{ opacity: 0; transform: scaleY(0.08) translateY(-24px); }
+  100%{ opacity: 1; transform: scaleY(1) translateY(0); }
+}
+
+@keyframes menuLinkIn{
+  0%{ opacity: 0; transform: translateY(24px); }
+  100%{ opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .routeFrame{ animation: none !important; }
+  .menuOverlay, .menuOverlayInner, .menuOverlayLink{ animation: none !important; }
+  .reveal-ready{ opacity: 1 !important; transform: none !important; transition: none !important; }
+}
+
+@media (max-width: 980px){
+  .menuOverlay{ inset: var(--headerH) 0 0 0; }
+  .menuOverlayInner{ padding: 16px 16px 28px 16px; }
+  .menuOverlayLink{ min-height: 58px; }
+}
+
+
+.weeklyOverviewLanding{
+  padding-top: 4px;
+  padding-bottom: 40px;
+}
+
+.weekSummaryTopline{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap: 14px;
+  margin-bottom: 10px;
+}
+
+.weekSummaryRangePill{
+  flex: 0 0 auto;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: var(--fs-meta);
+  color: var(--muted);
+  background: var(--panel);
+}
+
+.weekSummaryGridSecondary{
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 12px;
+}
+
+.weekSummaryValueSmall{
+  margin-top: 6px;
+  font-weight: 600;
+  font-size: var(--fs-body);
+  line-height: 1.45;
+}
+
+.weekSelectorRail{
+  display:grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+  margin-bottom: 18px;
+}
+
+.weekSelectorCard{
+  text-align:left;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fff;
+  padding: 14px;
+  display:flex;
+  flex-direction:column;
+  gap: 6px;
+}
+
+.weekSelectorCard:hover{
+  background: var(--hover);
+}
+
+.weekSelectorCard[data-active="true"]{
+  background: var(--accentSoft);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.08) inset;
+}
+
+.weekSelectorEyebrow{
+  font-size: var(--fs-meta);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+}
+
+.weekSelectorRange{
+  font-weight: 600;
+  font-size: var(--fs-body);
+}
+
+.weekSelectorMeta{
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+.weeklyLanding{
+  display:flex;
+  flex-direction:column;
+  gap: 18px;
+}
+
+.weeklyInsightsBar{
+  display:grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.weeklyInsightMetric{
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fff;
+  padding: 12px;
+}
+
+.weeklyInsightTop{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap: 8px;
+  font-size: var(--fs-meta);
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.weeklyInsightTrack{
+  width:100%;
+  height: 8px;
+  background: #e9e9e9;
+  border-radius: 999px;
+  overflow:hidden;
+}
+
+.weeklyInsightFill{
+  display:block;
+  height:100%;
+  border-radius:999px;
+  background: #1a1a1a;
+}
+
+.weeklyCardContentExpanded{
+  gap: 10px;
+}
+
+.weeklyCardMetaRow{
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+.weeklyCardDesc{
+  color: var(--text);
+  line-height: 1.55;
+}
+
+@media (max-width: 1180px){
+  .weekSelectorRail,
+  .weeklyInsightsBar{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 980px){
+  .paneLeft > .scroll{
+    padding-bottom: 100px;
+  }
+
+  .mobileDetail > .scroll{
+    padding: 12px 16px 110px 16px !important;
+    box-sizing: border-box;
+  }
+
+  .weekSummaryTopline,
+  .weekSelectorRail,
+  .weeklyInsightsBar,
+  .weekSummaryGridSecondary{
+    grid-template-columns: 1fr;
+    display:grid;
+  }
+
+  .weekSummaryTopline{
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+  }
+}
+
+
+@media (max-width: 980px){
+  .leftControls{ margin-top: 8px; }
+  .calendarToolbar{ gap: 8px; }
+  .dayJumpRail{ gap: 6px; overflow-x: auto; padding-bottom: 2px; }
+  .dayJumpBtn{ width: 30px; height: 30px; font-size: 10px; }
+  .searchRow{ gap: 8px; }
+  .searchInput{ height: 40px; }
+  .filterBtn, .clearBtn, .viewBtn{ height: 40px; }
+  .paneRight > .scroll{ padding: 12px 6px 22px 0; }
+}
+
+
+/* Directory filter dropdown */
+.filterBtn[data-active="true"]{
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+}
+
+.filterDropdown{
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 280ms ease, opacity 220ms ease, margin-top 220ms ease;
+  opacity: 0;
+  margin-top: 0;
+}
+
+.filterDropdown[data-open="true"]{
+  grid-template-rows: 1fr;
+  opacity: 1;
+  margin-top: 10px;
+}
+
+.filterDropdownInner{
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+  padding: 0 12px;
+}
+
+.filterDropdown[data-open="true"] .filterDropdownInner{
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.filterDropdownClear{
+  width: 100%;
+  margin-top: 10px;
+  height: 42px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--btnBg);
+  font-weight: var(--fw-medium);
+}
+.filterDropdownClear:hover{ background: var(--btnBgHover); }
+
+/* Mobile calendar controls */
+.calendarSearchRowMobile{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+}
+
+@media (max-width: 980px){
+  .calendarToolbar{
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .dayJumpRail{
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    overflow: visible;
+    width: 100%;
+  }
+
+  .calendarSearchRowMobile .searchInput{
+    min-width: 0;
+  }
+
+  .calendarSearchRowMobile .viewBtn,
+  .calendarSearchRowMobile .filterBtn{
+    white-space: nowrap;
+  }
+
+  .filterOverlay{
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .filterOverlayPanel{
+    width: 100%;
+    max-width: calc(100vw - 20px);
+    overflow-x: hidden;
+  }
+
+  .filterOverlayPanel .typePills{
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .filterOverlayPanel .typePill{
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 520px){
+  .calendarSearchRowMobile{
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .dayJumpRail{
+    gap: 4px;
+  }
+
+  .dayJumpBtn{
+    width: 100%;
+    min-width: 0;
+  }
+
+  .calendarSearchRowMobile .viewBtn{
+    padding: 0 10px;
+  }
+
+  .calendarSearchRowMobile .filterBtn{
+    max-width: none;
+    padding: 0 10px;
+  }
+
+  .filterDropdownInner{
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+}
+
+
+/* --- March 2026 follow-up fixes --- */
+.filterBtnSquare{
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+  justify-content: center;
+}
+
+@media (min-width: 981px){
+  .paneLeft > .scroll{
+    padding-top: 0;
+  }
+}
+
+/* Make anchor targets land below sticky controls */
+.dayBlock{
+  scroll-margin-top: 220px;
+}
+
+/* Remove content-area shadows on right/detail surfaces */
+.paneRight .detailCard,
+.mobileDetail .detailCard,
+.mobileDetailHeader,
+.paneRight .scroll,
+.mobileDetail{
+  box-shadow: none !important;
+}
+
+/* Ensure mobile detail overlays start below sticky search/filter UI */
+@media (max-width: 980px){
+  .mobileDetail{
+    inset: var(--headerH) 0 0 0;
+  }
+
+  .mobileDetailHeader{
+    top: 0;
+  }
+
+  .calendarToolbar{
+    gap: 8px;
+  }
+
+  .calendarSearchRowMobile{
+    grid-template-columns: minmax(0, 1fr) auto auto;
+  }
+
+  .calendarSearchRowMobile .filterBtn{
+    max-width: none;
   }
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
@@ -20,6 +20,12 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [mobileOverlayOffset, setMobileOverlayOffset] = useState(0);
+  const leftStickyRef = useRef<HTMLDivElement | null>(null);
+
+  const selectedKey = searchParams.get("location");
+  const q = searchParams.get("q") ?? "";
+  const cat = searchParams.get("cat") ?? "";
 
   useEffect(() => {
     setMounted(true);
@@ -41,10 +47,32 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   useEffect(() => {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
+  useEffect(() => {
+    if (!effectiveIsMobile) {
+      setMobileOverlayOffset(0);
+      return;
+    }
 
-  const selectedKey = searchParams.get("location");
-  const q = searchParams.get("q") ?? "";
-  const cat = searchParams.get("cat") ?? "";
+    const updateOffset = () => {
+      setMobileOverlayOffset(leftStickyRef.current?.offsetHeight ?? 0);
+    };
+
+    updateOffset();
+    window.addEventListener("resize", updateOffset);
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined" && leftStickyRef.current) {
+      ro = new ResizeObserver(() => updateOffset());
+      ro.observe(leftStickyRef.current);
+    }
+
+    return () => {
+      window.removeEventListener("resize", updateOffset);
+      ro?.disconnect();
+    };
+  }, [effectiveIsMobile, q, cat, filterOpen]);
+
+  const activeFilterLabel = cat ? `Filter: ${cat}` : "Filter";
 
   function navigate(params: URLSearchParams) {
     const qs = params.toString();
@@ -112,14 +140,14 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   const mobileDetailOpen = Boolean(selectedKey);
 
   return (
-    <div className="pageShell">
+    <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
       <div className="tagline">A directory of places in Lancaster to explore.</div>
 
       <div className="split">
         {/* LEFT */}
         <div className="pane paneLeft">
           <div className="scroll">
-            <div className="leftSticky">
+            <div className="leftSticky" ref={leftStickyRef}>
               <div className="tabs" aria-label="Primary navigation">
                 <button
                   type="button"
@@ -148,113 +176,49 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
               </div>
 
               <div className="leftControls">
-                {effectiveIsMobile ? (
-                  <div className="searchRow">
-                    <input
-                      className="searchInput"
-                      value={q}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Search"
-                      aria-label="Search locations"
-                    />
+                <div className="searchRow">
+                  <input
+                    className="searchInput"
+                    value={q}
+                    onChange={(e) => setQuery(e.target.value)}
+                    placeholder="Search"
+                    aria-label="Search locations"
+                  />
+                  {effectiveIsMobile ? (
                     <button
                       type="button"
                       className="filterBtn"
+                      data-active={filterOpen || !!cat ? "true" : "false"}
                       aria-label={filterOpen ? "Close filters" : "Open filters"}
                       aria-expanded={filterOpen ? "true" : "false"}
                       onClick={() => setFilterOpen((v) => !v)}
                     >
-                      Filter
+                      {activeFilterLabel}
                     </button>
-                  </div>
-                ) : (
-                  <>
-                    <input
-                      className="searchInput"
-                      value={q}
-                      onChange={(e) => setQuery(e.target.value)}
-                      placeholder="Search"
-                      aria-label="Search locations"
-                    />
-                    {(q || cat) ? (
-                      <button
-                        className="clearBtn"
-                        type="button"
-                        onClick={() => {
-                          setQuery("");
-                          setCategory(null);
-                        }}
-                      >
-                        Clear
-                      </button>
-                    ) : null}
-                  </>
-                )}
-              </div>
-
-              {!effectiveIsMobile ? (
-                <div className="typePills" role="group" aria-label="Directory filters">
-                  <button
-                    type="button"
-                    className="typePill"
-                    data-active={!cat ? "true" : "false"}
-                    onClick={() => setCategory(null)}
-                  >
-                    All
-                  </button>
-                  {categories.map((t) => {
-                    const on = normalize(cat ?? "") === normalize(t);
-                    return (
-                      <button
-                        key={t}
-                        type="button"
-                        className="typePill"
-                        data-active={on ? "true" : "false"}
-                        onClick={() => setCategory(on ? null : t)}
-                      >
-                        {t}
-                      </button>
-                    );
-                  })}
-                </div>
-              ) : null}
-            </div>
-
-            {effectiveIsMobile && filterOpen ? (
-              <div
-                className="filterOverlay"
-                role="dialog"
-                aria-modal="true"
-                aria-label="Filters"
-                onClick={() => setFilterOpen(false)}
-              >
-                <div className="filterOverlayPanel" onClick={(e) => e.stopPropagation()}>
-                  <div className="filterOverlayHeader">
-                    <div className="filterOverlayTitle">Filters</div>
+                  ) : null}
+                  {!effectiveIsMobile && (q || cat) ? (
                     <button
+                      className="clearBtn"
                       type="button"
-                      className="filterOverlayClose"
-                      onClick={() => setFilterOpen(false)}
-                      aria-label="Close filters"
-                    >
-                      ✕
-                    </button>
-                  </div>
-
-                  {(q || cat) ? (
-                    <button
-                      type="button"
-                      className="filterOverlayClear"
                       onClick={() => {
                         setQuery("");
                         setCategory(null);
-                        setFilterOpen(false);
                       }}
                     >
-                      Clear search & filters
+                      Clear
                     </button>
                   ) : null}
+                </div>
+              </div>
+            </div>
 
+            {effectiveIsMobile ? (
+              <div
+                className="filterDropdown"
+                data-open={filterOpen ? "true" : "false"}
+                aria-hidden={filterOpen ? "false" : "true"}
+              >
+                <div className="filterDropdownInner">
                   <div className="typePills" role="group" aria-label="Directory filters">
                     <button
                       type="button"
@@ -285,9 +249,48 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                       );
                     })}
                   </div>
+
+                  {(q || cat) ? (
+                    <button
+                      type="button"
+                      className="filterDropdownClear"
+                      onClick={() => {
+                        setQuery("");
+                        setCategory(null);
+                        setFilterOpen(false);
+                      }}
+                    >
+                      Clear search & filters
+                    </button>
+                  ) : null}
                 </div>
               </div>
-            ) : null}
+            ) : (
+              <div className="typePills" role="group" aria-label="Directory filters" style={{ marginTop: 12 }}>
+                <button
+                  type="button"
+                  className="typePill"
+                  data-active={!cat ? "true" : "false"}
+                  onClick={() => setCategory(null)}
+                >
+                  All
+                </button>
+                {categories.map((t) => {
+                  const on = normalize(cat ?? "") === normalize(t);
+                  return (
+                    <button
+                      key={t}
+                      type="button"
+                      className="typePill"
+                      data-active={on ? "true" : "false"}
+                      onClick={() => setCategory(on ? null : t)}
+                    >
+                      {t}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
 
             {filtered.length === 0 ? (
               <div className="emptyList">No listings yet.</div>

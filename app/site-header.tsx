@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 
 const LINKS = [
@@ -107,8 +108,9 @@ export default function SiteHeader() {
                   className="menuOverlayLink"
                   href={l.href}
                   data-active={pathname === l.href ? "true" : "false"}
+                  style={{ ["--menuIndex" as string]: idx } as CSSProperties}
                 >
-                  {l.label}
+                  <span className="menuOverlayLinkText">{l.label}</span>
                 </a>
               ))}
             </nav>
