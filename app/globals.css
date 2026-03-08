@@ -391,11 +391,22 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .pane{
   min-height: 0;
   border-left: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .paneRight{
   border-left: 1px solid var(--border);
   padding-left: var(--gutter);
+  min-height: 0;
+}
+
+
+.paneRight > .scroll,
+.paneLeft > .scroll,
+.mobileDetail > .scroll{
+  flex: 1 1 auto;
+  min-height: 0;
 }
 
 /* Weekly Overview cards (Right Pane) */
@@ -591,12 +602,15 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .scroll{
+  flex: 1 1 auto;
+  min-height: 0;
   height: 100%;
-  overflow: auto;
-  overflow-y: scroll;            /* reserve scrollbar space to prevent layout shift */
-  scrollbar-gutter: stable;      /* modern browsers: keep gutter stable */
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
   padding-bottom: 18px;
-  scroll-behavior: smooth;
 }
 
 /* Sticky tabs (desktop left) */
