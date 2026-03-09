@@ -739,25 +739,15 @@ export default function HomeSplitClient({ events }: Props) {
       })()
     : null;
 
-  const mobileDetailOpen = effectiveIsMobile && !!selectedEvent;
-
-  useEffect(() => {
-    if (!effectiveIsMobile) return;
-    const prev = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = mobileDetailOpen ? "hidden" : "";
-    return () => {
-      document.documentElement.style.overflow = prev;
-    };
-  }, [effectiveIsMobile, mobileDetailOpen]);
+  const mobileDetailOpen = false;
 
   function clearSelected() {
     setClientSelectedKey(null);
-    setParam("event", null);
   }
 
   function openSelected(key: string) {
-    setClientSelectedKey(key);
-    setParam("event", key);
+    setClientSelectedKey(null);
+    router.push(`/events/${encodeURIComponent(key)}`);
   }
 
   function openWeek(key: string) {
@@ -1605,115 +1595,34 @@ export default function HomeSplitClient({ events }: Props) {
 
       {/* Mobile bottom tabs */}
       {effectiveIsMobile ? (
-        <>
-          <div className="mobileTabs" aria-label="Primary navigation">
-            <button
-              type="button"
-              className="tabBtn"
-              data-active={pathname === "/" ? "true" : "false"}
-              onClick={() => router.push("/")}
-            >
-              Calendar
-            </button>
-            <button
-              type="button"
-              className="tabBtn"
-              data-active={pathname?.startsWith("/locations") ? "true" : "false"}
-              onClick={() => router.push("/locations")}
-            >
-              Directory
-            </button>
-            <button
-              type="button"
-              className="tabBtn"
-              data-active={pathname?.startsWith("/updates") ? "true" : "false"}
-              onClick={() => router.push("/updates")}
-            >
-              Updates
-            </button>
-          </div>
-          <div className="mobileFooterBar">What’s Next Lancaster</div>
-        </>
-      ) : null}
-
-      <div
-        className="mobileDetail"
-        data-open={mobileDetailOpen ? "true" : "false"}
-        aria-hidden={!mobileDetailOpen}
-      >
-        <div className="mobileDetailHeader">
-          <button className="backBtn" type="button" onClick={clearSelected}>
-            Back
+        <div className="mobileTabs" aria-label="Primary navigation">
+          <button
+            type="button"
+            className="tabBtn"
+            data-active={pathname === "/" ? "true" : "false"}
+            onClick={() => router.push("/")}
+          >
+            Calendar
           </button>
-          <div className="mobileDetailTitle">Event</div>
-          <div className="mobileDetailSpacer" aria-hidden />
+          <button
+            type="button"
+            className="tabBtn"
+            data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+            onClick={() => router.push("/locations")}
+          >
+            Directory
+          </button>
+          <button
+            type="button"
+            className="tabBtn"
+            data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+            onClick={() => router.push("/updates")}
+          >
+            Updates
+          </button>
         </div>
-
-        <div className="mobileDetailBody scroll">
-          {selectedEvent ? (
-            <div key={detailFlashKey} className="detailCard detailFlash">
-              <div className="rightDayLabel">{selectedEvent.event_type || "Event"}</div>
-              <div className="detailTitle">
-                {selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}
-              </div>
-
-              <div className="detailMeta">
-                <span>{selectedTime ?? "Time TBD"}</span>
-                {selectedEvent.locationName ? (
-                  <>
-                    <span className="dot">•</span>
-                    <span className="venue">{selectedEvent.locationName}</span>
-                  </>
-                ) : null}
-                {selectedEvent.address ? (
-                  <>
-                    <span className="dot">•</span>
-                    <span className="muted">{selectedEvent.address}</span>
-                  </>
-                ) : null}
-              </div>
-
-              {selectedImg ? (
-                <div className="heroImage" style={{ backgroundImage: `url(${selectedImg})` }} />
-              ) : null}
-
-              {selectedEvent.summary ? <p className="summary">{selectedEvent.summary}</p> : null}
-              {selectedDesc ? <div className="detailBody">{selectedDesc}</div> : null}
-
-              <MediaBlocks slices={(selectedEvent as any)?.content_blocks} />
-
-              {(selectedEvent.website_url || selectedEvent.tickets_url) ? (
-                <div className="ctaRow">
-                  <a
-                    className="ctaBtn"
-                    data-disabled={selectedEvent.website_url ? "false" : "true"}
-                    href={selectedEvent.website_url || "#"}
-                    target={selectedEvent.website_url ? "_blank" : undefined}
-                    rel={selectedEvent.website_url ? "noreferrer" : undefined}
-                    onClick={(ev) => {
-                      if (!selectedEvent.website_url) ev.preventDefault();
-                    }}
-                  >
-                    Website
-                  </a>
-                  <a
-                    className="ctaBtn"
-                    data-disabled={selectedEvent.tickets_url ? "false" : "true"}
-                    href={selectedEvent.tickets_url || "#"}
-                    target={selectedEvent.tickets_url ? "_blank" : undefined}
-                    rel={selectedEvent.tickets_url ? "noreferrer" : undefined}
-                    onClick={(ev) => {
-                      if (!selectedEvent.tickets_url) ev.preventDefault();
-                    }}
-                  >
-                    Tickets
-                  </a>
-                </div>
-              ) : null}
-            </div>
-          ) : null}
-        </div>
-      </div>
+      ) : null}
+    
 
 </div>
   );
