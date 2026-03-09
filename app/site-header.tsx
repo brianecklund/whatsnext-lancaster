@@ -1,8 +1,10 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 const LINKS = [
   { href: "/", label: "Calendar" },
@@ -14,6 +16,7 @@ const LINKS = [
 
 export default function SiteHeader() {
   const pathname = usePathname();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [flashKey, setFlashKey] = useState(0);
 
@@ -38,21 +41,22 @@ export default function SiteHeader() {
 
   return (
     <header className="siteHeader">
-      <a className="brand" href="/" aria-label="What’s Next Lancaster">
+      <Link className="brand" href="/" aria-label="What’s Next Lancaster" onClick={() => setOpen(false)}>
         <span className="brandFull">What’s Next Lancaster</span>
         <span className="brandShort" aria-hidden>
           What’s Next Lancaster
         </span>
-      </a>
+      </Link>
 
       {/* Desktop nav */}
       <nav className="topNav" aria-label="Primary">
         {LINKS.map((l, idx) => (
-          <a
+          <Link
             key={idx < 3 ? `${l.href}-${flashKey}` : l.href}
             className={idx < 3 ? "navLink navFlash" : "navLink"}
             href={l.href}
             data-active={pathname === l.href ? "true" : "false"}
+            onClick={() => setOpen(false)}
           >
             <span className="navLinkText">{l.label}</span>
             <span className="navLinkIcon" aria-hidden>
@@ -66,7 +70,7 @@ export default function SiteHeader() {
                 />
               </svg>
             </span>
-          </a>
+          </Link>
         ))}
       </nav>
 
@@ -104,15 +108,19 @@ export default function SiteHeader() {
 
             <nav className="menuOverlayNav" aria-label="Mobile primary">
               {LINKS.map((l, idx) => (
-                <a
+                <button
                   key={l.href}
+                  type="button"
                   className="menuOverlayLink"
-                  href={l.href}
                   data-active={pathname === l.href ? "true" : "false"}
                   style={{ ["--menuIndex" as string]: idx } as CSSProperties}
+                  onClick={() => {
+                    setOpen(false);
+                    router.push(l.href);
+                  }}
                 >
                   <span className="menuOverlayLinkText">{l.label}</span>
-                </a>
+                </button>
               ))}
             </nav>
           </div>

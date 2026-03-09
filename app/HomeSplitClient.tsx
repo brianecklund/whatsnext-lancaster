@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type TouchEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -290,8 +290,6 @@ export default function HomeSplitClient({ events }: Props) {
   const daySectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [scrollDayKey, setScrollDayKey] = useState<string | null>(null);
   const leftStickyRef = useRef<HTMLDivElement | null>(null);
-  const mobileDetailBodyRef = useRef<HTMLDivElement | null>(null);
-  const mobileSwipeState = useRef({ startX: 0, startY: 0, dragging: false, lastDx: 0 });
   const [didInitialScroll, setDidInitialScroll] = useState(false);
 
   // Staged intro animation (runs once per session): UI first, then list + right content.
@@ -570,13 +568,7 @@ export default function HomeSplitClient({ events }: Props) {
 
   function getListScrollOffset() {
     const stickyH = leftStickyRef.current?.offsetHeight ?? 0;
-    return Math.max(stickyH + 8, 20);
-  }
-
-  function updateDayScrollOffsetVar() {
-    const root = listRef.current;
-    if (!root) return;
-    root.style.setProperty("--dayScrollOffset", `${getListScrollOffset()}px`);
+    return Math.max(stickyH + 10, 24);
   }
 
 
@@ -592,23 +584,6 @@ export default function HomeSplitClient({ events }: Props) {
   useEffect(() => {
     if (dayParam) setDidInitialScroll(true);
   }, [dayParam]);
-
-  useEffect(() => {
-    updateDayScrollOffsetVar();
-    const onResize = () => updateDayScrollOffsetVar();
-    window.addEventListener("resize", onResize);
-
-    let ro: ResizeObserver | null = null;
-    if (typeof ResizeObserver !== "undefined" && leftStickyRef.current) {
-      ro = new ResizeObserver(() => updateDayScrollOffsetVar());
-      ro.observe(leftStickyRef.current);
-    }
-
-    return () => {
-      window.removeEventListener("resize", onResize);
-      ro?.disconnect();
-    };
-  }, [effectiveIsMobile, q, type, viewMode, filterOpen, selectedDisplayKey]);
 
   function syncVisibleDayFromScroll(scrollTop: number) {
     const root = listRef.current;
@@ -629,13 +604,12 @@ export default function HomeSplitClient({ events }: Props) {
 
   function jumpToDay(target: Date) {
     const key = dayKey(target);
-    const scrollNow = (behavior: ScrollBehavior = "smooth") => {
+    const scrollNow = () => {
       const root = listRef.current;
       const el = daySectionRefs.current[key];
       if (!root || !el) return false;
-      updateDayScrollOffsetVar();
       const top = Math.max(el.offsetTop - getListScrollOffset(), 0);
-      root.scrollTo({ top, behavior });
+      root.scrollTo({ top, behavior: "smooth" });
       syncVisibleDayFromScroll(top);
       return true;
     };
@@ -644,58 +618,15 @@ export default function HomeSplitClient({ events }: Props) {
     setScrollDayKey(key);
     setClientSelectedKey(null);
 
-    const params = new URLSearchParams(sp.toString());
-    params.set("day", key);
-    params.delete("event");
-    router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-
-    if (scrollNow("auto")) {
-      window.requestAnimationFrame(() => scrollNow("smooth"));
-      return;
-    }
+    // Scroll immediately against the current DOM so the first tap always works,
+    // then sync the URL and retry once after React/router updates settle.
+    scrollNow();
+    setParams({ day: key, event: null });
 
     window.requestAnimationFrame(() => {
-      if (scrollNow("auto")) {
-        window.requestAnimationFrame(() => scrollNow("smooth"));
-        return;
-      }
-      window.setTimeout(() => scrollNow("smooth"), 80);
+      if (scrollNow()) return;
+      window.setTimeout(scrollNow, 80);
     });
-  }
-
-  function handleMobileDetailTouchStart(e: TouchEvent<HTMLDivElement>) {
-    const touch = e.touches[0];
-    mobileSwipeState.current = { startX: touch.clientX, startY: touch.clientY, dragging: false, lastDx: 0 };
-  }
-
-  function handleMobileDetailTouchMove(e: TouchEvent<HTMLDivElement>) {
-    if (!mobileDetailOpen || !mobileDetailBodyRef.current) return;
-    const touch = e.touches[0];
-    const state = mobileSwipeState.current;
-    const dx = Math.max(touch.clientX - state.startX, 0);
-    const dy = Math.abs(touch.clientY - state.startY);
-
-    if (!state.dragging) {
-      if (dy > 18 || dx < 8) return;
-      if ((mobileDetailBodyRef.current.scrollTop ?? 0) > 6) return;
-      state.dragging = true;
-    }
-
-    if (dy > dx) return;
-
-    state.lastDx = dx;
-    e.preventDefault();
-    mobileDetailBodyRef.current.style.setProperty("--mobileDetailSwipeX", `${dx}px`);
-  }
-
-  function handleMobileDetailTouchEnd() {
-    const body = mobileDetailBodyRef.current;
-    if (!body) return;
-    const { dragging, lastDx } = mobileSwipeState.current;
-    body.style.setProperty("--mobileDetailSwipeX", "0px");
-    mobileSwipeState.current = { startX: 0, startY: 0, dragging: false, lastDx: 0 };
-
-    if (dragging && lastDx > 88) clearSelected();
   }
 
   const weekBuckets = useMemo<WeekBucket[]>(() => {
@@ -813,8 +744,7 @@ export default function HomeSplitClient({ events }: Props) {
       })()
     : null;
 
-  const mobileDetailOpen =
-    effectiveIsMobile && !!selectedEvent;
+  const mobileDetailOpen = false;
 
   function clearSelected() {
     setClientSelectedKey(null);
@@ -822,8 +752,7 @@ export default function HomeSplitClient({ events }: Props) {
   }
 
   function openSelected(key: string) {
-    setClientSelectedKey(key);
-    setParam("event", key);
+    router.push(`/events/${encodeURIComponent(key)}`);
   }
 
   function openWeek(key: string) {
@@ -1703,69 +1632,6 @@ export default function HomeSplitClient({ events }: Props) {
         </div>
       ) : null}
     
-      {/* Mobile detail overlay (matches Directory/Updates behavior) */}
-      <div
-        className="mobileDetail"
-        data-open={mobileDetailOpen ? "true" : "false"}
-        aria-hidden={!mobileDetailOpen}
-      >
-        <div className="mobileDetailHeader">
-          <button className="backBtn" type="button" onClick={clearSelected}>
-            Back
-          </button>
-          <div className="mobileDetailTitle">Event</div>
-        </div>
-        <div
-          ref={mobileDetailBodyRef}
-          className="mobileDetailBody scroll"
-          onTouchStart={handleMobileDetailTouchStart}
-          onTouchMove={handleMobileDetailTouchMove}
-          onTouchEnd={handleMobileDetailTouchEnd}
-          onTouchCancel={handleMobileDetailTouchEnd}
-        >
-          {selectedEvent ? (
-            <div key={detailFlashKey} className="detailCard detailFlash">
-              <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
-              <div className="detailMeta">
-                <span className="muted">{selectedTime ?? "Time TBD"}</span>
-                {selectedEvent.event_type ? <span className="badge">{selectedEvent.event_type}</span> : null}
-              </div>
-              {selectedImg ? (
-                <div className="media16x9" style={{ marginTop: 14 }}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={selectedImg} alt="" />
-                  {selectedDesc ? <div className="mediaDescBtn">{selectedDesc.slice(0, 120)}</div> : null}
-                </div>
-              ) : null}
-              {selectedDesc ? (
-                <div className="detailBody" style={{ marginTop: 14 }}>
-                  <p>{selectedDesc}</p>
-                </div>
-              ) : (
-                <div className="detailBody" style={{ marginTop: 14 }}>
-                  <p className="muted">No description yet.</p>
-                </div>
-              )}
-              {selectedEvent.website_url ? (
-                <p style={{ marginTop: 12 }}>
-                  <a className="link" href={selectedEvent.website_url} target="_blank" rel="noreferrer">
-                    Website
-                  </a>
-                </p>
-              ) : null}
-              {selectedEvent.tickets_url ? (
-                <p style={{ marginTop: 8 }}>
-                  <a className="link" href={selectedEvent.tickets_url} target="_blank" rel="noreferrer">
-                    Tickets
-                  </a>
-                </p>
-              ) : null}
-
-              <MediaBlocks slices={(selectedEvent as any)?.content_blocks} />
-            </div>
-          ) : null}
-        </div>
-      </div>
 
 </div>
   );
