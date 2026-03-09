@@ -39,3 +39,34 @@ GET /api/venues/import?location=Lancaster,%20PA&query=music%20venues%20bars%20co
 ```
 
 The endpoint dedupes providers and normalizes categories into the site taxonomy used by the directory.
+
+
+## Live venue import
+
+This repo can automatically enrich the Directory page with live venue data from Google Places, Foursquare, and Yelp.
+
+### Required environment variables
+
+- `ENABLE_LIVE_VENUE_IMPORT=true`
+- `GOOGLE_MAPS_API_KEY=...`
+- `FOURSQUARE_API_KEY=...`
+- `YELP_API_KEY=...`
+
+### Optional import tuning
+
+- `VENUE_IMPORT_LOCATION=Lancaster, PA`
+- `VENUE_IMPORT_QUERY=restaurants bars coffee shops music venues event spaces theaters stores businesses`
+- `VENUE_IMPORT_LIMIT=30`
+- `VENUE_IMPORT_RADIUS_METERS=12000`
+
+### Test the importer
+
+Open:
+
+`/api/venues/import`
+
+You can also pass query params, for example:
+
+`/api/venues/import?location=Lancaster,%20PA&query=coffee%20shops%20bars&limit=15`
+
+When `ENABLE_LIVE_VENUE_IMPORT=true`, the Directory page merges imported venues with your Prismic locations at request time.

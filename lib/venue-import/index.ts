@@ -1,30 +1,45 @@
+import { dedupeVenues } from "./normalize";
 import { importFoursquareVenues } from "./providers/foursquare";
 import { importGoogleVenues } from "./providers/google";
 import { importYelpVenues } from "./providers/yelp";
-import type { ImportedVenue, VenueImportParams } from "./types";
+import type { ImportedVenue, VenueImportParams, VenueImportResult, VenueImportProviderSummary, VenueSource } from "./types";
 
-function dedupeVenues(items: ImportedVenue[]) {
-  const map = new Map<string, ImportedVenue>();
-  for (const item of items) {
-    const key = `${item.name.toLowerCase()}|${(item.address ?? "").toLowerCase()}`;
-    if (!map.has(key)) map.set(key, item);
+async function runProvider(
+  source: VenueSource,
+  fn: (params: VenueImportParams) => Promise<ImportedVenue[]>,
+  params: VenueImportParams,
+): Promise<{ items: ImportedVenue[]; summary: VenueImportProviderSummary }> {
+  try {
+    const items = await fn(params);
+    return {
+      items,
+      summary: { count: items.length, enabled: true },
+    };
+  } catch (error) {
+    return {
+      items: [],
+      summary: {
+        count: 0,
+        enabled: true,
+        error: error instanceof Error ? error.message : `${source} import failed`,
+      },
+    };
   }
-  return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
-export async function importVenues(params: VenueImportParams) {
-  const [google, foursquare, yelp] = await Promise.all([
-    importGoogleVenues(params),
-    importFoursquareVenues(params),
-    importYelpVenues(params),
+export async function importVenues(params: VenueImportParams): Promise<VenueImportResult> {
+  const tasks = await Promise.all([
+    runProvider("google", importGoogleVenues, params),
+    runProvider("foursquare", importFoursquareVenues, params),
+    runProvider("yelp", importYelpVenues, params),
   ]);
 
   return {
-    venues: dedupeVenues([...google, ...foursquare, ...yelp]),
+    venues: dedupeVenues(tasks.flatMap((task) => task.items)),
     providers: {
-      google: google.length,
-      foursquare: foursquare.length,
-      yelp: yelp.length,
+      google: tasks[0].summary,
+      foursquare: tasks[1].summary,
+      yelp: tasks[2].summary,
     },
   };
 }

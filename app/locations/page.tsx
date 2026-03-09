@@ -2,10 +2,39 @@ import { createClient, prismic } from "@/prismicio";
 import type { LocationLite } from "@/lib/types";
 import type { RichTextField } from "@prismicio/client";
 import LocationsSplitClient from "./LocationsSplitClient";
+import { importVenues } from "@/lib/venue-import";
+import { importedVenueToLocationLite } from "@/lib/venue-import/to-location";
 
 export const dynamic = "force-dynamic";
 
 type LocationRow = LocationLite & { key: string };
+
+function shouldImportLiveVenues() {
+  return process.env.ENABLE_LIVE_VENUE_IMPORT === "true";
+}
+
+function mergeLocationRows(prismicRows: LocationRow[], importedRows: LocationRow[]) {
+  const map = new Map<string, LocationRow>();
+
+  for (const row of importedRows) {
+    const key = `${(row.name ?? "").toLowerCase()}|${(row.address ?? "").toLowerCase()}`;
+    map.set(key, row);
+  }
+
+  for (const row of prismicRows) {
+    const key = `${(row.name ?? "").toLowerCase()}|${(row.address ?? "").toLowerCase()}`;
+    const existing = map.get(key);
+    map.set(key, {
+      ...(existing ?? {}),
+      ...row,
+      description: row.description ?? existing?.description ?? null,
+      website: row.website ?? existing?.website ?? null,
+      category: row.category ?? existing?.category ?? null,
+    });
+  }
+
+  return Array.from(map.values()).sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+}
 
 export default async function LocationsPage() {
   const client = createClient();
@@ -20,7 +49,7 @@ export default async function LocationsPage() {
     docs = [];
   }
 
-  const locations: LocationRow[] = docs.map((doc: any) => {
+  const prismicLocations: LocationRow[] = docs.map((doc: any) => {
     const desc = doc.data?.description;
     const descText =
       typeof desc === "string"
@@ -43,10 +72,22 @@ export default async function LocationsPage() {
     };
   });
 
-  // Simple alpha sort
-  locations.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
+  let importedLocations: LocationRow[] = [];
+  if (shouldImportLiveVenues()) {
+    const result = await importVenues({
+      location: process.env.VENUE_IMPORT_LOCATION || "Lancaster, PA",
+      query:
+        process.env.VENUE_IMPORT_QUERY ||
+        "restaurants bars coffee shops music venues event spaces theaters stores businesses",
+      limit: Number(process.env.VENUE_IMPORT_LIMIT || 30),
+      radiusMeters: Number(process.env.VENUE_IMPORT_RADIUS_METERS || 12000),
+    });
+    importedLocations = result.venues.map((venue) => importedVenueToLocationLite(venue));
+  }
 
-  if (prismicError) {
+  const locations = mergeLocationRows(prismicLocations, importedLocations);
+
+  if (prismicError && !locations.length) {
     return (
       <div className="pageShell">
         <div className="tagline">Directory</div>

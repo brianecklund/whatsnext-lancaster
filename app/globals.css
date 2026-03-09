@@ -120,9 +120,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 /* Site chrome */
 .siteHeader{
-  position: sticky;
-  top: 0;
-  z-index: 5000;
+  position: relative;
+  z-index: 1400;
   height: var(--headerH);
   display:flex;
   align-items:flex-start;
@@ -136,8 +135,6 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .brand{
   display:inline-flex;
   align-items:center;
-  min-width: 0;
-  max-width: calc(100% - 56px);
   font-weight: var(--fw-medium);
   font-size: var(--fs-hero);
   letter-spacing: -0.02em;
@@ -149,10 +146,9 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .hamburgerBtn{
   position: relative;
-  z-index: 5100;
+  z-index: 1401;
   cursor: pointer;
   display:none;
-  flex: 0 0 46px;
   width: 46px;
   height: 46px;
   border-radius: 14px;
@@ -201,7 +197,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .menuOverlay{
   position: fixed;
   inset: var(--headerH) 0 0 0;
-  z-index: 5050;
+  z-index: 1400;
   background: rgba(255,255,255,0.96);
   backdrop-filter: blur(18px);
   display:block;
@@ -377,15 +373,15 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 @media (max-width: 980px){
   :root{ --headerH: 64px; }
-  .siteHeader{ padding: 10px 16px; align-items: center; }
-  .hamburgerBtn{ display:inline-flex !important; width: 40px; height: 40px; border-radius: 12px; margin-top: 0; }
+  .siteHeader{ padding: 12px var(--gutter) 0 var(--gutter); align-items: center; }
+  .hamburgerBtn{ width: 40px; height: 40px; border-radius: 12px; }
   .topNav{ display:none; }
   .hamburgerBtn{ display:inline-flex; }
   .brandFull{ display:none; }
   .brandShort{ display:inline; }
 
   /* Mobile brand: full name, small enough to fit comfortably */
-  .brand{ font-size: 1.02rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .brand{ font-size: 1.15rem; white-space: nowrap; }
 
   /* Reduce space under subhead on mobile */
   .tagline{ padding: 10px 0 4px 0; }
@@ -972,20 +968,16 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
   .leftSticky .tabs{ display:none; }
 
-  .pageShell{
-    padding-bottom: calc(var(--mobileTabsH) + var(--mobileFooterH));
-  }
-
   .leftControls{ display:block; }
 
   /* Sticky bottom tabs */
   .mobileTabs{
-    display:flex !important;
+    display:flex;
     position: fixed;
     left: 0;
     right: 0;
     bottom: var(--mobileFooterH);
-    z-index: 4200;
+    z-index: 1200;
     background: rgba(255,255,255,0.96);
     backdrop-filter: blur(10px);
     border-top: 1px solid var(--border);
@@ -995,13 +987,12 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   }
 
   .mobileFooterBar{
-    display:flex;
     position: fixed;
     left: 0;
     right: 0;
     bottom: 0;
     height: var(--mobileFooterH);
-    z-index: 4190;
+    z-index: 1190;
     display:flex;
     align-items:center;
     justify-content:center;
@@ -1012,31 +1003,11 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     text-transform: uppercase;
     color: var(--muted);
   }
-  .mobileTabs .tabBtn,
-  .mobileTabs .mobileTab{
+  .mobileTabs .tabBtn{
     flex: 1;
     min-width: 0;
     height: 48px;
     font-size: var(--fs-body);
-  }
-
-  .mobileTabs .mobileTab{
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-    width: 100%;
-    min-width: 0;
-    padding: 0 12px;
-    border-radius: 10px;
-    border: 0;
-    background: var(--btnBg);
-    font-weight: 600;
-    box-shadow: 0 0 0 1px rgba(0,0,0,0.04) inset;
-  }
-
-  .mobileTabs .mobileTab[data-active="true"]{
-    box-shadow: 0 0 0 2px var(--accent) inset;
-    background: #fff;
   }
 
   /* Keep search + filters at top on mobile */
@@ -1057,7 +1028,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     right: 0;
     bottom: calc(var(--mobileTabsH) + var(--mobileFooterH));
     background: var(--bg);
-    z-index: 4000;
+    z-index: 1300;
     transform: translateX(100%);
     transition: transform 320ms var(--ease-snap);
     will-change: transform;
