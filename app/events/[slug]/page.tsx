@@ -2,6 +2,7 @@ import { createClient, prismic } from "@/prismicio";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import type { RichTextField } from "@prismicio/client";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 export const dynamic = "force-dynamic";
 
@@ -40,29 +41,26 @@ export default async function EventPage({ params }: { params: Promise<Params> })
 
   let doc: any = null;
 
+  const fetchLinks = [
+    "location.name",
+    "location.address",
+    "location.category",
+    "location.website",
+    "location.description",
+  ];
+
   try {
-    doc = await client.getByUID("event", slug, {
-      fetchLinks: [
-        "location.name",
-        "location.address",
-        "location.category",
-        "location.website",
-        "location.description",
-      ],
-    });
+    doc = await client.getByUID("event", slug, { fetchLinks });
   } catch {
     try {
-      doc = await client.getByID(slug, {
-        fetchLinks: [
-          "location.name",
-          "location.address",
-          "location.category",
-          "location.website",
-          "location.description",
-        ],
-      });
+      doc = await client.getByID(slug, { fetchLinks });
     } catch {
-      notFound();
+      try {
+        const docs = await client.getAllByType("event", { fetchLinks });
+        doc = docs.find((item: any) => item?.uid === slug || item?.id === slug) ?? null;
+      } catch {
+        doc = null;
+      }
     }
   }
 
@@ -85,7 +83,7 @@ export default async function EventPage({ params }: { params: Promise<Params> })
   return (
     <div className="eventPageWrap">
       <div className="eventPageInner">
-        <a className="eventBackLink" href="/">← Back to calendar</a>
+        <Link className="eventBackLink" href="/">← Back to calendar</Link>
 
         <div className="eventEyebrow">{doc.data?.event_type || "Event"}</div>
         <h1 className="eventPageTitle">{doc.data?.title || "Untitled event"}</h1>

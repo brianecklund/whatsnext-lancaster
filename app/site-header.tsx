@@ -4,7 +4,7 @@ import Link from "next/link";
 
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 
 const LINKS = [
   { href: "/", label: "Calendar" },
@@ -16,7 +16,6 @@ const LINKS = [
 
 export default function SiteHeader() {
   const pathname = usePathname();
-  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [flashKey, setFlashKey] = useState(0);
 
@@ -108,19 +107,16 @@ export default function SiteHeader() {
 
             <nav className="menuOverlayNav" aria-label="Mobile primary">
               {LINKS.map((l, idx) => (
-                <button
+                <Link
                   key={l.href}
-                  type="button"
+                  href={l.href}
                   className="menuOverlayLink"
                   data-active={pathname === l.href ? "true" : "false"}
                   style={{ ["--menuIndex" as string]: idx } as CSSProperties}
-                  onClick={() => {
-                    setOpen(false);
-                    router.push(l.href);
-                  }}
+                  onClick={() => setOpen(false)}
                 >
                   <span className="menuOverlayLinkText">{l.label}</span>
-                </button>
+                </Link>
               ))}
             </nav>
           </div>

@@ -509,8 +509,7 @@ export default function HomeSplitClient({ events }: Props) {
     const key = only.uid ?? only.id;
     if (selectedDisplayKey === key) return;
 
-    setClientSelectedKey(key);
-    setParam("event", key);
+    openSelected(key);
   }, [effectiveIsMobile, viewMode, selectedDayStr, dayEvents, selectedDisplayKey]);
 
 
@@ -720,12 +719,8 @@ export default function HomeSplitClient({ events }: Props) {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
 
-  // On mobile, ensure route switches (Calendar/Directory/Updates) never carry a stuck detail overlay.
   useEffect(() => {
-    if (!effectiveIsMobile) return;
     setClientSelectedKey(null);
-    if (sp.get("event")) setParam("event", null);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
 
@@ -748,10 +743,10 @@ export default function HomeSplitClient({ events }: Props) {
 
   function clearSelected() {
     setClientSelectedKey(null);
-    setParam("event", null);
   }
 
   function openSelected(key: string) {
+    setClientSelectedKey(null);
     router.push(`/events/${encodeURIComponent(key)}`);
   }
 
@@ -1114,9 +1109,7 @@ export default function HomeSplitClient({ events }: Props) {
                         data-active={active ? "true" : "false"}
                         onClick={() => {
                           const key = e.uid ?? e.id;
-                          setClientSelectedKey(key);
-                          setParam("event", key);
-                          
+                          openSelected(key);
                         }}
                         type="button"
                       >
@@ -1235,8 +1228,7 @@ export default function HomeSplitClient({ events }: Props) {
                                 type="button"
                                 className="eventCard"
                                 onClick={() => {
-                                  setClientSelectedKey(key);
-                                  setParam("event", key);
+                                  openSelected(key);
                                 }}
                               >
                                 <div className="eventCardTitle">{title}</div>
@@ -1294,8 +1286,7 @@ export default function HomeSplitClient({ events }: Props) {
                             className="dayRightRow"
                             data-active={active ? "true" : "false"}
                             onClick={() => {
-                              setClientSelectedKey(key);
-                              setParam("event", key);
+                              openSelected(key);
                             }}
                             role="listitem"
                           >

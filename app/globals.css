@@ -144,7 +144,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .hamburgerBtn{
   position: relative;
-  z-index: 230;
+  z-index: 1401;
+  cursor: pointer;
   display:none;
   width: 46px;
   height: 46px;
@@ -194,7 +195,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .menuOverlay{
   position: fixed;
   inset: var(--headerH) 0 0 0;
-  z-index: 225;
+  z-index: 1400;
   background: rgba(255,255,255,0.96);
   backdrop-filter: blur(18px);
   display:block;
@@ -2963,7 +2964,7 @@ a:hover{
 
 /* event page */
 .eventPageWrap{
-  height: calc(100vh - var(--headerH));
+  min-height: calc(100vh - var(--headerH));
   overflow-y: auto;
 }
 .eventPageInner{
