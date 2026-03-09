@@ -41,32 +41,25 @@ GET /api/venues/import?location=Lancaster,%20PA&query=music%20venues%20bars%20co
 The endpoint dedupes providers and normalizes categories into the site taxonomy used by the directory.
 
 
-## Live venue import
+## Cached venue importing
 
-This repo can automatically enrich the Directory page with live venue data from Google Places, Foursquare, and Yelp.
+This repo stores imported directory venues in `data/venue-cache.json`.
 
-### Required environment variables
+### Refresh locally
 
-- `ENABLE_LIVE_VENUE_IMPORT=true`
-- `GOOGLE_MAPS_API_KEY=...`
-- `FOURSQUARE_API_KEY=...`
-- `YELP_API_KEY=...`
+```bash
+GOOGLE_MAPS_API_KEY=...
+FOURSQUARE_API_KEY=...
+YELP_API_KEY=...
+npm run refresh:venues
+```
 
-### Optional import tuning
+### Refresh daily with GitHub Actions
 
-- `VENUE_IMPORT_LOCATION=Lancaster, PA`
-- `VENUE_IMPORT_QUERY=restaurants bars coffee shops music venues event spaces theaters stores businesses`
-- `VENUE_IMPORT_LIMIT=30`
-- `VENUE_IMPORT_RADIUS_METERS=12000`
+A scheduled workflow lives at `.github/workflows/refresh-venues.yml`.
+Set these in GitHub:
 
-### Test the importer
+- Repository Secrets: `GOOGLE_MAPS_API_KEY`, `FOURSQUARE_API_KEY`, `YELP_API_KEY`
+- Repository Variables: `VENUE_IMPORT_LOCATION`, `VENUE_IMPORT_QUERY`, `VENUE_IMPORT_LIMIT`
 
-Open:
-
-`/api/venues/import`
-
-You can also pass query params, for example:
-
-`/api/venues/import?location=Lancaster,%20PA&query=coffee%20shops%20bars&limit=15`
-
-When `ENABLE_LIVE_VENUE_IMPORT=true`, the Directory page merges imported venues with your Prismic locations at request time.
+The Directory page reads from `data/venue-cache.json`, so imported venues are persisted in the repo and deployed with the site.

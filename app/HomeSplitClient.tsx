@@ -365,6 +365,9 @@ export default function HomeSplitClient({ events }: Props) {
   }, [selectedDayStr]);
 
 
+  // Mobile-only: hide the subhead tagline when the user starts scrolling the left list.
+  const [taglineHidden, setTaglineHidden] = useState(false);
+
   useEffect(() => {
     setMounted(true);
     const mq = window.matchMedia("(max-width: 980px)");
@@ -509,7 +512,8 @@ export default function HomeSplitClient({ events }: Props) {
     const key = only.uid ?? only.id;
     if (selectedDisplayKey === key) return;
 
-    openSelected(key);
+    setClientSelectedKey(key);
+    setParam("event", key);
   }, [effectiveIsMobile, viewMode, selectedDayStr, dayEvents, selectedDisplayKey]);
 
 
@@ -719,10 +723,18 @@ export default function HomeSplitClient({ events }: Props) {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
 
+  // On mobile, ensure route switches (Calendar/Directory/Updates) never carry a stuck detail overlay.
   useEffect(() => {
+    if (!effectiveIsMobile) return;
     setClientSelectedKey(null);
+    if (sp.get("event")) setParam("event", null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname]);
 
+  // Ensure tagline is visible again when leaving mobile.
+  useEffect(() => {
+    if (!effectiveIsMobile) setTaglineHidden(false);
+  }, [effectiveIsMobile]);
 
   const showLeft = true;
 
@@ -739,16 +751,8 @@ export default function HomeSplitClient({ events }: Props) {
       })()
     : null;
 
-  const mobileDetailOpen = effectiveIsMobile && !!selectedEvent;
-
-  useEffect(() => {
-    if (!effectiveIsMobile) return;
-    const prev = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = mobileDetailOpen ? "hidden" : "";
-    return () => {
-      document.documentElement.style.overflow = prev;
-    };
-  }, [effectiveIsMobile, mobileDetailOpen]);
+  const mobileDetailOpen =
+    effectiveIsMobile && !!selectedEvent;
 
   function clearSelected() {
     setClientSelectedKey(null);
@@ -767,6 +771,9 @@ export default function HomeSplitClient({ events }: Props) {
 
   return (
     <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
+      <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>
+        A calendar of events, specials, and pop-ups in Lancaster, PA.
+      </div>
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
@@ -776,6 +783,7 @@ export default function HomeSplitClient({ events }: Props) {
               ref={listRef}
               onScroll={(e) => {
                 const st = (e.currentTarget as HTMLDivElement).scrollTop;
+                if (effectiveIsMobile) setTaglineHidden(st > 2);
                 syncVisibleDayFromScroll(st);
               }}
             >
@@ -1119,7 +1127,9 @@ export default function HomeSplitClient({ events }: Props) {
                         data-active={active ? "true" : "false"}
                         onClick={() => {
                           const key = e.uid ?? e.id;
-                          openSelected(key);
+                          setClientSelectedKey(key);
+                          setParam("event", key);
+                          
                         }}
                         type="button"
                       >
@@ -1238,7 +1248,8 @@ export default function HomeSplitClient({ events }: Props) {
                                 type="button"
                                 className="eventCard"
                                 onClick={() => {
-                                  openSelected(key);
+                                  setClientSelectedKey(key);
+                                  setParam("event", key);
                                 }}
                               >
                                 <div className="eventCardTitle">{title}</div>
@@ -1296,7 +1307,8 @@ export default function HomeSplitClient({ events }: Props) {
                             className="dayRightRow"
                             data-active={active ? "true" : "false"}
                             onClick={() => {
-                              openSelected(key);
+                              setClientSelectedKey(key);
+                              setParam("event", key);
                             }}
                             role="listitem"
                           >
@@ -1605,37 +1617,35 @@ export default function HomeSplitClient({ events }: Props) {
 
       {/* Mobile bottom tabs */}
       {effectiveIsMobile ? (
-        <>
-          <div className="mobileTabs" aria-label="Primary navigation">
-            <button
-              type="button"
-              className="tabBtn"
-              data-active={pathname === "/" ? "true" : "false"}
-              onClick={() => router.push("/")}
-            >
-              Calendar
-            </button>
-            <button
-              type="button"
-              className="tabBtn"
-              data-active={pathname?.startsWith("/locations") ? "true" : "false"}
-              onClick={() => router.push("/locations")}
-            >
-              Directory
-            </button>
-            <button
-              type="button"
-              className="tabBtn"
-              data-active={pathname?.startsWith("/updates") ? "true" : "false"}
-              onClick={() => router.push("/updates")}
-            >
-              Updates
-            </button>
-          </div>
-          <div className="mobileFooterBar">What’s Next Lancaster</div>
-        </>
+        <div className="mobileTabs" aria-label="Primary navigation">
+          <button
+            type="button"
+            className="tabBtn"
+            data-active={pathname === "/" ? "true" : "false"}
+            onClick={() => router.push("/")}
+          >
+            Calendar
+          </button>
+          <button
+            type="button"
+            className="tabBtn"
+            data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+            onClick={() => router.push("/locations")}
+          >
+            Directory
+          </button>
+          <button
+            type="button"
+            className="tabBtn"
+            data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+            onClick={() => router.push("/updates")}
+          >
+            Updates
+          </button>
+        </div>
       ) : null}
-
+    
+      {/* Mobile detail overlay (matches Directory/Updates behavior) */}
       <div
         className="mobileDetail"
         data-open={mobileDetailOpen ? "true" : "false"}
@@ -1646,70 +1656,47 @@ export default function HomeSplitClient({ events }: Props) {
             Back
           </button>
           <div className="mobileDetailTitle">Event</div>
-          <div className="mobileDetailSpacer" aria-hidden />
         </div>
-
-        <div className="mobileDetailBody scroll">
+        <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
           {selectedEvent ? (
             <div key={detailFlashKey} className="detailCard detailFlash">
-              <div className="rightDayLabel">{selectedEvent.event_type || "Event"}</div>
-              <div className="detailTitle">
-                {selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}
-              </div>
-
+              <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
               <div className="detailMeta">
-                <span>{selectedTime ?? "Time TBD"}</span>
-                {selectedEvent.locationName ? (
-                  <>
-                    <span className="dot">•</span>
-                    <span className="venue">{selectedEvent.locationName}</span>
-                  </>
-                ) : null}
-                {selectedEvent.address ? (
-                  <>
-                    <span className="dot">•</span>
-                    <span className="muted">{selectedEvent.address}</span>
-                  </>
-                ) : null}
+                <span className="muted">{selectedTime ?? "Time TBD"}</span>
+                {selectedEvent.event_type ? <span className="badge">{selectedEvent.event_type}</span> : null}
               </div>
-
               {selectedImg ? (
-                <div className="heroImage" style={{ backgroundImage: `url(${selectedImg})` }} />
-              ) : null}
-
-              {selectedEvent.summary ? <p className="summary">{selectedEvent.summary}</p> : null}
-              {selectedDesc ? <div className="detailBody">{selectedDesc}</div> : null}
-
-              <MediaBlocks slices={(selectedEvent as any)?.content_blocks} />
-
-              {(selectedEvent.website_url || selectedEvent.tickets_url) ? (
-                <div className="ctaRow">
-                  <a
-                    className="ctaBtn"
-                    data-disabled={selectedEvent.website_url ? "false" : "true"}
-                    href={selectedEvent.website_url || "#"}
-                    target={selectedEvent.website_url ? "_blank" : undefined}
-                    rel={selectedEvent.website_url ? "noreferrer" : undefined}
-                    onClick={(ev) => {
-                      if (!selectedEvent.website_url) ev.preventDefault();
-                    }}
-                  >
-                    Website
-                  </a>
-                  <a
-                    className="ctaBtn"
-                    data-disabled={selectedEvent.tickets_url ? "false" : "true"}
-                    href={selectedEvent.tickets_url || "#"}
-                    target={selectedEvent.tickets_url ? "_blank" : undefined}
-                    rel={selectedEvent.tickets_url ? "noreferrer" : undefined}
-                    onClick={(ev) => {
-                      if (!selectedEvent.tickets_url) ev.preventDefault();
-                    }}
-                  >
-                    Tickets
-                  </a>
+                <div className="media16x9" style={{ marginTop: 14 }}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img src={selectedImg} alt="" />
+                  {selectedDesc ? <div className="mediaDescBtn">{selectedDesc.slice(0, 120)}</div> : null}
                 </div>
               ) : null}
+              {selectedDesc ? (
+                <div className="detailBody" style={{ marginTop: 14 }}>
+                  <p>{selectedDesc}</p>
+                </div>
+              ) : (
+                <div className="detailBody" style={{ marginTop: 14 }}>
+                  <p className="muted">No description yet.</p>
+                </div>
+              )}
+              {selectedEvent.website_url ? (
+                <p style={{ marginTop: 12 }}>
+                  <a className="link" href={selectedEvent.website_url} target="_blank" rel="noreferrer">
+                    Website
+                  </a>
+                </p>
+              ) : null}
+              {selectedEvent.tickets_url ? (
+                <p style={{ marginTop: 8 }}>
+                  <a className="link" href={selectedEvent.tickets_url} target="_blank" rel="noreferrer">
+                    Tickets
+                  </a>
+                </p>
+              ) : null}
+
+              <MediaBlocks slices={(selectedEvent as any)?.content_blocks} />
             </div>
           ) : null}
         </div>
