@@ -329,11 +329,14 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
       </div>
 
       {/* Mobile bottom tabs */}
-      <div className="mobileTabs" aria-label="Primary navigation">
-        <a className="tabBtn" href="/">Calendar</a>
-        <a className="tabBtn" href="/locations" aria-current="page">Directory</a>
-        <a className="tabBtn" href="/updates">Updates</a>
-      </div>
+      <>
+        <div className="mobileTabs" aria-label="Primary navigation">
+          <a className="tabBtn" href="/">Calendar</a>
+          <a className="tabBtn" href="/locations" aria-current="page">Directory</a>
+          <a className="tabBtn" href="/updates">Updates</a>
+        </div>
+        <div className="mobileFooterBar">What’s Next Lancaster</div>
+      </>
 
       {/* Mobile detail overlay */}
       <div

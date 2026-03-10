@@ -105,9 +105,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
 
   return (
     <div className="pageShell">
-      <div className="tagline">Updates, openings, menu changes, PSAs, and quick announcements.</div>
-
-      <div className="split">
+            <div className="split">
         {/* LEFT */}
         {showLeft ? (
           <aside className="pane paneLeft">
@@ -369,24 +367,27 @@ export default function UpdatesSplitClient({ updates }: Props) {
 
       {/* Mobile bottom tabs */}
       {isMobile ? (
-        <div className="mobileTabs" role="tablist" aria-label="Updates view">
-          <button
-            type="button"
-            className="mobileTab"
-            data-active={mobileTab === "list" ? "true" : "false"}
-            onClick={() => setMobileTab("list")}
-          >
-            List
-          </button>
-          <button
-            type="button"
-            className="mobileTab"
-            data-active={mobileTab === "detail" ? "true" : "false"}
-            onClick={() => setMobileTab("detail")}
-          >
-            Details
-          </button>
-        </div>
+        <>
+          <div className="mobileTabs" role="tablist" aria-label="Updates view">
+            <button
+              type="button"
+              className="mobileTab"
+              data-active={mobileTab === "list" ? "true" : "false"}
+              onClick={() => setMobileTab("list")}
+            >
+              List
+            </button>
+            <button
+              type="button"
+              className="mobileTab"
+              data-active={mobileTab === "detail" ? "true" : "false"}
+              onClick={() => setMobileTab("detail")}
+            >
+              Details
+            </button>
+          </div>
+          <div className="mobileFooterBar">What’s Next Lancaster</div>
+        </>
       ) : null}
     </div>
   );

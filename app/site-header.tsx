@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 import { useEffect, useState } from "react";
 import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
@@ -38,21 +40,22 @@ export default function SiteHeader() {
 
   return (
     <header className="siteHeader">
-      <a className="brand" href="/" aria-label="What’s Next Lancaster">
+      <Link className="brand" href="/" aria-label="What’s Next Lancaster" onClick={() => setOpen(false)}>
         <span className="brandFull">What’s Next Lancaster</span>
         <span className="brandShort" aria-hidden>
           What’s Next Lancaster
         </span>
-      </a>
+      </Link>
 
       {/* Desktop nav */}
       <nav className="topNav" aria-label="Primary">
         {LINKS.map((l, idx) => (
-          <a
+          <Link
             key={idx < 3 ? `${l.href}-${flashKey}` : l.href}
             className={idx < 3 ? "navLink navFlash" : "navLink"}
             href={l.href}
             data-active={pathname === l.href ? "true" : "false"}
+            onClick={() => setOpen(false)}
           >
             <span className="navLinkText">{l.label}</span>
             <span className="navLinkIcon" aria-hidden>
@@ -66,7 +69,7 @@ export default function SiteHeader() {
                 />
               </svg>
             </span>
-          </a>
+          </Link>
         ))}
       </nav>
 
@@ -104,15 +107,16 @@ export default function SiteHeader() {
 
             <nav className="menuOverlayNav" aria-label="Mobile primary">
               {LINKS.map((l, idx) => (
-                <a
+                <Link
                   key={l.href}
-                  className="menuOverlayLink"
                   href={l.href}
+                  className="menuOverlayLink"
                   data-active={pathname === l.href ? "true" : "false"}
                   style={{ ["--menuIndex" as string]: idx } as CSSProperties}
+                  onClick={() => setOpen(false)}
                 >
                   <span className="menuOverlayLinkText">{l.label}</span>
-                </a>
+                </Link>
               ))}
             </nav>
           </div>

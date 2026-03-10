@@ -39,27 +39,3 @@ GET /api/venues/import?location=Lancaster,%20PA&query=music%20venues%20bars%20co
 ```
 
 The endpoint dedupes providers and normalizes categories into the site taxonomy used by the directory.
-
-
-## Cached venue importing
-
-This repo stores imported directory venues in `data/venue-cache.json`.
-
-### Refresh locally
-
-```bash
-GOOGLE_MAPS_API_KEY=...
-FOURSQUARE_API_KEY=...
-YELP_API_KEY=...
-npm run refresh:venues
-```
-
-### Refresh daily with GitHub Actions
-
-A scheduled workflow lives at `.github/workflows/refresh-venues.yml`.
-Set these in GitHub:
-
-- Repository Secrets: `GOOGLE_MAPS_API_KEY`, `FOURSQUARE_API_KEY`, `YELP_API_KEY`
-- Repository Variables: `VENUE_IMPORT_LOCATION`, `VENUE_IMPORT_QUERY`, `VENUE_IMPORT_LIMIT`
-
-The Directory page reads from `data/venue-cache.json`, so imported venues are persisted in the repo and deployed with the site.

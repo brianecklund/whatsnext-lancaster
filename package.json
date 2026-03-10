@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "slicemachine": "start-slicemachine",
-    "refresh:venues": "node scripts/refresh-venues.mjs"
+    "slicemachine": "start-slicemachine"
   },
   "dependencies": {
     "@prismicio/client": "^7.21.3",
