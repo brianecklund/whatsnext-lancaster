@@ -2,6 +2,7 @@ import fs from 'fs/promises';
 import path from 'path';
 
 const CACHE_PATH = path.join(process.cwd(), 'data', 'venue-cache.json');
+const CACHE_TIME_ZONE = process.env.VENUE_CACHE_TIME_ZONE || 'America/New_York';
 const location = process.env.VENUE_IMPORT_LOCATION || 'Lancaster, PA';
 const query = process.env.VENUE_IMPORT_QUERY || 'restaurants bars coffee shops music venues event spaces theaters stores businesses';
 const limit = Number(process.env.VENUE_IMPORT_LIMIT || 30);
@@ -34,6 +35,15 @@ function dedupeVenues(items) {
   return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
+function getCacheDay(date = new Date(), timeZone = CACHE_TIME_ZONE) {
+  return new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(date);
+}
+
 async function importGoogleVenues() {
   const apiKey = process.env.GOOGLE_MAPS_API_KEY;
   if (!apiKey) return [];
@@ -62,83 +72,21 @@ async function importGoogleVenues() {
   });
 }
 
-async function importFoursquareVenues() {
-  const apiKey = process.env.FOURSQUARE_API_KEY;
-  if (!apiKey) return [];
-  const url = new URL('https://api.foursquare.com/v3/places/search');
-  url.searchParams.set('query', query || 'venues');
-  url.searchParams.set('near', location || 'Lancaster, PA');
-  url.searchParams.set('limit', String(limit));
-  const response = await fetch(url, { headers: { Authorization: apiKey, Accept: 'application/json' } });
-  if (!response.ok) throw new Error(`Foursquare import failed with ${response.status}`);
-  const data = await response.json();
-  return (data.results || []).map((item) => {
-    const rawCategories = (item.categories || []).map((c) => c.name || '').filter(Boolean);
-    return {
-      source: 'foursquare',
-      externalId: item.fsq_id || item.name,
-      name: item.name || 'Untitled venue',
-      address: item.location?.formatted_address || null,
-      latitude: item.geocodes?.main?.latitude ?? null,
-      longitude: item.geocodes?.main?.longitude ?? null,
-      website: item.website || null,
-      phone: item.tel || null,
-      rating: item.rating ?? null,
-      rawCategories,
-      category: inferDirectoryCategory(rawCategories[0] || null, rawCategories, item.name || ''),
-      description: null,
-    };
-  });
-}
-
-async function importYelpVenues() {
-  const apiKey = process.env.YELP_API_KEY;
-  if (!apiKey) return [];
-  const url = new URL('https://api.yelp.com/v3/businesses/search');
-  url.searchParams.set('location', location || 'Lancaster, PA');
-  url.searchParams.set('term', query || 'venues');
-  url.searchParams.set('limit', String(limit));
-  const response = await fetch(url, { headers: { Authorization: `Bearer ${apiKey}` } });
-  if (!response.ok) throw new Error(`Yelp import failed with ${response.status}`);
-  const data = await response.json();
-  return (data.businesses || []).map((item) => {
-    const rawCategories = (item.categories || []).map((c) => c.title || '').filter(Boolean);
-    return {
-      source: 'yelp',
-      externalId: item.id || item.name,
-      name: item.name || 'Untitled venue',
-      address: item.location?.display_address?.join(', ') || null,
-      latitude: item.coordinates?.latitude ?? null,
-      longitude: item.coordinates?.longitude ?? null,
-      website: item.url || null,
-      phone: item.phone || null,
-      rating: item.rating ?? null,
-      rawCategories,
-      category: inferDirectoryCategory(rawCategories[0] || null, rawCategories, item.name || ''),
-      description: null,
-    };
-  });
-}
-
-const [google, foursquare, yelp] = await Promise.all([
-  importGoogleVenues(),
-  importFoursquareVenues(),
-  importYelpVenues(),
-]);
-
+const google = await importGoogleVenues();
+const now = new Date();
 const cache = {
-  generatedAt: new Date().toISOString(),
+  generatedAt: now.toISOString(),
+  cacheDay: getCacheDay(now),
   location,
   query,
   limit,
   providers: {
     google: google.length,
-    foursquare: foursquare.length,
-    yelp: yelp.length,
   },
-  venues: dedupeVenues([...google, ...foursquare, ...yelp]),
+  venues: dedupeVenues(google),
 };
 
 await fs.mkdir(path.dirname(CACHE_PATH), { recursive: true });
-await fs.writeFile(CACHE_PATH, JSON.stringify(cache, null, 2) + '\n', 'utf8');
-console.log(`Saved ${cache.venues.length} venues to ${CACHE_PATH}`);
+await fs.writeFile(CACHE_PATH, JSON.stringify(cache, null, 2) + '
+', 'utf8');
+console.log(`Saved ${cache.venues.length} Google venues to ${CACHE_PATH}`);

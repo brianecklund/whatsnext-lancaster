@@ -1,7 +1,5 @@
-import { importFoursquareVenues } from "./providers/foursquare";
 import { importGoogleVenues } from "./providers/google";
-import { importYelpVenues } from "./providers/yelp";
-import { getDefaultVenueImportParams, readVenueCache, writeVenueCache, type VenueCacheFile } from "./cache";
+import { getCacheDay, getDefaultVenueImportParams, readVenueCache, writeVenueCache, type VenueCacheFile } from "./cache";
 import type { ImportedVenue, VenueImportParams } from "./types";
 
 function dedupeVenues(items: ImportedVenue[]) {
@@ -14,18 +12,12 @@ function dedupeVenues(items: ImportedVenue[]) {
 }
 
 export async function importVenues(params: VenueImportParams) {
-  const [google, foursquare, yelp] = await Promise.all([
-    importGoogleVenues(params),
-    importFoursquareVenues(params),
-    importYelpVenues(params),
-  ]);
+  const google = await importGoogleVenues(params);
 
   return {
-    venues: dedupeVenues([...google, ...foursquare, ...yelp]),
+    venues: dedupeVenues(google),
     providers: {
       google: google.length,
-      foursquare: foursquare.length,
-      yelp: yelp.length,
     },
   };
 }
@@ -37,8 +29,10 @@ export async function getCachedVenueImport() {
 export async function refreshVenueCache(overrides: VenueImportParams = {}): Promise<VenueCacheFile> {
   const params = { ...getDefaultVenueImportParams(), ...overrides };
   const result = await importVenues(params);
+  const now = new Date();
   const cache: VenueCacheFile = {
-    generatedAt: new Date().toISOString(),
+    generatedAt: now.toISOString(),
+    cacheDay: getCacheDay(now),
     location: params.location || "Lancaster, PA",
     query: params.query || "venues",
     limit: Number(params.limit || 30),

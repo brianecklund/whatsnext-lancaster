@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getCachedVenueImport, refreshVenueCache } from "@/lib/venue-import";
-import { getDefaultVenueImportParams, isVenueCacheFresh } from "@/lib/venue-import/cache";
+import { getDefaultVenueImportParams, isVenueCacheFresh, isVenueCacheForToday } from "@/lib/venue-import/cache";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -26,7 +26,13 @@ export async function GET(request: NextRequest) {
       (!parsed.query || parsed.query === cache.query) &&
       (!parsed.limit || parsed.limit === cache.limit);
 
-    if (!parsed.refresh && sameQuery && isVenueCacheFresh(cache, parsed.maxAgeHours) && cache.venues.length) {
+    const canUseCache =
+      !parsed.refresh &&
+      sameQuery &&
+      cache.venues.length > 0 &&
+      (isVenueCacheForToday(cache) || isVenueCacheFresh(cache, parsed.maxAgeHours));
+
+    if (canUseCache) {
       return NextResponse.json({ ok: true, source: "cache", ...cache });
     }
 
