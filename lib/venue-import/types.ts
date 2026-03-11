@@ -1,4 +1,4 @@
-export type VenueSource = "google" | "foursquare" | "yelp";
+export type VenueSource = "google";
 
 export type ImportedVenue = {
   source: VenueSource;

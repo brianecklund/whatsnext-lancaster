@@ -2,7 +2,8 @@ import { createClient, prismic } from "@/prismicio";
 import type { LocationLite } from "@/lib/types";
 import type { RichTextField } from "@prismicio/client";
 import LocationsSplitClient from "./LocationsSplitClient";
-import { getCachedVenueImport } from "@/lib/venue-import";
+import { getCachedVenueImport, refreshVenueCache } from "@/lib/venue-import";
+import { getDefaultVenueImportParams, isVenueCacheFresh } from "@/lib/venue-import/cache";
 import { importedVenueToLocationLite } from "@/lib/venue-import/to-location";
 
 export const dynamic = "force-dynamic";
@@ -42,8 +43,8 @@ export default async function LocationsPage() {
       typeof desc === "string"
         ? desc
         : Array.isArray(desc) && desc.length > 0
-        ? prismic.asText(desc as RichTextField)
-        : null;
+          ? prismic.asText(desc as RichTextField)
+          : null;
 
     const websiteUrl = prismic.asLink(doc.data?.website);
 
@@ -59,7 +60,17 @@ export default async function LocationsPage() {
     };
   });
 
-  const cachedImport = await getCachedVenueImport();
+  let cachedImport = await getCachedVenueImport();
+  const googleConfigured = Boolean(process.env.GOOGLE_MAPS_API_KEY || process.env.GOOGLE_PLACES_API_KEY);
+
+  if (googleConfigured && (!cachedImport.venues?.length || !isVenueCacheFresh(cachedImport))) {
+    try {
+      cachedImport = await refreshVenueCache(getDefaultVenueImportParams());
+    } catch {
+      // keep existing cache or fallback to Prismic-only listings
+    }
+  }
+
   const importedLocations: LocationRow[] = (cachedImport.venues ?? []).map(importedVenueToLocationLite);
 
   const locations = dedupeLocations([...prismicLocations, ...importedLocations]).sort((a, b) =>

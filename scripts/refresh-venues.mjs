@@ -5,6 +5,7 @@ const CACHE_PATH = path.join(process.cwd(), 'data', 'venue-cache.json');
 const location = process.env.VENUE_IMPORT_LOCATION || 'Lancaster, PA';
 const query = process.env.VENUE_IMPORT_QUERY || 'restaurants bars coffee shops music venues event spaces theaters stores businesses';
 const limit = Number(process.env.VENUE_IMPORT_LIMIT || 30);
+const apiKey = process.env.GOOGLE_MAPS_API_KEY || process.env.GOOGLE_PLACES_API_KEY;
 
 const RULES = [
   [/music venue|concert hall|live music|rock club|jazz club/i, 'Music Venue'],
@@ -34,15 +35,21 @@ function dedupeVenues(items) {
   return Array.from(map.values()).sort((a, b) => a.name.localeCompare(b.name));
 }
 
+function getCacheDay(date = new Date()) {
+  return date.toISOString().slice(0, 10);
+}
+
 async function importGoogleVenues() {
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-  if (!apiKey) return [];
+  if (!apiKey) throw new Error('Missing GOOGLE_MAPS_API_KEY or GOOGLE_PLACES_API_KEY');
   const url = new URL('https://maps.googleapis.com/maps/api/place/textsearch/json');
   url.searchParams.set('key', apiKey);
-  url.searchParams.set('query', query || `${location} venues`);
+  url.searchParams.set('query', query.toLowerCase().includes(location.toLowerCase()) ? query : `${query} in ${location}`);
   const response = await fetch(url);
   if (!response.ok) throw new Error(`Google import failed with ${response.status}`);
   const data = await response.json();
+  if (data.status && data.status !== 'OK' && data.status !== 'ZERO_RESULTS') {
+    throw new Error(data.error_message || `Google import failed with status ${data.status}`);
+  }
   return (data.results || []).slice(0, limit).map((item) => {
     const rawCategories = (item.types || []).map((v) => v.replace(/_/g, ' '));
     return {
@@ -62,81 +69,18 @@ async function importGoogleVenues() {
   });
 }
 
-async function importFoursquareVenues() {
-  const apiKey = process.env.FOURSQUARE_API_KEY;
-  if (!apiKey) return [];
-  const url = new URL('https://api.foursquare.com/v3/places/search');
-  url.searchParams.set('query', query || 'venues');
-  url.searchParams.set('near', location || 'Lancaster, PA');
-  url.searchParams.set('limit', String(limit));
-  const response = await fetch(url, { headers: { Authorization: apiKey, Accept: 'application/json' } });
-  if (!response.ok) throw new Error(`Foursquare import failed with ${response.status}`);
-  const data = await response.json();
-  return (data.results || []).map((item) => {
-    const rawCategories = (item.categories || []).map((c) => c.name || '').filter(Boolean);
-    return {
-      source: 'foursquare',
-      externalId: item.fsq_id || item.name,
-      name: item.name || 'Untitled venue',
-      address: item.location?.formatted_address || null,
-      latitude: item.geocodes?.main?.latitude ?? null,
-      longitude: item.geocodes?.main?.longitude ?? null,
-      website: item.website || null,
-      phone: item.tel || null,
-      rating: item.rating ?? null,
-      rawCategories,
-      category: inferDirectoryCategory(rawCategories[0] || null, rawCategories, item.name || ''),
-      description: null,
-    };
-  });
-}
-
-async function importYelpVenues() {
-  const apiKey = process.env.YELP_API_KEY;
-  if (!apiKey) return [];
-  const url = new URL('https://api.yelp.com/v3/businesses/search');
-  url.searchParams.set('location', location || 'Lancaster, PA');
-  url.searchParams.set('term', query || 'venues');
-  url.searchParams.set('limit', String(limit));
-  const response = await fetch(url, { headers: { Authorization: `Bearer ${apiKey}` } });
-  if (!response.ok) throw new Error(`Yelp import failed with ${response.status}`);
-  const data = await response.json();
-  return (data.businesses || []).map((item) => {
-    const rawCategories = (item.categories || []).map((c) => c.title || '').filter(Boolean);
-    return {
-      source: 'yelp',
-      externalId: item.id || item.name,
-      name: item.name || 'Untitled venue',
-      address: item.location?.display_address?.join(', ') || null,
-      latitude: item.coordinates?.latitude ?? null,
-      longitude: item.coordinates?.longitude ?? null,
-      website: item.url || null,
-      phone: item.phone || null,
-      rating: item.rating ?? null,
-      rawCategories,
-      category: inferDirectoryCategory(rawCategories[0] || null, rawCategories, item.name || ''),
-      description: null,
-    };
-  });
-}
-
-const [google, foursquare, yelp] = await Promise.all([
-  importGoogleVenues(),
-  importFoursquareVenues(),
-  importYelpVenues(),
-]);
-
+const google = await importGoogleVenues();
+const now = new Date();
 const cache = {
-  generatedAt: new Date().toISOString(),
+  generatedAt: now.toISOString(),
+  cacheDay: getCacheDay(now),
   location,
   query,
   limit,
   providers: {
     google: google.length,
-    foursquare: foursquare.length,
-    yelp: yelp.length,
   },
-  venues: dedupeVenues([...google, ...foursquare, ...yelp]),
+  venues: dedupeVenues(google),
 };
 
 await fs.mkdir(path.dirname(CACHE_PATH), { recursive: true });

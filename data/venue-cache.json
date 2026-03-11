@@ -1,12 +1,11 @@
 {
   "generatedAt": null,
+  "cacheDay": null,
   "location": "Lancaster, PA",
   "query": "restaurants bars coffee shops music venues event spaces theaters stores businesses",
   "limit": 30,
   "providers": {
-    "google": 0,
-    "foursquare": 0,
-    "yelp": 0
+    "google": 0
   },
   "venues": []
 }
