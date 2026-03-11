@@ -29,8 +29,6 @@ This repo includes a server-side venue import endpoint at `app/api/venues/import
 
 Supported providers:
 - Google Places via `GOOGLE_MAPS_API_KEY`
-- Foursquare Places via `FOURSQUARE_API_KEY`
-- Yelp via `YELP_API_KEY`
 
 Example:
 
@@ -49,8 +47,8 @@ This repo stores imported directory venues in `data/venue-cache.json`.
 
 ```bash
 GOOGLE_MAPS_API_KEY=...
-FOURSQUARE_API_KEY=...
-YELP_API_KEY=...
+# or
+GOOGLE_PLACES_API_KEY=...
 npm run refresh:venues
 ```
 
@@ -59,7 +57,7 @@ npm run refresh:venues
 A scheduled workflow lives at `.github/workflows/refresh-venues.yml`.
 Set these in GitHub:
 
-- Repository Secrets: `GOOGLE_MAPS_API_KEY`, `FOURSQUARE_API_KEY`, `YELP_API_KEY`
+- Repository Secrets: `GOOGLE_MAPS_API_KEY` or `GOOGLE_PLACES_API_KEY`
 - Repository Variables: `VENUE_IMPORT_LOCATION`, `VENUE_IMPORT_QUERY`, `VENUE_IMPORT_LIMIT`
 
 The Directory page reads from `data/venue-cache.json`, so imported venues are persisted in the repo and deployed with the site.

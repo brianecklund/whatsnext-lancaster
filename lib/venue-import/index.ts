@@ -1,5 +1,5 @@
 import { importGoogleVenues } from "./providers/google";
-import { getCacheDay, getDefaultVenueImportParams, readVenueCache, writeVenueCache, type VenueCacheFile } from "./cache";
+import { getDefaultVenueImportParams, readVenueCache, writeVenueCache, type VenueCacheFile } from "./cache";
 import type { ImportedVenue, VenueImportParams } from "./types";
 
 function dedupeVenues(items: ImportedVenue[]) {
@@ -30,9 +30,10 @@ export async function refreshVenueCache(overrides: VenueImportParams = {}): Prom
   const params = { ...getDefaultVenueImportParams(), ...overrides };
   const result = await importVenues(params);
   const now = new Date();
+  const cacheDay = now.toISOString().slice(0, 10);
   const cache: VenueCacheFile = {
     generatedAt: now.toISOString(),
-    cacheDay: getCacheDay(now),
+    cacheDay,
     location: params.location || "Lancaster, PA",
     query: params.query || "venues",
     limit: Number(params.limit || 30),

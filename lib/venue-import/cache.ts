@@ -4,7 +4,7 @@ import type { ImportedVenue, VenueImportParams } from "./types";
 
 export type VenueCacheFile = {
   generatedAt: string | null;
-  cacheDay: string | null;
+  cacheDay?: string | null;
   location: string;
   query: string;
   limit: number;
@@ -18,7 +18,7 @@ const EMPTY_CACHE: VenueCacheFile = {
   generatedAt: null,
   cacheDay: null,
   location: "Lancaster, PA",
-  query: "restaurants bars coffee shops music venues event spaces theaters stores businesses",
+  query: "restaurants bars coffee shops cafes music venues event spaces theaters shops boutiques businesses",
   limit: 30,
   providers: { google: 0 },
   venues: [],
@@ -33,18 +33,13 @@ export function getDefaultVenueImportParams(): VenueImportParams {
   };
 }
 
-export function getCacheDay(date = new Date()) {
-  return date.toISOString().slice(0, 10);
-}
-
 export async function readVenueCache(): Promise<VenueCacheFile> {
   try {
     const raw = await fs.readFile(CACHE_PATH, "utf8");
-    const parsed = JSON.parse(raw) as Partial<VenueCacheFile>;
+    const parsed = JSON.parse(raw) as VenueCacheFile;
     return {
       ...EMPTY_CACHE,
       ...parsed,
-      cacheDay: parsed.cacheDay || (parsed.generatedAt ? String(parsed.generatedAt).slice(0, 10) : null),
       providers: { ...EMPTY_CACHE.providers, ...(parsed.providers || {}) },
       venues: Array.isArray(parsed.venues) ? parsed.venues : [],
     };
@@ -58,8 +53,14 @@ export async function writeVenueCache(cache: VenueCacheFile) {
   await fs.writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}\n`, "utf8");
 }
 
+function getTodayCacheDay() {
+  return new Date().toISOString().slice(0, 10);
+}
+
 export function isVenueCacheFresh(cache: VenueCacheFile, maxAgeHours = 24) {
-  if (cache.cacheDay && cache.cacheDay === getCacheDay()) return true;
+  if (cache.cacheDay && cache.cacheDay === getTodayCacheDay() && Array.isArray(cache.venues) && cache.venues.length > 0) {
+    return true;
+  }
   if (!cache.generatedAt) return false;
   const generatedAt = new Date(cache.generatedAt).getTime();
   if (Number.isNaN(generatedAt)) return false;
