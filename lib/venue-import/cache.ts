@@ -4,7 +4,6 @@ import type { ImportedVenue, VenueImportParams } from "./types";
 
 export type VenueCacheFile = {
   generatedAt: string | null;
-  cacheDay: string | null;
   location: string;
   query: string;
   limit: number;
@@ -13,15 +12,13 @@ export type VenueCacheFile = {
 };
 
 const CACHE_PATH = path.join(process.cwd(), "data", "venue-cache.json");
-const CACHE_TIME_ZONE = process.env.VENUE_CACHE_TIME_ZONE || "America/New_York";
 
 const EMPTY_CACHE: VenueCacheFile = {
   generatedAt: null,
-  cacheDay: null,
   location: "Lancaster, PA",
   query: "restaurants bars coffee shops music venues event spaces theaters stores businesses",
   limit: 30,
-  providers: { google: 0 },
+  providers: { google: 0, foursquare: 0, yelp: 0 },
   venues: [],
 };
 
@@ -51,17 +48,7 @@ export async function readVenueCache(): Promise<VenueCacheFile> {
 
 export async function writeVenueCache(cache: VenueCacheFile) {
   await fs.mkdir(path.dirname(CACHE_PATH), { recursive: true });
-  await fs.writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}
-`, "utf8");
-}
-
-export function getCacheDay(date = new Date(), timeZone = CACHE_TIME_ZONE) {
-  return new Intl.DateTimeFormat("en-CA", {
-    timeZone,
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  }).format(date);
+  await fs.writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}\n`, "utf8");
 }
 
 export function isVenueCacheFresh(cache: VenueCacheFile, maxAgeHours = 24) {
@@ -69,10 +56,4 @@ export function isVenueCacheFresh(cache: VenueCacheFile, maxAgeHours = 24) {
   const generatedAt = new Date(cache.generatedAt).getTime();
   if (Number.isNaN(generatedAt)) return false;
   return Date.now() - generatedAt < maxAgeHours * 60 * 60 * 1000;
-}
-
-export function isVenueCacheForToday(cache: Pick<VenueCacheFile, "cacheDay" | "generatedAt">, timeZone = CACHE_TIME_ZONE) {
-  if (cache.cacheDay) return cache.cacheDay === getCacheDay(new Date(), timeZone);
-  if (!cache.generatedAt) return false;
-  return getCacheDay(new Date(cache.generatedAt), timeZone) === getCacheDay(new Date(), timeZone);
 }
