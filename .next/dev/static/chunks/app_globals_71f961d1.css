@@ -134,9 +134,11 @@ a:hover {
 }
 
 .brand {
+  min-width: 0;
   font-weight: var(--fw-medium);
   font-size: var(--fs-hero);
   letter-spacing: -.02em;
+  flex: auto;
   align-items: center;
   line-height: 1;
   display: inline-flex;
@@ -151,14 +153,16 @@ a:hover {
 }
 
 .hamburgerBtn {
-  z-index: 230;
+  z-index: 260;
   border: 1px solid var(--border);
   width: 46px;
   height: 46px;
   box-shadow: var(--shadowSoft);
   transition: transform .32s var(--ease-snap), background-color .32s ease, box-shadow .32s ease;
+  touch-action: manipulation;
   background: #fff;
   border-radius: 14px;
+  flex: none;
   justify-content: center;
   align-items: center;
   margin-top: 2px;
@@ -203,7 +207,7 @@ a:hover {
 }
 
 .menuOverlay {
-  inset: var(--headerH) 0 0 0;
+  padding-top: var(--headerH);
   z-index: 225;
   -webkit-backdrop-filter: blur(18px);
   backdrop-filter: blur(18px);
@@ -211,12 +215,13 @@ a:hover {
   background: #fffffff5;
   display: block;
   position: fixed;
+  inset: 0;
   overflow: hidden;
 }
 
 .menuOverlayInner {
   width: 100%;
-  min-height: 100%;
+  min-height: calc(100dvh - var(--headerH));
   box-shadow: none;
   transform-origin: top;
   animation: menuOverlayDrop .7s var(--ease-snap) both;
@@ -413,6 +418,12 @@ a:hover {
   .siteHeader {
     padding: 12px var(--gutter) 0 var(--gutter);
     align-items: center;
+  }
+
+  .brand {
+    text-overflow: ellipsis;
+    max-width: calc(100% - 56px);
+    overflow: hidden;
   }
 
   .hamburgerBtn {
@@ -1084,19 +1095,19 @@ a:hover {
   }
 
   .mobileTabs {
-    z-index: 30;
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
+    z-index: 240;
+    -webkit-backdrop-filter: blur(14px);
     border-top: 1px solid var(--border);
-    background: #ffffffeb;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
+    background: #fffffff5;
     justify-content: space-between;
     gap: 12px;
-    padding: 10px 16px;
     display: flex;
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
+    box-shadow: 0 -10px 28px #00000014;
   }
 
   .mobileTabs .tabBtn {
@@ -1118,7 +1129,7 @@ a:hover {
   .mobileDetail {
     inset: var(--headerH) 0 0 0;
     background: var(--bg);
-    z-index: 210;
+    z-index: 250;
     transition: transform .32s var(--ease-snap);
     will-change: transform;
     display: block;
@@ -2748,12 +2759,10 @@ a:hover {
 @keyframes routeFadeIn {
   0% {
     opacity: 0;
-    transform: translate3d(0, 14px, 0);
   }
 
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
   }
 }
 

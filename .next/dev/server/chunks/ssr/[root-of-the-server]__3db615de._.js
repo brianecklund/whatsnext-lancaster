@@ -312,8 +312,6 @@ module.exports = mod;
 "use strict";
 
 __turbopack_context__.s([
-    "canPersistVenueCache",
-    ()=>canPersistVenueCache,
     "getDefaultVenueImportParams",
     ()=>getDefaultVenueImportParams,
     "isVenueCacheFresh",
@@ -347,9 +345,6 @@ function getDefaultVenueImportParams() {
         radiusMeters: Number(process.env.VENUE_IMPORT_RADIUS_METERS || 12000)
     };
 }
-function canPersistVenueCache() {
-    return process.env.VERCEL !== "1";
-}
 async function readVenueCache() {
     try {
         const raw = await __TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__["promises"].readFile(CACHE_PATH, "utf8");
@@ -368,15 +363,10 @@ async function readVenueCache() {
     }
 }
 async function writeVenueCache(cache) {
-    if (!canPersistVenueCache()) {
-        return cache;
-    }
     await __TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__["promises"].mkdir(__TURBOPACK__imported__module__$5b$externals$5d2f$path__$5b$external$5d$__$28$path$2c$__cjs$29$__["default"].dirname(CACHE_PATH), {
         recursive: true
     });
-    await __TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__["promises"].writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}
-`, "utf8");
-    return cache;
+    await __TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__["promises"].writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}\n`, "utf8");
 }
 function getTodayCacheDay() {
     return new Date().toISOString().slice(0, 10);
@@ -430,9 +420,7 @@ async function refreshVenueCache(overrides = {}) {
         },
         venues
     };
-    if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["canPersistVenueCache"])()) {
-        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["writeVenueCache"])(cache);
-    }
+    await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["writeVenueCache"])(cache);
     return cache;
 }
 async function getVenues(options) {
@@ -443,19 +431,17 @@ async function getVenues(options) {
         ...overrides
     };
     const cache = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["readVenueCache"])();
-    const requestedLocation = params.location || cache.location;
-    const requestedQuery = params.query || cache.query;
-    const cacheMatchesParams = cache.location === requestedLocation && cache.query === requestedQuery;
+    const cacheMatchesParams = cache.location === (params.location || cache.location) && cache.query === (params.query || cache.query);
     if (!refresh && cacheMatchesParams && cache.cacheDay && cache.cacheDay === new Date().toISOString().slice(0, 10) && cache.venues.length) {
         return {
             source: "cache",
             ...cache
         };
     }
-    const live = await refreshVenueCache(params);
+    const saved = await refreshVenueCache(params);
     return {
-        source: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["canPersistVenueCache"])() ? "google" : "google-live",
-        ...live
+        source: "google",
+        ...saved
     };
 }
 }),
