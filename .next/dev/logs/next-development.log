@@ -1,16 +1,11 @@
-[00:00:00.766] Server  LOG     
-[00:00:00.766] Server  LOG       We detected TypeScript in your project and reconfigured your tsconfig.json file for you. Strict-mode is set to false by default.
-[00:00:00.766] Server  LOG       The following suggested values were added to your tsconfig.json. These values can be changed to fit your project's needs:
-
-[00:00:00.766] Server  LOG       	- include was updated to add '.next/dev/types/**/*.ts'
-[00:00:00.766] Server  LOG     
-[00:00:00.766] Server  LOG       The following mandatory changes were made to your tsconfig.json:
-
-[00:00:00.766] Server  LOG       	- jsx was set to react-jsx (next.js uses the React automatic runtime)
-[00:00:00.766] Server  LOG     
-[00:00:00.869] Server  LOG     ✓ Ready in 662ms
-[00:00:05.199] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
-[00:00:06.102] Server  ERROR   Failed to load imported venues Error: Missing GOOGLE_PLACES_API_KEY or GOOGLE_MAPS_API_KEY
-[00:03:00.487] Server  LOG       Reload env: .env.local
-[00:03:01.132] Server  ERROR   ⨯ Error: Missing Prismic repository name. Set PRISMIC_REPO_NAME in Vercel → Project → Settings → Environment Variables (and in .env.local for local dev). Example: PRISMIC_REPO_NAME=your-repo-name
-[00:03:01.589] Browser ERROR   uncaughtError: Error: Missing Prismic repository name. Set PRISMIC_REPO_NAME in Vercel → Project → Settings → Environment Variables (and in .env.local for local dev). Example: PRISMIC_REPO_NAME=your-repo-name
+[00:00:00.671] Server  LOG     ✓ Ready in 484ms
+[00:00:04.622] Server  ERROR   ⨯ Error: Missing Prismic repository name. Set PRISMIC_REPO_NAME in Vercel → Project → Settings → Environment Variables (and in .env.local for local dev). Example: PRISMIC_REPO_NAME=your-repo-name
+[00:00:04.687] Server  ERROR   ⨯ Error: Missing Prismic repository name. Set PRISMIC_REPO_NAME in Vercel → Project → Settings → Environment Variables (and in .env.local for local dev). Example: PRISMIC_REPO_NAME=your-repo-name
+[00:00:05.084] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:05.206] Browser ERROR   uncaughtError: Error: Missing Prismic repository name. Set PRISMIC_REPO_NAME in Vercel → Project → Settings → Environment Variables (and in .env.local for local dev). Example: PRISMIC_REPO_NAME=your-repo-name
+[00:00:18.126] Server  ERROR   ⨯ Error: Missing Prismic repository name. Set PRISMIC_REPO_NAME in Vercel → Project → Settings → Environment Variables (and in .env.local for local dev). Example: PRISMIC_REPO_NAME=your-repo-name
+[00:00:18.357] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:00:18.475] Browser ERROR   uncaughtError: Error: Missing Prismic repository name. Set PRISMIC_REPO_NAME in Vercel → Project → Settings → Environment Variables (and in .env.local for local dev). Example: PRISMIC_REPO_NAME=your-repo-name
+[00:01:41.032] Server  LOG       Reload env: .env.local
+[00:01:42.112] Browser INFO    %cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold
+[00:02:05.035] Server  LOG       Reload env: .env.local
