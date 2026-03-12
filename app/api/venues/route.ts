@@ -35,14 +35,17 @@ export async function GET(req: NextRequest) {
 
     if (!apiKey) {
       return NextResponse.json(
-        { ok: false, error: "Missing GOOGLE_PLACES_API_KEY or GOOGLE_MAPS_API_KEY" },
+        {
+          ok: false,
+          error: "Missing GOOGLE_PLACES_API_KEY or GOOGLE_MAPS_API_KEY",
+        },
         { status: 500 }
       );
     }
 
     const { searchParams } = new URL(req.url);
     const location = searchParams.get("location") || "Lancaster, PA";
-    const limit = Number(searchParams.get("limit") || "20");
+    const limit = Math.min(Number(searchParams.get("limit") || "20"), 20);
 
     const queries = [
       `restaurants in ${location}`,
@@ -66,7 +69,7 @@ export async function GET(req: NextRequest) {
         },
         body: JSON.stringify({
           textQuery,
-          pageSize: Math.min(limit, 20),
+          pageSize: limit,
           languageCode: "en",
           regionCode: "US",
         }),
