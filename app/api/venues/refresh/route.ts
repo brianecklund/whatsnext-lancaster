@@ -14,19 +14,22 @@ function parseOverrides(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   try {
-    const result = await getVenues({ refresh: true, overrides: parseOverrides(request) });
+    const result = await getVenues({
+      refresh: true,
+      overrides: parseOverrides(request),
+    });
+
     return NextResponse.json({
-      ok: true,
+      imported: result.venues.length,
+      cacheUpdated: true,
       source: result.source,
       cacheDay: result.cacheDay,
       updatedAt: result.generatedAt,
-      count: result.venues.length,
     });
   } catch (error) {
     return NextResponse.json(
       {
-        ok: false,
-        error: error instanceof Error ? error.message : "Failed to refresh venues",
+        error: error instanceof Error ? error.message : "Refresh failed",
       },
       { status: 500 }
     );

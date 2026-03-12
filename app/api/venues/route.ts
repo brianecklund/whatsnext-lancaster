@@ -15,8 +15,9 @@ function parseOverrides(request: NextRequest) {
 export async function GET(request: NextRequest) {
   try {
     const result = await getVenues({ overrides: parseOverrides(request) });
+
     return NextResponse.json({
-      ok: true,
+      cached: result.source === "cache",
       source: result.source,
       cacheDay: result.cacheDay,
       updatedAt: result.generatedAt,
@@ -26,8 +27,7 @@ export async function GET(request: NextRequest) {
   } catch (error) {
     return NextResponse.json(
       {
-        ok: false,
-        error: error instanceof Error ? error.message : "Failed to load venues",
+        error: error instanceof Error ? error.message : "Failed reading venue cache",
       },
       { status: 500 }
     );
