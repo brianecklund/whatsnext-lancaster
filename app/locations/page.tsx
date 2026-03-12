@@ -2,7 +2,7 @@ import { createClient, prismic } from "@/prismicio";
 import type { LocationLite } from "@/lib/types";
 import type { RichTextField } from "@prismicio/client";
 import LocationsSplitClient from "./LocationsSplitClient";
-import { getCachedVenueImport } from "@/lib/venue-import";
+import { getVenues } from "@/lib/venue-import";
 import { importedVenueToLocationLite } from "@/lib/venue-import/to-location";
 
 export const dynamic = "force-dynamic";
@@ -59,8 +59,13 @@ export default async function LocationsPage() {
     };
   });
 
-  const cachedImport = await getCachedVenueImport();
-  const importedLocations: LocationRow[] = (cachedImport.venues ?? []).map(importedVenueToLocationLite);
+  let importedLocations: LocationRow[] = [];
+  try {
+    const venueResult = await getVenues();
+    importedLocations = (venueResult.venues ?? []).map(importedVenueToLocationLite);
+  } catch (error) {
+    console.error("Failed to load imported venues", error);
+  }
 
   const locations = dedupeLocations([...prismicLocations, ...importedLocations]).sort((a, b) =>
     (a.name ?? "").localeCompare(b.name ?? "")

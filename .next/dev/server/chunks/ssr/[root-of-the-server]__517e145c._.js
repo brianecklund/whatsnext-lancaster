@@ -184,6 +184,9 @@ async function HomePage() {
             website_url: eventWebsite ?? null,
             tickets_url: ticketsUrl ?? null,
             tags: tagsArr,
+            // Raw Prismic Slice Zone for richer content (configured in Prismic as `content_blocks`)
+            // (Fallback: some repos name this `slices`.)
+            content_blocks: doc.data?.content_blocks ?? doc.data?.slices ?? null,
             location: loc ? {
                 id: loc.id,
                 uid: loc.uid ?? null,
@@ -220,7 +223,7 @@ async function HomePage() {
                     children: "Prismic is not returning events"
                 }, void 0, false, {
                     fileName: "[project]/app/page.tsx",
-                    lineNumber: 175,
+                    lineNumber: 179,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -234,7 +237,7 @@ async function HomePage() {
                             children: "event"
                         }, void 0, false, {
                             fileName: "[project]/app/page.tsx",
-                            lineNumber: 179,
+                            lineNumber: 183,
                             columnNumber: 41
                         }, this),
                         " documents from Prismic. The most common causes are a missing/incorrect ",
@@ -242,14 +245,14 @@ async function HomePage() {
                             children: "PRISMIC_REPO_NAME"
                         }, void 0, false, {
                             fileName: "[project]/app/page.tsx",
-                            lineNumber: 180,
+                            lineNumber: 184,
                             columnNumber: 58
                         }, this),
                         "and/or a missing access token when the repository is private."
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/page.tsx",
-                    lineNumber: 178,
+                    lineNumber: 182,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -267,7 +270,7 @@ async function HomePage() {
                             children: "Error"
                         }, void 0, false, {
                             fileName: "[project]/app/page.tsx",
-                            lineNumber: 190,
+                            lineNumber: 194,
                             columnNumber: 11
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("code", {
@@ -277,13 +280,13 @@ async function HomePage() {
                             children: prismicError
                         }, void 0, false, {
                             fileName: "[project]/app/page.tsx",
-                            lineNumber: 191,
+                            lineNumber: 195,
                             columnNumber: 11
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/page.tsx",
-                    lineNumber: 183,
+                    lineNumber: 187,
                     columnNumber: 9
                 }, this),
                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -297,19 +300,19 @@ async function HomePage() {
                             children: "/api/prismic-debug"
                         }, void 0, false, {
                             fileName: "[project]/app/page.tsx",
-                            lineNumber: 194,
+                            lineNumber: 198,
                             columnNumber: 27
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/page.tsx",
-                    lineNumber: 193,
+                    lineNumber: 197,
                     columnNumber: 9
                 }, this)
             ]
         }, void 0, true, {
             fileName: "[project]/app/page.tsx",
-            lineNumber: 174,
+            lineNumber: 178,
             columnNumber: 7
         }, this);
     }
@@ -317,7 +320,7 @@ async function HomePage() {
         events: events
     }, void 0, false, {
         fileName: "[project]/app/page.tsx",
-        lineNumber: 200,
+        lineNumber: 204,
         columnNumber: 10
     }, this);
 }
