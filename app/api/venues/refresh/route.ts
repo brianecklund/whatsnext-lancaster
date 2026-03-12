@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json({
       imported: result.venues.length,
-      cacheUpdated: true,
+      cacheUpdated: result.source !== "google-live",
       source: result.source,
       cacheDay: result.cacheDay,
       updatedAt: result.generatedAt,

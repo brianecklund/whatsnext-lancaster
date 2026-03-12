@@ -33,6 +33,10 @@ export function getDefaultVenueImportParams(): VenueImportParams {
   };
 }
 
+export function canPersistVenueCache() {
+  return process.env.VERCEL !== "1";
+}
+
 export async function readVenueCache(): Promise<VenueCacheFile> {
   try {
     const raw = await fs.readFile(CACHE_PATH, "utf8");
@@ -49,8 +53,14 @@ export async function readVenueCache(): Promise<VenueCacheFile> {
 }
 
 export async function writeVenueCache(cache: VenueCacheFile) {
+  if (!canPersistVenueCache()) {
+    return cache;
+  }
+
   await fs.mkdir(path.dirname(CACHE_PATH), { recursive: true });
-  await fs.writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}\n`, "utf8");
+  await fs.writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}
+`, "utf8");
+  return cache;
 }
 
 function getTodayCacheDay() {

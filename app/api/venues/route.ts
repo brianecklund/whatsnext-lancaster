@@ -1,134 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
+import { getVenues } from "@/lib/venue-import";
 
-type GooglePlace = {
-  id?: string;
-  displayName?: { text?: string };
-  formattedAddress?: string;
-  location?: { latitude?: number; longitude?: number };
-  websiteUri?: string;
-  nationalPhoneNumber?: string;
-  rating?: number;
-  primaryType?: string;
-  types?: string[];
-  googleMapsUri?: string;
-};
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
-const GOOGLE_URL = "https://places.googleapis.com/v1/places:searchText";
+function parseOverrides(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  return {
+    location: searchParams.get("location") || undefined,
+    query: searchParams.get("query") || undefined,
+  };
+}
 
-const FIELD_MASK = [
-  "places.id",
-  "places.displayName",
-  "places.formattedAddress",
-  "places.location",
-  "places.websiteUri",
-  "places.nationalPhoneNumber",
-  "places.rating",
-  "places.primaryType",
-  "places.types",
-  "places.googleMapsUri",
-].join(",");
-
-export async function GET(req: NextRequest) {
+export async function GET(request: NextRequest) {
   try {
-    const apiKey =
-      process.env.GOOGLE_PLACES_API_KEY || process.env.GOOGLE_MAPS_API_KEY;
-
-    if (!apiKey) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "Missing GOOGLE_PLACES_API_KEY or GOOGLE_MAPS_API_KEY",
-        },
-        { status: 500 }
-      );
-    }
-
-    const { searchParams } = new URL(req.url);
-    const location = searchParams.get("location") || "Lancaster, PA";
-    const limit = Math.min(Number(searchParams.get("limit") || "20"), 20);
-
-    const queries = [
-      `restaurants in ${location}`,
-      `coffee shops in ${location}`,
-      `bars in ${location}`,
-      `music venues in ${location}`,
-      `art galleries in ${location}`,
-      `event venues in ${location}`,
-      `breweries in ${location}`,
-    ];
-
-    const byId = new Map<string, any>();
-
-    for (const textQuery of queries) {
-      const res = await fetch(GOOGLE_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "X-Goog-Api-Key": apiKey,
-          "X-Goog-FieldMask": FIELD_MASK,
-        },
-        body: JSON.stringify({
-          textQuery,
-          pageSize: limit,
-          languageCode: "en",
-          regionCode: "US",
-        }),
-        cache: "no-store",
-      });
-
-      const data = await res.json();
-
-      if (!res.ok) {
-        return NextResponse.json(
-          {
-            ok: false,
-            error: "Google Places request failed",
-            status: res.status,
-            details: data,
-          },
-          { status: 500 }
-        );
-      }
-
-      for (const place of (data.places || []) as GooglePlace[]) {
-        const id = place.id || "";
-        const name = place.displayName?.text || "";
-        if (!id || !name) continue;
-
-        if (!byId.has(id)) {
-          byId.set(id, {
-            id,
-            name,
-            address: place.formattedAddress || "",
-            lat: place.location?.latitude ?? null,
-            lng: place.location?.longitude ?? null,
-            website: place.websiteUri || "",
-            phone: place.nationalPhoneNumber || "",
-            rating: place.rating ?? null,
-            category: place.primaryType || "place",
-            rawCategories: place.types || [],
-            mapsUrl: place.googleMapsUri || "",
-            source: "google",
-          });
-        }
-      }
-    }
-
-    const venues = Array.from(byId.values()).sort((a, b) =>
-      a.name.localeCompare(b.name)
-    );
+    const result = await getVenues({ overrides: parseOverrides(request) });
 
     return NextResponse.json({
-      ok: true,
-      source: "google-live",
-      count: venues.length,
-      venues,
+      cached: result.source === "cache",
+      source: result.source,
+      cacheDay: result.cacheDay,
+      updatedAt: result.generatedAt,
+      count: result.venues.length,
+      venues: result.venues,
     });
   } catch (error) {
     return NextResponse.json(
       {
-        ok: false,
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : "Failed reading venue cache",
       },
       { status: 500 }
     );
