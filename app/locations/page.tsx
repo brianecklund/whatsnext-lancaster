@@ -1,9 +1,8 @@
+import { headers } from "next/headers";
 import { createClient, prismic } from "@/prismicio";
 import type { LocationLite } from "@/lib/types";
 import type { RichTextField } from "@prismicio/client";
 import LocationsSplitClient from "./LocationsSplitClient";
-import { getVenues } from "@/lib/venue-import";
-import { importedVenueToLocationLite } from "@/lib/venue-import/to-location";
 
 export const dynamic = "force-dynamic";
 
@@ -21,6 +20,47 @@ function dedupeLocations(items: LocationRow[]) {
   }
 
   return result;
+}
+
+async function getImportedLocations(): Promise<LocationRow[]> {
+  try {
+    const h = await headers();
+    const host = h.get("x-forwarded-host") || h.get("host");
+    const proto =
+      h.get("x-forwarded-proto") ||
+      (process.env.NODE_ENV === "development" ? "http" : "https");
+
+    if (!host) {
+      return [];
+    }
+
+    const url = `${proto}://${host}/api/venues/import?location=Lancaster,%20PA&limit=20`;
+
+    const res = await fetch(url, {
+      cache: "no-store",
+    });
+
+    const data = await res.json();
+
+    if (!res.ok || !data?.ok || !Array.isArray(data.venues)) {
+      console.error("Failed to load imported venues from API route", data);
+      return [];
+    }
+
+    return data.venues.map((venue: any) => ({
+      id: venue.id ?? venue.externalId ?? venue.name,
+      key: venue.id ?? venue.externalId ?? venue.name,
+      uid: null,
+      name: venue.name ?? null,
+      address: venue.address ?? null,
+      category: venue.category ?? null,
+      website: venue.website ?? null,
+      description: null,
+    }));
+  } catch (error) {
+    console.error("Failed to fetch imported venues", error);
+    return [];
+  }
 }
 
 export default async function LocationsPage() {
@@ -59,13 +99,7 @@ export default async function LocationsPage() {
     };
   });
 
-  let importedLocations: LocationRow[] = [];
-  try {
-    const venueResult = await getVenues();
-    importedLocations = (venueResult.venues ?? []).map(importedVenueToLocationLite);
-  } catch (error) {
-    console.error("Failed to load imported venues", error);
-  }
+  const importedLocations = await getImportedLocations();
 
   const locations = dedupeLocations([...prismicLocations, ...importedLocations]).sort((a, b) =>
     (a.name ?? "").localeCompare(b.name ?? "")
