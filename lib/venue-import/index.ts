@@ -1,11 +1,5 @@
 import { importGoogleVenues } from "./providers/google";
-import {
-  canPersistVenueCache,
-  getDefaultVenueImportParams,
-  readVenueCache,
-  writeVenueCache,
-  type VenueCacheFile,
-} from "./cache";
+import { getDefaultVenueImportParams, readVenueCache, writeVenueCache, type VenueCacheFile } from "./cache";
 import type { VenueImportParams } from "./types";
 
 export async function getCachedVenueImport() {
@@ -30,10 +24,7 @@ export async function refreshVenueCache(overrides: VenueImportParams = {}): Prom
     venues,
   };
 
-  if (canPersistVenueCache()) {
-    await writeVenueCache(cache);
-  }
-
+  await writeVenueCache(cache);
   return cache;
 }
 
@@ -42,22 +33,14 @@ export async function getVenues(options?: { refresh?: boolean; overrides?: Venue
   const overrides = options?.overrides || {};
   const params = { ...getDefaultVenueImportParams(), ...overrides };
   const cache = await readVenueCache();
-  const requestedLocation = params.location || cache.location;
-  const requestedQuery = params.query || cache.query;
   const cacheMatchesParams =
-    cache.location === requestedLocation &&
-    cache.query === requestedQuery;
+    cache.location === (params.location || cache.location) &&
+    cache.query === (params.query || cache.query);
 
-  if (
-    !refresh &&
-    cacheMatchesParams &&
-    cache.cacheDay &&
-    cache.cacheDay === new Date().toISOString().slice(0, 10) &&
-    cache.venues.length
-  ) {
+  if (!refresh && cacheMatchesParams && cache.cacheDay && cache.cacheDay === new Date().toISOString().slice(0, 10) && cache.venues.length) {
     return { source: "cache" as const, ...cache };
   }
 
-  const live = await refreshVenueCache(params);
-  return { source: canPersistVenueCache() ? ("google" as const) : ("google-live" as const), ...live };
+  const saved = await refreshVenueCache(params);
+  return { source: "google" as const, ...saved };
 }

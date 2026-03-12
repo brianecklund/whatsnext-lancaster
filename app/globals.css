@@ -133,6 +133,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .brand{
   display:inline-flex;
   align-items:center;
+  min-width: 0;
+  flex: 1 1 auto;
   font-weight: var(--fw-medium);
   font-size: var(--fs-hero);
   letter-spacing: -0.02em;
@@ -144,7 +146,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .hamburgerBtn{
   position: relative;
-  z-index: 230;
+  z-index: 260;
   display:none;
   width: 46px;
   height: 46px;
@@ -156,6 +158,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   justify-content:center;
   margin-top: 2px;
   transition: transform 320ms var(--ease-snap), background-color 320ms ease, box-shadow 320ms ease;
+  flex: 0 0 auto;
+  touch-action: manipulation;
 }
 
 .hamburgerBtn:hover{ background: var(--hover); }
@@ -193,7 +197,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .menuOverlay{
   position: fixed;
-  inset: var(--headerH) 0 0 0;
+  inset: 0;
+  padding-top: var(--headerH);
   z-index: 225;
   background: rgba(255,255,255,0.96);
   backdrop-filter: blur(18px);
@@ -204,7 +209,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .menuOverlayInner{
   width: 100%;
-  min-height: 100%;
+  min-height: calc(100dvh - var(--headerH));
   background: transparent;
   border-radius: 0;
   border: 0;
@@ -383,6 +388,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 @media (max-width: 980px){
   :root{ --headerH: 64px; }
   .siteHeader{ padding: 12px var(--gutter) 0 var(--gutter); align-items: center; }
+  .brand{ max-width: calc(100% - 56px); overflow: hidden; text-overflow: ellipsis; }
   .hamburgerBtn{ width: 40px; height: 40px; border-radius: 12px; }
   .topNav{ display:none; }
   .hamburgerBtn{ display:inline-flex; }
@@ -986,13 +992,15 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     left: 0;
     right: 0;
     bottom: 0;
-    z-index: 30;
-    background: rgba(255,255,255,0.92);
-    backdrop-filter: blur(10px);
+    z-index: 240;
+    background: rgba(255,255,255,0.96);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
     border-top: 1px solid var(--border);
-    padding: 10px 16px;
+    padding: 10px 16px calc(10px + env(safe-area-inset-bottom));
     gap: 12px;
     justify-content: space-between;
+    box-shadow: 0 -10px 28px rgba(0,0,0,0.08);
   }
   .mobileTabs .tabBtn{
     flex: 1;
@@ -1016,7 +1024,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     position: fixed;
     inset: var(--headerH) 0 0 0;
     background: var(--bg);
-    z-index: 210;
+    z-index: 250;
     transform: translateX(100%);
     transition: transform 320ms var(--ease-snap);
     will-change: transform;
@@ -2420,8 +2428,8 @@ a:hover{
 }
 
 @keyframes routeFadeIn{
-  0%{ opacity: 0; transform: translate3d(0, 14px, 0); }
-  100%{ opacity: 1; transform: translate3d(0, 0, 0); }
+  0%{ opacity: 0; }
+  100%{ opacity: 1; }
 }
 
 @keyframes menuOverlayFade{

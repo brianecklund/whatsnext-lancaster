@@ -145,40 +145,161 @@ __turbopack_context__.s([
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$category$2d$map$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/venue-import/category-map.ts [app-rsc] (ecmascript)");
 ;
-function buildSearchUrl(params) {
-    const apiKey = process.env.GOOGLE_MAPS_API_KEY;
-    if (!apiKey) return null;
-    const url = new URL("https://maps.googleapis.com/maps/api/place/textsearch/json");
-    url.searchParams.set("key", apiKey);
-    url.searchParams.set("query", params.query || `${params.location || "Lancaster, PA"} venues`);
-    return url.toString();
+const GOOGLE_TEXT_SEARCH_URL = "https://places.googleapis.com/v1/places:searchText";
+const PAGE_SIZE = 20;
+const MAX_PAGES_PER_QUERY = 3;
+const NEXT_PAGE_DELAY_MS = 1500;
+const FIELD_MASK = [
+    "places.id",
+    "places.displayName",
+    "places.formattedAddress",
+    "places.location",
+    "places.websiteUri",
+    "places.nationalPhoneNumber",
+    "places.rating",
+    "places.primaryType",
+    "places.types",
+    "places.googleMapsUri",
+    "nextPageToken"
+].join(",");
+const DEFAULT_CITY = "Lancaster, PA";
+const DEFAULT_QUERIES = [
+    "restaurants in Lancaster, PA",
+    "coffee shops in Lancaster, PA",
+    "bars in Lancaster, PA",
+    "music venues in Lancaster, PA",
+    "art galleries in Lancaster, PA",
+    "event venues in Lancaster, PA",
+    "breweries in Lancaster, PA",
+    "bakeries in Lancaster, PA",
+    "bookstores in Lancaster, PA",
+    "boutiques in Lancaster, PA"
+];
+function getApiKey() {
+    const key = process.env.GOOGLE_PLACES_API_KEY || process.env.GOOGLE_MAPS_API_KEY;
+    if (!key) {
+        throw new Error("Missing GOOGLE_PLACES_API_KEY or GOOGLE_MAPS_API_KEY");
+    }
+    return key;
 }
-async function importGoogleVenues(params) {
-    const url = buildSearchUrl(params);
-    if (!url) return [];
-    const response = await fetch(url, {
+function sleep(ms) {
+    return new Promise((resolve)=>setTimeout(resolve, ms));
+}
+function buildQueries(location, query) {
+    const city = (location || DEFAULT_CITY).trim();
+    if (query?.trim()) {
+        return query.split(/[\n|,]+/).map((item)=>item.trim()).filter(Boolean).map((item)=>/\bin\s+/i.test(item) ? item : `${item} in ${city}`);
+    }
+    return DEFAULT_QUERIES.map((item)=>item.replace(DEFAULT_CITY, city));
+}
+async function searchTextPage(params) {
+    const body = {
+        textQuery: params.textQuery,
+        pageSize: PAGE_SIZE,
+        languageCode: "en",
+        regionCode: "US"
+    };
+    if (params.pageToken) body.pageToken = params.pageToken;
+    const response = await fetch(GOOGLE_TEXT_SEARCH_URL, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-Goog-Api-Key": params.apiKey,
+            "X-Goog-FieldMask": FIELD_MASK
+        },
+        body: JSON.stringify(body),
         cache: "no-store"
     });
-    if (!response.ok) throw new Error(`Google import failed with ${response.status}`);
-    const data = await response.json();
-    return (data.results ?? []).slice(0, params.limit ?? 20).map((item)=>{
-        const rawCategories = item.types?.map((value)=>value.replace(/_/g, " ")) ?? [];
-        return {
-            source: "google",
-            externalId: item.place_id || item.name || crypto.randomUUID(),
-            name: item.name || "Untitled venue",
-            address: item.formatted_address ?? null,
-            latitude: item.geometry?.location?.lat ?? null,
-            longitude: item.geometry?.location?.lng ?? null,
-            rating: item.rating ?? null,
+    if (!response.ok) {
+        const message = await response.text();
+        throw new Error(`Google Places request failed (${response.status} ${response.statusText}): ${message}`);
+    }
+    return await response.json();
+}
+function normalizePlace(place) {
+    const externalId = place.id?.trim() || "";
+    const name = place.displayName?.text?.trim() || "";
+    if (!externalId || !name) return null;
+    const rawCategories = Array.from(new Set([
+        ...place.types || [],
+        place.primaryType || ""
+    ].filter(Boolean).map((value)=>value.replace(/_/g, " "))));
+    return {
+        source: "google",
+        externalId,
+        name,
+        address: place.formattedAddress || null,
+        latitude: typeof place.location?.latitude === "number" ? place.location.latitude : null,
+        longitude: typeof place.location?.longitude === "number" ? place.location.longitude : null,
+        website: place.websiteUri || place.googleMapsUri || null,
+        phone: place.nationalPhoneNumber || null,
+        rating: typeof place.rating === "number" ? place.rating : null,
+        rawCategories,
+        category: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$category$2d$map$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["inferDirectoryCategory"])({
+            category: place.primaryType?.replace(/_/g, " ") || rawCategories[0] || null,
             rawCategories,
-            category: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$category$2d$map$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["inferDirectoryCategory"])({
-                category: rawCategories[0] ?? null,
-                rawCategories,
-                name: item.name || ""
-            })
-        };
-    });
+            name
+        }),
+        description: null
+    };
+}
+function isLancasterArea(venue) {
+    const haystack = `${venue.name} ${venue.address || ""} ${(venue.rawCategories || []).join(" ")}`.toLowerCase();
+    return [
+        "lancaster, pa",
+        "lancaster pa",
+        "lititz",
+        "millersville",
+        "manheim",
+        "east petersburg",
+        "landisville",
+        "strasburg"
+    ].some((term)=>haystack.includes(term));
+}
+function mergeVenue(existing, incoming) {
+    return {
+        ...existing,
+        website: existing.website || incoming.website || null,
+        phone: existing.phone || incoming.phone || null,
+        rating: existing.rating ?? incoming.rating ?? null,
+        rawCategories: Array.from(new Set([
+            ...existing.rawCategories || [],
+            ...incoming.rawCategories || []
+        ])),
+        category: existing.category || incoming.category || null,
+        address: existing.address || incoming.address || null,
+        latitude: existing.latitude ?? incoming.latitude ?? null,
+        longitude: existing.longitude ?? incoming.longitude ?? null
+    };
+}
+async function importGoogleVenues(params = {}) {
+    const apiKey = getApiKey();
+    const queries = buildQueries(params.location, params.query);
+    const byId = new Map();
+    for (const textQuery of queries){
+        let pageToken;
+        let page = 0;
+        do {
+            const data = await searchTextPage({
+                apiKey,
+                textQuery,
+                pageToken
+            });
+            const normalized = (data.places || []).map(normalizePlace).filter((venue)=>Boolean(venue)).filter(isLancasterArea);
+            for (const venue of normalized){
+                const existing = byId.get(venue.externalId);
+                byId.set(venue.externalId, existing ? mergeVenue(existing, venue) : venue);
+            }
+            page += 1;
+            pageToken = data.nextPageToken;
+            if (pageToken && page < MAX_PAGES_PER_QUERY) {
+                await sleep(NEXT_PAGE_DELAY_MS);
+            } else {
+                pageToken = undefined;
+            }
+        }while (pageToken)
+    }
+    return Array.from(byId.values()).sort((a, b)=>a.name.localeCompare(b.name));
 }
 }),
 "[externals]/fs [external] (fs, cjs)", ((__turbopack_context__, module, exports) => {
@@ -191,6 +312,8 @@ module.exports = mod;
 "use strict";
 
 __turbopack_context__.s([
+    "canPersistVenueCache",
+    ()=>canPersistVenueCache,
     "getDefaultVenueImportParams",
     ()=>getDefaultVenueImportParams,
     "isVenueCacheFresh",
@@ -224,6 +347,9 @@ function getDefaultVenueImportParams() {
         radiusMeters: Number(process.env.VENUE_IMPORT_RADIUS_METERS || 12000)
     };
 }
+function canPersistVenueCache() {
+    return process.env.VERCEL !== "1";
+}
 async function readVenueCache() {
     try {
         const raw = await __TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__["promises"].readFile(CACHE_PATH, "utf8");
@@ -242,10 +368,15 @@ async function readVenueCache() {
     }
 }
 async function writeVenueCache(cache) {
+    if (!canPersistVenueCache()) {
+        return cache;
+    }
     await __TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__["promises"].mkdir(__TURBOPACK__imported__module__$5b$externals$5d2f$path__$5b$external$5d$__$28$path$2c$__cjs$29$__["default"].dirname(CACHE_PATH), {
         recursive: true
     });
-    await __TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__["promises"].writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}\n`, "utf8");
+    await __TURBOPACK__imported__module__$5b$externals$5d2f$fs__$5b$external$5d$__$28$fs$2c$__cjs$29$__["promises"].writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}
+`, "utf8");
+    return cache;
 }
 function getTodayCacheDay() {
     return new Date().toISOString().slice(0, 10);
@@ -266,8 +397,8 @@ function isVenueCacheFresh(cache, maxAgeHours = 24) {
 __turbopack_context__.s([
     "getCachedVenueImport",
     ()=>getCachedVenueImport,
-    "importVenues",
-    ()=>importVenues,
+    "getVenues",
+    ()=>getVenues,
     "refreshVenueCache",
     ()=>refreshVenueCache
 ]);
@@ -275,23 +406,6 @@ var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$pr
 var __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/lib/venue-import/cache.ts [app-rsc] (ecmascript)");
 ;
 ;
-function dedupeVenues(items) {
-    const map = new Map();
-    for (const item of items){
-        const key = `${item.name.toLowerCase()}|${(item.address ?? "").toLowerCase()}`;
-        if (!map.has(key)) map.set(key, item);
-    }
-    return Array.from(map.values()).sort((a, b)=>a.name.localeCompare(b.name));
-}
-async function importVenues(params) {
-    const google = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$providers$2f$google$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["importGoogleVenues"])(params);
-    return {
-        venues: dedupeVenues(google),
-        providers: {
-            google: google.length
-        }
-    };
-}
 async function getCachedVenueImport() {
     return (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["readVenueCache"])();
 }
@@ -300,20 +414,49 @@ async function refreshVenueCache(overrides = {}) {
         ...(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDefaultVenueImportParams"])(),
         ...overrides
     };
-    const result = await importVenues(params);
+    const venues = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$providers$2f$google$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["importGoogleVenues"])({
+        location: params.location,
+        query: params.query
+    });
     const now = new Date();
-    const cacheDay = now.toISOString().slice(0, 10);
     const cache = {
         generatedAt: now.toISOString(),
-        cacheDay,
+        cacheDay: now.toISOString().slice(0, 10),
         location: params.location || "Lancaster, PA",
-        query: params.query || "venues",
-        limit: Number(params.limit || 30),
-        providers: result.providers,
-        venues: result.venues
+        query: params.query || "",
+        limit: venues.length,
+        providers: {
+            google: venues.length
+        },
+        venues
     };
-    await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["writeVenueCache"])(cache);
+    if ((0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["canPersistVenueCache"])()) {
+        await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["writeVenueCache"])(cache);
+    }
     return cache;
+}
+async function getVenues(options) {
+    const refresh = options?.refresh === true;
+    const overrides = options?.overrides || {};
+    const params = {
+        ...(0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getDefaultVenueImportParams"])(),
+        ...overrides
+    };
+    const cache = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["readVenueCache"])();
+    const requestedLocation = params.location || cache.location;
+    const requestedQuery = params.query || cache.query;
+    const cacheMatchesParams = cache.location === requestedLocation && cache.query === requestedQuery;
+    if (!refresh && cacheMatchesParams && cache.cacheDay && cache.cacheDay === new Date().toISOString().slice(0, 10) && cache.venues.length) {
+        return {
+            source: "cache",
+            ...cache
+        };
+    }
+    const live = await refreshVenueCache(params);
+    return {
+        source: (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$cache$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["canPersistVenueCache"])() ? "google" : "google-live",
+        ...live
+    };
 }
 }),
 "[project]/lib/venue-import/to-location.ts [app-rsc] (ecmascript)", ((__turbopack_context__) => {
@@ -398,8 +541,13 @@ async function LocationsPage() {
             description: descText ?? null
         };
     });
-    const cachedImport = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$index$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getCachedVenueImport"])();
-    const importedLocations = (cachedImport.venues ?? []).map(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$to$2d$location$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["importedVenueToLocationLite"]);
+    let importedLocations = [];
+    try {
+        const venueResult = await (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$index$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getVenues"])();
+        importedLocations = (venueResult.venues ?? []).map(__TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$to$2d$location$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["importedVenueToLocationLite"]);
+    } catch (error) {
+        console.error("Failed to load imported venues", error);
+    }
     const locations = dedupeLocations([
         ...prismicLocations,
         ...importedLocations
@@ -418,7 +566,7 @@ async function LocationsPage() {
                         children: "Couldn’t load locations from Prismic."
                     }, void 0, false, {
                         fileName: "[project]/app/locations/page.tsx",
-                        lineNumber: 73,
+                        lineNumber: 78,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$rsc$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -426,18 +574,18 @@ async function LocationsPage() {
                         children: prismicError
                     }, void 0, false, {
                         fileName: "[project]/app/locations/page.tsx",
-                        lineNumber: 74,
+                        lineNumber: 79,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/locations/page.tsx",
-                lineNumber: 72,
+                lineNumber: 77,
                 columnNumber: 9
             }, this)
         }, void 0, false, {
             fileName: "[project]/app/locations/page.tsx",
-            lineNumber: 71,
+            lineNumber: 76,
             columnNumber: 7
         }, this);
     }
@@ -445,7 +593,7 @@ async function LocationsPage() {
         locations: locations
     }, void 0, false, {
         fileName: "[project]/app/locations/page.tsx",
-        lineNumber: 80,
+        lineNumber: 85,
         columnNumber: 10
     }, this);
 }
