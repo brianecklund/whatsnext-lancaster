@@ -1,4 +1,0 @@
-import { NextRequest, NextResponse } from "next/server";
-import { searchVenueSuggestions } from "@/lib/venue-import";
-export const runtime = "nodejs"; export const dynamic = "force-dynamic";
-export async function GET(request: NextRequest) { try { const { searchParams } = new URL(request.url); const query = searchParams.get("q") || ""; const location = searchParams.get("location") || undefined; const limit = Number(searchParams.get("limit") || "8"); if (!query.trim()) return NextResponse.json({ ok: true, count: 0, results: [] }); const results = await searchVenueSuggestions(query, location, limit); return NextResponse.json({ ok: true, count: results.length, results }); } catch (error) { return NextResponse.json({ ok: false, error: error instanceof Error ? error.message : "Search failed" }, { status: 500 }); } }

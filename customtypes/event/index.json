@@ -157,38 +157,18 @@
           }
         }
       },
-      "venue_name": {
-        "type": "Text",
+      "venue": {
+        "type": "IntegrationFields",
         "config": {
-          "label": "Venue Search / Name",
-          "placeholder": "Start typing the venue name used in Google Maps"
+          "catalog": "whatsnext-lancaster--venues",
+          "label": "Venue",
+          "placeholder": "Search for a venue from the cached directory feed"
         }
       },
-      "venue_place_id": {
-        "type": "Text",
-        "config": {
-          "label": "Google Place ID (optional)",
-          "placeholder": "Optional: paste a Google Place ID for an exact match"
-        }
-      },
-      "venue_address": {
-        "type": "Text",
-        "config": {
-          "label": "Venue Address (optional fallback)",
-          "placeholder": "Optional fallback for event display"
-        }
-      },
-      "venue_search_area": {
-        "type": "Text",
-        "config": {
-          "label": "Venue Search Area",
-          "placeholder": "Lancaster, PA"
-        }
-      },
-      "location": {
+      "location_page": {
         "type": "Link",
         "config": {
-          "label": "Location",
+          "label": "Custom Venue Page",
           "select": "document",
           "repeat": false,
           "customtypes": [
@@ -199,7 +179,8 @@
                 "description",
                 "address",
                 "website",
-                "category"
+                "category",
+                "external_venue_id"
               ]
             }
           ]

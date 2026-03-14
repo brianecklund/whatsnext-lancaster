@@ -13,9 +13,6 @@ export type ImportedVenue = {
   category?: string | null;
   rawCategories?: string[];
   description?: string | null;
-  mapsUrl?: string | null;
-  hours?: string[] | null;
-  photoNames?: string[] | null;
 };
 
 export type VenueImportParams = {
@@ -25,12 +22,4 @@ export type VenueImportParams = {
   lat?: number;
   lng?: number;
   limit?: number;
-};
-
-export type VenueSearchResult = {
-  externalId: string;
-  name: string;
-  address?: string | null;
-  category?: string | null;
-  rawCategories?: string[];
 };

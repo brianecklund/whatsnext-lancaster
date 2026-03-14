@@ -368,11 +368,18 @@ function LocationDetail({ location }: { location: LocationRow }) {
         {location.address ? <span className="muted">{location.address}</span> : null}
       </div>
 
-      {location.website ? (
-        <p style={{ marginTop: 10 }}>
-          <a className="link" href={location.website} target="_blank" rel="noreferrer">
-            Website
-          </a>
+      {(location.customPageUrl || location.website) ? (
+        <p style={{ marginTop: 10, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+          {location.customPageUrl ? (
+            <a className="link" href={location.customPageUrl}>
+              Full page
+            </a>
+          ) : null}
+          {location.website ? (
+            <a className="link" href={location.website} target="_blank" rel="noreferrer">
+              Website
+            </a>
+          ) : null}
         </p>
       ) : null}
 

@@ -20,6 +20,7 @@ type EventLite = {
 
   locationName?: string | null;
   address?: string | null;
+  locationUrl?: string | null;
 
   website_url?: string | null;
   tickets_url?: string | null;
@@ -1555,7 +1556,13 @@ export default function HomeSplitClient({ events }: Props) {
                     {selectedEvent.locationName ? (
                       <>
                         <span className="dot">•</span>
-                        <span className="venue">{selectedEvent.locationName}</span>
+                        {selectedEvent.locationUrl ? (
+                          <a className="venue link" href={selectedEvent.locationUrl}>
+                            {selectedEvent.locationName}
+                          </a>
+                        ) : (
+                          <span className="venue">{selectedEvent.locationName}</span>
+                        )}
                       </>
                     ) : null}
                     {selectedEvent.address ? (
