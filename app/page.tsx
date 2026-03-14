@@ -105,8 +105,8 @@ export default async function HomePage() {
       // If start is missing but end exists, use end as a fallback so it still appears.
       const effectiveStart = startVal ?? endVal;
 
-      const locationName = locData?.name ?? null;
-      const locationAddress = locData?.address ?? null;
+      const locationName = locData?.name ?? doc.data?.venue_name ?? null;
+      const locationAddress = locData?.address ?? doc.data?.venue_address ?? null;
 
       return {
         id: doc.id,

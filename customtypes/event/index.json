@@ -157,6 +157,34 @@
           }
         }
       },
+      "venue_name": {
+        "type": "Text",
+        "config": {
+          "label": "Venue Search / Name",
+          "placeholder": "Start typing the venue name used in Google Maps"
+        }
+      },
+      "venue_place_id": {
+        "type": "Text",
+        "config": {
+          "label": "Google Place ID (optional)",
+          "placeholder": "Optional: paste a Google Place ID for an exact match"
+        }
+      },
+      "venue_address": {
+        "type": "Text",
+        "config": {
+          "label": "Venue Address (optional fallback)",
+          "placeholder": "Optional fallback for event display"
+        }
+      },
+      "venue_search_area": {
+        "type": "Text",
+        "config": {
+          "label": "Venue Search Area",
+          "placeholder": "Lancaster, PA"
+        }
+      },
       "location": {
         "type": "Link",
         "config": {
@@ -190,12 +218,59 @@
               "icon": "image",
               "display": "list",
               "non-repeat": {
-                "style": { "type": "Select", "config": { "label": "Style", "options": ["clean", "poster", "glow"] } },
-                "media_image": { "type": "Image", "config": { "label": "Image", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
-                "media_video_file": { "type": "Link", "config": { "label": "Video file (mp4/webm)", "select": "media", "allowTargetBlank": false } },
-                "media_embed": { "type": "Embed", "config": { "label": "Embed" } },
-                "poster": { "type": "Image", "config": { "label": "Poster (optional)", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
-                "caption": { "type": "Text", "config": { "label": "Caption" } }
+                "style": {
+                  "type": "Select",
+                  "config": {
+                    "label": "Style",
+                    "options": [
+                      "clean",
+                      "poster",
+                      "glow"
+                    ]
+                  }
+                },
+                "media_image": {
+                  "type": "Image",
+                  "config": {
+                    "label": "Image",
+                    "constraint": {
+                      "width": 2400,
+                      "height": 2400
+                    },
+                    "thumbnails": []
+                  }
+                },
+                "media_video_file": {
+                  "type": "Link",
+                  "config": {
+                    "label": "Video file (mp4/webm)",
+                    "select": "media",
+                    "allowTargetBlank": false
+                  }
+                },
+                "media_embed": {
+                  "type": "Embed",
+                  "config": {
+                    "label": "Embed"
+                  }
+                },
+                "poster": {
+                  "type": "Image",
+                  "config": {
+                    "label": "Poster (optional)",
+                    "constraint": {
+                      "width": 2400,
+                      "height": 2400
+                    },
+                    "thumbnails": []
+                  }
+                },
+                "caption": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Caption"
+                  }
+                }
               },
               "repeat": {}
             },
@@ -206,11 +281,45 @@
               "icon": "text_fields",
               "display": "list",
               "non-repeat": {
-                "kicker": { "type": "Text", "config": { "label": "Kicker" } },
-                "heading": { "type": "Text", "config": { "label": "Heading" } },
-                "body": { "type": "StructuredText", "config": { "label": "Body", "multi": "paragraph,strong,em,hyperlink" } },
-                "style": { "type": "Select", "config": { "label": "Style", "options": ["plain", "marquee"] } },
-                "align": { "type": "Select", "config": { "label": "Align", "options": ["left", "center"] } }
+                "kicker": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Kicker"
+                  }
+                },
+                "heading": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Heading"
+                  }
+                },
+                "body": {
+                  "type": "StructuredText",
+                  "config": {
+                    "label": "Body",
+                    "multi": "paragraph,strong,em,hyperlink"
+                  }
+                },
+                "style": {
+                  "type": "Select",
+                  "config": {
+                    "label": "Style",
+                    "options": [
+                      "plain",
+                      "marquee"
+                    ]
+                  }
+                },
+                "align": {
+                  "type": "Select",
+                  "config": {
+                    "label": "Align",
+                    "options": [
+                      "left",
+                      "center"
+                    ]
+                  }
+                }
               },
               "repeat": {}
             },
@@ -221,15 +330,71 @@
               "icon": "view_column",
               "display": "grid",
               "non-repeat": {
-                "layout": { "type": "Select", "config": { "label": "Layout", "options": ["2", "3"] } }
+                "layout": {
+                  "type": "Select",
+                  "config": {
+                    "label": "Layout",
+                    "options": [
+                      "2",
+                      "3"
+                    ]
+                  }
+                }
               },
               "repeat": {
-                "image": { "type": "Image", "config": { "label": "Image/GIF", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
-                "video_file": { "type": "Link", "config": { "label": "Video file (mp4/webm)", "select": "media", "allowTargetBlank": false } },
-                "embed": { "type": "Embed", "config": { "label": "Embed" } },
-                "poster": { "type": "Image", "config": { "label": "Poster (optional)", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
-                "caption": { "type": "Text", "config": { "label": "Caption" } },
-                "behavior": { "type": "Select", "config": { "label": "Behavior", "options": ["none", "tilt", "parallax"] } }
+                "image": {
+                  "type": "Image",
+                  "config": {
+                    "label": "Image/GIF",
+                    "constraint": {
+                      "width": 2400,
+                      "height": 2400
+                    },
+                    "thumbnails": []
+                  }
+                },
+                "video_file": {
+                  "type": "Link",
+                  "config": {
+                    "label": "Video file (mp4/webm)",
+                    "select": "media",
+                    "allowTargetBlank": false
+                  }
+                },
+                "embed": {
+                  "type": "Embed",
+                  "config": {
+                    "label": "Embed"
+                  }
+                },
+                "poster": {
+                  "type": "Image",
+                  "config": {
+                    "label": "Poster (optional)",
+                    "constraint": {
+                      "width": 2400,
+                      "height": 2400
+                    },
+                    "thumbnails": []
+                  }
+                },
+                "caption": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Caption"
+                  }
+                },
+                "behavior": {
+                  "type": "Select",
+                  "config": {
+                    "label": "Behavior",
+                    "options": [
+                      "none",
+                      "tilt",
+                      "parallax"
+                    ]
+                  }
+                }
               }
             },
             "showcase_gallery": {
@@ -239,11 +404,35 @@
               "icon": "photo_library",
               "display": "grid",
               "non-repeat": {
-                "hover": { "type": "Select", "config": { "label": "Hover style", "options": ["zoom", "reveal"] } }
+                "hover": {
+                  "type": "Select",
+                  "config": {
+                    "label": "Hover style",
+                    "options": [
+                      "zoom",
+                      "reveal"
+                    ]
+                  }
+                }
               },
               "repeat": {
-                "image": { "type": "Image", "config": { "label": "Image", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
-                "caption": { "type": "Text", "config": { "label": "Caption" } }
+                "image": {
+                  "type": "Image",
+                  "config": {
+                    "label": "Image",
+                    "constraint": {
+                      "width": 2400,
+                      "height": 2400
+                    },
+                    "thumbnails": []
+                  }
+                },
+                "caption": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Caption"
+                  }
+                }
               }
             },
             "showcase_video": {
@@ -253,10 +442,37 @@
               "icon": "ondemand_video",
               "display": "list",
               "non-repeat": {
-                "video": { "type": "Embed", "config": { "label": "Video embed" } },
-                "video_file": { "type": "Link", "config": { "label": "Video file (mp4/webm)", "select": "media", "allowTargetBlank": false } },
-                "poster": { "type": "Image", "config": { "label": "Poster (optional)", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
-                "caption": { "type": "Text", "config": { "label": "Caption" } }
+                "video": {
+                  "type": "Embed",
+                  "config": {
+                    "label": "Video embed"
+                  }
+                },
+                "video_file": {
+                  "type": "Link",
+                  "config": {
+                    "label": "Video file (mp4/webm)",
+                    "select": "media",
+                    "allowTargetBlank": false
+                  }
+                },
+                "poster": {
+                  "type": "Image",
+                  "config": {
+                    "label": "Poster (optional)",
+                    "constraint": {
+                      "width": 2400,
+                      "height": 2400
+                    },
+                    "thumbnails": []
+                  }
+                },
+                "caption": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Caption"
+                  }
+                }
               },
               "repeat": {}
             },
@@ -267,8 +483,23 @@
               "icon": "gif",
               "display": "list",
               "non-repeat": {
-                "gif": { "type": "Image", "config": { "label": "GIF", "constraint": { "width": 2400, "height": 2400 }, "thumbnails": [] } },
-                "caption": { "type": "Text", "config": { "label": "Caption" } }
+                "gif": {
+                  "type": "Image",
+                  "config": {
+                    "label": "GIF",
+                    "constraint": {
+                      "width": 2400,
+                      "height": 2400
+                    },
+                    "thumbnails": []
+                  }
+                },
+                "caption": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Caption"
+                  }
+                }
               },
               "repeat": {}
             },
@@ -279,8 +510,18 @@
               "icon": "code",
               "display": "list",
               "non-repeat": {
-                "embed": { "type": "Embed", "config": { "label": "Embed" } },
-                "caption": { "type": "Text", "config": { "label": "Caption" } }
+                "embed": {
+                  "type": "Embed",
+                  "config": {
+                    "label": "Embed"
+                  }
+                },
+                "caption": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Caption"
+                  }
+                }
               },
               "repeat": {}
             },
@@ -292,9 +533,30 @@
               "display": "list",
               "non-repeat": {},
               "repeat": {
-                "label": { "type": "Text", "config": { "label": "Label" } },
-                "url": { "type": "Link", "config": { "label": "URL", "select": "web", "allowTargetBlank": true } },
-                "variant": { "type": "Select", "config": { "label": "Variant", "options": ["ghost", "primary"] } }
+                "label": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Label"
+                  }
+                },
+                "url": {
+                  "type": "Link",
+                  "config": {
+                    "label": "URL",
+                    "select": "web",
+                    "allowTargetBlank": true
+                  }
+                },
+                "variant": {
+                  "type": "Select",
+                  "config": {
+                    "label": "Variant",
+                    "options": [
+                      "ghost",
+                      "primary"
+                    ]
+                  }
+                }
               }
             }
           }

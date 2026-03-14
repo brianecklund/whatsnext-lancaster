@@ -1,68 +1,12 @@
 import { promises as fs } from "fs";
 import path from "path";
 import type { ImportedVenue, VenueImportParams } from "./types";
-
-export type VenueCacheFile = {
-  generatedAt: string | null;
-  cacheDay?: string | null;
-  location: string;
-  query: string;
-  limit: number;
-  providers: Record<string, number>;
-  venues: ImportedVenue[];
-};
-
+export type VenueCacheFile = { generatedAt: string | null; cacheDay?: string | null; location: string; query: string; limit: number; providers: Record<string, number>; venues: ImportedVenue[]; };
 const CACHE_PATH = path.join(process.cwd(), "data", "venue-cache.json");
-
-const EMPTY_CACHE: VenueCacheFile = {
-  generatedAt: null,
-  cacheDay: null,
-  location: "Lancaster, PA",
-  query: "restaurants bars coffee shops cafes music venues event spaces theaters shops boutiques businesses",
-  limit: 30,
-  providers: { google: 0 },
-  venues: [],
-};
-
-export function getDefaultVenueImportParams(): VenueImportParams {
-  return {
-    location: process.env.VENUE_IMPORT_LOCATION || EMPTY_CACHE.location,
-    query: process.env.VENUE_IMPORT_QUERY || EMPTY_CACHE.query,
-    limit: Number(process.env.VENUE_IMPORT_LIMIT || EMPTY_CACHE.limit),
-    radiusMeters: Number(process.env.VENUE_IMPORT_RADIUS_METERS || 12000),
-  };
-}
-
-export async function readVenueCache(): Promise<VenueCacheFile> {
-  try {
-    const raw = await fs.readFile(CACHE_PATH, "utf8");
-    const parsed = JSON.parse(raw) as VenueCacheFile;
-    return {
-      ...EMPTY_CACHE,
-      ...parsed,
-      providers: { ...EMPTY_CACHE.providers, ...(parsed.providers || {}) },
-      venues: Array.isArray(parsed.venues) ? parsed.venues : [],
-    };
-  } catch {
-    return EMPTY_CACHE;
-  }
-}
-
-export async function writeVenueCache(cache: VenueCacheFile) {
-  await fs.mkdir(path.dirname(CACHE_PATH), { recursive: true });
-  await fs.writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}\n`, "utf8");
-}
-
-function getTodayCacheDay() {
-  return new Date().toISOString().slice(0, 10);
-}
-
-export function isVenueCacheFresh(cache: VenueCacheFile, maxAgeHours = 24) {
-  if (cache.cacheDay && cache.cacheDay === getTodayCacheDay() && Array.isArray(cache.venues) && cache.venues.length > 0) {
-    return true;
-  }
-  if (!cache.generatedAt) return false;
-  const generatedAt = new Date(cache.generatedAt).getTime();
-  if (Number.isNaN(generatedAt)) return false;
-  return Date.now() - generatedAt < maxAgeHours * 60 * 60 * 1000;
-}
+const EMPTY_CACHE: VenueCacheFile = { generatedAt: null, cacheDay: null, location: "Lancaster, PA", query: "restaurants bars coffee shops cafes music venues event spaces theaters shops boutiques businesses", limit: 30, providers: { google: 0 }, venues: [] };
+export function getDefaultVenueImportParams(): VenueImportParams { return { location: process.env.VENUE_IMPORT_LOCATION || EMPTY_CACHE.location, query: process.env.VENUE_IMPORT_QUERY || EMPTY_CACHE.query, limit: Number(process.env.VENUE_IMPORT_LIMIT || EMPTY_CACHE.limit), radiusMeters: Number(process.env.VENUE_IMPORT_RADIUS_METERS || 12000) }; }
+export async function readVenueCache(): Promise<VenueCacheFile> { try { const parsed = JSON.parse(await fs.readFile(CACHE_PATH, "utf8")) as VenueCacheFile; return { ...EMPTY_CACHE, ...parsed, providers: { ...EMPTY_CACHE.providers, ...(parsed.providers || {}) }, venues: Array.isArray(parsed.venues) ? parsed.venues : [] }; } catch { return EMPTY_CACHE; } }
+export async function writeVenueCache(cache: VenueCacheFile) { await fs.mkdir(path.dirname(CACHE_PATH), { recursive: true }); await fs.writeFile(CACHE_PATH, `${JSON.stringify(cache, null, 2)}\n`, "utf8"); }
+function getTodayCacheDay() { return new Date().toISOString().slice(0, 10); }
+export function isVenueCacheFresh(cache: VenueCacheFile, maxAgeHours = 24) { if (cache.cacheDay && cache.cacheDay === getTodayCacheDay() && Array.isArray(cache.venues) && cache.venues.length > 0) return true; if (!cache.generatedAt) return false; const generatedAt = new Date(cache.generatedAt).getTime(); if (Number.isNaN(generatedAt)) return false; return Date.now() - generatedAt < maxAgeHours * 60 * 60 * 1000; }
+export async function upsertVenueInCache(venue: ImportedVenue, location?: string) { const cache = await readVenueCache(); const key = `${venue.source}:${venue.externalId}`.toLowerCase(); const idx = cache.venues.findIndex((item) => `${item.source}:${item.externalId}`.toLowerCase() === key); if (idx >= 0) cache.venues[idx] = { ...cache.venues[idx], ...venue, rawCategories: Array.from(new Set([...(cache.venues[idx].rawCategories || []), ...(venue.rawCategories || [])])), photoNames: cache.venues[idx].photoNames?.length ? cache.venues[idx].photoNames : venue.photoNames || null, hours: cache.venues[idx].hours?.length ? cache.venues[idx].hours : venue.hours || null }; else cache.venues.push(venue); cache.venues = [...cache.venues].sort((a, b) => a.name.localeCompare(b.name)); cache.providers.google = cache.venues.filter((item) => item.source === "google").length; cache.limit = cache.venues.length; cache.generatedAt = new Date().toISOString(); cache.cacheDay = getTodayCacheDay(); if (location) cache.location = location; await writeVenueCache(cache); return cache; }
