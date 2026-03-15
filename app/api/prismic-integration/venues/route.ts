@@ -26,13 +26,19 @@ export async function GET(request: NextRequest) {
   const totalPages = Math.max(1, Math.ceil(totalResults / limit));
   const currentPage = Math.min(page, totalPages);
   const start = (currentPage - 1) * limit;
+  const versionTs = Date.parse(cache.generatedAt || '') || Date.now();
   const results = venues.slice(start, start + limit).map((venue) => ({
     id: venue.externalId,
     title: venue.name,
     description: [venue.category, venue.address].filter(Boolean).join(' • '),
     image_url: '',
+    last_update: versionTs,
     blob: {
+      sku: venue.externalId,
       id: venue.externalId,
+      title: venue.name,
+      description: venue.description ?? [venue.category, venue.address].filter(Boolean).join(' • '),
+      image_url: '',
       externalId: venue.externalId,
       source: venue.source,
       name: venue.name,
@@ -42,7 +48,8 @@ export async function GET(request: NextRequest) {
       rating: venue.rating ?? null,
       category: venue.category ?? null,
       rawCategories: venue.rawCategories ?? [],
-      description: venue.description ?? null,
+      latitude: venue.latitude ?? null,
+      longitude: venue.longitude ?? null,
     },
   }));
 

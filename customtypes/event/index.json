@@ -180,7 +180,7 @@
                 "address",
                 "website",
                 "category",
-                "external_venue_id"
+                "venue"
               ]
             }
           ]
