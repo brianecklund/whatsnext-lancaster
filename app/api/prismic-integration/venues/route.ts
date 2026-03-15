@@ -26,7 +26,8 @@ export async function GET(request: NextRequest) {
   const totalPages = Math.max(1, Math.ceil(totalResults / limit));
   const currentPage = Math.min(page, totalPages);
   const start = (currentPage - 1) * limit;
-  const versionTs = Date.parse(cache.generatedAt || '') || Date.now();
+  const versionTsMs = Date.parse(cache.generatedAt || '') || Date.now();
+  const versionTs = Math.floor(versionTsMs / 1000);
   const results = venues.slice(start, start + limit).map((venue) => ({
     id: venue.externalId,
     title: venue.name,
@@ -53,6 +54,15 @@ export async function GET(request: NextRequest) {
     },
   }));
 
+  const base = new URL(request.url);
+  const makePageUrl = (pageNumber: number) => {
+    const next = new URL(base);
+    next.searchParams.set('page', String(pageNumber));
+    next.searchParams.set('limit', String(limit));
+    if (q) next.searchParams.set('q', q);
+    return next.toString();
+  };
+
   return NextResponse.json({
     results_size: results.length,
     results_per_page: limit,
@@ -61,7 +71,10 @@ export async function GET(request: NextRequest) {
     total_pages: totalPages,
     version: cache.generatedAt || new Date().toISOString(),
     license: 'private',
-    bookmarks: {},
+    bookmarks: {
+      next_page: currentPage < totalPages ? makePageUrl(currentPage + 1) : null,
+      prev_page: currentPage > 1 ? makePageUrl(currentPage - 1) : null,
+    },
     results,
   });
 }
