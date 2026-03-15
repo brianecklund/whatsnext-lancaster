@@ -44,7 +44,6 @@ export default async function HomePage() {
         'location.address',
         'location.website',
         'location.category',
-        'location.external_venue_id',
       ],
     });
   } catch (err: any) {
@@ -59,7 +58,7 @@ export default async function HomePage() {
   const customLocationByName = new Map<string, any>();
 
   for (const doc of customLocationDocs) {
-    const externalId = doc.data?.external_venue_id;
+    const externalId = parseIntegrationVenue(doc.data?.venue)?.venue_external_id;
     if (externalId) customLocationByExternalId.set(String(externalId).trim().toLowerCase(), doc);
     if (doc.data?.name) customLocationByName.set(String(doc.data.name).trim().toLowerCase(), doc);
   }
@@ -78,7 +77,7 @@ export default async function HomePage() {
     const integrationVenue = parseIntegrationVenue(doc.data?.venue);
     const legacyLocationDoc = doc.data?.location;
     const legacyLocationData = legacyLocationDoc?.data;
-    const legacyLocationExternalId = legacyLocationData?.external_venue_id ?? null;
+    const legacyLocationExternalId = parseIntegrationVenue(legacyLocationData?.venue)?.venue_external_id ?? null;
     const locationPage = doc.data?.location_page ?? null;
 
     const matchedVenue =

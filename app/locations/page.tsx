@@ -2,7 +2,7 @@ import LocationsSplitClient from './LocationsSplitClient';
 import { createClient } from '@/prismicio';
 import { getCachedVenueImport } from '@/lib/venue-import';
 import type { LocationLite } from '@/lib/types';
-import { createLocationLiteFromVenue, getLocationDocSummary, matchVenueFromDocData } from '@/lib/prismic-venue';
+import { createLocationLiteFromVenue, getLocationDocSummary, matchVenueFromDocData, parseIntegrationVenue } from '@/lib/prismic-venue';
 
 export const dynamic = 'force-dynamic';
 
@@ -33,7 +33,7 @@ export default async function LocationsPage() {
 
   for (const doc of docs) {
     const matchedVenue = matchVenueFromDocData(importedVenues, doc.data);
-    const explicitId = doc.data?.external_venue_id || matchedVenue?.externalId || null;
+    const explicitId = parseIntegrationVenue(doc.data?.venue)?.venue_external_id || matchedVenue?.externalId || null;
     if (explicitId) customPageByVenueId.set(String(explicitId).trim().toLowerCase(), doc);
     if (doc.data?.name) customPageByName.set(String(doc.data.name).trim().toLowerCase(), doc);
   }
@@ -59,7 +59,7 @@ export default async function LocationsPage() {
         category: summary.category,
         website: summary.website,
         description: summary.description,
-        venue_external_id: summary.external_venue_id,
+        venue_external_id: summary.venue_external_id,
         customPageUid: doc.uid ?? null,
         customPageUrl: doc.uid ? `/locations/${doc.uid}` : null,
       };

@@ -16,11 +16,12 @@
           "placeholder": ""
         }
       },
-      "external_venue_id": {
-        "type": "Text",
+      "venue": {
+        "type": "IntegrationFields",
         "config": {
-          "label": "Linked Venue ID",
-          "placeholder": "Google / cached venue ID from the directory feed"
+          "catalog": "whatsnext-lancaster--venues",
+          "label": "Linked Venue",
+          "placeholder": "Search for a venue from the directory data"
         }
       },
       "description": {

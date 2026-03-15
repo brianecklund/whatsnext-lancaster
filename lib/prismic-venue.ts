@@ -76,21 +76,22 @@ export function resolveLocationUrl(location: LocationLite | null | undefined) {
 export function matchVenueFromDocData(venues: ImportedVenue[], data: any) {
   const venueField = parseIntegrationVenue(data?.venue);
   return (
-    resolveVenueById(venues, data?.external_venue_id, venueField?.venue_external_id || data?.venue_place_id) ||
+    resolveVenueById(venues, venueField?.venue_external_id || data?.venue_place_id, venueField?.id || null) ||
     resolveVenueByName(venues, data?.name || venueField?.name, data?.address || venueField?.address) ||
     null
   );
 }
 
 export function getLocationDocSummary(doc: any) {
+  const venue = parseIntegrationVenue(doc.data?.venue);
   return {
     id: doc.id,
     uid: doc.uid ?? null,
-    name: doc.data?.name ?? null,
+    name: doc.data?.name ?? venue?.name ?? null,
     description: asText(doc.data?.description),
-    address: doc.data?.address ?? null,
-    website: prismic.asLink(doc.data?.website) ?? null,
-    category: doc.data?.category ?? null,
-    external_venue_id: doc.data?.external_venue_id ?? null,
+    address: doc.data?.address ?? venue?.address ?? null,
+    website: prismic.asLink(doc.data?.website) ?? venue?.website ?? null,
+    category: doc.data?.category ?? venue?.category ?? null,
+    venue_external_id: venue?.venue_external_id ?? null,
   };
 }
