@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
@@ -89,38 +90,41 @@ export default function SiteHeader() {
       </button>
 
       {/* Mobile overlay */}
-      {open ? (
-        <div className="mobileSheetOverlay mobileMenuOverlay" role="dialog" aria-modal="true" onClick={() => setOpen(false)}>
-          <div className="mobileSheet mobileMenuSheet" onClick={(e) => e.stopPropagation()}>
-            <div className="mobileSheetHeader">
-              <div className="mobileSheetTitle">Menu</div>
-              <button
-                type="button"
-                className="mobileSheetClose"
-                onClick={() => setOpen(false)}
-                aria-label="Close menu"
-              >
-                ✕
-              </button>
-            </div>
+      {open && typeof document !== "undefined"
+        ? createPortal(
+            <div className="mobileSheetOverlay mobileMenuOverlay" role="dialog" aria-modal="true" onClick={() => setOpen(false)}>
+              <div className="mobileSheet mobileMenuSheet" onClick={(e) => e.stopPropagation()}>
+                <div className="mobileSheetHeader">
+                  <div className="mobileSheetTitle">Menu</div>
+                  <button
+                    type="button"
+                    className="mobileSheetClose"
+                    onClick={() => setOpen(false)}
+                    aria-label="Close menu"
+                  >
+                    ✕
+                  </button>
+                </div>
 
-            <nav className="mobileSheetList mobileMenuList" aria-label="Mobile primary">
-              {LINKS.map((l, idx) => (
-                <Link
-                  key={l.href}
-                  className="mobileSheetAction mobileMenuAction"
-                  href={l.href}
-                  data-active={pathname === l.href ? "true" : "false"}
-                  style={{ ["--menuIndex" as string]: idx } as CSSProperties}
-                  onClick={() => setOpen(false)}
-                >
-                  <span className="mobileMenuActionText">{l.label}</span>
-                </Link>
-              ))}
-            </nav>
-          </div>
-        </div>
-      ) : null}
+                <nav className="mobileSheetList mobileMenuList" aria-label="Mobile primary">
+                  {LINKS.map((l, idx) => (
+                    <Link
+                      key={l.href}
+                      className="mobileSheetAction mobileMenuAction"
+                      href={l.href}
+                      data-active={pathname === l.href ? "true" : "false"}
+                      style={{ ["--menuIndex" as string]: idx } as CSSProperties}
+                      onClick={() => setOpen(false)}
+                    >
+                      <span className="mobileMenuActionText">{l.label}</span>
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
     </header>
   );
 }
