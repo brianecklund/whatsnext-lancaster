@@ -3,7 +3,13 @@ import HomeSplitClient from './HomeSplitClient';
 import type { EventLite, LocationLite } from '@/lib/types';
 import { createClient, prismic } from '@/prismicio';
 import { getCachedVenueImport } from '@/lib/venue-import';
-import { createLocationLiteFromVenue, parseIntegrationVenue, resolveLocationUrl } from '@/lib/prismic-venue';
+import {
+  createLocationLiteFromManualFields,
+  createLocationLiteFromVenue,
+  getLocationDocLookupKey,
+  getVenueFields,
+  resolveLocationUrl,
+} from '@/lib/prismic-venue';
 import { resolveVenueById, resolveVenueByName } from '@/lib/venue-import/resolve';
 
 export const dynamic = 'force-dynamic';
@@ -30,6 +36,10 @@ function asText(value: unknown) {
   return null;
 }
 
+function normalize(value: string | null | undefined) {
+  return (value || '').trim().toLowerCase();
+}
+
 export default async function HomePage() {
   const client = createClient();
 
@@ -44,6 +54,8 @@ export default async function HomePage() {
         'location.address',
         'location.website',
         'location.category',
+        'location.venue_name',
+        'location.venue_place_id',
       ],
     });
   } catch (err: any) {
@@ -54,13 +66,13 @@ export default async function HomePage() {
   const importedVenues = venueCache.venues || [];
 
   const customLocationDocs = await client.getAllByType('location').catch(() => [] as any[]);
-  const customLocationByExternalId = new Map<string, any>();
+  const customLocationByVenueId = new Map<string, any>();
   const customLocationByName = new Map<string, any>();
 
   for (const doc of customLocationDocs) {
-    const externalId = parseIntegrationVenue(doc.data?.venue)?.venue_external_id;
-    if (externalId) customLocationByExternalId.set(String(externalId).trim().toLowerCase(), doc);
-    if (doc.data?.name) customLocationByName.set(String(doc.data.name).trim().toLowerCase(), doc);
+    const lookup = getLocationDocLookupKey(doc);
+    if (lookup.venueIdKey) customLocationByVenueId.set(lookup.venueIdKey, doc);
+    if (lookup.venueNameKey) customLocationByName.set(lookup.venueNameKey, doc);
   }
 
   const events: EventLite[] = docs.map((doc: any) => {
@@ -74,51 +86,28 @@ export default async function HomePage() {
     const endVal = pickDateLike(doc.data, ['end_datetime', 'end_date', 'end', 'end_time', 'endtime']) ?? null;
     const effectiveStart = startVal ?? endVal;
 
-    const integrationVenue = parseIntegrationVenue(doc.data?.venue);
-    const legacyLocationDoc = doc.data?.location;
-    const legacyLocationData = legacyLocationDoc?.data;
-    const legacyLocationExternalId = parseIntegrationVenue(legacyLocationData?.venue)?.venue_external_id ?? null;
     const locationPage = doc.data?.location_page ?? null;
+    const { venueName, venuePlaceId } = getVenueFields(doc.data);
 
     const matchedVenue =
-      resolveVenueById(importedVenues, integrationVenue?.venue_external_id || legacyLocationExternalId, integrationVenue?.id || null) ||
-      resolveVenueByName(importedVenues, integrationVenue?.name || legacyLocationData?.name || doc.data?.venue_name, integrationVenue?.address || legacyLocationData?.address || doc.data?.venue_address);
+      resolveVenueById(importedVenues, venuePlaceId, null) ||
+      resolveVenueByName(importedVenues, venueName, doc.data?.venue_address);
 
     const matchedCustomPage =
       locationPage ||
-      (matchedVenue ? customLocationByExternalId.get(String(matchedVenue.externalId).trim().toLowerCase()) : null) ||
-      customLocationByName.get(String(integrationVenue?.name || legacyLocationData?.name || doc.data?.venue_name || '').trim().toLowerCase()) ||
+      (venuePlaceId ? customLocationByVenueId.get(normalize(venuePlaceId)) : null) ||
+      (venueName ? customLocationByName.get(normalize(venueName)) : null) ||
       null;
 
     let location: LocationLite | null = null;
 
     if (matchedVenue) {
       location = createLocationLiteFromVenue(matchedVenue, matchedCustomPage ? { uid: matchedCustomPage.uid } : null);
-    } else if (integrationVenue) {
-      location = {
-        ...integrationVenue,
-        key: integrationVenue.venue_external_id ? `${integrationVenue.source || 'google'}:${integrationVenue.venue_external_id}` : integrationVenue.id,
-        customPageUid: matchedCustomPage?.uid ?? null,
-        customPageUrl: matchedCustomPage?.uid ? `/locations/${matchedCustomPage.uid}` : null,
-      };
-    } else if (legacyLocationDoc) {
-      const locDesc = asText(legacyLocationData?.description);
-      location = {
-        id: legacyLocationDoc.id,
-        key: legacyLocationDoc.uid ?? legacyLocationDoc.id,
-        uid: legacyLocationDoc.uid ?? null,
-        name: legacyLocationData?.name ?? null,
-        address: legacyLocationData?.address ?? null,
-        category: legacyLocationData?.category ?? null,
-        website: prismic.asLink(legacyLocationData?.website) ?? null,
-        description: locDesc,
-        venue_external_id: legacyLocationExternalId,
-        customPageUid: legacyLocationDoc.uid ?? null,
-        customPageUrl: legacyLocationDoc.uid ? `/locations/${legacyLocationDoc.uid}` : null,
-      };
+    } else {
+      location = createLocationLiteFromManualFields(doc.data, matchedCustomPage ? { uid: matchedCustomPage.uid } : null);
     }
 
-    const locationName = location?.name ?? doc.data?.venue_name ?? null;
+    const locationName = location?.name ?? venueName ?? null;
     const locationAddress = location?.address ?? doc.data?.venue_address ?? null;
     const locationUrl = resolveLocationUrl(location);
 
@@ -135,7 +124,7 @@ export default async function HomePage() {
       locationName,
       address: locationAddress,
       locationUrl,
-      venue_external_id: location?.venue_external_id ?? null,
+      venue_external_id: location?.venue_external_id ?? venuePlaceId ?? null,
       location_page_uid: location?.customPageUid ?? null,
       start_datetime: effectiveStart,
       end_datetime: endVal,

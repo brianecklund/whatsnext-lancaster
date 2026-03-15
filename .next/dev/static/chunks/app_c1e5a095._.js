@@ -1657,7 +1657,7 @@ function HomeSplitClient({ events }) {
                 children: "A calendar of events, specials, and pop-ups in Lancaster, PA."
             }, void 0, false, {
                 fileName: "[project]/app/HomeSplitClient.tsx",
-                lineNumber: 774,
+                lineNumber: 775,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1690,7 +1690,7 @@ function HomeSplitClient({ events }) {
                                                     children: "Calendar"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 792,
+                                                    lineNumber: 793,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1701,7 +1701,7 @@ function HomeSplitClient({ events }) {
                                                     children: "Directory"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 800,
+                                                    lineNumber: 801,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1712,13 +1712,13 @@ function HomeSplitClient({ events }) {
                                                     children: "Updates"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 808,
+                                                    lineNumber: 809,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 791,
+                                            lineNumber: 792,
                                             columnNumber: 17
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1741,13 +1741,13 @@ function HomeSplitClient({ events }) {
                                                                 children: entry.label.slice(0, 1)
                                                             }, entry.label, false, {
                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                lineNumber: 829,
+                                                                lineNumber: 830,
                                                                 columnNumber: 27
                                                             }, this);
                                                         })
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                        lineNumber: 820,
+                                                        lineNumber: 821,
                                                         columnNumber: 21
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1761,7 +1761,7 @@ function HomeSplitClient({ events }) {
                                                                 "aria-label": "Search events"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                lineNumber: 845,
+                                                                lineNumber: 846,
                                                                 columnNumber: 23
                                                             }, this),
                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1776,7 +1776,7 @@ function HomeSplitClient({ events }) {
                                                                 children: viewMode === "month" ? effectiveIsMobile ? "List" : "List view" : effectiveIsMobile ? "Cal" : "Calendar view"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                lineNumber: 852,
+                                                                lineNumber: 853,
                                                                 columnNumber: 23
                                                             }, this),
                                                             effectiveIsMobile ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1789,7 +1789,7 @@ function HomeSplitClient({ events }) {
                                                                 children: type ? `Filter: ${type}` : "Filter"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                lineNumber: 865,
+                                                                lineNumber: 866,
                                                                 columnNumber: 25
                                                             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
                                                                 type: "button",
@@ -1801,7 +1801,7 @@ function HomeSplitClient({ events }) {
                                                                 children: type ? "F*" : "F"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                lineNumber: 876,
+                                                                lineNumber: 877,
                                                                 columnNumber: 25
                                                             }, this),
                                                             !effectiveIsMobile && (q || type) ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1814,30 +1814,30 @@ function HomeSplitClient({ events }) {
                                                                 children: "Clear"
                                                             }, void 0, false, {
                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                lineNumber: 888,
+                                                                lineNumber: 889,
                                                                 columnNumber: 25
                                                             }, this) : null
                                                         ]
                                                     }, void 0, true, {
                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                        lineNumber: 844,
+                                                        lineNumber: 845,
                                                         columnNumber: 21
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                lineNumber: 819,
+                                                lineNumber: 820,
                                                 columnNumber: 19
                                             }, this)
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 818,
+                                            lineNumber: 819,
                                             columnNumber: 17
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 790,
+                                    lineNumber: 791,
                                     columnNumber: 15
                                 }, this),
                                 !effectiveIsMobile ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1863,7 +1863,7 @@ function HomeSplitClient({ events }) {
                                                         children: "All"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                        lineNumber: 913,
+                                                        lineNumber: 914,
                                                         columnNumber: 23
                                                     }, this),
                                                     eventTypes.map((t)=>{
@@ -1879,14 +1879,14 @@ function HomeSplitClient({ events }) {
                                                             children: t
                                                         }, t, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 927,
+                                                            lineNumber: 928,
                                                             columnNumber: 27
                                                         }, this);
                                                     })
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                lineNumber: 912,
+                                                lineNumber: 913,
                                                 columnNumber: 21
                                             }, this),
                                             q || type ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1900,18 +1900,18 @@ function HomeSplitClient({ events }) {
                                                 children: "Clear search & filters"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                lineNumber: 943,
+                                                lineNumber: 944,
                                                 columnNumber: 23
                                             }, this) : null
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                        lineNumber: 911,
+                                        lineNumber: 912,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 906,
+                                    lineNumber: 907,
                                     columnNumber: 17
                                 }, this) : null,
                                 effectiveIsMobile && filterOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1932,7 +1932,7 @@ function HomeSplitClient({ events }) {
                                                         children: "Filters"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                        lineNumber: 970,
+                                                        lineNumber: 971,
                                                         columnNumber: 23
                                                     }, this),
                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1943,13 +1943,13 @@ function HomeSplitClient({ events }) {
                                                         children: "✕"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                        lineNumber: 971,
+                                                        lineNumber: 972,
                                                         columnNumber: 23
                                                     }, this)
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                lineNumber: 969,
+                                                lineNumber: 970,
                                                 columnNumber: 21
                                             }, this),
                                             q || type ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1963,7 +1963,7 @@ function HomeSplitClient({ events }) {
                                                 children: "Clear search & filters"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                lineNumber: 982,
+                                                lineNumber: 983,
                                                 columnNumber: 23
                                             }, this) : null,
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1982,7 +1982,7 @@ function HomeSplitClient({ events }) {
                                                         children: "All"
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                        lineNumber: 996,
+                                                        lineNumber: 997,
                                                         columnNumber: 23
                                                     }, this),
                                                     eventTypes.map((t)=>{
@@ -1998,25 +1998,25 @@ function HomeSplitClient({ events }) {
                                                             children: t
                                                         }, t, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1010,
+                                                            lineNumber: 1011,
                                                             columnNumber: 27
                                                         }, this);
                                                     })
                                                 ]
                                             }, void 0, true, {
                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                lineNumber: 995,
+                                                lineNumber: 996,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                        lineNumber: 968,
+                                        lineNumber: 969,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 961,
+                                    lineNumber: 962,
                                     columnNumber: 17
                                 }, this) : null,
                                 viewMode === "list" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -2035,7 +2035,7 @@ function HomeSplitClient({ events }) {
                                                     children: "Weekly Overview"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1039,
+                                                    lineNumber: 1040,
                                                     columnNumber: 17
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2048,13 +2048,13 @@ function HomeSplitClient({ events }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1040,
+                                                    lineNumber: 1041,
                                                     columnNumber: 17
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1032,
+                                            lineNumber: 1033,
                                             columnNumber: 15
                                         }, this),
                                         effectiveIsMobile && (selectedWeekBucket ?? defaultWeekBucket) ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2074,7 +2074,7 @@ function HomeSplitClient({ events }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1050,
+                                                            lineNumber: 1051,
                                                             columnNumber: 21
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2090,7 +2090,7 @@ function HomeSplitClient({ events }) {
                                                                             children: "Total"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                            lineNumber: 1053,
+                                                                            lineNumber: 1054,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2098,13 +2098,13 @@ function HomeSplitClient({ events }) {
                                                                             children: (selectedWeekBucket ?? defaultWeekBucket)?.events.length ?? 0
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                            lineNumber: 1054,
+                                                                            lineNumber: 1055,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1052,
+                                                                    lineNumber: 1053,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2116,7 +2116,7 @@ function HomeSplitClient({ events }) {
                                                                             children: "Live"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                            lineNumber: 1057,
+                                                                            lineNumber: 1058,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2124,13 +2124,13 @@ function HomeSplitClient({ events }) {
                                                                             children: weekInsights["Live music"]
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                            lineNumber: 1058,
+                                                                            lineNumber: 1059,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1056,
+                                                                    lineNumber: 1057,
                                                                     columnNumber: 23
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2142,7 +2142,7 @@ function HomeSplitClient({ events }) {
                                                                             children: "Food"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                            lineNumber: 1061,
+                                                                            lineNumber: 1062,
                                                                             columnNumber: 25
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2150,25 +2150,25 @@ function HomeSplitClient({ events }) {
                                                                             children: weekInsights["Food & drink"]
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                            lineNumber: 1062,
+                                                                            lineNumber: 1063,
                                                                             columnNumber: 25
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1060,
+                                                                    lineNumber: 1061,
                                                                     columnNumber: 23
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1051,
+                                                            lineNumber: 1052,
                                                             columnNumber: 21
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1049,
+                                                    lineNumber: 1050,
                                                     columnNumber: 19
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2181,7 +2181,7 @@ function HomeSplitClient({ events }) {
                                                                     children: formatDayHeading(g.date)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1070,
+                                                                    lineNumber: 1071,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 g.items.map((e)=>{
@@ -2205,7 +2205,7 @@ function HomeSplitClient({ events }) {
                                                                                         children: timeLabel
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                        lineNumber: 1089,
+                                                                                        lineNumber: 1090,
                                                                                         columnNumber: 33
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2213,13 +2213,13 @@ function HomeSplitClient({ events }) {
                                                                                         children: title
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                        lineNumber: 1090,
+                                                                                        lineNumber: 1091,
                                                                                         columnNumber: 33
                                                                                     }, this)
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                lineNumber: 1088,
+                                                                                lineNumber: 1089,
                                                                                 columnNumber: 31
                                                                             }, this),
                                                                             venueBits ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2227,31 +2227,31 @@ function HomeSplitClient({ events }) {
                                                                                 children: venueBits
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                lineNumber: 1093,
+                                                                                lineNumber: 1094,
                                                                                 columnNumber: 33
                                                                             }, this) : null
                                                                         ]
                                                                     }, e.id, true, {
                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                        lineNumber: 1082,
+                                                                        lineNumber: 1083,
                                                                         columnNumber: 29
                                                                     }, this);
                                                                 })
                                                             ]
                                                         }, dayKey(g.date), true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1069,
+                                                            lineNumber: 1070,
                                                             columnNumber: 23
                                                         }, this))
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1067,
+                                                    lineNumber: 1068,
                                                     columnNumber: 19
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1048,
+                                            lineNumber: 1049,
                                             columnNumber: 17
                                         }, this) : null,
                                         leftDayGroups.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2259,7 +2259,7 @@ function HomeSplitClient({ events }) {
                                             children: "No events match your search."
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1105,
+                                            lineNumber: 1106,
                                             columnNumber: 17
                                         }, this) : null,
                                         leftDayGroups.map((g)=>/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -2273,7 +2273,7 @@ function HomeSplitClient({ events }) {
                                                         children: formatDayHeading(g.date)
                                                     }, void 0, false, {
                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                        lineNumber: 1111,
+                                                        lineNumber: 1112,
                                                         columnNumber: 19
                                                     }, this),
                                                     g.items.map((e)=>{
@@ -2299,7 +2299,7 @@ function HomeSplitClient({ events }) {
                                                                     children: title
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1136,
+                                                                    lineNumber: 1137,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2309,7 +2309,7 @@ function HomeSplitClient({ events }) {
                                                                             children: timeLabel
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                            lineNumber: 1138,
+                                                                            lineNumber: 1139,
                                                                             columnNumber: 27
                                                                         }, this),
                                                                         e.event_type ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2317,20 +2317,20 @@ function HomeSplitClient({ events }) {
                                                                             children: "•"
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                            lineNumber: 1139,
+                                                                            lineNumber: 1140,
                                                                             columnNumber: 43
                                                                         }, this) : null,
                                                                         e.event_type ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             children: e.event_type
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                            lineNumber: 1140,
+                                                                            lineNumber: 1141,
                                                                             columnNumber: 43
                                                                         }, this) : null
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1137,
+                                                                    lineNumber: 1138,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 (()=>{
@@ -2342,21 +2342,21 @@ function HomeSplitClient({ events }) {
                                                                         children: s.length > 180 ? `${s.slice(0, 180).trim()}…` : s
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                        lineNumber: 1148,
+                                                                        lineNumber: 1149,
                                                                         columnNumber: 29
                                                                     }, this);
                                                                 })()
                                                             ]
                                                         }, e.id, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1123,
+                                                            lineNumber: 1124,
                                                             columnNumber: 23
                                                         }, this);
                                                     })
                                                 ]
                                             }, dayKey(g.date), true, {
                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                lineNumber: 1110,
+                                                lineNumber: 1111,
                                                 columnNumber: 17
                                             }, this))
                                     ]
@@ -2386,7 +2386,7 @@ function HomeSplitClient({ events }) {
                                                             children: "‹"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1164,
+                                                            lineNumber: 1165,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2394,7 +2394,7 @@ function HomeSplitClient({ events }) {
                                                             children: formatMonthYear(monthGrid.first)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1179,
+                                                            lineNumber: 1180,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2414,13 +2414,13 @@ function HomeSplitClient({ events }) {
                                                             children: "›"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1180,
+                                                            lineNumber: 1181,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1163,
+                                                    lineNumber: 1164,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2431,55 +2431,55 @@ function HomeSplitClient({ events }) {
                                                             children: "Sun"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1197,
+                                                            lineNumber: 1198,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Mon"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1197,
+                                                            lineNumber: 1198,
                                                             columnNumber: 39
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Tue"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1197,
+                                                            lineNumber: 1198,
                                                             columnNumber: 55
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Wed"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1197,
+                                                            lineNumber: 1198,
                                                             columnNumber: 71
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Thu"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1197,
+                                                            lineNumber: 1198,
                                                             columnNumber: 87
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Fri"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1197,
+                                                            lineNumber: 1198,
                                                             columnNumber: 103
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             children: "Sat"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1197,
+                                                            lineNumber: 1198,
                                                             columnNumber: 119
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1196,
+                                                    lineNumber: 1197,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2491,7 +2491,7 @@ function HomeSplitClient({ events }) {
                                                             className: "monthCell empty"
                                                         }, `e-${i}`, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1202,
+                                                            lineNumber: 1203,
                                                             columnNumber: 44
                                                         }, this);
                                                         const dayNum = Number(c.ymd.split("-")[2]);
@@ -2515,7 +2515,7 @@ function HomeSplitClient({ events }) {
                                                                     children: dayNum
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1218,
+                                                                    lineNumber: 1219,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 c.hasEvents ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -2523,25 +2523,25 @@ function HomeSplitClient({ events }) {
                                                                     "aria-hidden": "true"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1219,
+                                                                    lineNumber: 1220,
                                                                     columnNumber: 44
                                                                 }, this) : null
                                                             ]
                                                         }, c.ymd, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1206,
+                                                            lineNumber: 1207,
                                                             columnNumber: 27
                                                         }, this);
                                                     })
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1200,
+                                                    lineNumber: 1201,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1162,
+                                            lineNumber: 1163,
                                             columnNumber: 19
                                         }, this),
                                         effectiveIsMobile ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2555,7 +2555,7 @@ function HomeSplitClient({ events }) {
                                                             children: formatDayHeading(selectedDay)
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1229,
+                                                            lineNumber: 1230,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2567,13 +2567,13 @@ function HomeSplitClient({ events }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1230,
+                                                            lineNumber: 1231,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1228,
+                                                    lineNumber: 1229,
                                                     columnNumber: 23
                                                 }, this),
                                                 dayEvents.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2581,7 +2581,7 @@ function HomeSplitClient({ events }) {
                                                     children: "No events on this day."
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1236,
+                                                    lineNumber: 1237,
                                                     columnNumber: 25
                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                     className: "dayEventsList",
@@ -2607,7 +2607,7 @@ function HomeSplitClient({ events }) {
                                                                     children: title
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1255,
+                                                                    lineNumber: 1256,
                                                                     columnNumber: 33
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2618,25 +2618,25 @@ function HomeSplitClient({ events }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1256,
+                                                                    lineNumber: 1257,
                                                                     columnNumber: 33
                                                                 }, this)
                                                             ]
                                                         }, key, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1246,
+                                                            lineNumber: 1247,
                                                             columnNumber: 31
                                                         }, this);
                                                     })
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1238,
+                                                    lineNumber: 1239,
                                                     columnNumber: 25
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1227,
+                                            lineNumber: 1228,
                                             columnNumber: 21
                                         }, this) : null
                                     ]
@@ -2644,12 +2644,12 @@ function HomeSplitClient({ events }) {
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/HomeSplitClient.tsx",
-                            lineNumber: 781,
+                            lineNumber: 782,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/HomeSplitClient.tsx",
-                        lineNumber: 780,
+                        lineNumber: 781,
                         columnNumber: 11
                     }, this) : "TURBOPACK unreachable",
                     showRight ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("main", {
@@ -2668,7 +2668,7 @@ function HomeSplitClient({ events }) {
                                                     children: formatDayHeading(selectedDay)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1282,
+                                                    lineNumber: 1283,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2680,13 +2680,13 @@ function HomeSplitClient({ events }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1283,
+                                                    lineNumber: 1284,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1281,
+                                            lineNumber: 1282,
                                             columnNumber: 19
                                         }, this),
                                         dayEvents.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2694,7 +2694,7 @@ function HomeSplitClient({ events }) {
                                             children: "No events on this day."
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1289,
+                                            lineNumber: 1290,
                                             columnNumber: 21
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "dayRightList",
@@ -2727,7 +2727,7 @@ function HomeSplitClient({ events }) {
                                                                     children: title
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1316,
+                                                                    lineNumber: 1317,
                                                                     columnNumber: 31
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2735,13 +2735,13 @@ function HomeSplitClient({ events }) {
                                                                     children: timeLabel
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1317,
+                                                                    lineNumber: 1318,
                                                                     columnNumber: 31
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1315,
+                                                            lineNumber: 1316,
                                                             columnNumber: 29
                                                         }, this),
                                                         venueBits ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2749,25 +2749,25 @@ function HomeSplitClient({ events }) {
                                                             children: venueBits
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1319,
+                                                            lineNumber: 1320,
                                                             columnNumber: 42
                                                         }, this) : null
                                                     ]
                                                 }, key, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1304,
+                                                    lineNumber: 1305,
                                                     columnNumber: 27
                                                 }, this);
                                             })
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1291,
+                                            lineNumber: 1292,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1280,
+                                    lineNumber: 1281,
                                     columnNumber: 17
                                 }, this) : null,
                                 viewMode === "list" && selectedWeekBucket ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2781,7 +2781,7 @@ function HomeSplitClient({ events }) {
                                             children: "Weekly Overview"
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1331,
+                                            lineNumber: 1332,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2800,7 +2800,7 @@ function HomeSplitClient({ events }) {
                                                             children: bucket.label
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1347,
+                                                            lineNumber: 1348,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2808,7 +2808,7 @@ function HomeSplitClient({ events }) {
                                                             children: bucket.rangeLabel
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1348,
+                                                            lineNumber: 1349,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2820,18 +2820,18 @@ function HomeSplitClient({ events }) {
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1349,
+                                                            lineNumber: 1350,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
                                                 }, bucket.key, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1340,
+                                                    lineNumber: 1341,
                                                     columnNumber: 23
                                                 }, this))
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1338,
+                                            lineNumber: 1339,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2850,7 +2850,7 @@ function HomeSplitClient({ events }) {
                                                                     children: selectedWeekBucket.label
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1357,
+                                                                    lineNumber: 1358,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -2862,13 +2862,13 @@ function HomeSplitClient({ events }) {
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1358,
+                                                                    lineNumber: 1359,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1356,
+                                                            lineNumber: 1357,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2876,13 +2876,13 @@ function HomeSplitClient({ events }) {
                                                             children: selectedWeekBucket.rangeLabel
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1362,
+                                                            lineNumber: 1363,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1355,
+                                                    lineNumber: 1356,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2898,7 +2898,7 @@ function HomeSplitClient({ events }) {
                                                                     children: "Total events"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1367,
+                                                                    lineNumber: 1368,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2906,13 +2906,13 @@ function HomeSplitClient({ events }) {
                                                                     children: weekEventsCount
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1368,
+                                                                    lineNumber: 1369,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1366,
+                                                            lineNumber: 1367,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2924,7 +2924,7 @@ function HomeSplitClient({ events }) {
                                                                     children: "Live music"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1371,
+                                                                    lineNumber: 1372,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2932,13 +2932,13 @@ function HomeSplitClient({ events }) {
                                                                     children: weekInsights["Live music"]
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1372,
+                                                                    lineNumber: 1373,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1370,
+                                                            lineNumber: 1371,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2950,7 +2950,7 @@ function HomeSplitClient({ events }) {
                                                                     children: "Food & drink"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1375,
+                                                                    lineNumber: 1376,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2958,13 +2958,13 @@ function HomeSplitClient({ events }) {
                                                                     children: weekInsights["Food & drink"]
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1376,
+                                                                    lineNumber: 1377,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1374,
+                                                            lineNumber: 1375,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2976,7 +2976,7 @@ function HomeSplitClient({ events }) {
                                                                     children: "Community"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1379,
+                                                                    lineNumber: 1380,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2984,19 +2984,19 @@ function HomeSplitClient({ events }) {
                                                                     children: weekInsights["Community"]
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1380,
+                                                                    lineNumber: 1381,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1378,
+                                                            lineNumber: 1379,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1365,
+                                                    lineNumber: 1366,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3012,7 +3012,7 @@ function HomeSplitClient({ events }) {
                                                                     children: "Busiest day"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1386,
+                                                                    lineNumber: 1387,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3020,13 +3020,13 @@ function HomeSplitClient({ events }) {
                                                                     children: selectedWeekBucket.busiestDayLabel
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1387,
+                                                                    lineNumber: 1388,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1385,
+                                                            lineNumber: 1386,
                                                             columnNumber: 23
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3038,7 +3038,7 @@ function HomeSplitClient({ events }) {
                                                                     children: "Peak time"
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1390,
+                                                                    lineNumber: 1391,
                                                                     columnNumber: 25
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3046,25 +3046,25 @@ function HomeSplitClient({ events }) {
                                                                     children: selectedWeekBucket.peakWindowLabel
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1391,
+                                                                    lineNumber: 1392,
                                                                     columnNumber: 25
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1389,
+                                                            lineNumber: 1390,
                                                             columnNumber: 23
                                                         }, this)
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1384,
+                                                    lineNumber: 1385,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1354,
+                                            lineNumber: 1355,
                                             columnNumber: 19
                                         }, this),
                                         weekEventsCount === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3072,7 +3072,7 @@ function HomeSplitClient({ events }) {
                                             children: "No events scheduled for this week yet."
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1397,
+                                            lineNumber: 1398,
                                             columnNumber: 21
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "weeklyLanding fadeInItem",
@@ -3095,20 +3095,20 @@ function HomeSplitClient({ events }) {
                                                                             children: label
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                            lineNumber: 1406,
+                                                                            lineNumber: 1407,
                                                                             columnNumber: 31
                                                                         }, this),
                                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                                             children: count
                                                                         }, void 0, false, {
                                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                            lineNumber: 1407,
+                                                                            lineNumber: 1408,
                                                                             columnNumber: 31
                                                                         }, this)
                                                                     ]
                                                                 }, void 0, true, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1405,
+                                                                    lineNumber: 1406,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3120,24 +3120,24 @@ function HomeSplitClient({ events }) {
                                                                         }
                                                                     }, void 0, false, {
                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                        lineNumber: 1410,
+                                                                        lineNumber: 1411,
                                                                         columnNumber: 31
                                                                     }, this)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1409,
+                                                                    lineNumber: 1410,
                                                                     columnNumber: 29
                                                                 }, this)
                                                             ]
                                                         }, label, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1404,
+                                                            lineNumber: 1405,
                                                             columnNumber: 27
                                                         }, this);
                                                     })
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1400,
+                                                    lineNumber: 1401,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3150,7 +3150,7 @@ function HomeSplitClient({ events }) {
                                                                     children: formatDayHeading(g.date)
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1425,
+                                                                    lineNumber: 1426,
                                                                     columnNumber: 29
                                                                 }, this),
                                                                 g.items.map((e)=>{
@@ -3174,24 +3174,24 @@ function HomeSplitClient({ events }) {
                                                                                         alt: ""
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                        lineNumber: 1445,
+                                                                                        lineNumber: 1446,
                                                                                         columnNumber: 41
                                                                                     }, this)
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                    lineNumber: 1443,
+                                                                                    lineNumber: 1444,
                                                                                     columnNumber: 39
                                                                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                                                                     className: "media16x9 weeklyThumbPlaceholder",
                                                                                     "aria-hidden": true
                                                                                 }, void 0, false, {
                                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                    lineNumber: 1448,
+                                                                                    lineNumber: 1449,
                                                                                     columnNumber: 39
                                                                                 }, this)
                                                                             }, void 0, false, {
                                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                lineNumber: 1441,
+                                                                                lineNumber: 1442,
                                                                                 columnNumber: 35
                                                                             }, this),
                                                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3208,7 +3208,7 @@ function HomeSplitClient({ events }) {
                                                                                                         children: title
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                                        lineNumber: 1455,
+                                                                                                        lineNumber: 1456,
                                                                                                         columnNumber: 41
                                                                                                     }, this),
                                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3216,13 +3216,13 @@ function HomeSplitClient({ events }) {
                                                                                                         children: timeLabel
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                                        lineNumber: 1456,
+                                                                                                        lineNumber: 1457,
                                                                                                         columnNumber: 41
                                                                                                     }, this)
                                                                                                 ]
                                                                                             }, void 0, true, {
                                                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                                lineNumber: 1454,
+                                                                                                lineNumber: 1455,
                                                                                                 columnNumber: 39
                                                                                             }, this),
                                                                                             e.tickets_url || e.website_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3237,7 +3237,7 @@ function HomeSplitClient({ events }) {
                                                                                                         children: "Tickets"
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                                        lineNumber: 1462,
+                                                                                                        lineNumber: 1463,
                                                                                                         columnNumber: 45
                                                                                                     }, this) : null,
                                                                                                     e.website_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -3249,19 +3249,19 @@ function HomeSplitClient({ events }) {
                                                                                                         children: "Website"
                                                                                                     }, void 0, false, {
                                                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                                        lineNumber: 1473,
+                                                                                                        lineNumber: 1474,
                                                                                                         columnNumber: 45
                                                                                                     }, this) : null
                                                                                                 ]
                                                                                             }, void 0, true, {
                                                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                                lineNumber: 1460,
+                                                                                                lineNumber: 1461,
                                                                                                 columnNumber: 41
                                                                                             }, this) : null
                                                                                         ]
                                                                                     }, void 0, true, {
                                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                        lineNumber: 1453,
+                                                                                        lineNumber: 1454,
                                                                                         columnNumber: 37
                                                                                     }, this),
                                                                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3272,7 +3272,7 @@ function HomeSplitClient({ events }) {
                                                                                         ].filter(Boolean).join(" • ")
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                        lineNumber: 1487,
+                                                                                        lineNumber: 1488,
                                                                                         columnNumber: 37
                                                                                     }, this),
                                                                                     desc ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3280,43 +3280,43 @@ function HomeSplitClient({ events }) {
                                                                                         children: desc.length > 200 ? `${desc.slice(0, 200).trim()}…` : desc
                                                                                     }, void 0, false, {
                                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                        lineNumber: 1490,
+                                                                                        lineNumber: 1491,
                                                                                         columnNumber: 45
                                                                                     }, this) : null
                                                                                 ]
                                                                             }, void 0, true, {
                                                                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                                lineNumber: 1452,
+                                                                                lineNumber: 1453,
                                                                                 columnNumber: 35
                                                                             }, this)
                                                                         ]
                                                                     }, e.id, true, {
                                                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                        lineNumber: 1435,
+                                                                        lineNumber: 1436,
                                                                         columnNumber: 33
                                                                     }, this);
                                                                 })
                                                             ]
                                                         }, dayKey(g.date), true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1424,
+                                                            lineNumber: 1425,
                                                             columnNumber: 27
                                                         }, this))
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1422,
+                                                    lineNumber: 1423,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1399,
+                                            lineNumber: 1400,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1330,
+                                    lineNumber: 1331,
                                     columnNumber: 17
                                 }, this) : !selectedEvent ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "dayRight",
@@ -3329,7 +3329,7 @@ function HomeSplitClient({ events }) {
                                                     children: formatDayHeading(selectedDay)
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1504,
+                                                    lineNumber: 1505,
                                                     columnNumber: 21
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3341,13 +3341,13 @@ function HomeSplitClient({ events }) {
                                                     ]
                                                 }, void 0, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1505,
+                                                    lineNumber: 1506,
                                                     columnNumber: 21
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1503,
+                                            lineNumber: 1504,
                                             columnNumber: 19
                                         }, this),
                                         dayEvents.length === 0 ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3355,7 +3355,7 @@ function HomeSplitClient({ events }) {
                                             children: "No events on this day."
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1511,
+                                            lineNumber: 1512,
                                             columnNumber: 21
                                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                             className: "dayRightList",
@@ -3383,7 +3383,7 @@ function HomeSplitClient({ events }) {
                                                                     children: title
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1530,
+                                                                    lineNumber: 1531,
                                                                     columnNumber: 31
                                                                 }, this),
                                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3391,13 +3391,13 @@ function HomeSplitClient({ events }) {
                                                                     children: timeLabel
                                                                 }, void 0, false, {
                                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                                    lineNumber: 1531,
+                                                                    lineNumber: 1532,
                                                                     columnNumber: 31
                                                                 }, this)
                                                             ]
                                                         }, void 0, true, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1529,
+                                                            lineNumber: 1530,
                                                             columnNumber: 29
                                                         }, this),
                                                         venueBits ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3405,25 +3405,25 @@ function HomeSplitClient({ events }) {
                                                             children: venueBits
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1533,
+                                                            lineNumber: 1534,
                                                             columnNumber: 42
                                                         }, this) : null
                                                     ]
                                                 }, key, true, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1522,
+                                                    lineNumber: 1523,
                                                     columnNumber: 27
                                                 }, this);
                                             })
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1513,
+                                            lineNumber: 1514,
                                             columnNumber: 21
                                         }, this)
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1502,
+                                    lineNumber: 1503,
                                     columnNumber: 17
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "rightHeader",
@@ -3436,7 +3436,7 @@ function HomeSplitClient({ events }) {
                                             children: selectedEvent.event_type || "Event"
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1542,
+                                            lineNumber: 1543,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("h1", {
@@ -3447,7 +3447,7 @@ function HomeSplitClient({ events }) {
                                             children: selectedEvent.title || "Untitled event"
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1549,
+                                            lineNumber: 1550,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3460,7 +3460,7 @@ function HomeSplitClient({ events }) {
                                                     children: selectedTime
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1554,
+                                                    lineNumber: 1555,
                                                     columnNumber: 21
                                                 }, this),
                                                 selectedEvent.locationName ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -3470,16 +3470,24 @@ function HomeSplitClient({ events }) {
                                                             children: "•"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1557,
+                                                            lineNumber: 1558,
                                                             columnNumber: 25
                                                         }, this),
-                                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
+                                                        selectedEvent.locationUrl ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                                                            className: "venue link",
+                                                            href: selectedEvent.locationUrl,
+                                                            children: selectedEvent.locationName
+                                                        }, void 0, false, {
+                                                            fileName: "[project]/app/HomeSplitClient.tsx",
+                                                            lineNumber: 1560,
+                                                            columnNumber: 27
+                                                        }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
                                                             className: "venue",
                                                             children: selectedEvent.locationName
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1558,
-                                                            columnNumber: 25
+                                                            lineNumber: 1564,
+                                                            columnNumber: 27
                                                         }, this)
                                                     ]
                                                 }, void 0, true) : null,
@@ -3490,7 +3498,7 @@ function HomeSplitClient({ events }) {
                                                             children: "•"
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1563,
+                                                            lineNumber: 1570,
                                                             columnNumber: 25
                                                         }, this),
                                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3498,7 +3506,7 @@ function HomeSplitClient({ events }) {
                                                             children: selectedEvent.address
                                                         }, void 0, false, {
                                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                                            lineNumber: 1564,
+                                                            lineNumber: 1571,
                                                             columnNumber: 25
                                                         }, this)
                                                     ]
@@ -3506,7 +3514,7 @@ function HomeSplitClient({ events }) {
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1553,
+                                            lineNumber: 1554,
                                             columnNumber: 19
                                         }, this),
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3516,7 +3524,7 @@ function HomeSplitClient({ events }) {
                                             } : undefined
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1570,
+                                            lineNumber: 1577,
                                             columnNumber: 19
                                         }, this),
                                         selectedEvent.summary ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3524,7 +3532,7 @@ function HomeSplitClient({ events }) {
                                             children: selectedEvent.summary
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1575,
+                                            lineNumber: 1582,
                                             columnNumber: 44
                                         }, this) : null,
                                         selectedDesc ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3532,14 +3540,14 @@ function HomeSplitClient({ events }) {
                                             children: selectedDesc
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1577,
+                                            lineNumber: 1584,
                                             columnNumber: 35
                                         }, this) : null,
                                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$MediaBlocks$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                             slices: selectedEvent?.content_blocks
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1580,
+                                            lineNumber: 1587,
                                             columnNumber: 19
                                         }, this),
                                         selectedEvent.website_url || selectedEvent.tickets_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3557,7 +3565,7 @@ function HomeSplitClient({ events }) {
                                                     children: "Website"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1584,
+                                                    lineNumber: 1591,
                                                     columnNumber: 23
                                                 }, this),
                                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
@@ -3572,36 +3580,36 @@ function HomeSplitClient({ events }) {
                                                     children: "Tickets"
                                                 }, void 0, false, {
                                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                                    lineNumber: 1597,
+                                                    lineNumber: 1604,
                                                     columnNumber: 23
                                                 }, this)
                                             ]
                                         }, void 0, true, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1583,
+                                            lineNumber: 1590,
                                             columnNumber: 21
                                         }, this) : null
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1541,
+                                    lineNumber: 1542,
                                     columnNumber: 17
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/HomeSplitClient.tsx",
-                            lineNumber: 1276,
+                            lineNumber: 1277,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/HomeSplitClient.tsx",
-                        lineNumber: 1275,
+                        lineNumber: 1276,
                         columnNumber: 11
                     }, this) : null
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/HomeSplitClient.tsx",
-                lineNumber: 777,
+                lineNumber: 778,
                 columnNumber: 7
             }, this),
             effectiveIsMobile ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3616,7 +3624,7 @@ function HomeSplitClient({ events }) {
                         children: "Calendar"
                     }, void 0, false, {
                         fileName: "[project]/app/HomeSplitClient.tsx",
-                        lineNumber: 1621,
+                        lineNumber: 1628,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3627,7 +3635,7 @@ function HomeSplitClient({ events }) {
                         children: "Directory"
                     }, void 0, false, {
                         fileName: "[project]/app/HomeSplitClient.tsx",
-                        lineNumber: 1629,
+                        lineNumber: 1636,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -3638,13 +3646,13 @@ function HomeSplitClient({ events }) {
                         children: "Updates"
                     }, void 0, false, {
                         fileName: "[project]/app/HomeSplitClient.tsx",
-                        lineNumber: 1637,
+                        lineNumber: 1644,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/HomeSplitClient.tsx",
-                lineNumber: 1620,
+                lineNumber: 1627,
                 columnNumber: 9
             }, this) : null,
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3662,7 +3670,7 @@ function HomeSplitClient({ events }) {
                                 children: "Back"
                             }, void 0, false, {
                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                lineNumber: 1655,
+                                lineNumber: 1662,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3670,13 +3678,13 @@ function HomeSplitClient({ events }) {
                                 children: "Event"
                             }, void 0, false, {
                                 fileName: "[project]/app/HomeSplitClient.tsx",
-                                lineNumber: 1658,
+                                lineNumber: 1665,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/HomeSplitClient.tsx",
-                        lineNumber: 1654,
+                        lineNumber: 1661,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3692,7 +3700,7 @@ function HomeSplitClient({ events }) {
                                     children: selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"
                                 }, void 0, false, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1663,
+                                    lineNumber: 1670,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3703,7 +3711,7 @@ function HomeSplitClient({ events }) {
                                             children: selectedTime ?? "Time TBD"
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1665,
+                                            lineNumber: 1672,
                                             columnNumber: 17
                                         }, this),
                                         selectedEvent.event_type ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -3711,13 +3719,13 @@ function HomeSplitClient({ events }) {
                                             children: selectedEvent.event_type
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1666,
+                                            lineNumber: 1673,
                                             columnNumber: 45
                                         }, this) : null
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1664,
+                                    lineNumber: 1671,
                                     columnNumber: 15
                                 }, this),
                                 selectedImg ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3731,7 +3739,7 @@ function HomeSplitClient({ events }) {
                                             alt: ""
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1671,
+                                            lineNumber: 1678,
                                             columnNumber: 19
                                         }, this),
                                         selectedDesc ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3739,13 +3747,13 @@ function HomeSplitClient({ events }) {
                                             children: selectedDesc.slice(0, 120)
                                         }, void 0, false, {
                                             fileName: "[project]/app/HomeSplitClient.tsx",
-                                            lineNumber: 1672,
+                                            lineNumber: 1679,
                                             columnNumber: 35
                                         }, this) : null
                                     ]
                                 }, void 0, true, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1669,
+                                    lineNumber: 1676,
                                     columnNumber: 17
                                 }, this) : null,
                                 selectedDesc ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -3757,12 +3765,12 @@ function HomeSplitClient({ events }) {
                                         children: selectedDesc
                                     }, void 0, false, {
                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                        lineNumber: 1677,
+                                        lineNumber: 1684,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1676,
+                                    lineNumber: 1683,
                                     columnNumber: 17
                                 }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                                     className: "detailBody",
@@ -3774,12 +3782,12 @@ function HomeSplitClient({ events }) {
                                         children: "No description yet."
                                     }, void 0, false, {
                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                        lineNumber: 1681,
+                                        lineNumber: 1688,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1680,
+                                    lineNumber: 1687,
                                     columnNumber: 17
                                 }, this),
                                 selectedEvent.website_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3794,12 +3802,12 @@ function HomeSplitClient({ events }) {
                                         children: "Website"
                                     }, void 0, false, {
                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                        lineNumber: 1686,
+                                        lineNumber: 1693,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1685,
+                                    lineNumber: 1692,
                                     columnNumber: 17
                                 }, this) : null,
                                 selectedEvent.tickets_url ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
@@ -3814,42 +3822,42 @@ function HomeSplitClient({ events }) {
                                         children: "Tickets"
                                     }, void 0, false, {
                                         fileName: "[project]/app/HomeSplitClient.tsx",
-                                        lineNumber: 1693,
+                                        lineNumber: 1700,
                                         columnNumber: 19
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1692,
+                                    lineNumber: 1699,
                                     columnNumber: 17
                                 }, this) : null,
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$MediaBlocks$2e$tsx__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"], {
                                     slices: selectedEvent?.content_blocks
                                 }, void 0, false, {
                                     fileName: "[project]/app/HomeSplitClient.tsx",
-                                    lineNumber: 1699,
+                                    lineNumber: 1706,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, detailFlashKey, true, {
                             fileName: "[project]/app/HomeSplitClient.tsx",
-                            lineNumber: 1662,
+                            lineNumber: 1669,
                             columnNumber: 13
                         }, this) : null
                     }, void 0, false, {
                         fileName: "[project]/app/HomeSplitClient.tsx",
-                        lineNumber: 1660,
+                        lineNumber: 1667,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/HomeSplitClient.tsx",
-                lineNumber: 1649,
+                lineNumber: 1656,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/HomeSplitClient.tsx",
-        lineNumber: 773,
+        lineNumber: 774,
         columnNumber: 5
     }, this);
 }

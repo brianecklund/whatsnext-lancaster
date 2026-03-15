@@ -2,7 +2,12 @@ import LocationsSplitClient from './LocationsSplitClient';
 import { createClient } from '@/prismicio';
 import { getCachedVenueImport } from '@/lib/venue-import';
 import type { LocationLite } from '@/lib/types';
-import { createLocationLiteFromVenue, getLocationDocSummary, matchVenueFromDocData, parseIntegrationVenue } from '@/lib/prismic-venue';
+import {
+  createLocationLiteFromVenue,
+  getLocationDocLookupKey,
+  getLocationDocSummary,
+  matchVenueFromDocData,
+} from '@/lib/prismic-venue';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,10 +37,9 @@ export default async function LocationsPage() {
   const customPageByName = new Map<string, any>();
 
   for (const doc of docs) {
-    const matchedVenue = matchVenueFromDocData(importedVenues, doc.data);
-    const explicitId = parseIntegrationVenue(doc.data?.venue)?.venue_external_id || matchedVenue?.externalId || null;
-    if (explicitId) customPageByVenueId.set(String(explicitId).trim().toLowerCase(), doc);
-    if (doc.data?.name) customPageByName.set(String(doc.data.name).trim().toLowerCase(), doc);
+    const lookup = getLocationDocLookupKey(doc);
+    if (lookup.venueIdKey) customPageByVenueId.set(lookup.venueIdKey, doc);
+    if (lookup.venueNameKey) customPageByName.set(lookup.venueNameKey, doc);
   }
 
   const apiLocations: LocationRow[] = importedVenues.map((venue) => {

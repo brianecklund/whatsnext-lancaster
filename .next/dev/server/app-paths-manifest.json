@@ -1,5 +1,4 @@
 {
-  "/api/venues/import/route": "app/api/venues/import/route.js",
   "/locations/page": "app/locations/page.js",
   "/page": "app/page.js"
 }

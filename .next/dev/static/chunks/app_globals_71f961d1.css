@@ -3194,4 +3194,76 @@ a:hover {
   }
 }
 
+.locationPageShell {
+  color: #0f0f0f;
+  background: #fbf8ef;
+  min-height: 100vh;
+  padding: 120px 24px 80px;
+}
+
+.locationPageInner {
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.locationPageBack {
+  color: inherit;
+  opacity: .72;
+  margin-bottom: 24px;
+  text-decoration: none;
+  display: inline-flex;
+}
+
+.locationPageHeader {
+  border-top: 1px solid #0f0f0f1f;
+  padding-top: 24px;
+}
+
+.locationPageEyebrow, .locationPageSectionLabel, .locationPageStatLabel {
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  opacity: .6;
+  font-size: 12px;
+}
+
+.locationPageTitle {
+  margin: 12px 0 16px;
+  font-size: clamp(36px, 6vw, 76px);
+  line-height: .98;
+}
+
+.locationPageMeta {
+  opacity: .78;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  display: flex;
+}
+
+.locationPageIntro, .locationPageVenueCard {
+  border-top: 1px solid #0f0f0f1f;
+  margin-top: 32px;
+  padding-top: 24px;
+}
+
+.locationPageVenueGrid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  margin-top: 14px;
+  display: grid;
+}
+
+.locationPageStatLabel {
+  margin-bottom: 4px;
+}
+
+@media (max-width: 760px) {
+  .locationPageShell {
+    padding: 96px 18px 100px;
+  }
+
+  .locationPageVenueGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
 /*# sourceMappingURL=app_globals_71f961d1.css.map*/

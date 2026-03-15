@@ -12,34 +12,14 @@ function asText(value: unknown) {
   return null;
 }
 
-function asVenueBlob(value: any) {
-  if (!value || typeof value !== 'object') return null;
-  if (value.blob && typeof value.blob === 'object') return value.blob;
-  return value;
+function normalize(value: string | null | undefined) {
+  return (value || '').trim().toLowerCase();
 }
 
-export function parseIntegrationVenue(value: any): LocationLite | null {
-  const blob = asVenueBlob(value);
-  if (!blob) return null;
-
-  const externalId = blob.externalId || blob.external_id || blob.place_id || blob.id || value?.id || null;
-  const name = blob.name || value?.title || value?.name || null;
-  if (!externalId && !name) return null;
-
-  return {
-    id: externalId || name,
-    key: externalId || name,
-    uid: null,
-    name,
-    address: blob.address || value?.description || null,
-    category: blob.category || null,
-    website: blob.website || null,
-    description: blob.description || null,
-    phone: blob.phone || null,
-    rating: typeof blob.rating === 'number' ? blob.rating : null,
-    venue_external_id: externalId,
-    source: blob.source || 'google',
-  };
+export function getVenueFields(data: any) {
+  const venueName = typeof data?.venue_name === 'string' && data.venue_name.trim() ? data.venue_name.trim() : null;
+  const venuePlaceId = typeof data?.venue_place_id === 'string' && data.venue_place_id.trim() ? data.venue_place_id.trim() : null;
+  return { venueName, venuePlaceId };
 }
 
 export function createLocationLiteFromVenue(venue: ImportedVenue, customPage?: { uid?: string | null } | null): LocationLite {
@@ -61,6 +41,31 @@ export function createLocationLiteFromVenue(venue: ImportedVenue, customPage?: {
   };
 }
 
+export function createLocationLiteFromManualFields(data: any, customPage?: { uid?: string | null } | null): LocationLite | null {
+  const { venueName, venuePlaceId } = getVenueFields(data);
+  const fallbackName = typeof data?.name === 'string' && data.name.trim() ? data.name.trim() : null;
+  const fallbackAddress = typeof data?.address === 'string' && data.address.trim() ? data.address.trim() : null;
+  const fallbackCategory = typeof data?.category === 'string' && data.category.trim() ? data.category.trim() : null;
+  const fallbackWebsite = prismic.asLink(data?.website) ?? null;
+  const name = venueName ?? fallbackName;
+  if (!name && !venuePlaceId) return null;
+
+  return {
+    id: venuePlaceId || name || 'location',
+    key: venuePlaceId ? `google:${venuePlaceId}` : name || 'location',
+    uid: null,
+    name,
+    address: fallbackAddress,
+    category: fallbackCategory,
+    website: fallbackWebsite,
+    description: asText(data?.description),
+    venue_external_id: venuePlaceId,
+    source: 'google',
+    customPageUid: customPage?.uid ?? null,
+    customPageUrl: customPage?.uid ? `/locations/${customPage.uid}` : null,
+  };
+}
+
 export function resolveLocationUrl(location: LocationLite | null | undefined) {
   if (!location) return null;
   if (location.customPageUrl) return location.customPageUrl;
@@ -74,24 +79,32 @@ export function resolveLocationUrl(location: LocationLite | null | undefined) {
 }
 
 export function matchVenueFromDocData(venues: ImportedVenue[], data: any) {
-  const venueField = parseIntegrationVenue(data?.venue);
+  const { venueName, venuePlaceId } = getVenueFields(data);
   return (
-    resolveVenueById(venues, venueField?.venue_external_id || data?.venue_place_id, venueField?.id || null) ||
-    resolveVenueByName(venues, data?.name || venueField?.name, data?.address || venueField?.address) ||
+    resolveVenueById(venues, venuePlaceId, null) ||
+    resolveVenueByName(venues, venueName || data?.name, data?.address) ||
     null
   );
 }
 
 export function getLocationDocSummary(doc: any) {
-  const venue = parseIntegrationVenue(doc.data?.venue);
+  const { venueName, venuePlaceId } = getVenueFields(doc.data);
   return {
     id: doc.id,
     uid: doc.uid ?? null,
-    name: doc.data?.name ?? venue?.name ?? null,
+    name: doc.data?.name ?? venueName ?? null,
     description: asText(doc.data?.description),
-    address: doc.data?.address ?? venue?.address ?? null,
-    website: prismic.asLink(doc.data?.website) ?? venue?.website ?? null,
-    category: doc.data?.category ?? venue?.category ?? null,
-    venue_external_id: venue?.venue_external_id ?? null,
+    address: doc.data?.address ?? null,
+    website: prismic.asLink(doc.data?.website) ?? null,
+    category: doc.data?.category ?? null,
+    venue_external_id: venuePlaceId ?? null,
+  };
+}
+
+export function getLocationDocLookupKey(doc: any) {
+  const { venueName, venuePlaceId } = getVenueFields(doc.data);
+  return {
+    venueIdKey: normalize(venuePlaceId),
+    venueNameKey: normalize(venueName || doc.data?.name),
   };
 }

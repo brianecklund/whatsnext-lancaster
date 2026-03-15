@@ -30,7 +30,7 @@ export default async function LocationDetailPage({ params }: { params: Promise<{
         <a className="locationPageBack" href="/locations">← Back to directory</a>
         <div className="locationPageHeader">
           <div className="locationPageEyebrow">Directory</div>
-          <h1 className="locationPageTitle">{doc.data?.name || venue?.name || 'Location'}</h1>
+          <h1 className="locationPageTitle">{doc.data?.name || venue?.name || doc.data?.venue_name || 'Location'}</h1>
           <div className="locationPageMeta">
             {doc.data?.category || venue?.category ? <span>{doc.data?.category || venue?.category}</span> : null}
             {doc.data?.address || venue?.address ? <span>{doc.data?.address || venue?.address}</span> : null}

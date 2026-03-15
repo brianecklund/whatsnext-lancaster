@@ -691,22 +691,36 @@ function LocationDetail({ location }) {
                 lineNumber: 366,
                 columnNumber: 7
             }, this),
-            location.website ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
+            location.customPageUrl || location.website ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("p", {
                 style: {
-                    marginTop: 10
+                    marginTop: 10,
+                    display: 'flex',
+                    gap: 14,
+                    flexWrap: 'wrap'
                 },
-                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
-                    className: "link",
-                    href: location.website,
-                    target: "_blank",
-                    rel: "noreferrer",
-                    children: "Website"
-                }, void 0, false, {
-                    fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                    lineNumber: 373,
-                    columnNumber: 11
-                }, this)
-            }, void 0, false, {
+                children: [
+                    location.customPageUrl ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                        className: "link",
+                        href: location.customPageUrl,
+                        children: "Full page"
+                    }, void 0, false, {
+                        fileName: "[project]/app/locations/LocationsSplitClient.tsx",
+                        lineNumber: 374,
+                        columnNumber: 13
+                    }, this) : null,
+                    location.website ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("a", {
+                        className: "link",
+                        href: location.website,
+                        target: "_blank",
+                        rel: "noreferrer",
+                        children: "Website"
+                    }, void 0, false, {
+                        fileName: "[project]/app/locations/LocationsSplitClient.tsx",
+                        lineNumber: 379,
+                        columnNumber: 13
+                    }, this) : null
+                ]
+            }, void 0, true, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
                 lineNumber: 372,
                 columnNumber: 9
@@ -721,12 +735,12 @@ function LocationDetail({ location }) {
                     children: location.description
                 }, void 0, false, {
                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                    lineNumber: 381,
+                    lineNumber: 388,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                lineNumber: 380,
+                lineNumber: 387,
                 columnNumber: 9
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "detailBody fadeInItem",
@@ -739,12 +753,12 @@ function LocationDetail({ location }) {
                     children: "No description yet."
                 }, void 0, false, {
                     fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                    lineNumber: 385,
+                    lineNumber: 392,
                     columnNumber: 11
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/locations/LocationsSplitClient.tsx",
-                lineNumber: 384,
+                lineNumber: 391,
                 columnNumber: 9
             }, this)
         ]

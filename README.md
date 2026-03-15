@@ -1,63 +1,38 @@
-# What's Next Lancaster — v4 Fixed (no @prismicio/helpers)
+# WhatsNext Lancaster
 
-## What’s fixed
-- Removes any import of `@prismicio/helpers` (so `npm run build` won’t fail on that).
-- Uses `images.remotePatterns` (Next warning removed).
-- Includes split-view home + hover highlight on rows.
+This version keeps the directory API/cache driven and simplifies the Prismic connection layer.
 
-## Setup
-1) Create `.env.local` in the project root:
-   PRISMIC_REPO_NAME=whatsnext-lancaster
-   # If private:
-   # PRISMIC_ACCESS_TOKEN=YOUR_TOKEN
+## Venue workflow
 
-2) Install + run:
-   npm install
-   npm run dev
+Use the cached venue feed as the source of truth for directory listings. In Prismic, events and custom location pages store:
 
-3) Build:
-   npm run build
+- `venue_name`
+- `venue_place_id`
+- `location_page` (events only, optional)
 
-## If Next says “multiple lockfiles”
-That’s caused by an unrelated `package-lock.json` somewhere above your project folder.
-Make sure you run commands from *inside* this project folder (where this package.json lives).
+Use the helper page below to find a venue in the cached feed:
 
+- `/admin/venue-search`
 
-## Automatic venue importing
+Paste the copied values into Prismic. The frontend resolves venue details from the cached API data at render time.
 
-This repo includes a server-side venue import endpoint at `app/api/venues/import/route.ts`.
+## Useful routes
 
-Supported providers:
-- Google Places via `GOOGLE_MAPS_API_KEY`
+- `/api/venues`
+- `/api/venues/search?q=west`
+- `/api/venues/refresh`
+- `/api/venues/status`
+- `/admin/venue-search`
 
-Example:
-
-```
-GET /api/venues/import?location=Lancaster,%20PA&query=music%20venues%20bars%20coffee%20shops&limit=20
-```
-
-The endpoint dedupes providers and normalizes categories into the site taxonomy used by the directory.
-
-
-## Cached venue importing
-
-This repo stores imported directory venues in `data/venue-cache.json`.
-
-### Refresh locally
+## Local development
 
 ```bash
-GOOGLE_MAPS_API_KEY=...
-# or
-GOOGLE_PLACES_API_KEY=...
-npm run refresh:venues
+npm install
+npm run dev
 ```
 
-### Refresh daily with GitHub Actions
+## Environment variables
 
-A scheduled workflow lives at `.github/workflows/refresh-venues.yml`.
-Set these in GitHub:
-
-- Repository Secrets: `GOOGLE_MAPS_API_KEY` or `GOOGLE_PLACES_API_KEY`
-- Repository Variables: `VENUE_IMPORT_LOCATION`, `VENUE_IMPORT_QUERY`, `VENUE_IMPORT_LIMIT`
-
-The Directory page reads from `data/venue-cache.json`, so imported venues are persisted in the repo and deployed with the site.
+- `PRISMIC_REPO_NAME`
+- `PRISMIC_ACCESS_TOKEN` (if repo is private)
+- `GOOGLE_PLACES_API_KEY` or `GOOGLE_MAPS_API_KEY`

@@ -16,12 +16,18 @@
           "placeholder": ""
         }
       },
-      "venue": {
-        "type": "IntegrationFields",
+      "venue_name": {
+        "type": "Text",
         "config": {
-          "catalog": "whatsnext-lancaster--venues",
-          "label": "Linked Venue",
-          "placeholder": "Search for a venue from the directory data"
+          "label": "Venue Name",
+          "placeholder": "Venue name from the cached directory feed."
+        }
+      },
+      "venue_place_id": {
+        "type": "Text",
+        "config": {
+          "label": "Venue Place ID",
+          "placeholder": "Paste the cached venue ID from the venue search helper."
         }
       },
       "description": {
