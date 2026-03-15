@@ -2911,20 +2911,22 @@ a:hover{
 
 .mobileSheetOverlay{
   position: fixed;
-  inset: var(--headerH) 0 0 0;
-  z-index: 235;
-  background: rgba(255,255,255,0.96);
+  inset: 0;
+  z-index: 500;
+  background: rgba(255,255,255,0.98);
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
   overflow: hidden;
+  animation: menuOverlayFade 220ms ease both;
 }
 
 .mobileSheet{
-  min-height: calc(100dvh - var(--headerH));
-  padding: 16px;
+  min-height: 100dvh;
+  padding: calc(var(--headerH) + 12px) 16px 18px;
   display: flex;
   flex-direction: column;
   gap: 16px;
+  animation: menuOverlayDrop 260ms ease both;
 }
 
 .mobileSheetHeader{
@@ -2989,8 +2991,8 @@ a:hover{
   font-weight: var(--fw-medium);
 }
 
-.mobileMenuOverlay{ z-index: 245; }
-.mobileMenuSheet{ min-height: calc(100dvh - var(--headerH)); }
+.mobileMenuOverlay{ z-index: 520; }
+.mobileMenuSheet{ min-height: 100dvh; }
 .mobileMenuList{ gap: 14px; }
 .mobileMenuActionText{ display:block; }
 
