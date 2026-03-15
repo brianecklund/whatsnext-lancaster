@@ -2895,3 +2895,105 @@ a:hover{
     grid-template-columns: 1fr;
   }
 }
+
+
+.directorySectionHeading{
+  padding: 20px 6px 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.directorySectionHeading:first-child{
+  padding-top: 10px;
+}
+
+.mobileSheetOverlay{
+  position: fixed;
+  inset: var(--headerH) 0 0 0;
+  z-index: 235;
+  background: rgba(255,255,255,0.96);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  overflow: hidden;
+}
+
+.mobileSheet{
+  min-height: calc(100dvh - var(--headerH));
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.mobileSheetHeader{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mobileSheetTitle{
+  font-weight: var(--fw-medium);
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.mobileSheetClose{
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-weight: 600;
+}
+
+.mobileSheetList{
+  display:flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: auto;
+  padding-bottom: 8px;
+}
+
+.mobileSheetAction{
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  min-height: 58px;
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  box-shadow: var(--shadowSoft);
+  font-weight: var(--fw-medium);
+  font-size: clamp(1rem, 3.6vw, 1.35rem);
+  text-align: left;
+}
+
+.mobileSheetAction[data-active="true"]{
+  box-shadow: 0 0 0 2px var(--accent) inset;
+  background: var(--accentSoft);
+}
+
+.mobileSheetClear{
+  width: 100%;
+  min-height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--btnBg);
+  font-weight: var(--fw-medium);
+}
+
+.mobileMenuOverlay{ z-index: 245; }
+.mobileMenuSheet{ min-height: calc(100dvh - var(--headerH)); }
+.mobileMenuList{ gap: 14px; }
+.mobileMenuActionText{ display:block; }
+
+@media (min-width: 981px){
+  .mobileSheetOverlay{ display:none; }
+}

@@ -48,6 +48,15 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   useEffect(() => {
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
+
+  useEffect(() => {
+    if (!filterOpen) return;
+    const previousOverflow = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = previousOverflow;
+    };
+  }, [filterOpen]);
   useEffect(() => {
     if (!effectiveIsMobile) {
       setMobileOverlayOffset(0);
@@ -121,11 +130,22 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
     });
   }, [locations, q, cat]);
 
+  const featuredPartners = useMemo(
+    () => filtered.filter((location) => Boolean(location.customPageUid)).sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")),
+    [filtered],
+  );
+
+  const standardListings = useMemo(
+    () => filtered.filter((location) => !location.customPageUid).sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")),
+    [filtered],
+  );
+
   const selectedDesktop = useMemo(() => {
     if (!filtered.length) return null;
-    if (!selectedKey) return filtered[0];
-    return filtered.find((l) => l.key === selectedKey) ?? filtered[0];
-  }, [filtered, selectedKey]);
+    const ordered = [...featuredPartners, ...standardListings];
+    if (!selectedKey) return ordered[0] ?? null;
+    return filtered.find((l) => l.key === selectedKey) ?? ordered[0] ?? null;
+  }, [filtered, selectedKey, featuredPartners, standardListings]);
 
   const selectedMobile = useMemo(() => {
     if (!selectedKey) return null;
@@ -133,6 +153,12 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   }, [filtered, selectedKey]);
 
   const mobileDetailOpen = Boolean(selectedKey);
+  const groupedRows = [
+    ...(featuredPartners.length ? [{ type: "heading", label: "Featured partners" } as const] : []),
+    ...featuredPartners.map((location) => ({ type: "row", location } as const)),
+    ...(standardListings.length ? [{ type: "heading", label: featuredPartners.length ? "Directory" : "All listings" } as const] : []),
+    ...standardListings.map((location) => ({ type: "row", location } as const)),
+  ];
 
   return (
     <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
@@ -208,58 +234,68 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
             </div>
 
             {effectiveIsMobile ? (
-              <div
-                className="filterDropdown"
-                data-open={filterOpen ? "true" : "false"}
-                aria-hidden={filterOpen ? "false" : "true"}
-              >
-                <div className="filterDropdownInner">
-                  <div className="typePills" role="group" aria-label="Directory filters">
-                    <button
-                      type="button"
-                      className="typePill"
-                      data-active={!cat ? "true" : "false"}
-                      onClick={() => {
-                        setCategory(null);
-                        setFilterOpen(false);
-                      }}
-                    >
-                      All
-                    </button>
-                    {categories.map((t) => {
-                      const on = normalize(cat ?? "") === normalize(t);
-                      return (
-                        <button
-                          key={t}
-                          type="button"
-                          className="typePill"
-                          data-active={on ? "true" : "false"}
-                          onClick={() => {
-                            setCategory(on ? null : t);
-                            setFilterOpen(false);
-                          }}
-                        >
-                          {t}
-                        </button>
-                      );
-                    })}
-                  </div>
+              filterOpen ? (
+                <div className="mobileSheetOverlay" role="dialog" aria-modal="true" onClick={() => setFilterOpen(false)}>
+                  <div className="mobileSheet" onClick={(e) => e.stopPropagation()}>
+                    <div className="mobileSheetHeader">
+                      <div className="mobileSheetTitle">Directory filters</div>
+                      <button
+                        type="button"
+                        className="mobileSheetClose"
+                        onClick={() => setFilterOpen(false)}
+                        aria-label="Close filters"
+                      >
+                        ✕
+                      </button>
+                    </div>
 
-                  {(q || cat) ? (
-                    <button
-                      type="button"
-                      className="filterDropdownClear"
-                      onClick={() => {
-                        setQuery("");
-                        setCategory(null);
-                        setFilterOpen(false);
-                      }}
-                    >
-                      Clear search & filters
-                    </button>
-                  ) : null}
+                    <div className="mobileSheetList" role="group" aria-label="Directory filters">
+                      <button
+                        type="button"
+                        className="mobileSheetAction"
+                        data-active={!cat ? "true" : "false"}
+                        onClick={() => {
+                          setCategory(null);
+                          setFilterOpen(false);
+                        }}
+                      >
+                        All
+                      </button>
+                      {categories.map((t) => {
+                        const on = normalize(cat ?? "") === normalize(t);
+                        return (
+                          <button
+                            key={t}
+                            type="button"
+                            className="mobileSheetAction"
+                            data-active={on ? "true" : "false"}
+                            onClick={() => {
+                              setCategory(on ? null : t);
+                              setFilterOpen(false);
+                            }}
+                          >
+                            {t}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {(q || cat) ? (
+                      <button
+                        type="button"
+                        className="mobileSheetClear"
+                        onClick={() => {
+                          setQuery("");
+                          setCategory(null);
+                          setFilterOpen(false);
+                        }}
+                      >
+                        Clear search & filters
+                      </button>
+                    ) : null}
+                  </div>
                 </div>
-              </div>
+              ) : null
             ) : (
               <div className="typePills" role="group" aria-label="Directory filters" style={{ marginTop: 12 }}>
                 <button
@@ -291,7 +327,16 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
               <div className="emptyList">No listings yet.</div>
             ) : (
               <div style={{ paddingTop: 6 }}>
-                {filtered.map((l) => {
+                {groupedRows.map((item) => {
+                  if (item.type === "heading") {
+                    return (
+                      <div key={item.label} className="directorySectionHeading">
+                        {item.label}
+                      </div>
+                    );
+                  }
+
+                  const l = item.location;
                   const active = selectedKey ? selectedKey === l.key : selectedDesktop?.key === l.key;
                   return (
                     <button

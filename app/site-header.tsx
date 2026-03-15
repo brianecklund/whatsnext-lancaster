@@ -90,13 +90,13 @@ export default function SiteHeader() {
 
       {/* Mobile overlay */}
       {open ? (
-        <div className="menuOverlay" role="dialog" aria-modal="true" onClick={() => setOpen(false)}>
-          <div className="menuOverlayInner" onClick={(e) => e.stopPropagation()}>
-            <div className="menuOverlayHeader">
-              <div className="menuOverlayTitle">Menu</div>
+        <div className="mobileSheetOverlay mobileMenuOverlay" role="dialog" aria-modal="true" onClick={() => setOpen(false)}>
+          <div className="mobileSheet mobileMenuSheet" onClick={(e) => e.stopPropagation()}>
+            <div className="mobileSheetHeader">
+              <div className="mobileSheetTitle">Menu</div>
               <button
                 type="button"
-                className="menuCloseBtn"
+                className="mobileSheetClose"
                 onClick={() => setOpen(false)}
                 aria-label="Close menu"
               >
@@ -104,17 +104,17 @@ export default function SiteHeader() {
               </button>
             </div>
 
-            <nav className="menuOverlayNav" aria-label="Mobile primary">
+            <nav className="mobileSheetList mobileMenuList" aria-label="Mobile primary">
               {LINKS.map((l, idx) => (
                 <Link
                   key={l.href}
-                  className="menuOverlayLink"
+                  className="mobileSheetAction mobileMenuAction"
                   href={l.href}
                   data-active={pathname === l.href ? "true" : "false"}
                   style={{ ["--menuIndex" as string]: idx } as CSSProperties}
                   onClick={() => setOpen(false)}
                 >
-                  <span className="menuOverlayLinkText">{l.label}</span>
+                  <span className="mobileMenuActionText">{l.label}</span>
                 </Link>
               ))}
             </nav>
