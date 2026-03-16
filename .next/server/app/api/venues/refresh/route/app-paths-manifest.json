@@ -1,0 +1,3 @@
+{
+  "/api/venues/refresh/route": "app/api/venues/refresh/route.js"
+}

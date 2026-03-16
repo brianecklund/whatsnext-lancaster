@@ -1,0 +1,3 @@
+{
+  "/api/venues/import/route": "app/api/venues/import/route.js"
+}
