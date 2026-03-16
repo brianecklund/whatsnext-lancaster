@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  const safeLocations = Array.isArray(safeLocations) ? safeLocations : [];
+ useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 // removed smooth wheel for directory
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
@@ -32,11 +34,11 @@ const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
 
 const safeLocations = useMemo(() => {
-  if (!Array.isArray(locations)) return [];
-  return locations;
-}, [locations]);
+  if (!Array.isArray(safeLocations)) return [];
+  return safeLocations;
+}, [safeLocations]);
 
-export default function LocationsSplitClient({ safeLocations }: { safeLocations: LocationRow[] }) {
+export default function LocationsSplitClient({ safeLocations = [] }: { safeLocations?: any[] }) {{ safeLocations }: { safeLocations: LocationRow[] }) {
   // smooth wheel disabled for directory
   const router = useRouter();
   const pathname = usePathname();
