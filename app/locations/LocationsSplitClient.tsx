@@ -30,7 +30,13 @@ type GroupedSection = { letter: string; rows: LocationRow[] };
 
 const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
-export default function LocationsSplitClient({ locations }: { locations: LocationRow[] }) {
+
+const safeLocations = useMemo(() => {
+  if (!Array.isArray(locations)) return [];
+  return locations;
+}, [locations]);
+
+export default function LocationsSplitClient({ safeLocations }: { safeLocations: LocationRow[] }) {
   // smooth wheel disabled for directory
   const router = useRouter();
   const pathname = usePathname();
@@ -111,7 +117,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
   function navigate(params: URLSearchParams) {
     const qs = params.toString();
-    router.replace(qs ? `/locations?${qs}` : "/locations");
+    router.replace(qs ? `/safeLocations?${qs}` : "/safeLocations");
   }
 
   function setSelected(key: string) {
@@ -142,19 +148,19 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
     navigate(params);
   }
 
-  const categories = useMemo(() => mergeDirectoryCategories(locations.map((location) => location.category)), [locations]);
+  const categories = useMemo(() => mergeDirectoryCategories(safeLocations.map((location) => location.category)), [safeLocations]);
 
   const filtered = useMemo(() => {
     const nq = normalize(q);
     const nc = normalize(cat);
 
-    return locations.filter((l) => {
+    return safeLocations.filter((l) => {
       const hay = normalize([l.name ?? "", l.address ?? "", l.category ?? "", l.description ?? ""].filter(Boolean).join(" "));
       const matchesSearch = !nq || hay.includes(nq);
       const matchesCat = !nc || normalize(l.category ?? "") === nc;
       return matchesSearch && matchesCat;
     });
-  }, [locations, q, cat]);
+  }, [safeLocations, q, cat]);
 
   const featuredPartners = useMemo(
     () => filtered.filter((location) => Boolean(location.customPageUid)).sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")),
@@ -183,7 +189,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   const visibleLetters = useMemo(() => groupedStandardListings.map((section) => section.letter), [groupedStandardListings]);
 
   const selectedDesktop = useMemo(() => {
-    if (!filtered.length) return null;
+    if (!filtered?.length || 0) return null;
     const ordered = [...featuredPartners, ...standardListings];
     if (!selectedKey) return ordered[0] ?? null;
     return filtered.find((l) => l.key === selectedKey) ?? ordered[0] ?? null;
@@ -195,7 +201,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   }, [filtered, selectedKey]);
 
   useEffect(() => {
-    if (!visibleLetters.length) {
+    if (!visibleLetters?.length || 0) {
       setActiveLetter("#");
       return;
     }
@@ -207,7 +213,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
   useEffect(() => {
     if (effectiveIsMobile) return;
     const container = leftScrollRef.current;
-    if (!container || !visibleLetters.length) return;
+    if (!container || !visibleLetters?.length || 0) return;
 
     const syncActiveLetter = () => {
       const containerRect = container.getBoundingClientRect();
@@ -254,7 +260,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
             <div className="leftSticky" ref={leftStickyRef}>
               <div className="tabs" aria-label="Primary navigation">
                 <button type="button" className="tabBtn" data-active={pathname === "/" ? "true" : "false"} onClick={() => router.push("/")}>Calendar</button>
-                <button type="button" className="tabBtn" data-active={pathname.startsWith("/locations") ? "true" : "false"} onClick={() => router.push("/locations")}>Directory</button>
+                <button type="button" className="tabBtn" data-active={pathname.startsWith("/safeLocations") ? "true" : "false"} onClick={() => router.push("/safeLocations")}>Directory</button>
                 <button type="button" className="tabBtn" data-active={pathname.startsWith("/updates") ? "true" : "false"} onClick={() => router.push("/updates")}>Updates</button>
               </div>
 
@@ -265,7 +271,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                     value={q}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search"
-                    aria-label="Search locations"
+                    aria-label="Search safeLocations"
                   />
 
                   {effectiveIsMobile ? (
@@ -423,11 +429,11 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
               ) : null
             ) : null}
 
-            {filtered.length === 0 ? (
+            {filtered?.length || 0 === 0 ? (
               <div className="emptyList">No listings yet.</div>
             ) : (
               <div className="directoryListWrap">
-                {featuredPartners.length ? (
+                {featuredPartners?.length || 0 ? (
                   <div className="directoryGroupBlock">
                     <div className="directorySectionHeading">Featured partners</div>
                     {featuredPartners.map((l) => {
@@ -446,7 +452,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                   </div>
                 ) : null}
 
-                {groupedStandardListings.length ? (
+                {groupedStandardListings?.length || 0 ? (
                   <div className="directoryGroupBlock">
                     <div className="directorySectionHeading">Directory</div>
                     {groupedStandardListings.map((section) => (
@@ -490,7 +496,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
       <div className="mobileTabs" aria-label="Primary navigation">
         <a className="tabBtn" href="/">Calendar</a>
-        <a className="tabBtn" href="/locations" aria-current="page">Directory</a>
+        <a className="tabBtn" href="/safeLocations" aria-current="page">Directory</a>
         <a className="tabBtn" href="/updates">Updates</a>
       </div>
 
