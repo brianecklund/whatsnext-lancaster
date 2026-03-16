@@ -739,9 +739,15 @@ export default function HomeSplitClient({ events }: Props) {
     if (!effectiveIsMobile) setTaglineHidden(false);
   }, [effectiveIsMobile]);
 
+const mobileWeeklyOpen =
+    effectiveIsMobile && !!selectedDisplayKey && (selectedDisplayKey === WEEKLY_KEY || selectedDisplayKey.startsWith("__week__:"));
+
+  const mobileDetailOpen =
+    effectiveIsMobile && (!!selectedEvent || mobileWeeklyOpen);
+
 useEffect(() => {
   if (typeof document === "undefined") return;
-  if (!(effectiveIsMobile && mobileDetailOpen)) {
+  if (!mobileDetailOpen) {
     document.body.style.overflow = "";
     document.documentElement.style.overflow = "";
     return;
@@ -752,7 +758,7 @@ useEffect(() => {
     document.body.style.overflow = "";
     document.documentElement.style.overflow = "";
   };
-}, [effectiveIsMobile, mobileDetailOpen]);
+}, [mobileDetailOpen]);
 
   const showLeft = true;
 
@@ -788,12 +794,6 @@ useEffect(() => {
           { label: "NEWS", text: "Upcoming Lancaster events, specials, and pop-ups.", href: "#" },
         ];
   }, [events]);
-
-  const mobileWeeklyOpen =
-    effectiveIsMobile && !!selectedDisplayKey && (selectedDisplayKey === WEEKLY_KEY || selectedDisplayKey.startsWith("__week__:"));
-
-  const mobileDetailOpen =
-    effectiveIsMobile && (!!selectedEvent || mobileWeeklyOpen);
 
   const navigableEvents = useMemo(() => {
     return [...filteredEvents].sort((a, b) => {
