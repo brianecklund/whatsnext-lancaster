@@ -4,36 +4,52 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 const SELECTOR = [
+  ".newsBar",
   ".tagline",
-  ".leftSticky",
-  ".tabs .tabBtn",
-  ".leftControls > *",
-  ".typePills .typePill",
   ".weeklyOverview",
   ".weeklyMobilePanel",
   ".eventRow",
   ".weeklyCondensed .weeklyCondRow",
   ".weeklyCards .weeklyCard",
+  ".paneRight .detailCard",
   ".paneRight .detailCard > *",
   ".paneRight .weeklyList > *",
   ".paneRight .weekSummary",
   ".paneRight .weeklyCondensed > *",
   ".paneRight .weeklyCards > *",
   ".filterOverlayPanel > *",
+  ".mobileDetail .detailCard",
   ".mobileDetail .detailCard > *",
   ".menuOverlayLink",
-  ".newsBar",
   ".newsBar .nw__slider__item",
   ".directoryCard",
   ".directoryFeaturedCard",
   ".locationCard",
   ".updateCard",
-  ".updateRow",
-  ".dayJumpBtn"
+  ".updateRow"
 ].join(",");
 
 export default function RevealFX() {
   const pathname = usePathname();
+
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce) return;
+
+    try {
+      const KEY = "wnl_ui_load_v2";
+      if (!window.sessionStorage.getItem(KEY)) {
+        document.body.classList.add("ui-load-in");
+        window.sessionStorage.setItem(KEY, "1");
+        const t = window.setTimeout(() => {
+          document.body.classList.remove("ui-load-in");
+        }, 1900);
+        return () => window.clearTimeout(t);
+      }
+    } catch (e) {
+      // ignore storage issues
+    }
+  }, []);
 
   useEffect(() => {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -46,8 +62,9 @@ export default function RevealFX() {
     const unique = Array.from(new Set(all));
 
     unique.forEach((el, index) => {
+      el.classList.remove("reveal-visible");
       el.classList.add("reveal-ready");
-      el.style.setProperty("--reveal-delay", `${Math.min(index * 45, 520)}ms`);
+      el.style.setProperty("--reveal-delay", `${Math.min(index * 70, 720)}ms`);
     });
 
     const observer = new IntersectionObserver(
@@ -60,7 +77,7 @@ export default function RevealFX() {
             (node as HTMLElement).classList?.contains("reveal-ready")
           ) as HTMLElement[];
           const siblingIndex = Math.max(0, siblings.indexOf(el));
-          el.style.setProperty("--reveal-delay", `${Math.min(siblingIndex * 95, 620)}ms`);
+          el.style.setProperty("--reveal-delay", `${Math.min(siblingIndex * 120, 760)}ms`);
 
           window.requestAnimationFrame(() => {
             el.classList.add("reveal-visible");
@@ -69,8 +86,8 @@ export default function RevealFX() {
         });
       },
       {
-        threshold: 0.1,
-        rootMargin: "0px 0px -8% 0px",
+        threshold: 0.12,
+        rootMargin: "0px 0px -10% 0px",
       }
     );
 
