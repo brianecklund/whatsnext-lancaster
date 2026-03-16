@@ -11,6 +11,7 @@ import {
   resolveLocationUrl,
 } from '@/lib/prismic-venue';
 import { resolveVenueById, resolveVenueByName } from '@/lib/venue-import/resolve';
+import { seedEvents } from '@/data/seed-events';
 
 export const dynamic = 'force-dynamic';
 
@@ -75,7 +76,7 @@ export default async function HomePage() {
     if (lookup.venueNameKey) customLocationByName.set(lookup.venueNameKey, doc);
   }
 
-  const events: EventLite[] = docs.map((doc: any) => {
+  const prismicEvents: EventLite[] = docs.map((doc: any) => {
     const descText = asText(doc.data?.description);
     const eventWebsite = prismic.asLink(doc.data?.website_url);
     const ticketsUrl = prismic.asLink(doc.data?.tickets_url);
@@ -140,7 +141,25 @@ export default async function HomePage() {
       content_blocks: (doc.data?.content_blocks ?? doc.data?.slices ?? null) as any,
       location,
     } as EventLite;
-  }).sort((a, b) => {
+  });
+
+  const mergedEventMap = new Map<string, EventLite>();
+  const buildDedupKey = (event: EventLite) => {
+    const title = normalize(event.title);
+    const venue = normalize(event.locationName);
+    const start = normalize(event.start_datetime);
+    return [title, venue, start].join('|');
+  };
+
+  for (const event of seedEvents) {
+    mergedEventMap.set(buildDedupKey(event), event);
+  }
+
+  for (const event of prismicEvents) {
+    mergedEventMap.set(buildDedupKey(event), event);
+  }
+
+  const events = Array.from(mergedEventMap.values()).sort((a, b) => {
     const ta = a.start_datetime ? Date.parse(a.start_datetime) : Number.NaN;
     const tb = b.start_datetime ? Date.parse(b.start_datetime) : Number.NaN;
     const aValid = Number.isFinite(ta);
@@ -152,19 +171,7 @@ export default async function HomePage() {
   });
 
   if (prismicError) {
-    return (
-      <div style={{ padding: 24, maxWidth: 820 }}>
-        <h1 style={{ fontSize: 22, fontWeight: 500, marginBottom: 10 }}>Prismic is not returning events</h1>
-        <p style={{ marginBottom: 12, opacity: 0.9 }}>
-          This page couldn&apos;t fetch <code>event</code> documents from Prismic. The most common causes are a missing/incorrect <code>PRISMIC_REPO_NAME</code> and/or a missing access token when the repository is private.
-        </p>
-        <div style={{ padding: 12, border: '1px solid rgba(0,0,0,0.12)', borderRadius: 12 }}>
-          <div style={{ fontWeight: 500, marginBottom: 6 }}>Error</div>
-          <code style={{ whiteSpace: 'pre-wrap' }}>{prismicError}</code>
-        </div>
-        <p style={{ marginTop: 14, opacity: 0.9 }}>Debug endpoint: <code>/api/prismic-debug</code></p>
-      </div>
-    );
+    console.error('Prismic event fetch failed, using bundled seed events instead:', prismicError);
   }
 
   return <HomeSplitClient events={events} />;
