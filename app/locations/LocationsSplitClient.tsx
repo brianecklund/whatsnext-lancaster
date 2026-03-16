@@ -1,25 +1,12 @@
 "use client";
 
-import {
-  const safeLocations = Array.isArray(safeLocations) ? safeLocations : [];
- useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-// removed smooth wheel for directory
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
 import { mergeDirectoryCategories } from "@/lib/directoryCategories";
 
-function normalize(v: string) {
-  
-  useEffect(() => {
-    const open = document.querySelector('[data-overlay-open="true"]');
-    if(open){
-      document.body.style.overflow='hidden';
-    }else{
-      document.body.style.overflow='';
-    }
-  });
-
-return (v || "").toLowerCase().trim();
+function normalize(v?: string | null) {
+  return (v || "").toLowerCase().trim();
 }
 
 function getLetter(value?: string | null) {
@@ -30,19 +17,21 @@ function getLetter(value?: string | null) {
 type LocationRow = LocationLite & { key: string };
 type GroupedSection = { letter: string; rows: LocationRow[] };
 
+type Props = {
+  locations?: LocationRow[];
+};
+
 const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
-
-const safeLocations = useMemo(() => {
-  if (!Array.isArray(safeLocations)) return [];
-  return safeLocations;
-}, [safeLocations]);
-
-export default function LocationsSplitClient({ safeLocations = [] }: { safeLocations?: any[] }) {{ safeLocations }: { safeLocations: LocationRow[] }) {
-  // smooth wheel disabled for directory
+export default function LocationsSplitClient({ locations = [] }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
+
+  const safeLocations = useMemo<LocationRow[]>(
+    () => (Array.isArray(locations) ? locations : []),
+    [locations],
+  );
 
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -64,13 +53,13 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
     const mq = window.matchMedia("(max-width: 980px)");
     const apply = () => setIsMobile(mq.matches);
     apply();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const anyMq: any = mq;
+
     if (mq.addEventListener) mq.addEventListener("change", apply);
-    else if (anyMq.addListener) anyMq.addListener(apply);
+    else mq.addListener(apply);
+
     return () => {
       if (mq.removeEventListener) mq.removeEventListener("change", apply);
-      else if (anyMq.removeListener) anyMq.removeListener(apply);
+      else mq.removeListener(apply);
     };
   }, []);
 
@@ -82,13 +71,20 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
   }, [effectiveIsMobile]);
 
   useEffect(() => {
-    if (!filterOpen) return;
-    const previousOverflow = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = "hidden";
+    const shouldLock = filterOpen || (effectiveIsMobile && Boolean(selectedKey));
+    const previousHtmlOverflow = document.documentElement.style.overflow;
+    const previousBodyOverflow = document.body.style.overflow;
+
+    if (shouldLock) {
+      document.documentElement.style.overflow = "hidden";
+      document.body.style.overflow = "hidden";
+    }
+
     return () => {
-      document.documentElement.style.overflow = previousOverflow;
+      document.documentElement.style.overflow = previousHtmlOverflow;
+      document.body.style.overflow = previousBodyOverflow;
     };
-  }, [filterOpen]);
+  }, [filterOpen, effectiveIsMobile, selectedKey]);
 
   useEffect(() => {
     if (!effectiveIsMobile) {
@@ -105,7 +101,7 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
 
     let ro: ResizeObserver | null = null;
     if (typeof ResizeObserver !== "undefined" && leftStickyRef.current) {
-      ro = new ResizeObserver(() => updateOffset());
+      ro = new ResizeObserver(updateOffset);
       ro.observe(leftStickyRef.current);
     }
 
@@ -115,11 +111,9 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
     };
   }, [effectiveIsMobile, q, cat, filterOpen, desktopFilterOpen]);
 
-  const activeFilterLabel = cat ? `Filter: ${cat}` : "Filter";
-
   function navigate(params: URLSearchParams) {
     const qs = params.toString();
-    router.replace(qs ? `/safeLocations?${qs}` : "/safeLocations");
+    router.replace(qs ? `/locations?${qs}` : "/locations");
   }
 
   function setSelected(key: string) {
@@ -150,52 +144,74 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
     navigate(params);
   }
 
-  const categories = useMemo(() => mergeDirectoryCategories(safeLocations.map((location) => location.category)), [safeLocations]);
+  const categories = useMemo(
+    () => mergeDirectoryCategories(safeLocations.map((location) => location.category)),
+    [safeLocations],
+  );
 
   const filtered = useMemo(() => {
     const nq = normalize(q);
     const nc = normalize(cat);
 
     return safeLocations.filter((l) => {
-      const hay = normalize([l.name ?? "", l.address ?? "", l.category ?? "", l.description ?? ""].filter(Boolean).join(" "));
+      const hay = normalize(
+        [l.name ?? "", l.address ?? "", l.category ?? "", l.description ?? ""]
+          .filter(Boolean)
+          .join(" "),
+      );
       const matchesSearch = !nq || hay.includes(nq);
-      const matchesCat = !nc || normalize(l.category ?? "") === nc;
+      const matchesCat = !nc || normalize(l.category) === nc;
       return matchesSearch && matchesCat;
     });
   }, [safeLocations, q, cat]);
 
   const featuredPartners = useMemo(
-    () => filtered.filter((location) => Boolean(location.customPageUid)).sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")),
+    () =>
+      filtered
+        .filter((location) => Boolean(location.customPageUid))
+        .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")),
     [filtered],
   );
 
   const standardListings = useMemo(
-    () => filtered.filter((location) => !location.customPageUid).sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")),
+    () =>
+      filtered
+        .filter((location) => !location.customPageUid)
+        .sort((a, b) => (a.name ?? "").localeCompare(b.name ?? "")),
     [filtered],
   );
 
   const groupedStandardListings = useMemo<GroupedSection[]>(() => {
     const grouped = new Map<string, LocationRow[]>();
+
     for (const row of standardListings) {
       const letter = getLetter(row.name);
       const existing = grouped.get(letter) ?? [];
       existing.push(row);
       grouped.set(letter, existing);
     }
+
     return ALPHABET.filter((letter) => grouped.has(letter)).map((letter) => ({
       letter,
       rows: grouped.get(letter) ?? [],
     }));
   }, [standardListings]);
 
-  const visibleLetters = useMemo(() => groupedStandardListings.map((section) => section.letter), [groupedStandardListings]);
+  const visibleLetters = useMemo(
+    () => groupedStandardListings.map((section) => section.letter),
+    [groupedStandardListings],
+  );
+
+  const orderedLocations = useMemo(
+    () => [...featuredPartners, ...standardListings],
+    [featuredPartners, standardListings],
+  );
 
   const selectedDesktop = useMemo(() => {
-    if (!filtered?.length || 0) return null;
-    const ordered = [...featuredPartners, ...standardListings];
-    if (!selectedKey) return ordered[0] ?? null;
-    return filtered.find((l) => l.key === selectedKey) ?? ordered[0] ?? null;
-  }, [filtered, selectedKey, featuredPartners, standardListings]);
+    if (orderedLocations.length === 0) return null;
+    if (!selectedKey) return orderedLocations[0] ?? null;
+    return filtered.find((l) => l.key === selectedKey) ?? orderedLocations[0] ?? null;
+  }, [orderedLocations, selectedKey, filtered]);
 
   const selectedMobile = useMemo(() => {
     if (!selectedKey) return null;
@@ -203,23 +219,24 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
   }, [filtered, selectedKey]);
 
   useEffect(() => {
-    if (!visibleLetters?.length || 0) {
+    if (visibleLetters.length === 0) {
       setActiveLetter("#");
       return;
     }
     if (!visibleLetters.includes(activeLetter)) {
-      setActiveLetter(visibleLetters[0]);
+      setActiveLetter(visibleLetters[0] ?? "#");
     }
   }, [visibleLetters, activeLetter]);
 
   useEffect(() => {
     if (effectiveIsMobile) return;
     const container = leftScrollRef.current;
-    if (!container || !visibleLetters?.length || 0) return;
+    if (!container || visibleLetters.length === 0) return;
 
     const syncActiveLetter = () => {
       const containerRect = container.getBoundingClientRect();
-      let current = visibleLetters[0];
+      let current = visibleLetters[0] ?? "#";
+
       for (const letter of visibleLetters) {
         const section = sectionRefs.current[letter];
         if (!section) continue;
@@ -227,12 +244,14 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
         if (top <= 140) current = letter;
         else break;
       }
+
       setActiveLetter(current);
     };
 
     syncActiveLetter();
     container.addEventListener("scroll", syncActiveLetter, { passive: true });
     window.addEventListener("resize", syncActiveLetter);
+
     return () => {
       container.removeEventListener("scroll", syncActiveLetter);
       window.removeEventListener("resize", syncActiveLetter);
@@ -250,10 +269,18 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
     setActiveLetter(letter);
   }
 
-  const mobileDetailOpen = Boolean(selectedKey);
+  const mobileDetailOpen = effectiveIsMobile && Boolean(selectedMobile);
+  const activeFilterLabel = cat ? `Filter: ${cat}` : "Filter";
 
   return (
-    <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
+    <div
+      className="pageShell"
+      style={
+        effectiveIsMobile
+          ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties)
+          : undefined
+      }
+    >
       <div className="tagline">A directory of places in Lancaster to explore.</div>
 
       <div className="split">
@@ -261,9 +288,30 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
           <div className="scroll" ref={leftScrollRef}>
             <div className="leftSticky" ref={leftStickyRef}>
               <div className="tabs" aria-label="Primary navigation">
-                <button type="button" className="tabBtn" data-active={pathname === "/" ? "true" : "false"} onClick={() => router.push("/")}>Calendar</button>
-                <button type="button" className="tabBtn" data-active={pathname.startsWith("/safeLocations") ? "true" : "false"} onClick={() => router.push("/safeLocations")}>Directory</button>
-                <button type="button" className="tabBtn" data-active={pathname.startsWith("/updates") ? "true" : "false"} onClick={() => router.push("/updates")}>Updates</button>
+                <button
+                  type="button"
+                  className="tabBtn"
+                  data-active={pathname === "/" ? "true" : "false"}
+                  onClick={() => router.push("/")}
+                >
+                  Calendar
+                </button>
+                <button
+                  type="button"
+                  className="tabBtn"
+                  data-active={pathname.startsWith("/locations") ? "true" : "false"}
+                  onClick={() => router.push("/locations")}
+                >
+                  Directory
+                </button>
+                <button
+                  type="button"
+                  className="tabBtn"
+                  data-active={pathname.startsWith("/updates") ? "true" : "false"}
+                  onClick={() => router.push("/updates")}
+                >
+                  Updates
+                </button>
               </div>
 
               <div className="leftControls">
@@ -273,7 +321,7 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
                     value={q}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search"
-                    aria-label="Search safeLocations"
+                    aria-label="Search locations"
                   />
 
                   {effectiveIsMobile ? (
@@ -287,7 +335,7 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
                     >
                       {activeFilterLabel}
                     </button>
-                  ) : (q || cat) ? (
+                  ) : q || cat ? (
                     <button
                       className="clearBtn"
                       type="button"
@@ -349,7 +397,7 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
                             All
                           </button>
                           {categories.map((t) => {
-                            const on = normalize(cat ?? "") === normalize(t);
+                            const on = normalize(cat) === normalize(t);
                             return (
                               <button
                                 key={t}
@@ -373,75 +421,86 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
               </div>
             </div>
 
-            {effectiveIsMobile ? (
-              filterOpen ? (
-                <div className="mobileSheetOverlay" role="dialog" aria-modal="true" onClick={() => setFilterOpen(false)}>
-                  <div className="mobileSheet" onClick={(e) => e.stopPropagation()}>
-                    <div className="mobileSheetHeader">
-                      <div className="mobileSheetTitle">Directory filters</div>
-                      <button type="button" className="mobileSheetClose" onClick={() => setFilterOpen(false)} aria-label="Close filters">✕</button>
-                    </div>
-
-                    <div className="mobileSheetList" role="group" aria-label="Directory filters">
-                      <button
-                        type="button"
-                        className="mobileSheetAction"
-                        data-active={!cat ? "true" : "false"}
-                        onClick={() => {
-                          setCategory(null);
-                          setFilterOpen(false);
-                        }}
-                      >
-                        All
-                      </button>
-                      {categories.map((t) => {
-                        const on = normalize(cat ?? "") === normalize(t);
-                        return (
-                          <button
-                            key={t}
-                            type="button"
-                            className="mobileSheetAction"
-                            data-active={on ? "true" : "false"}
-                            onClick={() => {
-                              setCategory(on ? null : t);
-                              setFilterOpen(false);
-                            }}
-                          >
-                            {t}
-                          </button>
-                        );
-                      })}
-                    </div>
-
-                    {(q || cat) ? (
-                      <button
-                        type="button"
-                        className="mobileSheetClear"
-                        onClick={() => {
-                          setQuery("");
-                          setCategory(null);
-                          setFilterOpen(false);
-                        }}
-                      >
-                        Clear search & filters
-                      </button>
-                    ) : null}
+            {effectiveIsMobile && filterOpen ? (
+              <div className="mobileSheetOverlay" role="dialog" aria-modal="true" onClick={() => setFilterOpen(false)}>
+                <div className="mobileSheet" onClick={(e) => e.stopPropagation()}>
+                  <div className="mobileSheetHeader">
+                    <div className="mobileSheetTitle">Directory filters</div>
+                    <button
+                      type="button"
+                      className="mobileSheetClose"
+                      onClick={() => setFilterOpen(false)}
+                      aria-label="Close filters"
+                    >
+                      ✕
+                    </button>
                   </div>
+
+                  <div className="mobileSheetList" role="group" aria-label="Directory filters">
+                    <button
+                      type="button"
+                      className="mobileSheetAction"
+                      data-active={!cat ? "true" : "false"}
+                      onClick={() => {
+                        setCategory(null);
+                        setFilterOpen(false);
+                      }}
+                    >
+                      All
+                    </button>
+                    {categories.map((t) => {
+                      const on = normalize(cat) === normalize(t);
+                      return (
+                        <button
+                          key={t}
+                          type="button"
+                          className="mobileSheetAction"
+                          data-active={on ? "true" : "false"}
+                          onClick={() => {
+                            setCategory(on ? null : t);
+                            setFilterOpen(false);
+                          }}
+                        >
+                          {t}
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {q || cat ? (
+                    <button
+                      type="button"
+                      className="mobileSheetClear"
+                      onClick={() => {
+                        setQuery("");
+                        setCategory(null);
+                        setFilterOpen(false);
+                      }}
+                    >
+                      Clear search & filters
+                    </button>
+                  ) : null}
                 </div>
-              ) : null
+              </div>
             ) : null}
 
-            {filtered?.length || 0 === 0 ? (
+            {filtered.length === 0 ? (
               <div className="emptyList">No listings yet.</div>
             ) : (
               <div className="directoryListWrap">
-                {featuredPartners?.length || 0 ? (
+                {featuredPartners.length > 0 ? (
                   <div className="directoryGroupBlock">
                     <div className="directorySectionHeading">Featured partners</div>
                     {featuredPartners.map((l) => {
                       const active = selectedKey ? selectedKey === l.key : selectedDesktop?.key === l.key;
                       return (
-                        <button key={l.id} className="eventRow" data-active={active ? "true" : "false"} onClick={() => setSelected(l.key)} type="button">
+                        <button
+                          key={l.id}
+                          className="eventRow"
+                          data-active={active ? "true" : "false"}
+                          onClick={() => setSelected(l.key)}
+                          type="button"
+                        >
                           <span className="eventRowTitle">{l.name ?? "Untitled listing"}</span>
                           <span className="eventRowMeta">
                             {l.category ? <span>{l.category}</span> : null}
@@ -454,7 +513,7 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
                   </div>
                 ) : null}
 
-                {groupedStandardListings?.length || 0 ? (
+                {groupedStandardListings.length > 0 ? (
                   <div className="directoryGroupBlock">
                     <div className="directorySectionHeading">Directory</div>
                     {groupedStandardListings.map((section) => (
@@ -470,7 +529,13 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
                         {section.rows.map((l) => {
                           const active = selectedKey ? selectedKey === l.key : selectedDesktop?.key === l.key;
                           return (
-                            <button key={l.id} className="eventRow" data-active={active ? "true" : "false"} onClick={() => setSelected(l.key)} type="button">
+                            <button
+                              key={l.id}
+                              className="eventRow"
+                              data-active={active ? "true" : "false"}
+                              onClick={() => setSelected(l.key)}
+                              type="button"
+                            >
                               <span className="eventRowTitle">{l.name ?? "Untitled listing"}</span>
                               <span className="eventRowMeta">
                                 {l.category ? <span>{l.category}</span> : null}
@@ -491,20 +556,26 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
 
         <div className="pane paneRight">
           <div className="scroll">
-            {!selectedDesktop ? <div className="emptyRight">Select a listing to see details.</div> : <LocationDetail location={selectedDesktop} />}
+            {!selectedDesktop ? (
+              <div className="emptyRight">Select a listing to see details.</div>
+            ) : (
+              <LocationDetail location={selectedDesktop} />
+            )}
           </div>
         </div>
       </div>
 
       <div className="mobileTabs" aria-label="Primary navigation">
         <a className="tabBtn" href="/">Calendar</a>
-        <a className="tabBtn" href="/safeLocations" aria-current="page">Directory</a>
+        <a className="tabBtn" href="/locations" aria-current="page">Directory</a>
         <a className="tabBtn" href="/updates">Updates</a>
       </div>
 
       <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
         <div className="mobileDetailHeader">
-          <button className="backBtn" type="button" onClick={clearSelected}>Back</button>
+          <button className="backBtn" type="button" onClick={clearSelected}>
+            Back
+          </button>
           <div className="mobileDetailTitle">Listing</div>
         </div>
         <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
@@ -517,6 +588,7 @@ export default function LocationsSplitClient({ safeLocations = [] }: { safeLocat
 
 function LocationDetail({ location }: { location: LocationRow }) {
   const detailFlashKey = location.id ?? location.uid ?? location.name ?? "detail";
+
   return (
     <div key={detailFlashKey} className="detailCard detailFlash">
       <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
@@ -544,14 +616,10 @@ function LocationDetail({ location }: { location: LocationRow }) {
       ) : null}
 
       {location.description ? (
-        <div className="detailBody fadeInItem" style={{ marginTop: 14, animationDelay: "360ms" }}>
+        <div className="detailBody fadeInItem" style={{ animationDelay: "380ms" }}>
           <p>{location.description}</p>
         </div>
-      ) : (
-        <div className="detailBody fadeInItem" style={{ marginTop: 14, animationDelay: "360ms" }}>
-          <p className="muted">No description yet.</p>
-        </div>
-      )}
+      ) : null}
     </div>
   );
 }
