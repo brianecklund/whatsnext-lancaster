@@ -3252,3 +3252,43 @@ textarea,
     max-width: 100%;
   }
 }
+
+
+/* Ensure content never hides behind sticky UI */
+.left-column-content{
+  padding-top: 140px;
+}
+
+@media (max-width:768px){
+  .left-column-content{
+    padding-top:120px;
+  }
+}
+
+/* Scroll anchor offset for A-Z directory */
+:root{
+  scroll-padding-top:140px;
+}
+
+/* Depth for sticky UI areas */
+.sticky-ui{
+  box-shadow:0 8px 20px rgba(0,0,0,0.15);
+  background:white;
+  z-index:50;
+}
+
+/* Bottom mobile nav (calendar / directory / updates) */
+.mobile-bottom-nav{
+  position:fixed;
+  bottom:0;
+  left:0;
+  width:100%;
+  z-index:60;
+  box-shadow:0 -6px 20px rgba(0,0,0,0.15);
+  background:white;
+}
+
+/* Prevent content scrolling behind overlays */
+body.overlay-open{
+  overflow:hidden;
+}
