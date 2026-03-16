@@ -22,6 +22,18 @@ function norm(v: string) {
   return (v || "").toLowerCase().trim();
 }
 
+
+function tagIconFor(tag: string): string {
+  const t = norm(tag);
+  if (t.includes("opening") || t.includes("launch")) return "✦";
+  if (t.includes("food") || t.includes("drink") || t.includes("menu")) return "◔";
+  if (t.includes("music") || t.includes("show") || t.includes("concert")) return "♪";
+  if (t.includes("art") || t.includes("gallery")) return "✳";
+  if (t.includes("community") || t.includes("market")) return "◎";
+  if (t.includes("alert") || t.includes("psa") || t.includes("notice")) return "!";
+  return "•";
+}
+
 function UpdateDetail({ update }: { update: UpdateLite }) {
   const detailFlashKey = update?.id ?? update?.title ?? update?.date ?? "detail";
 
@@ -41,8 +53,9 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
       {update.tags?.length ? (
         <div className="tagRow" style={{ marginTop: 10 }}>
           {update.tags.map((t) => (
-            <span key={t} className="tagChip">
-              {t}
+            <span key={t} className="tagChip updateTagChip">
+              <span className="tagGlyph" aria-hidden>{tagIconFor(t)}</span>
+              <span>{t}</span>
             </span>
           ))}
         </div>
@@ -298,12 +311,15 @@ export default function UpdatesSplitClient({ updates }: Props) {
           type="button"
         >
           <span className="eventRowTitle">{u.title}</span>
-          <span className="eventRowMeta">{u.date ? <span>{u.date}</span> : null}</span>
+          <span className="eventRowMeta updateRowMeta">
+            {u.date ? <span className="updateDateBadge">{u.date}</span> : null}
+          </span>
           {u.tags?.length ? (
             <span className="tagRow" aria-label="Update tags">
               {u.tags.slice(0, 3).map((t) => (
-                <span key={t} className="tagChip">
-                  {t}
+                <span key={t} className="tagChip updateTagChip">
+                  <span className="tagGlyph" aria-hidden>{tagIconFor(t)}</span>
+                  <span>{t}</span>
                 </span>
               ))}
             </span>
