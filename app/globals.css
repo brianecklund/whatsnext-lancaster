@@ -1,5 +1,7 @@
 :root{
   /* Type */
+  --font-sans: "Inter", "Gabarito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --font-serif: Georgia, "Times New Roman", Times, serif;
   --baseSize: 18px;
   --fs-hero: 2.6rem;
   --fs-title: 1.6rem;
@@ -76,8 +78,7 @@ html{ font-size: var(--baseSize); }
 html,body{ height:100%; }
 body{
   margin:0;
-  /* Ensure calendar + directory list typography never falls back to a default */
-  font-family: "Gabarito", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+  font-family: var(--font-sans);
   background: var(--bg);
   color: var(--text);
   max-width: 100%;
@@ -96,6 +97,34 @@ button{
 input{
   -webkit-appearance: none;
   appearance: none;
+}
+
+.serifTitle,
+.detailTitle,
+.weeklyCardTitle,
+.eventRowTitle,
+.dayRightTitle,
+.weekSummaryTitle,
+.weeklyCondTitle,
+.dayTitle,
+.rightDayLabel{
+  font-family: var(--font-serif);
+}
+
+body,
+button,
+input,
+select,
+textarea,
+.eventRowMeta,
+.eventRowDesc,
+.weeklyCardTime,
+.weeklyCardMetaRow,
+.weeklyCardDesc,
+.dayRightMeta,
+.dayRightTime,
+.weekSummarySubhead{
+  font-family: var(--font-sans);
 }
 
 /* Prevent any horizontal overflow on mobile */
@@ -494,8 +523,10 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .weeklyCondTitle{
   font-weight: 600;
-  font-size: var(--fs-body);
-  letter-spacing: -0.01em;
+  font-size: clamp(1.04rem, 0.98rem + 0.15vw, 1.14rem);
+  letter-spacing: -0.015em;
+  line-height: 1.04;
+  transition: transform 220ms ease;
 }
 
 .weeklyCondMeta{
@@ -506,12 +537,13 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .weeklyCard{
   width: 100%;
   display: grid;
-  grid-template-columns: 168px 1fr;
-  gap: 14px;
-  padding: 14px;
+  grid-template-columns: 156px 1fr;
+  gap: 12px;
+  padding: 12px;
   border: 1px solid var(--border);
   border-radius: 18px;
   background: #fff;
+  transition: transform 220ms ease, box-shadow 220ms ease, background-color 220ms ease;
 }
 
 .weeklyCardMedia{
@@ -539,14 +571,14 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   min-width: 0;
   display:flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .weeklyCardTop{
   display:flex;
   align-items:flex-start;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
 }
 
 .weeklyCardTitleWrap{
@@ -555,18 +587,20 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .weeklyCardTitle{
-  font-weight: var(--fw-medium);
-  font-size: var(--fs-subhead);
-  letter-spacing: -0.01em;
-  line-height: 1.15;
+  font-weight: 600;
+  font-size: clamp(1.22rem, 1.08rem + 0.28vw, 1.46rem);
+  letter-spacing: -0.018em;
+  line-height: 1.02;
+  transition: transform 220ms ease;
 }
 
 .weeklyCardTime{
-  margin-top: 4px;
+  margin-top: 2px;
   text-align: left;
   font-weight: 500;
-  font-size: var(--fs-meta);
+  font-size: clamp(0.94rem, 0.9rem + 0.12vw, 1rem);
   color: var(--muted);
+  transition: transform 220ms ease;
 }
 
 .weeklyCardActions{
@@ -729,11 +763,11 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .dayTitle{
-  font-weight: var(--fw-medium);
-  font-size: var(--fs-meta);
-  letter-spacing: 0.02em;
-  text-transform: uppercase;
-  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: clamp(1rem, 0.94rem + 0.16vw, 1.12rem);
+  letter-spacing: -0.01em;
+  text-transform: none;
+  margin-bottom: 8px;
 }
 
 .eventRow{
@@ -741,30 +775,35 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   text-align: left;
   border: 0;
   background: transparent;
-  padding: 12px 14px;
-  border-radius: 10px;
+  padding: 10px 12px;
+  border-radius: 12px;
   cursor: pointer;
   display:flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
   color: var(--text);
+  transition: background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
-.eventRow:hover{ background: var(--hover); }
+.eventRow:hover{ background: var(--hover); transform: translateX(4px); }
 .eventRow[data-active="true"]{
   background: var(--accentSoft);
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.35) inset;
 }
 .eventRowTitle{
-  font-weight: var(--fw-medium);
-  font-size: var(--fs-body);
-  letter-spacing: -0.01em;
+  font-weight: 600;
+  font-size: clamp(1.16rem, 1.06rem + 0.22vw, 1.34rem);
+  letter-spacing: -0.015em;
+  line-height: 1.02;
+  transition: transform 220ms ease;
 }
 .eventRowMeta{
-  font-size: var(--fs-meta);
+  font-size: clamp(0.94rem, 0.9rem + 0.12vw, 1rem);
   color: var(--muted);
   display:flex;
   align-items:center;
   gap: 8px;
+  line-height: 1.3;
+  transition: transform 220ms ease;
 }
 .dot{ color: var(--border); }
 
@@ -774,17 +813,18 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .rightDayLabel{
-  font-weight: var(--fw-medium);
-  font-size: var(--fs-meta);
-  text-transform: uppercase;
-  letter-spacing: 0.02em;
+  font-weight: 600;
+  font-size: clamp(1.1rem, 1rem + 0.2vw, 1.24rem);
+  text-transform: none;
+  letter-spacing: -0.01em;
   margin-bottom: 10px;
 }
 
 .detailTitle{
-  font-weight: var(--fw-medium);
-  font-size: var(--fs-hero);
-  letter-spacing: -0.02em;
+  font-weight: 600;
+  font-size: clamp(2rem, 1.72rem + 0.7vw, 2.7rem);
+  letter-spacing: -0.03em;
+  line-height: 0.96;
   margin: 0 0 10px 0;
 }
 
@@ -1223,10 +1263,11 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 
 .eventRowDesc{
-  margin-top: 6px;
-  font-size: var(--fs-meta);
-  line-height: 1.25;
-  opacity: 0.85;
+  margin-top: 2px;
+  font-size: clamp(0.95rem, 0.92rem + 0.1vw, 1rem);
+  line-height: 1.32;
+  opacity: 0.88;
+  transition: transform 220ms ease, opacity 220ms ease;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -1409,8 +1450,9 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 .weekSummaryTitle{
   margin: 0;
   font-weight: 600;
-  font-size: var(--fs-subhead);
+  font-size: clamp(1.45rem, 1.28rem + 0.35vw, 1.75rem);
   letter-spacing: -0.02em;
+  line-height: 0.98;
 }
 .weekSummarySubhead{
   margin: 8px 0 14px 0;
@@ -1553,7 +1595,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 
 /* Typography rules (keep simple; never use bold weight) */
-body{ font-family: "Gabarito", system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif; font-weight: var(--fw-regular); line-height: var(--lh-relaxed); }
+body{ font-family: var(--font-sans); font-weight: var(--fw-regular); line-height: var(--lh-relaxed); }
 strong, b{ font-weight: var(--fw-medium); }
 
 /* Headings */
@@ -2076,18 +2118,22 @@ html{ scroll-behavior: auto; }
   gap: 10px;
 }
 .dayRightTitle{
-  font-weight: 650;
-  line-height: 1.2;
+  font-weight: 600;
+  font-size: clamp(1.08rem, 1rem + 0.2vw, 1.24rem);
+  line-height: 1.02;
+  transition: transform 220ms ease;
 }
 .dayRightTime{
-  font-size: 12px;
-  opacity: 0.75;
+  font-size: clamp(0.92rem, 0.9rem + 0.08vw, 0.98rem);
+  opacity: 0.78;
   white-space: nowrap;
+  transition: transform 220ms ease;
 }
 .dayRightMeta{
   margin-top: 4px;
-  font-size: 12px;
-  opacity: 0.75;
+  font-size: clamp(0.92rem, 0.9rem + 0.08vw, 0.98rem);
+  opacity: 0.78;
+  transition: transform 220ms ease;
 }
 
 
@@ -3001,4 +3047,25 @@ a:hover{
 
 @media (min-width: 981px){
   .mobileSheetOverlay{ display:none; }
+}
+
+@media (hover: hover) and (pointer: fine){
+  .eventRow:hover .eventRowTitle,
+  .eventRow:hover .eventRowMeta,
+  .eventRow:hover .eventRowDesc,
+  .weeklyCard:hover .weeklyCardTitle,
+  .weeklyCard:hover .weeklyCardTime,
+  .weeklyCard:hover .weeklyCardMetaRow,
+  .weeklyCard:hover .weeklyCardDesc,
+  .weeklyCondRow:hover .weeklyCondTitle,
+  .dayRightRow:hover .dayRightTitle,
+  .dayRightRow:hover .dayRightTime,
+  .dayRightRow:hover .dayRightMeta{
+    transform: translateX(6px);
+  }
+
+  .weeklyCard:hover{
+    transform: translateY(-2px);
+    box-shadow: var(--shadowSoft);
+  }
 }
