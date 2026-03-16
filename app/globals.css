@@ -4098,3 +4098,82 @@ svg:not(:root) {
     padding-top: 12px;
   }
 }
+
+
+/* March 16 mobile calendar/detail + directory anchor refinements */
+@media (max-width: 980px){
+  .pageShell[data-mobile-detail-open="true"]{
+    height: calc(100dvh - var(--headerH));
+    overflow: hidden;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .split,
+  .pageShell[data-mobile-detail-open="true"] .paneLeft{
+    height: 100%;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .paneLeft > .scroll{
+    overflow: hidden !important;
+  }
+
+  .mobileDetail{
+    position: fixed !important;
+    inset: var(--headerH) 0 0 0 !important;
+    z-index: 260 !important;
+    background: var(--bg) !important;
+    overscroll-behavior: contain;
+    touch-action: pan-y;
+  }
+
+  .mobileDetail[data-open="false"]{
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  .mobileDetail[data-open="true"]{
+    pointer-events: auto;
+    visibility: visible;
+  }
+
+  .mobileDetailScroll,
+  .mobileDetail > .scroll{
+    height: 100%;
+    padding: 0 16px calc(96px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mobileEventDetailCard,
+  .mobileWeeklyOverviewOpen{
+    min-height: 100%;
+    background: var(--bg);
+  }
+
+  .directoryToolbarMobile{
+    grid-template-columns: 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .directoryToolbarMobile .directoryAlphabetNav{
+    order: 0;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+    padding: 0;
+  }
+
+  .directoryToolbarMobile .directoryAlphaBtn{
+    width: 100%;
+    min-width: 0;
+    height: 32px;
+    padding: 0;
+    border-radius: 999px;
+  }
+
+  .directoryLetterSection{
+    scroll-margin-top: 132px;
+  }
+}

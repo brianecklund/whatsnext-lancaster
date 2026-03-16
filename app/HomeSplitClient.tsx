@@ -739,6 +739,21 @@ export default function HomeSplitClient({ events }: Props) {
     if (!effectiveIsMobile) setTaglineHidden(false);
   }, [effectiveIsMobile]);
 
+useEffect(() => {
+  if (typeof document === "undefined") return;
+  if (!(effectiveIsMobile && mobileDetailOpen)) {
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+    return;
+  }
+  document.body.style.overflow = "hidden";
+  document.documentElement.style.overflow = "hidden";
+  return () => {
+    document.body.style.overflow = "";
+    document.documentElement.style.overflow = "";
+  };
+}, [effectiveIsMobile, mobileDetailOpen]);
+
   const showLeft = true;
 
   // Desktop shows the split detail pane; mobile uses an overlay for details.
@@ -815,12 +830,14 @@ export default function HomeSplitClient({ events }: Props) {
   }
 
   return (<>
-    <NewsTickerBar
-      introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
-      items={newsTickerItems}
-    />
+    {!(effectiveIsMobile && mobileDetailOpen) ? (
+      <NewsTickerBar
+        introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
+        items={newsTickerItems}
+      />
+    ) : null}
 
-    <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
+    <div className="pageShell" data-mobile-detail-open={mobileDetailOpen ? "true" : "false"} style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
       <div className="split">
         {/* LEFT */}
         {showLeft ? (
@@ -1674,6 +1691,8 @@ export default function HomeSplitClient({ events }: Props) {
         className="mobileDetail"
         data-open={mobileDetailOpen ? "true" : "false"}
         aria-hidden={!mobileDetailOpen}
+        role="dialog"
+        aria-modal={mobileDetailOpen ? "true" : "false"}
       >
         <div className="scroll mobileDetailScroll">
           {selectedEvent ? (

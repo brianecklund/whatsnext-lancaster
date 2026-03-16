@@ -369,28 +369,28 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                   ) : null}
                 </div>
 
-                {!effectiveIsMobile ? (
-                  <div className="directoryToolbar">
-                    <div className="directoryAlphabetNav" aria-label="Directory alphabet navigation">
-                      {ALPHABET.map((letter) => {
-                        const enabled = visibleLetters.includes(letter);
-                        const active = activeLetter === letter;
-                        return (
-                          <button
-                            key={letter}
-                            type="button"
-                            className="directoryAlphaBtn"
-                            data-letter={letter}
-                            data-active={active ? "true" : "false"}
-                            disabled={!enabled}
-                            onClick={() => jumpToLetter(letter)}
-                          >
-                            {letter}
-                          </button>
-                        );
-                      })}
-                    </div>
+                <div className={`directoryToolbar${effectiveIsMobile ? " directoryToolbarMobile" : ""}`}>
+                  <div className="directoryAlphabetNav" aria-label="Directory alphabet navigation">
+                    {ALPHABET.map((letter) => {
+                      const enabled = visibleLetters.includes(letter);
+                      const active = activeLetter === letter;
+                      return (
+                        <button
+                          key={letter}
+                          type="button"
+                          className="directoryAlphaBtn"
+                          data-letter={letter}
+                          data-active={active ? "true" : "false"}
+                          disabled={!enabled}
+                          onClick={() => jumpToLetter(letter)}
+                        >
+                          {letter}
+                        </button>
+                      );
+                    })}
+                  </div>
 
+                  {!effectiveIsMobile ? (
                     <div className="directoryFilterWrap">
                       <button
                         type="button"
@@ -435,8 +435,8 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                         </div>
                       ) : null}
                     </div>
-                  </div>
-                ) : null}
+                  ) : null}
+                </div>
               </div>
             </div>
 
