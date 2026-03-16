@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import SplitPageLayout from "@/app/components/SplitPageLayout";
 import type { LocationLite } from "@/lib/types";
 import { mergeDirectoryCategories } from "@/lib/directoryCategories";
 
@@ -39,6 +40,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
   const [desktopFilterOpen, setDesktopFilterOpen] = useState(false);
   const [mobileOverlayOffset, setMobileOverlayOffset] = useState(0);
   const [activeLetter, setActiveLetter] = useState("#");
+  const [taglineHidden, setTaglineHidden] = useState(false);
 
   const leftStickyRef = useRef<HTMLDivElement | null>(null);
   const leftScrollRef = useRef<HTMLDivElement | null>(null);
@@ -66,7 +68,10 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
   const effectiveIsMobile = mounted ? isMobile : false;
 
   useEffect(() => {
-    if (!effectiveIsMobile) setFilterOpen(false);
+    if (!effectiveIsMobile) {
+      setFilterOpen(false);
+      setTaglineHidden(false);
+    }
     if (effectiveIsMobile) setDesktopFilterOpen(false);
   }, [effectiveIsMobile]);
 
@@ -273,20 +278,34 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
   const activeFilterLabel = cat ? `Filter: ${cat}` : "Filter";
 
   return (
-    <div
-      className="pageShell"
+    <SplitPageLayout
+      tagline="A directory of places in Lancaster to explore."
+      taglineHidden={taglineHidden}
+      isMobile={effectiveIsMobile}
+      current="directory"
       style={
         effectiveIsMobile
           ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties)
           : undefined
       }
+      mobileOverlay={
+        <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
+          <div className="mobileDetailHeader">
+            <button className="backBtn" type="button" onClick={clearSelected}>
+              Back
+            </button>
+            <div className="mobileDetailTitle">Listing</div>
+          </div>
+          <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
+            {selectedMobile ? <LocationDetail location={selectedMobile} /> : null}
+          </div>
+        </div>
+      }
     >
-      <div className="tagline">A directory of places in Lancaster to explore.</div>
-
       <div className="split">
         <div className="pane paneLeft">
-          <div className="scroll" ref={leftScrollRef}>
-            <div className="leftSticky" ref={leftStickyRef}>
+          <div className="scroll" ref={leftScrollRef} onScroll={(e) => { if (effectiveIsMobile) setTaglineHidden((e.currentTarget as HTMLDivElement).scrollTop > 2); }}>
+            <div className="leftSticky splitPageStickySurface" ref={leftStickyRef}>
               <div className="tabs" aria-label="Primary navigation">
                 <button
                   type="button"
@@ -484,6 +503,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
               </div>
             ) : null}
 
+            <div className="splitPageListBody">
             {filtered.length === 0 ? (
               <div className="emptyList">No listings yet.</div>
             ) : (
@@ -551,6 +571,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                 ) : null}
               </div>
             )}
+            </div>
           </div>
         </div>
 
@@ -564,25 +585,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
           </div>
         </div>
       </div>
-
-      <div className="mobileTabs" aria-label="Primary navigation">
-        <a className="tabBtn" href="/">Calendar</a>
-        <a className="tabBtn" href="/locations" aria-current="page">Directory</a>
-        <a className="tabBtn" href="/updates">Updates</a>
-      </div>
-
-      <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
-        <div className="mobileDetailHeader">
-          <button className="backBtn" type="button" onClick={clearSelected}>
-            Back
-          </button>
-          <div className="mobileDetailTitle">Listing</div>
-        </div>
-        <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
-          {selectedMobile ? <LocationDetail location={selectedMobile} /> : null}
-        </div>
-      </div>
-    </div>
+    </SplitPageLayout>
   );
 }
 

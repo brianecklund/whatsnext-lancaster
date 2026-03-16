@@ -3292,3 +3292,23 @@ textarea,
 body.overlay-open{
   overflow:hidden;
 }
+
+
+.splitPageStickySurface{
+  box-shadow: 0 10px 22px rgba(0,0,0,0.08);
+}
+
+.splitPageListBody{
+  padding-top: 12px;
+}
+
+@media (max-width: 980px){
+  .splitPageListBody{
+    padding-top: 8px;
+    padding-bottom: 88px;
+  }
+
+  .mobilePrimaryTabs{
+    display: flex;
+  }
+}
