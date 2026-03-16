@@ -4323,3 +4323,60 @@ svg:not(:root) {
     margin-bottom: 0;
   }
 }
+
+
+
+/* March 16 mobile spacing + directory anchor refinements */
+@media (max-width: 980px){
+  /* Keep calendar list content above sticky bottom bar */
+  .splitPageListBody,
+  .paneLeft .scroll,
+  .leftScroll,
+  .eventsList,
+  .calendarList{
+    padding-bottom: calc(110px + env(safe-area-inset-bottom, 0px)) !important;
+    box-sizing: border-box;
+  }
+
+  /* Mobile directory alphabet directly under search/filter in two rows */
+  .directoryAlphabetNavMobile{
+    display: grid !important;
+    grid-template-columns: repeat(14, minmax(0, 1fr));
+    gap: 6px;
+    margin-top: 8px;
+    margin-bottom: 6px;
+    order: 2;
+  }
+
+  .directoryToolbarMobile{
+    order: 3;
+  }
+
+  .directoryAlphabetNavMobile .directoryAlphaBtn{
+    min-width: 0;
+    padding: 8px 0;
+    font-size: 0.68rem;
+    line-height: 1;
+  }
+
+  /* Keep the intro line compact on mobile */
+  .newsBar{
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 10px;
+    min-height: 46px;
+  }
+
+  .newsBar__intro{
+    font-size: 0.78rem !important;
+    line-height: 1.1 !important;
+    letter-spacing: 0.005em;
+    white-space: nowrap !important;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .nw{
+    min-width: 190px;
+    max-width: min(54vw, 260px);
+  }
+}
