@@ -3580,3 +3580,71 @@ html[data-theme="ember-signal"]{
 }
 
 .topNav{ margin-left: auto; }
+
+/* THEMES */
+[data-theme="paper-ink"]{
+--bg:#ffffff;--text:#0a0a0a;--panel:#f3f3f3;--accent:#111;
+}
+[data-theme="night-shift"]{
+--bg:#0e1116;--text:#e6edf3;--panel:#1b2230;--accent:#7aa2ff;
+}
+[data-theme="moss-stone"]{
+--bg:#f4f6f2;--text:#1f2a1f;--panel:#e2e7df;--accent:#5f7a60;
+}
+[data-theme="ocean-blueprint"]{
+--bg:#f0f5ff;--text:#0d1b2a;--panel:#dde7ff;--accent:#3b6cff;
+}
+[data-theme="rose-room"]{
+--bg:#fff4f6;--text:#2a0f16;--panel:#ffe3ea;--accent:#d14b6c;
+}
+[data-theme="ember-signal"]{
+--bg:#fff6f2;--text:#2b140a;--panel:#ffe4d8;--accent:#ff6a3d;
+}
+
+/* INTRO SECTION */
+.introSection{
+display:grid;
+grid-template-columns:1fr 320px;
+gap:24px;
+padding:32px 0;
+border-bottom:1px solid var(--border);
+}
+
+.ticker{
+overflow:hidden;
+height:160px;
+position:relative;
+}
+
+.ticker-track{
+display:flex;
+flex-direction:column;
+animation:tickerScroll 18s linear infinite;
+}
+
+.ticker-item{
+padding:6px 0;
+font-size:.9rem;
+opacity:.8;
+}
+
+@keyframes tickerScroll{
+0%{transform:translateY(0)}
+100%{transform:translateY(-50%)}
+}
+
+@media(max-width:768px){
+.introSection{
+grid-template-columns:1fr;
+}
+.ticker{
+max-height:0;
+transition:max-height .35s ease;
+}
+.ticker.open{
+max-height:200px;
+}
+.mobileTickerToggle{
+margin-top:12px;
+}
+}
