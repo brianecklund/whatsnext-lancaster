@@ -4288,3 +4288,38 @@ svg:not(:root) {
     z-index: 320 !important;
   }
 }
+
+
+/* Mobile directory alphabet + calendar list bottom spacing */
+@media (max-width: 980px){
+  .directoryAlphabetNavMobile{
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    width: 100%;
+    margin: 8px 0 0 0;
+    padding: 0 0 2px 0;
+  }
+
+  .directoryAlphabetNavMobile .directoryAlphaBtn{
+    width: 100%;
+    min-width: 0;
+    height: 32px;
+    padding: 0;
+    border-radius: 999px;
+  }
+
+  .directoryToolbarMobile{
+    margin-top: 0;
+  }
+
+  .paneLeft > .scroll{
+    padding-bottom: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .dayBlock:last-child,
+  .monthWrap,
+  .emptyList{
+    margin-bottom: 0;
+  }
+}

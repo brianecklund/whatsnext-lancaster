@@ -369,8 +369,8 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                   ) : null}
                 </div>
 
-                <div className={`directoryToolbar${effectiveIsMobile ? " directoryToolbarMobile" : ""}`}>
-                  <div className="directoryAlphabetNav" aria-label="Directory alphabet navigation">
+                {effectiveIsMobile ? (
+                  <div className="directoryAlphabetNav directoryAlphabetNavMobile" aria-label="Directory alphabet navigation">
                     {ALPHABET.map((letter) => {
                       const enabled = visibleLetters.includes(letter);
                       const active = activeLetter === letter;
@@ -389,6 +389,30 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                       );
                     })}
                   </div>
+                ) : null}
+
+                <div className={`directoryToolbar${effectiveIsMobile ? " directoryToolbarMobile" : ""}`}>
+                  {!effectiveIsMobile ? (
+                    <div className="directoryAlphabetNav" aria-label="Directory alphabet navigation">
+                      {ALPHABET.map((letter) => {
+                        const enabled = visibleLetters.includes(letter);
+                        const active = activeLetter === letter;
+                        return (
+                          <button
+                            key={letter}
+                            type="button"
+                            className="directoryAlphaBtn"
+                            data-letter={letter}
+                            data-active={active ? "true" : "false"}
+                            disabled={!enabled}
+                            onClick={() => jumpToLetter(letter)}
+                          >
+                            {letter}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ) : null}
 
                   {!effectiveIsMobile ? (
                     <div className="directoryFilterWrap">
