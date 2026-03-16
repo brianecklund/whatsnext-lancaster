@@ -7,10 +7,28 @@ import type { LocationLite } from "@/lib/types";
 import { mergeDirectoryCategories } from "@/lib/directoryCategories";
 
 function normalize(v: string) {
-  return (v || "").toLowerCase().trim();
+  return (<>
+<AlphabetNav />v || "").toLowerCase().trim();
 }
 
 type LocationRow = LocationLite & { key: string };
+
+
+const alphabet = ["#","A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+
+function AlphabetNav(){
+  return (<>
+<AlphabetNav />
+    <div className="alphabetNav">
+      {alphabet.map(l=>(
+        <button key={l} onClick={()=> {
+          const el=document.querySelector(`[data-letter='${l}']`);
+          if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+        }}>{l}</button>
+      ))}
+    </div>
+  )
+}
 
 export default function LocationsSplitClient({ locations }: { locations: LocationRow[] }) {
   useSmoothWheel(".scroll");
@@ -37,7 +55,8 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
     const anyMq: any = mq;
     if (mq.addEventListener) mq.addEventListener("change", apply);
     else if (anyMq.addListener) anyMq.addListener(apply);
-    return () => {
+    return (<>
+<AlphabetNav />) => {
       if (mq.removeEventListener) mq.removeEventListener("change", apply);
       else if (anyMq.removeListener) anyMq.removeListener(apply);
     };
@@ -53,7 +72,8 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
     if (!filterOpen) return;
     const previousOverflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
-    return () => {
+    return (<>
+<AlphabetNav />) => {
       document.documentElement.style.overflow = previousOverflow;
     };
   }, [filterOpen]);
@@ -76,7 +96,8 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
       ro.observe(leftStickyRef.current);
     }
 
-    return () => {
+    return (<>
+<AlphabetNav />) => {
       window.removeEventListener("resize", updateOffset);
       ro?.disconnect();
     };
@@ -160,7 +181,8 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
     ...standardListings.map((location) => ({ type: "row", location } as const)),
   ];
 
-  return (
+  return (<>
+<AlphabetNav />
     <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
       <div className="tagline">A directory of places in Lancaster to explore.</div>
 
@@ -263,7 +285,8 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                       </button>
                       {categories.map((t) => {
                         const on = normalize(cat ?? "") === normalize(t);
-                        return (
+                        return (<>
+<AlphabetNav />
                           <button
                             key={t}
                             type="button"
@@ -308,7 +331,8 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
                 </button>
                 {categories.map((t) => {
                   const on = normalize(cat ?? "") === normalize(t);
-                  return (
+                  return (<>
+<AlphabetNav />
                     <button
                       key={t}
                       type="button"
@@ -329,7 +353,8 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
               <div style={{ paddingTop: 6 }}>
                 {groupedRows.map((item) => {
                   if (item.type === "heading") {
-                    return (
+                    return (<>
+<AlphabetNav />
                       <div key={item.label} className="directorySectionHeading">
                         {item.label}
                       </div>
@@ -338,7 +363,8 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
                   const l = item.location;
                   const active = selectedKey ? selectedKey === l.key : selectedDesktop?.key === l.key;
-                  return (
+                  return (<>
+<AlphabetNav />
                     <button
                       key={l.id}
                       className="eventRow"
@@ -402,7 +428,8 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
 function LocationDetail({ location }: { location: LocationRow }) {
   const detailFlashKey = location.id ?? location.uid ?? location.name ?? "detail";
-  return (
+  return (<>
+<AlphabetNav />
     <div key={detailFlashKey} className="detailCard detailFlash">
       <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
         {location.name ?? "Untitled listing"}
@@ -440,3 +467,5 @@ function LocationDetail({ location }: { location: LocationRow }) {
     </div>
   );
 }
+
+</>
