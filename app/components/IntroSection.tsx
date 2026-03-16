@@ -1,35 +1,56 @@
 
 "use client";
-import { useState } from "react";
 
-export default function IntroSection({children}:{children?:React.ReactNode}){
-const [open,setOpen]=useState(false)
+import { useEffect, useRef } from "react";
+import gsap from "gsap";
 
-const items=[
-"Live music tonight at Tellus 360",
-"Trivia at Southern Market Wednesday",
-"Open mic at West Art Tuesday",
-"Fulton Theatre mainstage this weekend",
-"Gallery opening at Ware Center Friday",
-"DJ set rooftop party Saturday"
-]
+const items = [
+  "Live music tonight at Tellus360",
+  "Open Mic at West Art",
+  "Trivia Night at Southern Market",
+  "Gallery Opening at Ware Center",
+  "Broadway Cabaret at Prima Theatre",
+  "New production at Fulton Theatre"
+];
 
-return(
-<section className="introSection">
-<div>
-{children}
-<button className="mobileTickerToggle" onClick={()=>setOpen(!open)}>
-{open ? "Close updates" : "Show updates"}
-</button>
-</div>
+export default function IntroSection() {
+  const track = useRef<HTMLDivElement | null>(null);
 
-<div className={`ticker ${open?"open":""}`}>
-<div className="ticker-track">
-{items.concat(items).map((i,idx)=>(
-<div key={idx} className="ticker-item">{i}</div>
-))}
-</div>
-</div>
-</section>
-)
+  useEffect(() => {
+    if (!track.current) return;
+
+    const children = Array.from(track.current.children);
+
+    gsap.to(children, {
+      yPercent: -100 * children.length,
+      duration: 30,
+      ease: "none",
+      repeat: -1,
+      modifiers: {
+        yPercent: gsap.utils.wrap(-100 * children.length, 0)
+      }
+    });
+  }, []);
+
+  return (
+    <section className="intro-section">
+      <div className="intro-left">
+        <h1>What's Next Lancaster</h1>
+        <p>
+          A live calendar of events, pop-ups, music, food, and happenings around
+          Lancaster, Pennsylvania.
+        </p>
+      </div>
+
+      <div className="intro-right ticker">
+        <div ref={track} className="ticker-track">
+          {items.concat(items).map((item, i) => (
+            <div key={i} className="ticker-item">
+              {item}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
 }
