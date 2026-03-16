@@ -1075,28 +1075,19 @@ export default function HomeSplitClient({ events }: Props) {
 
               {viewMode === "list" ? (
                 <>
-              {/* Weekly Overview (left) */}
-              <button
-                type="button"
-                className="weeklyOverview fadeInItem"
-                style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
-                data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
-                onClick={() => openWeek(WEEKLY_KEY)}
-              >
-                <div className="weeklyTitle">Weekly Overview</div>
-                <div className="weeklyCount">
-                  {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left
-                  this week
-                </div>
-              </button>
-                            </button>
-                          );
-                        })}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ) : null}
+                  {/* Weekly Overview (left) */}
+                  <button
+                    type="button"
+                    className="weeklyOverview fadeInItem"
+                    style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
+                    data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
+                    onClick={() => openWeek(WEEKLY_KEY)}
+                  >
+                    <div className="weeklyTitle">Weekly Overview</div>
+                    <div className="weeklyCount">
+                      {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left this week
+                    </div>
+                  </button>
 
 {leftDayGroups.length === 0 ? (
                 <div className="emptyList">No events match your search.</div>
