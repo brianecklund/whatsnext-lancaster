@@ -3138,8 +3138,9 @@ textarea,
 }
 
 .directoryToolbar{
-  display: flex;
-  align-items: center;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 12px;
   margin-top: 12px;
   position: relative;
@@ -3147,17 +3148,14 @@ textarea,
 
 .directoryAlphabetNav{
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
+  align-content: flex-start;
   gap: 6px;
   flex: 1 1 auto;
   min-width: 0;
-  overflow-x: auto;
   padding: 2px 0 4px;
-  scrollbar-width: none;
-}
-
-.directoryAlphabetNav::-webkit-scrollbar{
-  display: none;
+  max-width: 100%;
 }
 
 .directoryAlphaBtn{
@@ -3189,6 +3187,7 @@ textarea,
 .directoryFilterWrap{
   position: relative;
   flex: 0 0 auto;
+  align-self: start;
 }
 
 .directoryFilterMenu{
@@ -3245,5 +3244,11 @@ textarea,
   .directorySectionHeading,
   .directoryLetterHeading{
     position: static;
+  }
+}
+
+@media (min-width: 981px){
+  .directoryAlphabetNav{
+    max-width: 100%;
   }
 }

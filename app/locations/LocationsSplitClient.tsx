@@ -35,7 +35,6 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
   const leftStickyRef = useRef<HTMLDivElement | null>(null);
   const leftScrollRef = useRef<HTMLDivElement | null>(null);
-  const alphaNavRef = useRef<HTMLDivElement | null>(null);
   const sectionRefs = useRef<Record<string, HTMLDivElement | null>>({});
 
   const selectedKey = searchParams.get("location");
@@ -211,8 +210,6 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
         else break;
       }
       setActiveLetter(current);
-      const activeBtn = alphaNavRef.current?.querySelector<HTMLButtonElement>(`button[data-letter="${current}"]`);
-      activeBtn?.scrollIntoView({ inline: "center", block: "nearest", behavior: "smooth" });
     };
 
     syncActiveLetter();
@@ -289,7 +286,7 @@ export default function LocationsSplitClient({ locations }: { locations: Locatio
 
                 {!effectiveIsMobile ? (
                   <div className="directoryToolbar">
-                    <div className="directoryAlphabetNav" ref={alphaNavRef} aria-label="Directory alphabet navigation">
+                    <div className="directoryAlphabetNav" aria-label="Directory alphabet navigation">
                       {ALPHABET.map((letter) => {
                         const enabled = visibleLetters.includes(letter);
                         const active = activeLetter === letter;
