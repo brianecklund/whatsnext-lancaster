@@ -1,6 +1,6 @@
 "use client";
 
-import IntroSection from "./components/IntroSection";
+import NewsTickerBar from "./components/NewsTickerBar";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
@@ -754,6 +754,26 @@ export default function HomeSplitClient({ events }: Props) {
       })()
     : null;
 
+  const newsTickerItems = useMemo(() => {
+    const upcoming = [...events]
+      .map((event) => ({ event, date: safeDateFromEvent(event) }))
+      .filter((entry): entry is { event: EventLite; date: Date } => !!entry.date)
+      .filter(({ date }) => date.getTime() >= startOfToday().getTime())
+      .sort((a, b) => a.date.getTime() - b.date.getTime())
+      .slice(0, 6)
+      .map(({ event, date }) => ({
+        label: event.event_type ? event.event_type.toUpperCase() : "NEWS",
+        text: `${event.title ?? event.summary ?? "Upcoming event"} • ${event.locationName ?? "Lancaster"} • ${formatTimeLabel(date)}`,
+        href: "#",
+      }));
+
+    return upcoming.length
+      ? upcoming
+      : [
+          { label: "NEWS", text: "Upcoming Lancaster events, specials, and pop-ups.", href: "#" },
+        ];
+  }, [events]);
+
   const mobileDetailOpen =
     effectiveIsMobile && !!selectedEvent;
 
@@ -773,12 +793,12 @@ export default function HomeSplitClient({ events }: Props) {
   }
 
   return (<>
-    <IntroSection />
+    <NewsTickerBar
+      introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
+      items={newsTickerItems}
+    />
 
     <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
-      <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>
-        A calendar of events, specials, and pop-ups in Lancaster, PA.
-      </div>
       <div className="split">
         {/* LEFT */}
         {showLeft ? (

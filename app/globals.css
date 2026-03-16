@@ -3688,3 +3688,153 @@ margin-top:12px;
     height:120px;
   }
 }
+
+/* Thin news bar / CodePen ticker */
+.newsBar{
+  display:grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items:center;
+  gap: 20px;
+  min-height: 56px;
+  padding: 0 var(--gutter);
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  overflow: hidden;
+}
+
+.newsBar__intro{
+  min-width: 0;
+  font-size: 0.95rem;
+  line-height: 1.2;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+svg:not(:root) {
+  overflow: visible;
+}
+
+.nw {
+  min-width: 300px;
+  max-width: min(46vw, 520px);
+}
+.nw__inner {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.nw__wrapper {
+  overflow: hidden;
+  height: 2.4em;
+}
+.nw__slider {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  margin-right: 1.5em;
+  transform: translate3d(0, 0, 0);
+  transition: transform 0.5s ease-in-out;
+  will-change: transform;
+}
+.nw__slider__item {
+  display: flex;
+  align-items: center;
+  max-width: 30em;
+  height: 2.4em;
+}
+.nw__slider__link {
+  width: 100%;
+  line-height: 1.2;
+  letter-spacing: 0.025em;
+  max-height: 2.4em;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0.2);
+  text-decoration: none;
+  color: #00172F;
+  -webkit-box-orient: vertical;
+}
+.nw__slider__link strong {
+  font-weight: 700;
+}
+@media screen and (min-width: 768px) {
+  .nw__slider__link {
+    text-align: right;
+  }
+}
+.nw__progress {
+  width: 3em;
+  height: 3em;
+  flex-shrink: 0;
+  position: relative;
+}
+.nw__progress__icon {
+  width: 30px;
+  height: 30px;
+  position: absolute;
+  top: calc(50% - 1px);
+  left: calc(50% - 1px);
+  transform: translate(-50%, -50%);
+  fill: #00172F;
+}
+.nw__progress__indicator {
+  display: block;
+  width: 100%;
+}
+.nw__progress__indicator path {
+  stroke-width: 3;
+}
+.nw__progress__indicator path:nth-child(1) {
+  stroke: rgba(0, 23, 47, 0.1);
+}
+.nw__progress__indicator path:nth-child(2) {
+  stroke: #00172F;
+  z-index: 1;
+}
+
+@media (max-width: 768px){
+  .newsBar{
+    gap: 12px;
+    min-height: 48px;
+    padding: 0 16px;
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+
+  .newsBar__intro{
+    font-size: 0.8rem;
+  }
+
+  .nw{
+    min-width: 0;
+    max-width: min(56vw, 260px);
+  }
+
+  .nw__wrapper{
+    height: 2.2em;
+  }
+
+  .nw__slider__item{
+    max-width: 18em;
+    height: 2.2em;
+  }
+
+  .nw__slider__link{
+    font-size: 0.72rem;
+    text-align: right;
+  }
+
+  .nw__progress{
+    width: 2.5em;
+    height: 2.5em;
+  }
+
+  .nw__progress__icon{
+    width: 24px;
+    height: 24px;
+  }
+}
