@@ -1,5 +1,6 @@
-import IntroSection from "./components/IntroSection";
 "use client";
+
+import IntroSection from "./components/IntroSection";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
@@ -49,9 +50,7 @@ type Props = {
 const WEEKLY_KEY = "__weekly__";
 
 function norm(v: string) {
-  return (<>
-<IntroSection />
-v || "").toLowerCase().trim();
+  return (v || "").toLowerCase().trim();
 }
 
 function safeDateFromEvent(e: EventLite): Date | null {
@@ -319,9 +318,7 @@ export default function HomeSplitClient({ events }: Props) {
       document.body.classList.remove("wnl-intro");
     }, 1400);
 
-    return (<>
-<IntroSection />
-) => window.clearTimeout(t);
+    return () => window.clearTimeout(t);
   }, []);
 
   // default selection = weekly overview
@@ -384,9 +381,7 @@ export default function HomeSplitClient({ events }: Props) {
     const anyMq: any = mq;
     if (mq.addEventListener) mq.addEventListener("change", apply);
     else if (anyMq.addListener) anyMq.addListener(apply);
-    return (<>
-<IntroSection />
-) => {
+    return () => {
       if (mq.removeEventListener) mq.removeEventListener("change", apply);
       else if (anyMq.removeListener) anyMq.removeListener(apply);
     };
@@ -411,9 +406,7 @@ export default function HomeSplitClient({ events }: Props) {
       ro.observe(leftStickyRef.current);
     }
 
-    return (<>
-<IntroSection />
-) => {
+    return () => {
       window.removeEventListener("resize", updateOffset);
       ro?.disconnect();
     };
@@ -780,7 +773,7 @@ export default function HomeSplitClient({ events }: Props) {
   }
 
   return (<>
-<IntroSection />
+    <IntroSection />
 
     <div className="pageShell" style={effectiveIsMobile ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties) : undefined}>
       <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>
@@ -837,9 +830,7 @@ export default function HomeSplitClient({ events }: Props) {
                             : entry.index === parseDayKey(currentDisplayDayKey)?.getDay()
                           : false;
 
-                        return (<>
-<IntroSection />
-
+                        return (
                           <button
                             key={entry.label}
                             type="button"
@@ -937,9 +928,7 @@ export default function HomeSplitClient({ events }: Props) {
                       </button>
                       {eventTypes.map((t) => {
                         const on = norm(type) === norm(t);
-                        return (<>
-<IntroSection />
-
+                        return (
                           <button
                             key={t}
                             type="button"
@@ -1022,9 +1011,7 @@ export default function HomeSplitClient({ events }: Props) {
                       </button>
                       {eventTypes.map((t) => {
                         const on = norm(type) === norm(t);
-                        return (<>
-<IntroSection />
-
+                        return (
                           <button
                             key={t}
                             type="button"
@@ -1096,9 +1083,7 @@ export default function HomeSplitClient({ events }: Props) {
                             .filter(Boolean)
                             .join(" • ");
 
-                          return (<>
-<IntroSection />
-
+                          return (
                             <button
                               key={e.id}
                               type="button"
@@ -1139,9 +1124,7 @@ export default function HomeSplitClient({ events }: Props) {
                     const d = safeDateFromEvent(e);
                     const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
 
-                    return (<>
-<IntroSection />
-
+                    return (
                       <button
                         key={e.id}
                         className="eventRow fadeInItem"
@@ -1166,9 +1149,7 @@ export default function HomeSplitClient({ events }: Props) {
                             (e.summary ?? "") || (pickDescriptionText(e) ?? "");
                           const s = (raw || "").trim();
                           if (!s) return null;
-                          return (<>
-<IntroSection />
-
+                          return (
                             <div className="eventRowDesc">
                               {s.length > 180 ? `${s.slice(0, 180).trim()}…` : s}
                             </div>
@@ -1226,9 +1207,7 @@ export default function HomeSplitClient({ events }: Props) {
                         if (!c.ymd) return <div key={`e-${i}`} className="monthCell empty" />;
                         const dayNum = Number(c.ymd.split("-")[2]);
                         const active = c.ymd === selectedDayStr;
-                        return (<>
-<IntroSection />
-
+                        return (
                           <button
                             key={c.ymd}
                             type="button"
@@ -1268,9 +1247,7 @@ export default function HomeSplitClient({ events }: Props) {
                             const d = safeDateFromEvent(e);
                             const timeLabel = d ? formatTimeShort(d) : "Time TBD";
                             const venueBits = [e.locationName, e.event_type].filter(Boolean).join(" • ");
-                            return (<>
-<IntroSection />
-
+                            return (
                               <button
                                 key={key}
                                 type="button"
@@ -1328,9 +1305,7 @@ export default function HomeSplitClient({ events }: Props) {
                         const timeLabel = d ? formatTimeShort(d) : "Time TBD";
                         const venueBits = [e.locationName, e.event_type].filter(Boolean).join(" • ");
 
-                        return (<>
-<IntroSection />
-
+                        return (
                           <button
                             key={key}
                             type="button"
@@ -1430,9 +1405,7 @@ export default function HomeSplitClient({ events }: Props) {
                       <div className="weeklyInsightsBar" aria-label="Week visualizations">
                         {Object.entries(weekInsights).map(([label, rawCount]) => {
                           const count = Number(rawCount) || 0;
-                          return (<>
-<IntroSection />
-
+                          return (
                           <div key={label} className="weeklyInsightMetric">
                             <div className="weeklyInsightTop">
                               <span>{label}</span>
@@ -1463,9 +1436,7 @@ export default function HomeSplitClient({ events }: Props) {
                               const img = pickImageUrl(e);
                               const desc = (pickDescriptionText(e) || e.summary || "").trim();
 
-                              return (<>
-<IntroSection />
-
+                              return (
                                 <button
                                   key={e.id}
                                   type="button"
@@ -1552,9 +1523,7 @@ export default function HomeSplitClient({ events }: Props) {
                         const timeLabel = d ? formatTimeShort(d) : "Time TBD";
                         const venueBits = [e.locationName, e.event_type].filter(Boolean).join(" • ");
 
-                        return (<>
-<IntroSection />
-
+                        return (
                           <button
                             key={key}
                             type="button"
