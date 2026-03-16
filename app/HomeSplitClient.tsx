@@ -774,8 +774,30 @@ export default function HomeSplitClient({ events }: Props) {
         ];
   }, [events]);
 
+  const mobileWeeklyOpen =
+    effectiveIsMobile && !!selectedDisplayKey && (selectedDisplayKey === WEEKLY_KEY || selectedDisplayKey.startsWith("__week__:"));
+
   const mobileDetailOpen =
-    effectiveIsMobile && !!selectedEvent;
+    effectiveIsMobile && (!!selectedEvent || mobileWeeklyOpen);
+
+  const navigableEvents = useMemo(() => {
+    return [...filteredEvents].sort((a, b) => {
+      const da = safeDateFromEvent(a)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+      const db = safeDateFromEvent(b)?.getTime() ?? Number.MAX_SAFE_INTEGER;
+      if (da !== db) return da - db;
+      return (a.title ?? "").localeCompare(b.title ?? "");
+    });
+  }, [filteredEvents]);
+
+  const selectedEventIndex = useMemo(() => {
+    if (!selectedEvent) return -1;
+    return navigableEvents.findIndex((e) => (selectedEvent.uid && e.uid ? e.uid === selectedEvent.uid : e.id === selectedEvent.id));
+  }, [navigableEvents, selectedEvent]);
+
+  const previousEventKey = selectedEventIndex > 0 ? (navigableEvents[selectedEventIndex - 1].uid ?? navigableEvents[selectedEventIndex - 1].id) : null;
+  const nextEventKey = selectedEventIndex >= 0 && selectedEventIndex < navigableEvents.length - 1
+    ? (navigableEvents[selectedEventIndex + 1].uid ?? navigableEvents[selectedEventIndex + 1].id)
+    : null;
 
   function clearSelected() {
     setClientSelectedKey(null);
@@ -1067,56 +1089,6 @@ export default function HomeSplitClient({ events }: Props) {
                   this week
                 </div>
               </button>
-
-              
-              {effectiveIsMobile && (selectedWeekBucket ?? defaultWeekBucket) ? (
-                <div className="weeklyMobilePanel fadeInItem" style={{ animationDelay: "320ms" }}>
-                  <div className="weekSummaryMini">
-                    <div className="weekSummaryMiniTitle">Week of {(selectedWeekBucket ?? defaultWeekBucket)?.rangeLabel}</div>
-                    <div className="weekSummaryMiniGrid" role="list">
-                      <div className="weekSummaryMiniCard" role="listitem">
-                        <div className="weekSummaryMiniKicker">Total</div>
-                        <div className="weekSummaryMiniValue">{(selectedWeekBucket ?? defaultWeekBucket)?.events.length ?? 0}</div>
-                      </div>
-                      <div className="weekSummaryMiniCard" role="listitem">
-                        <div className="weekSummaryMiniKicker">Live</div>
-                        <div className="weekSummaryMiniValue">{weekInsights["Live music"]}</div>
-                      </div>
-                      <div className="weekSummaryMiniCard" role="listitem">
-                        <div className="weekSummaryMiniKicker">Food</div>
-                        <div className="weekSummaryMiniValue">{weekInsights["Food & drink"]}</div>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="weeklyCondensed" aria-label="Weekly overview (condensed)">
-                    {weekGroups.map((g) => (
-                      <div key={dayKey(g.date)}>
-                        <div className="weeklyCondensedDayTitle">{formatDayHeading(g.date)}</div>
-
-                        {g.items.map((e) => {
-                          const title = e.title || "Untitled event";
-                          const d = safeDateFromEvent(e);
-                          const timeLabel = d ? formatTimeShort(d) : "Time TBD";
-
-                          const venueBits = [e.locationName, e.event_type]
-                            .filter(Boolean)
-                            .join(" • ");
-
-                          return (
-                            <button
-                              key={e.id}
-                              type="button"
-                              className="weeklyCondRow"
-                              onClick={() => openSelected(e.uid ?? e.id)}
-                            >
-                              <div className="weeklyCondTop">
-                                <div className="weeklyCondTime">{timeLabel}</div>
-                                <div className="weeklyCondTitle">{title}</div>
-                              </div>
-                              {venueBits ? (
-                                <div className="weeklyCondMeta">{venueBits}</div>
-                              ) : null}
                             </button>
                           );
                         })}
@@ -1648,35 +1620,65 @@ export default function HomeSplitClient({ events }: Props) {
 
       {/* Mobile bottom tabs */}
       {effectiveIsMobile ? (
-        <div className="mobileTabs" aria-label="Primary navigation">
-          <button
-            type="button"
-            className="tabBtn"
-            data-active={pathname === "/" ? "true" : "false"}
-            onClick={() => router.push("/")}
-          >
-            Calendar
-          </button>
-          <button
-            type="button"
-            className="tabBtn"
-            data-active={pathname?.startsWith("/locations") ? "true" : "false"}
-            onClick={() => router.push("/locations")}
-          >
-            Directory
-          </button>
-          <button
-            type="button"
-            className="tabBtn"
-            data-active={pathname?.startsWith("/updates") ? "true" : "false"}
-            onClick={() => router.push("/updates")}
-          >
-            Updates
-          </button>
-        </div>
+        mobileDetailOpen ? (
+          <div className="mobileTabs mobileTabsDetail" aria-label="Event navigation">
+            <button
+              type="button"
+              className="tabBtn"
+              onClick={() => previousEventKey && openSelected(previousEventKey)}
+              disabled={!previousEventKey}
+              aria-disabled={!previousEventKey}
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              onClick={clearSelected}
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              onClick={() => nextEventKey && openSelected(nextEventKey)}
+              disabled={!nextEventKey}
+              aria-disabled={!nextEventKey}
+            >
+              Next
+            </button>
+          </div>
+        ) : (
+          <div className="mobileTabs" aria-label="Primary navigation">
+            <button
+              type="button"
+              className="tabBtn"
+              data-active={pathname === "/" ? "true" : "false"}
+              onClick={() => router.push("/")}
+            >
+              Calendar
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+              onClick={() => router.push("/locations")}
+            >
+              Directory
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+              onClick={() => router.push("/updates")}
+            >
+              Updates
+            </button>
+          </div>
+        )
       ) : null}
-    
-      {/* Mobile detail overlay (matches Directory/Updates behavior) */}
+
+      {/* Mobile detail overlay */}
       <div
         className="mobileDetail"
         data-open={mobileDetailOpen ? "true" : "false"}
@@ -1686,48 +1688,115 @@ export default function HomeSplitClient({ events }: Props) {
           <button className="backBtn" type="button" onClick={clearSelected}>
             Back
           </button>
-          <div className="mobileDetailTitle">Event</div>
+          <div className="mobileDetailTitle">{selectedEvent ? "Event" : "Weekly Overview"}</div>
         </div>
-        <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
+        <div className="scroll mobileDetailScroll">
           {selectedEvent ? (
-            <div key={detailFlashKey} className="detailCard detailFlash">
+            <div key={detailFlashKey} className="detailCard detailFlash mobileEventDetailCard">
               <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
               <div className="detailMeta">
                 <span className="muted">{selectedTime ?? "Time TBD"}</span>
                 {selectedEvent.event_type ? <span className="badge">{selectedEvent.event_type}</span> : null}
               </div>
               {selectedImg ? (
-                <div className="media16x9" style={{ marginTop: 14 }}>
+                <div className="media16x9 mobileEventHero">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={selectedImg} alt="" />
-                  {selectedDesc ? <div className="mediaDescBtn">{selectedDesc.slice(0, 120)}</div> : null}
                 </div>
               ) : null}
               {selectedDesc ? (
-                <div className="detailBody" style={{ marginTop: 14 }}>
+                <div className="detailBody mobileEventDetailBody">
                   <p>{selectedDesc}</p>
                 </div>
               ) : (
-                <div className="detailBody" style={{ marginTop: 14 }}>
+                <div className="detailBody mobileEventDetailBody">
                   <p className="muted">No description yet.</p>
                 </div>
               )}
-              {selectedEvent.website_url ? (
-                <p style={{ marginTop: 12 }}>
-                  <a className="link" href={selectedEvent.website_url} target="_blank" rel="noreferrer">
-                    Website
-                  </a>
-                </p>
-              ) : null}
-              {selectedEvent.tickets_url ? (
-                <p style={{ marginTop: 8 }}>
-                  <a className="link" href={selectedEvent.tickets_url} target="_blank" rel="noreferrer">
-                    Tickets
-                  </a>
-                </p>
-              ) : null}
-
               <MediaBlocks slices={(selectedEvent as any)?.content_blocks} />
+              {(selectedEvent.website_url || selectedEvent.tickets_url) ? (
+                <div className="ctaRow">
+                  {selectedEvent.website_url ? (
+                    <a className="ctaBtn" href={selectedEvent.website_url} target="_blank" rel="noreferrer">Website</a>
+                  ) : null}
+                  {selectedEvent.tickets_url ? (
+                    <a className="ctaBtn" href={selectedEvent.tickets_url} target="_blank" rel="noreferrer">Tickets</a>
+                  ) : null}
+                </div>
+              ) : null}
+            </div>
+          ) : selectedWeekBucket ? (
+            <div className="weeklyOverviewLanding mobileWeeklyOverviewOpen">
+              <div className="weekSummary fadeInItem" style={{ animationDelay: "180ms" }}>
+                <div className="weekSummaryTopline">
+                  <div>
+                    <div className="rightDayLabel">Weekly Overview</div>
+                    <h3 className="weekSummaryTitle">{selectedWeekBucket.label}</h3>
+                  </div>
+                  <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
+                </div>
+
+                <div className="weekSummaryGrid" role="list">
+                  <div className="weekSummaryCard" role="listitem">
+                    <div className="weekSummaryKicker">Events</div>
+                    <div className="weekSummaryValue">{selectedWeekBucket.events.length}</div>
+                  </div>
+                  <div className="weekSummaryCard" role="listitem">
+                    <div className="weekSummaryKicker">Live music</div>
+                    <div className="weekSummaryValue">{weekInsights["Live music"]}</div>
+                  </div>
+                  <div className="weekSummaryCard" role="listitem">
+                    <div className="weekSummaryKicker">Food & drink</div>
+                    <div className="weekSummaryValue">{weekInsights["Food & drink"]}</div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="weeklyLanding fadeInItem" style={{ animationDelay: "260ms" }}>
+                <div className="weeklyCards">
+                  {weekGroups.map((g) => (
+                    <div key={dayKey(g.date)} className="weeklyDayGroup">
+                      <div className="weeklyCondensedDayTitle">{formatDayHeading(g.date)}</div>
+                      {g.items.map((e) => {
+                        const title = e.title || "Untitled event";
+                        const d = safeDateFromEvent(e);
+                        const timeLabel = d ? formatTimeShort(d) : "Time TBD";
+                        const desc = pickDescriptionText(e);
+                        const img = pickImageUrl(e);
+                        return (
+                          <button
+                            key={e.id}
+                            type="button"
+                            className="weeklyCard weeklyCardSelectable"
+                            onClick={() => openSelected(e.uid ?? e.id)}
+                          >
+                            <div className="weeklyCardMedia">
+                              {img ? (
+                                <div className="media16x9">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img className="weeklyThumb" src={img} alt="" />
+                                </div>
+                              ) : (
+                                <div className="media16x9 weeklyThumbPlaceholder" aria-hidden />
+                              )}
+                            </div>
+                            <div className="weeklyCardContent weeklyCardContentExpanded">
+                              <div className="weeklyCardTop">
+                                <div className="weeklyCardTitleWrap">
+                                  <div className="weeklyCardTitle">{title}</div>
+                                  <div className="weeklyCardTime">{timeLabel}</div>
+                                </div>
+                              </div>
+                              <div className="weeklyCardMetaRow">{[e.locationName, e.event_type].filter(Boolean).join(" • ")}</div>
+                              {desc ? <div className="weeklyCardDesc">{desc.length > 180 ? `${desc.slice(0, 180).trim()}…` : desc}</div> : null}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           ) : null}
         </div>
