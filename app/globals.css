@@ -4177,3 +4177,106 @@ svg:not(:root) {
     scroll-margin-top: 132px;
   }
 }
+
+
+/* March 16 late mobile spacing + calendar detail controls refinements */
+@media (max-width: 980px){
+  :root{ --headerH: 54px; }
+
+  .siteHeader{
+    height: var(--headerH);
+    padding: 6px 12px 4px 12px !important;
+    align-items: center !important;
+  }
+
+  .brand{
+    font-size: 0.96rem !important;
+    line-height: 1 !important;
+    max-width: calc(100% - 88px);
+    letter-spacing: -0.015em;
+  }
+
+  .headerActions{
+    gap: 6px !important;
+  }
+
+  .themeToggleBtn,
+  .hamburgerBtn{
+    width: 34px !important;
+    height: 34px !important;
+    min-width: 34px;
+    border-radius: 10px !important;
+    margin-top: 0 !important;
+    box-shadow: none;
+  }
+
+  .themeToggleIcon,
+  .themeToggleIcon svg{
+    width: 16px;
+    height: 16px;
+  }
+
+  .hamburgerIcon{
+    width: 17px;
+    gap: 4px;
+  }
+
+  .leftSticky{
+    padding: 4px 0 4px 0 !important;
+  }
+
+  .calendarToolbar{
+    gap: 4px !important;
+  }
+
+  .calendarSearchRowMobile,
+  .searchRow.calendarSearchRowMobile{
+    margin-bottom: 0 !important;
+    row-gap: 0 !important;
+  }
+
+  .calendarSearchRowMobile .searchInput,
+  .calendarSearchRowMobile .viewBtn,
+  .calendarSearchRowMobile .filterBtn{
+    height: 40px;
+  }
+
+  .dayJumpRail{
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    gap: 4px;
+  }
+
+  .dayJumpBtn{
+    height: 34px;
+  }
+
+  .paneLeft > .scroll{
+    padding-top: 0 !important;
+  }
+
+  .mobileDetail{
+    inset: var(--headerH) 0 0 0 !important;
+  }
+
+  .mobileDetailScroll,
+  .mobileDetail > .scroll{
+    padding: 0 12px calc(92px + env(safe-area-inset-bottom, 0px)) 12px !important;
+  }
+
+  .mobileDetail .detailTitle{
+    padding-top: 8px !important;
+  }
+
+  .mobileTabs,
+  .mobileTabsDetail{
+    padding: 8px 12px calc(8px + env(safe-area-inset-bottom)) !important;
+    gap: 10px !important;
+  }
+
+  .mobileTabs .tabBtn,
+  .mobileTabsDetail .tabBtn{
+    height: 46px !important;
+    font-size: 0.96rem;
+  }
+}
