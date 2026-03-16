@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { DEFAULT_THEME, THEME_PALETTES, type ThemeKey } from "./theme-palettes";
 
 const LINKS = [
   { href: "/", label: "Calendar" },
@@ -14,29 +15,113 @@ const LINKS = [
   { href: "/contact", label: "Contact" },
 ];
 
+function ThemeIcon({ theme }: { theme: ThemeKey }) {
+  switch (theme) {
+    case "paper-ink":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+          <circle cx="12" cy="12" r="7" stroke="currentColor" strokeWidth="1.8" />
+          <circle cx="12" cy="12" r="2.4" fill="currentColor" />
+        </svg>
+      );
+    case "night-shift":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M15.8 3.6a8.9 8.9 0 1 0 4.6 16.3A9.6 9.6 0 0 1 15.8 3.6Z" fill="currentColor" />
+        </svg>
+      );
+    case "moss-stone":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M12 3.8c4.7 0 8.5 3.8 8.5 8.5S16.7 20.8 12 20.8 3.5 17 3.5 12.3 7.3 3.8 12 3.8Z" stroke="currentColor" strokeWidth="1.8" />
+          <path d="M12 6.2c-1.9 2.1-3 4-3 5.8 0 1.9 1.3 3.3 3 3.3s3-1.4 3-3.3c0-1.8-1.1-3.7-3-5.8Z" fill="currentColor" />
+        </svg>
+      );
+    case "ocean-blueprint":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M4 14c1.6-1.8 3.2-2.7 4.8-2.7S12 12.2 13.6 14c1.6 1.8 3.2 2.7 4.8 2.7 1 0 2-.3 3-1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+          <path d="M4 9c1.6-1.8 3.2-2.7 4.8-2.7S12 7.2 13.6 9c1.6 1.8 3.2 2.7 4.8 2.7 1 0 2-.3 3-1" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+        </svg>
+      );
+    case "rose-room":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M12 20.2s-6.6-4.1-6.6-9.2c0-2.1 1.7-3.8 3.8-3.8 1.2 0 2.2.5 2.8 1.4.6-.9 1.6-1.4 2.8-1.4 2.1 0 3.8 1.7 3.8 3.8 0 5.1-6.4 9.2-6.6 9.2Z" fill="currentColor" />
+        </svg>
+      );
+    case "ember-signal":
+      return (
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden>
+          <path d="M12 3 14.3 9.2 21 12l-6.7 2.8L12 21l-2.3-6.2L3 12l6.7-2.8L12 3Z" fill="currentColor" />
+        </svg>
+      );
+    default:
+      return null;
+  }
+}
+
 export default function SiteHeader() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const [flashKey, setFlashKey] = useState(0);
+  const [currentTheme, setCurrentTheme] = useState<ThemeKey>(DEFAULT_THEME);
 
+  const currentThemeLabel = useMemo(
+    () => THEME_PALETTES.find((theme) => theme.key === currentTheme)?.name ?? "Theme",
+    [currentTheme],
+  );
 
-  // Close the overlay on route changes
   useEffect(() => {
     setOpen(false);
-    // Trigger a re-mount on the 3 primary buttons only (Calendar/Directory/Updates)
-    // so only those "flash in" on route changes.
+    setThemeMenuOpen(false);
     setFlashKey((k) => k + 1);
   }, [pathname]);
 
-  // Prevent background scroll when overlay is open
   useEffect(() => {
-    if (!open) return;
+    try {
+      const stored = window.localStorage.getItem("wnl-theme") as ThemeKey | null;
+      const initial = THEME_PALETTES.some((theme) => theme.key === stored) ? stored! : DEFAULT_THEME;
+      setCurrentTheme(initial);
+      document.documentElement.setAttribute("data-theme", initial);
+    } catch {
+      setCurrentTheme(DEFAULT_THEME);
+      document.documentElement.setAttribute("data-theme", DEFAULT_THEME);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!open && !themeMenuOpen) return;
     const prev = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
     return () => {
       document.documentElement.style.overflow = prev;
     };
-  }, [open]);
+  }, [open, themeMenuOpen]);
+
+  function applyTheme(theme: ThemeKey) {
+    setCurrentTheme(theme);
+    document.documentElement.setAttribute("data-theme", theme);
+    try {
+      window.localStorage.setItem("wnl-theme", theme);
+    } catch {}
+  }
+
+  function cycleTheme() {
+    const currentIndex = THEME_PALETTES.findIndex((theme) => theme.key === currentTheme);
+    const nextTheme = THEME_PALETTES[(currentIndex + 1 + THEME_PALETTES.length) % THEME_PALETTES.length];
+    applyTheme(nextTheme.key);
+  }
+
+  function onThemeButtonPress() {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 980px)").matches) {
+      setOpen(false);
+      setThemeMenuOpen(true);
+      return;
+    }
+    cycleTheme();
+  }
 
   return (
     <header className="siteHeader">
@@ -47,7 +132,6 @@ export default function SiteHeader() {
         </span>
       </Link>
 
-      {/* Desktop nav */}
       <nav className="topNav" aria-label="Primary">
         {LINKS.map((l, idx) => (
           <Link
@@ -73,23 +157,38 @@ export default function SiteHeader() {
         ))}
       </nav>
 
-      {/* Mobile hamburger */}
-      <button
-        type="button"
-        className="hamburgerBtn"
-        data-open={open ? "true" : "false"}
-        aria-label={open ? "Close menu" : "Open menu"}
-        aria-expanded={open ? "true" : "false"}
-        onClick={() => setOpen((v) => !v)}
-      >
-        <span className="hamburgerIcon" aria-hidden>
-          <span />
-          <span />
-          <span />
-        </span>
-      </button>
+      <div className="headerActions">
+        <button
+          type="button"
+          className="themeToggleBtn"
+          aria-label={`Change color palette. Current palette: ${currentThemeLabel}`}
+          title={`Palette: ${currentThemeLabel}`}
+          onClick={onThemeButtonPress}
+        >
+          <span className="themeToggleIcon" aria-hidden>
+            <ThemeIcon theme={currentTheme} />
+          </span>
+        </button>
 
-      {/* Mobile overlay */}
+        <button
+          type="button"
+          className="hamburgerBtn"
+          data-open={open ? "true" : "false"}
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open ? "true" : "false"}
+          onClick={() => {
+            setThemeMenuOpen(false);
+            setOpen((v) => !v);
+          }}
+        >
+          <span className="hamburgerIcon" aria-hidden>
+            <span />
+            <span />
+            <span />
+          </span>
+        </button>
+      </div>
+
       {open && typeof document !== "undefined"
         ? createPortal(
             <div className="mobileSheetOverlay mobileMenuOverlay" role="dialog" aria-modal="true" onClick={() => setOpen(false)}>
@@ -120,6 +219,54 @@ export default function SiteHeader() {
                     </Link>
                   ))}
                 </nav>
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
+
+      {themeMenuOpen && typeof document !== "undefined"
+        ? createPortal(
+            <div className="mobileSheetOverlay mobileThemeOverlay" role="dialog" aria-modal="true" onClick={() => setThemeMenuOpen(false)}>
+              <div className="mobileSheet mobileThemeSheet" onClick={(e) => e.stopPropagation()}>
+                <div className="mobileSheetHeader">
+                  <div className="mobileSheetTitle">Choose palette</div>
+                  <button
+                    type="button"
+                    className="mobileSheetClose"
+                    onClick={() => setThemeMenuOpen(false)}
+                    aria-label="Close color palette menu"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="mobileSheetList mobileThemeList" aria-label="Color palettes">
+                  {THEME_PALETTES.map((theme) => (
+                    <button
+                      key={theme.key}
+                      type="button"
+                      className="mobileSheetAction mobileThemeAction"
+                      data-active={currentTheme === theme.key ? "true" : "false"}
+                      onClick={() => {
+                        applyTheme(theme.key);
+                        setThemeMenuOpen(false);
+                      }}
+                    >
+                      <span className="mobileThemeActionMain">
+                        <span className="mobileThemeIcon" aria-hidden>
+                          <ThemeIcon theme={theme.key} />
+                        </span>
+                        <span>{theme.name}</span>
+                      </span>
+                      <span className="mobileThemeSwatches" aria-hidden>
+                        <span className="mobileThemeSwatch swatchOne" />
+                        <span className="mobileThemeSwatch swatchTwo" />
+                        <span className="mobileThemeSwatch swatchThree" />
+                      </span>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>,
             document.body,
