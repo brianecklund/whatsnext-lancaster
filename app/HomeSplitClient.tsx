@@ -1675,12 +1675,6 @@ export default function HomeSplitClient({ events }: Props) {
         data-open={mobileDetailOpen ? "true" : "false"}
         aria-hidden={!mobileDetailOpen}
       >
-        <div className="mobileDetailHeader">
-          <button className="backBtn" type="button" onClick={clearSelected}>
-            Back
-          </button>
-          <div className="mobileDetailTitle">{selectedEvent ? "Event" : "Weekly Overview"}</div>
-        </div>
         <div className="scroll mobileDetailScroll">
           {selectedEvent ? (
             <div key={detailFlashKey} className="detailCard detailFlash mobileEventDetailCard">

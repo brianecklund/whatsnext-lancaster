@@ -4068,3 +4068,33 @@ svg:not(:root) {
   line-height: 1;
   opacity: 0.9;
 }
+
+
+/* March 16 mobile detail overlay: remove back bar and pin content under nav */
+@media (max-width: 980px){
+  .mobileDetail{
+    inset: var(--headerH) 0 0 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .mobileDetailHeader{
+    display: none !important;
+  }
+
+  .mobileDetailScroll,
+  .mobileDetail > .scroll{
+    padding: 0 16px 110px 16px !important;
+    margin: 0 !important;
+  }
+
+  .mobileDetail .detailCard,
+  .mobileEventDetailCard,
+  .mobileWeeklyOverviewOpen{
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .mobileDetail .detailTitle{
+    padding-top: 12px;
+  }
+}
