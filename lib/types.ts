@@ -13,6 +13,11 @@ export type LocationLite = {
   source?: string | null;
   customPageUid?: string | null;
   customPageUrl?: string | null;
+  coverImageUrl?: string | null;
+  galleryImageUrls?: string[];
+  weekdayDescriptions?: string[];
+  openNow?: boolean | null;
+  googleMapsUri?: string | null;
 };
 
 export type EventLite = {

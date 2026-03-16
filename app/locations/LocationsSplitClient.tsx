@@ -18,6 +18,23 @@ function getLetter(value?: string | null) {
 type LocationRow = LocationLite & { key: string };
 type GroupedSection = { letter: string; rows: LocationRow[] };
 
+
+type PlaceDetailsResponse = {
+  placeId: string;
+  displayName?: string | null;
+  formattedAddress?: string | null;
+  websiteUri?: string | null;
+  nationalPhoneNumber?: string | null;
+  googleMapsUri?: string | null;
+  rating?: number | null;
+  openNow?: boolean | null;
+  weekdayDescriptions?: string[];
+  coverImageUrl?: string | null;
+  galleryImageUrls?: string[];
+  photoAttributions?: string[];
+};
+
+
 type Props = {
   locations?: LocationRow[];
 };
@@ -613,11 +630,59 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
   );
 }
 
+
 function LocationDetail({ location }: { location: LocationRow }) {
   const detailFlashKey = location.id ?? location.uid ?? location.name ?? "detail";
+  const [placeDetails, setPlaceDetails] = useState<PlaceDetailsResponse | null>(null);
+  const [detailsLoading, setDetailsLoading] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    const placeId = location.venue_external_id?.trim();
+    if (!placeId) {
+      setPlaceDetails(null);
+      setDetailsLoading(false);
+      return;
+    }
+
+    setDetailsLoading(true);
+
+    fetch(`/api/places/details?id=${encodeURIComponent(placeId)}`, { cache: "no-store" })
+      .then((response) => response.json())
+      .then((data) => {
+        if (cancelled) return;
+        setPlaceDetails(data?.ok ? data.details ?? null : null);
+      })
+      .catch(() => {
+        if (!cancelled) setPlaceDetails(null);
+      })
+      .finally(() => {
+        if (!cancelled) setDetailsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [location.venue_external_id]);
+
+  const coverImageUrl = placeDetails?.coverImageUrl || location.coverImageUrl || null;
+  const galleryImageUrls = placeDetails?.galleryImageUrls?.length ? placeDetails.galleryImageUrls : location.galleryImageUrls || [];
+  const weekdayDescriptions = placeDetails?.weekdayDescriptions?.length ? placeDetails.weekdayDescriptions : location.weekdayDescriptions || [];
+  const websiteHref = location.website || placeDetails?.websiteUri || null;
+  const mapsHref = placeDetails?.googleMapsUri || location.googleMapsUri || null;
+  const phone = placeDetails?.nationalPhoneNumber || location.phone || null;
+  const rating = typeof placeDetails?.rating === "number" ? placeDetails.rating : location.rating;
+  const photoAttributions = placeDetails?.photoAttributions?.length ? placeDetails.photoAttributions : [];
 
   return (
     <div key={detailFlashKey} className="detailCard detailFlash">
+      {coverImageUrl ? (
+        <div className="locationCover fadeInItem" style={{ animationDelay: "160ms" }}>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={coverImageUrl} alt={location.name ?? "Listing cover"} />
+        </div>
+      ) : null}
+
       <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
         {location.name ?? "Untitled listing"}
       </div>
@@ -625,18 +690,29 @@ function LocationDetail({ location }: { location: LocationRow }) {
       <div className="detailMeta fadeInItem" style={{ animationDelay: "320ms" }}>
         {location.category ? <span className="badge">{location.category}</span> : null}
         {location.address ? <span className="muted">{location.address}</span> : null}
+        {typeof rating === "number" ? <span className="muted">★ {rating.toFixed(1)}</span> : null}
+        {typeof placeDetails?.openNow === "boolean" ? (
+          <span className={`badge ${placeDetails.openNow ? "badgeOpen" : "badgeClosed"}`}>
+            {placeDetails.openNow ? "Open now" : "Closed now"}
+          </span>
+        ) : null}
       </div>
 
-      {(location.customPageUrl || location.website) ? (
-        <p style={{ marginTop: 10, display: "flex", gap: 14, flexWrap: "wrap" }}>
+      {(location.customPageUrl || websiteHref || mapsHref) ? (
+        <p className="locationDetailLinks" style={{ marginTop: 10, display: "flex", gap: 14, flexWrap: "wrap" }}>
           {location.customPageUrl ? (
             <a className="link" href={location.customPageUrl}>
               Full page
             </a>
           ) : null}
-          {location.website ? (
-            <a className="link" href={location.website} target="_blank" rel="noreferrer">
+          {websiteHref ? (
+            <a className="link" href={websiteHref} target="_blank" rel="noreferrer">
               Website
+            </a>
+          ) : null}
+          {mapsHref ? (
+            <a className="link" href={mapsHref} target="_blank" rel="noreferrer">
+              Maps
             </a>
           ) : null}
         </p>
@@ -645,6 +721,45 @@ function LocationDetail({ location }: { location: LocationRow }) {
       {location.description ? (
         <div className="detailBody fadeInItem" style={{ animationDelay: "380ms" }}>
           <p>{location.description}</p>
+        </div>
+      ) : null}
+
+      {phone || weekdayDescriptions.length || detailsLoading ? (
+        <div className="locationDataCard fadeInItem" style={{ animationDelay: "420ms" }}>
+          <div className="locationDataTitle">Business info</div>
+          {phone ? (
+            <div className="locationDataRow">
+              <span className="locationDataLabel">Phone</span>
+              <span>{phone}</span>
+            </div>
+          ) : null}
+
+          {weekdayDescriptions.length ? (
+            <div className="locationHoursList">
+              <div className="locationDataLabel">Hours</div>
+              {weekdayDescriptions.map((line) => (
+                <div key={line} className="locationHoursRow">{line}</div>
+              ))}
+            </div>
+          ) : detailsLoading ? (
+            <div className="locationHoursLoading">Loading hours…</div>
+          ) : null}
+        </div>
+      ) : null}
+
+      {galleryImageUrls.length ? (
+        <div className="locationGalleryWrap fadeInItem" style={{ animationDelay: "480ms" }}>
+          <div className="locationGallery">
+            {galleryImageUrls.map((src, index) => (
+              <div key={`${src}-${index}`} className="locationGalleryItem">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={src} alt={`${location.name ?? "Listing"} image ${index + 1}`} loading="lazy" />
+              </div>
+            ))}
+          </div>
+          {photoAttributions.length ? (
+            <div className="locationPhotoAttribution">Photos: {photoAttributions.join(", ")}</div>
+          ) : null}
         </div>
       ) : null}
     </div>

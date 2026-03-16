@@ -38,6 +38,7 @@ export function createLocationLiteFromVenue(venue: ImportedVenue, customPage?: {
     source: venue.source,
     customPageUid: customPage?.uid ?? null,
     customPageUrl: customPage?.uid ? `/locations/${customPage.uid}` : null,
+    googleMapsUri: null,
   };
 }
 
@@ -63,6 +64,7 @@ export function createLocationLiteFromManualFields(data: any, customPage?: { uid
     source: 'google',
     customPageUid: customPage?.uid ?? null,
     customPageUrl: customPage?.uid ? `/locations/${customPage.uid}` : null,
+    googleMapsUri: null,
   };
 }
 

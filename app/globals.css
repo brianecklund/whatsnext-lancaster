@@ -4586,3 +4586,132 @@ svg:not(:root) {
     margin-right: 0 !important;
   }
 }
+
+
+/* Google Places detail enrichments */
+.locationCover{
+  width: 100%;
+  border-radius: 22px;
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadowCard, 0 10px 24px rgba(0,0,0,0.08));
+  margin: 0 0 18px;
+  aspect-ratio: 16 / 10;
+}
+
+.locationCover img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.locationDataCard{
+  margin-top: 18px;
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: var(--panel);
+}
+
+.locationDataTitle{
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-bottom: 12px;
+}
+
+.locationDataRow{
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 8px 0;
+  border-top: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+}
+.locationDataRow:first-of-type{
+  border-top: 0;
+  padding-top: 0;
+}
+
+.locationDataLabel{
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.locationHoursList{
+  display: grid;
+  gap: 8px;
+  margin-top: 8px;
+}
+.locationHoursRow{
+  padding: 8px 0;
+  border-top: 1px solid color-mix(in srgb, var(--border) 78%, transparent);
+}
+.locationHoursRow:first-child{
+  border-top: 0;
+}
+.locationHoursLoading{
+  color: var(--muted);
+}
+
+.locationGallery{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.locationGalleryItem{
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  aspect-ratio: 1 / 1;
+}
+
+.locationGalleryItem img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.badgeOpen{
+  background: color-mix(in srgb, #2c8f59 12%, var(--panel));
+  color: #226a43;
+}
+.badgeClosed{
+  background: color-mix(in srgb, #9d3f3f 12%, var(--panel));
+  color: #8a2f2f;
+}
+
+@media (max-width: 980px){
+  .locationDataCard{
+    margin-top: 14px;
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .locationGallery{
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+
+  .locationCover{
+    border-radius: 18px;
+    margin-bottom: 14px;
+  }
+}
+
+.locationPhotoAttribution{
+  margin-top: 10px;
+  font-size: 0.74rem;
+  color: var(--muted);
+}
