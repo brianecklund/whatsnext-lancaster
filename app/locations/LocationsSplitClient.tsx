@@ -1,13 +1,23 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { useSmoothWheel } from "@/app/components/useSmoothWheel";
+// removed smooth wheel for directory
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { LocationLite } from "@/lib/types";
 import { mergeDirectoryCategories } from "@/lib/directoryCategories";
 
 function normalize(v: string) {
-  return (v || "").toLowerCase().trim();
+  
+  useEffect(() => {
+    const open = document.querySelector('[data-overlay-open="true"]');
+    if(open){
+      document.body.style.overflow='hidden';
+    }else{
+      document.body.style.overflow='';
+    }
+  });
+
+return (v || "").toLowerCase().trim();
 }
 
 function getLetter(value?: string | null) {
@@ -21,7 +31,7 @@ type GroupedSection = { letter: string; rows: LocationRow[] };
 const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
 export default function LocationsSplitClient({ locations }: { locations: LocationRow[] }) {
-  useSmoothWheel(".scroll");
+  // smooth wheel disabled for directory
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
