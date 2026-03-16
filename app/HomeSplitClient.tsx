@@ -1714,6 +1714,6 @@ export default function HomeSplitClient({ events }: Props) {
       </div>
 
 </div>
+    </>
   );
 }
-</>);
