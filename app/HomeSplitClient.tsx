@@ -1,6 +1,7 @@
 "use client";
 
 import NewsTickerBar from "./components/NewsTickerBar";
+import SegmentedTabs from "./components/SegmentedTabs";
 import ToolbarIcon from "./components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { dayKey, eventHasEnded, nearestDayWithEvents, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
@@ -820,32 +821,7 @@ useBodyScrollLock(mobileDetailOpen);
               }}
             >
               <div className="leftSticky" ref={leftStickyRef}>
-                <div className="tabs" aria-label="Primary navigation">
-                  <button
-                    type="button"
-                    className="tabBtn"
-                    data-active={pathname === "/" ? "true" : "false"}
-                    onClick={() => router.push("/")}
-                  >
-                    Calendar
-                  </button>
-                  <button
-                    type="button"
-                    className="tabBtn"
-                    data-active={pathname?.startsWith("/locations") ? "true" : "false"}
-                    onClick={() => router.push("/locations")}
-                  >
-                    Directory
-                  </button>
-                  <button
-                    type="button"
-                    className="tabBtn"
-                    data-active={pathname?.startsWith("/updates") ? "true" : "false"}
-                    onClick={() => router.push("/updates")}
-                  >
-                    Updates
-                  </button>
-                </div>
+                <SegmentedTabs className="tabs" />
 
                 <div className="leftControls">
                   <div className="calendarToolbar">
@@ -1632,32 +1608,7 @@ useBodyScrollLock(mobileDetailOpen);
             </button>
           </div>
         ) : (
-          <div className="mobileTabs" aria-label="Primary navigation">
-            <button
-              type="button"
-              className="tabBtn"
-              data-active={pathname === "/" ? "true" : "false"}
-              onClick={() => router.push("/")}
-            >
-              Calendar
-            </button>
-            <button
-              type="button"
-              className="tabBtn"
-              data-active={pathname?.startsWith("/locations") ? "true" : "false"}
-              onClick={() => router.push("/locations")}
-            >
-              Directory
-            </button>
-            <button
-              type="button"
-              className="tabBtn"
-              data-active={pathname?.startsWith("/updates") ? "true" : "false"}
-              onClick={() => router.push("/updates")}
-            >
-              Updates
-            </button>
-          </div>
+          <SegmentedTabs className="mobileTabs" />
         )
       ) : null}
 

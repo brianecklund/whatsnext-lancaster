@@ -5,6 +5,7 @@ import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
+import SegmentedTabs from "@/app/components/SegmentedTabs";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export type UpdateLite = {
@@ -174,32 +175,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
 
   const leftSticky = (
     <div className="leftSticky splitPageStickySurface">
-      <div className="tabs" aria-label="Primary navigation">
-        <button
-          type="button"
-          className="tabBtn"
-          data-active={pathname === "/" ? "true" : "false"}
-          onClick={() => router.push("/")}
-        >
-          Calendar
-        </button>
-        <button
-          type="button"
-          className="tabBtn"
-          data-active={pathname?.startsWith("/locations") ? "true" : "false"}
-          onClick={() => router.push("/locations")}
-        >
-          Directory
-        </button>
-        <button
-          type="button"
-          className="tabBtn"
-          data-active={pathname?.startsWith("/updates") ? "true" : "false"}
-          onClick={() => router.push("/updates")}
-        >
-          Updates
-        </button>
-      </div>
+      <SegmentedTabs className="tabs" />
 
       <div className="leftControls">
         {isMobile ? (

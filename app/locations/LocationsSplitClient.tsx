@@ -5,6 +5,7 @@ import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
+import SegmentedTabs from "@/app/components/SegmentedTabs";
 import type { LocationLite } from "@/lib/types";
 import { mergeDirectoryCategories } from "@/lib/directoryCategories";
 
@@ -329,32 +330,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
         <div className="pane paneLeft">
           <div className="scroll" ref={leftScrollRef} onScroll={(e) => { if (effectiveIsMobile) setTaglineHidden((e.currentTarget as HTMLDivElement).scrollTop > 2); }}>
             <div className="leftSticky splitPageStickySurface" ref={leftStickyRef}>
-              <div className="tabs" aria-label="Primary navigation">
-                <button
-                  type="button"
-                  className="tabBtn"
-                  data-active={pathname === "/" ? "true" : "false"}
-                  onClick={() => router.push("/")}
-                >
-                  Calendar
-                </button>
-                <button
-                  type="button"
-                  className="tabBtn"
-                  data-active={pathname.startsWith("/locations") ? "true" : "false"}
-                  onClick={() => router.push("/locations")}
-                >
-                  Directory
-                </button>
-                <button
-                  type="button"
-                  className="tabBtn"
-                  data-active={pathname.startsWith("/updates") ? "true" : "false"}
-                  onClick={() => router.push("/updates")}
-                >
-                  Updates
-                </button>
-              </div>
+              <SegmentedTabs className="tabs" />
 
               <div className="leftControls directoryLeftControls">
                 <div className={`searchRow${!effectiveIsMobile ? " directorySearchRowDesktop" : ""}`}>
