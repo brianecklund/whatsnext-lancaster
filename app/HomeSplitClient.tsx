@@ -915,7 +915,7 @@ useEffect(() => {
                       />
                       <button
                         type="button"
-                        className="viewBtn"
+                        className={`viewBtn ${effectiveIsMobile ? "viewBtnSquare viewBtnIcon" : ""}`}
                         aria-label={viewMode === "month" ? "Switch to list view" : "Switch to calendar view"}
                         onClick={() => {
                           clearSelected();
@@ -923,18 +923,26 @@ useEffect(() => {
                           setParam("view", viewMode === "month" ? "list" : "month");
                         }}
                       >
-                        {viewMode === "month" ? (effectiveIsMobile ? "List" : "List view") : (effectiveIsMobile ? "Cal" : "Calendar view")}
+                        {effectiveIsMobile ? (
+                          <span className="controlIconWrap" aria-hidden="true">
+                            <img src="/calendar-mobile.svg" alt="" className="controlIcon" />
+                          </span>
+                        ) : (
+                          viewMode === "month" ? "List view" : "Calendar view"
+                        )}
                       </button>
                       {effectiveIsMobile ? (
                         <button
                           type="button"
-                          className="filterBtn"
+                          className="filterBtn filterBtnSquare filterBtnIcon"
                           aria-label={filterOpen ? "Close filters" : "Open filters"}
                           aria-expanded={filterOpen ? "true" : "false"}
                           data-active={filterOpen || !!type ? "true" : "false"}
                           onClick={() => setFilterOpen((v) => !v)}
                         >
-                          {type ? `Filter: ${type}` : "Filter"}
+                          <span className="controlIconWrap" aria-hidden="true">
+                            <img src="/filter-mobile.svg" alt="" className="controlIcon" />
+                          </span>
                         </button>
                       ) : (
                         <button
