@@ -356,8 +356,8 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                 </button>
               </div>
 
-              <div className="leftControls">
-                <div className="searchRow">
+              <div className="leftControls directoryLeftControls">
+                <div className={`searchRow${!effectiveIsMobile ? " directorySearchRowDesktop" : ""}`}>
                   <input
                     className="searchInput"
                     value={q}
@@ -378,23 +378,73 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                       <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
                       <span>{activeFilterLabel}</span>
                     </button>
-                  ) : q || cat ? (
-                    <button
-                      className="clearBtn"
-                      type="button"
-                      onClick={() => {
-                        setQuery("");
-                        setCategory(null);
-                        setDesktopFilterOpen(false);
-                      }}
-                    >
-                      Clear
-                    </button>
-                  ) : null}
+                  ) : (
+                    <>
+                      <div className="directoryFilterWrap">
+                        <button
+                          type="button"
+                          className="filterBtn filterBtnSquare squareIconBtn"
+                          data-active={desktopFilterOpen || !!cat ? "true" : "false"}
+                          aria-label={desktopFilterOpen ? "Close filters" : activeFilterLabel}
+                          aria-expanded={desktopFilterOpen ? "true" : "false"}
+                          onClick={() => setDesktopFilterOpen((value) => !value)}
+                        >
+                          <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
+                        </button>
+
+                        {desktopFilterOpen ? (
+                          <div className="directoryFilterMenu" role="dialog" aria-label="Directory filters">
+                            <button
+                              type="button"
+                              className="directoryFilterOption"
+                              data-active={!cat ? "true" : "false"}
+                              onClick={() => {
+                                setCategory(null);
+                                setDesktopFilterOpen(false);
+                              }}
+                            >
+                              All
+                            </button>
+                            {categories.map((t) => {
+                              const on = normalize(cat) === normalize(t);
+                              return (
+                                <button
+                                  key={t}
+                                  type="button"
+                                  className="directoryFilterOption"
+                                  data-active={on ? "true" : "false"}
+                                  onClick={() => {
+                                    setCategory(on ? null : t);
+                                    setDesktopFilterOpen(false);
+                                  }}
+                                >
+                                  {t}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ) : null}
+                      </div>
+
+                      {q || cat ? (
+                        <button
+                          className="clearBtn"
+                          type="button"
+                          onClick={() => {
+                            setQuery("");
+                            setCategory(null);
+                            setDesktopFilterOpen(false);
+                          }}
+                        >
+                          Clear
+                        </button>
+                      ) : null}
+                    </>
+                  )}
                 </div>
 
-                {effectiveIsMobile ? (
-                  <div className="directoryAlphabetNav directoryAlphabetNavMobile" aria-label="Directory alphabet navigation">
+                <div className={`directoryToolbar${effectiveIsMobile ? " directoryToolbarMobile" : ""}`}>
+                  <div className={`directoryAlphabetNav${effectiveIsMobile ? " directoryAlphabetNavMobile" : ""}`} aria-label="Directory alphabet navigation">
                     {ALPHABET.map((letter) => {
                       const enabled = visibleLetters.includes(letter);
                       const active = activeLetter === letter;
@@ -413,78 +463,6 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                       );
                     })}
                   </div>
-                ) : null}
-
-                <div className={`directoryToolbar${effectiveIsMobile ? " directoryToolbarMobile" : ""}`}>
-                  {!effectiveIsMobile ? (
-                    <div className="directoryAlphabetNav" aria-label="Directory alphabet navigation">
-                      {ALPHABET.map((letter) => {
-                        const enabled = visibleLetters.includes(letter);
-                        const active = activeLetter === letter;
-                        return (
-                          <button
-                            key={letter}
-                            type="button"
-                            className="directoryAlphaBtn"
-                            data-letter={letter}
-                            data-active={active ? "true" : "false"}
-                            disabled={!enabled}
-                            onClick={() => jumpToLetter(letter)}
-                          >
-                            {letter}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-
-                  {!effectiveIsMobile ? (
-                    <div className="directoryFilterWrap">
-                      <button
-                        type="button"
-                        className="filterBtn"
-                        data-active={desktopFilterOpen || !!cat ? "true" : "false"}
-                        aria-expanded={desktopFilterOpen ? "true" : "false"}
-                        onClick={() => setDesktopFilterOpen((value) => !value)}
-                      >
-                        <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
-                        <span>{activeFilterLabel}</span>
-                      </button>
-
-                      {desktopFilterOpen ? (
-                        <div className="directoryFilterMenu" role="dialog" aria-label="Directory filters">
-                          <button
-                            type="button"
-                            className="directoryFilterOption"
-                            data-active={!cat ? "true" : "false"}
-                            onClick={() => {
-                              setCategory(null);
-                              setDesktopFilterOpen(false);
-                            }}
-                          >
-                            All
-                          </button>
-                          {categories.map((t) => {
-                            const on = normalize(cat) === normalize(t);
-                            return (
-                              <button
-                                key={t}
-                                type="button"
-                                className="directoryFilterOption"
-                                data-active={on ? "true" : "false"}
-                                onClick={() => {
-                                  setCategory(on ? null : t);
-                                  setDesktopFilterOpen(false);
-                                }}
-                              >
-                                {t}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      ) : null}
-                    </div>
-                  ) : null}
                 </div>
               </div>
             </div>

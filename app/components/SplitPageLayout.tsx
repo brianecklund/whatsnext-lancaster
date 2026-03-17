@@ -28,7 +28,9 @@ export default function SplitPageLayout({
 
   return (
     <div className="pageShell" style={style}>
-      <div className={`tagline ${taglineHidden ? "taglineHidden" : ""}`}>{tagline}</div>
+      <section className={`newsBar pageIntroBar ${taglineHidden ? "pageIntroBarHidden" : ""}`} aria-label="Page introduction">
+        <div className="newsBar__intro">{tagline}</div>
+      </section>
       {children}
       {isMobile ? (
         <div className="mobileTabs mobilePrimaryTabs" aria-label="Primary navigation">

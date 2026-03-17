@@ -4905,3 +4905,71 @@ body {
     overscroll-behavior: contain;
   }
 }
+
+
+.pageIntroBar{
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.pageIntroBarHidden{
+  opacity: 0;
+  transform: translateY(-10px);
+  max-height: 0;
+  min-height: 0;
+  padding-top: 0;
+  padding-bottom: 0;
+  border-bottom-color: transparent;
+  pointer-events: none;
+}
+
+.squareIconBtn{
+  width: 44px;
+  min-width: 44px;
+  padding: 0;
+  justify-content: center;
+}
+
+.squareIconBtn span{
+  display: none;
+}
+
+.directoryLeftControls{
+  width: 100%;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.directorySearchRowDesktop{
+  width: 100%;
+}
+
+.directorySearchRowDesktop .searchInput{
+  flex: 1 1 auto;
+}
+
+.directoryToolbar{
+  width: 100%;
+}
+
+.directoryAlphabetNav{
+  display: grid;
+  grid-template-columns: repeat(27, minmax(0, 1fr));
+  gap: 8px;
+  width: 100%;
+}
+
+.directoryAlphaBtn{
+  width: 100%;
+}
+
+@media (max-width: 980px){
+  .pageIntroBar{
+    min-height: 48px;
+  }
+
+  .pageIntroBar .newsBar__intro{
+    white-space: normal;
+    overflow: visible;
+    text-overflow: initial;
+  }
+}

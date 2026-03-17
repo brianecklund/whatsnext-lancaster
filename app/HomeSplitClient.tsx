@@ -513,11 +513,18 @@ export default function HomeSplitClient({ events }: Props) {
     return groups;
   }, [filteredEvents]);
 
+  const displayDayGroups = useMemo(() => {
+    if (!leftDayGroups.length) return leftDayGroups;
+    const currentIndex = leftDayGroups.findIndex((group) => dayKey(group.date) === selectedDayStr);
+    if (currentIndex <= 0) return leftDayGroups;
+    return [...leftDayGroups.slice(currentIndex), ...leftDayGroups.slice(0, currentIndex)];
+  }, [leftDayGroups, selectedDayStr]);
+
   const currentWeekDayGroups = useMemo(() => {
     const start = currentWeekRange.start;
     const end = currentWeekRange.end;
-    return leftDayGroups.filter((group) => group.date.getTime() >= start.getTime() && group.date.getTime() <= end.getTime());
-  }, [currentWeekRange, leftDayGroups]);
+    return displayDayGroups.filter((group) => group.date.getTime() >= start.getTime() && group.date.getTime() <= end.getTime());
+  }, [currentWeekRange, displayDayGroups]);
 
   const dayJumpDates = useMemo(() => {
     const map = new Map<number, Date>();
@@ -865,7 +872,7 @@ useBodyScrollLock(mobileDetailOpen);
                       />
                       <button
                         type="button"
-                        className="viewBtn iconBtn"
+                        className={`viewBtn iconBtn${!effectiveIsMobile ? " squareIconBtn" : ""}`}
                         aria-label={viewMode === "month" ? "Switch to list view" : "Switch to calendar view"}
                         onClick={() => {
                           clearSelected();
@@ -874,7 +881,7 @@ useBodyScrollLock(mobileDetailOpen);
                         }}
                       >
                         <ToolbarIcon src="/icons/calendar-alt.svg" alt="Calendar view" />
-                        <span>{viewMode === "month" ? (effectiveIsMobile ? "List" : "List view") : (effectiveIsMobile ? "Calendar" : "Calendar view")}</span>
+                        {effectiveIsMobile ? <span>{viewMode === "month" ? "List" : "Calendar"}</span> : null}
                       </button>
                       {effectiveIsMobile ? (
                         <button
@@ -891,14 +898,14 @@ useBodyScrollLock(mobileDetailOpen);
                       ) : (
                         <button
                           type="button"
-                          className="filterBtn filterBtnSquare"
+                          className="filterBtn filterBtnSquare squareIconBtn"
                           aria-label={filterOpen ? "Close filters" : "Open filters"}
                           aria-expanded={filterOpen ? "true" : "false"}
                           data-active={filterOpen || !!type ? "true" : "false"}
                           onClick={() => setFilterOpen((v) => !v)}
                         >
                           <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
-                          <span>{type ? "Filtered" : "Filter"}</span>
+                          {!effectiveIsMobile ? null : <span>{type ? "Filtered" : "Filter"}</span>}
                         </button>
                       )}
                       {!effectiveIsMobile && (q || type) ? (
@@ -1059,12 +1066,12 @@ useBodyScrollLock(mobileDetailOpen);
                     </div>
                   </button>
 
-{leftDayGroups.length === 0 ? (
+{displayDayGroups.length === 0 ? (
                 <div className="emptyList">No events match your search.</div>
               ) : null}
 
               {/* Left list */}
-              {leftDayGroups.map((g) => (
+              {displayDayGroups.map((g) => (
                 <section key={dayKey(g.date)} className="dayBlock" ref={(el) => { daySectionRefs.current[dayKey(g.date)] = el; }}>
                   <div className="dayTitle">{formatDayHeading(g.date)}</div>
 
