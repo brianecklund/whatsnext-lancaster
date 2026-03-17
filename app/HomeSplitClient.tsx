@@ -47,6 +47,30 @@ type Props = {
   events: EventLite[];
 };
 
+function CalendarToggleIcon({ monthView }: { monthView: boolean }) {
+  return monthView ? (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="btnIconSvg">
+      <rect x="4" y="5" width="16" height="15" rx="3" stroke="currentColor" strokeWidth="1.8" />
+      <path d="M8 3.75V6.25M16 3.75V6.25M4 9.25H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+      <path d="M8 12.5H11M8 16H11M13 12.5H16M13 16H16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="btnIconSvg">
+      <rect x="4.5" y="6" width="15" height="2.2" rx="1.1" fill="currentColor" />
+      <rect x="4.5" y="10.9" width="15" height="2.2" rx="1.1" fill="currentColor" />
+      <rect x="4.5" y="15.8" width="15" height="2.2" rx="1.1" fill="currentColor" />
+    </svg>
+  );
+}
+
+function FilterToggleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="btnIconSvg">
+      <path d="M5 7H19M8.5 12H15.5M10.5 17H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 const WEEKLY_KEY = "__weekly__";
 
 function norm(v: string) {
@@ -58,6 +82,13 @@ function safeDateFromEvent(e: EventLite): Date | null {
   if (!raw) return null;
   const d = new Date(raw);
   return Number.isNaN(d.getTime()) ? null : d;
+}
+
+function eventHasEnded(e: EventLite): boolean {
+  const raw = e.end_datetime || e.start_datetime;
+  if (!raw) return false;
+  const d = new Date(raw);
+  return !Number.isNaN(d.getTime()) && d.getTime() < Date.now();
 }
 
 function startOfToday(): Date {
@@ -551,11 +582,8 @@ export default function HomeSplitClient({ events }: Props) {
       });
     }
 
-    const anchorIndex = groups.findIndex((g) => dayKey(g.date) === selectedDayStr);
-    if (anchorIndex <= 0) return groups;
-
-    return [...groups.slice(anchorIndex), ...groups.slice(0, anchorIndex)];
-  }, [filteredEvents, selectedDayStr]);
+    return groups;
+  }, [filteredEvents]);
 
   const currentWeekDayGroups = useMemo(() => {
     const start = currentWeekRange.start;
@@ -582,9 +610,16 @@ export default function HomeSplitClient({ events }: Props) {
     const root = listRef.current;
     if (!root || didInitialScroll || viewMode !== "list" || !leftDayGroups.length) return;
 
-    root.scrollTop = 0;
-    setScrollDayKey(selectedDayStr);
-    setDidInitialScroll(true);
+    const scrollToAnchor = () => {
+      const target = daySectionRefs.current[selectedDayStr];
+      const top = target ? Math.max(target.offsetTop - getListScrollOffset(), 0) : 0;
+      root.scrollTop = top;
+      syncVisibleDayFromScroll(top);
+      setScrollDayKey(selectedDayStr);
+      setDidInitialScroll(true);
+    };
+
+    window.requestAnimationFrame(scrollToAnchor);
   }, [didInitialScroll, leftDayGroups, selectedDayStr, viewMode]);
 
   useEffect(() => {
@@ -915,7 +950,7 @@ useEffect(() => {
                       />
                       <button
                         type="button"
-                        className="viewBtn"
+                        className="viewBtn iconBtn"
                         aria-label={viewMode === "month" ? "Switch to list view" : "Switch to calendar view"}
                         onClick={() => {
                           clearSelected();
@@ -923,7 +958,8 @@ useEffect(() => {
                           setParam("view", viewMode === "month" ? "list" : "month");
                         }}
                       >
-                        {viewMode === "month" ? (effectiveIsMobile ? "List" : "List view") : (effectiveIsMobile ? "Cal" : "Calendar view")}
+                        <CalendarToggleIcon monthView={viewMode !== "month"} />
+                        <span>{viewMode === "month" ? (effectiveIsMobile ? "List" : "List view") : (effectiveIsMobile ? "Calendar" : "Calendar view")}</span>
                       </button>
                       {effectiveIsMobile ? (
                         <button
@@ -934,7 +970,8 @@ useEffect(() => {
                           data-active={filterOpen || !!type ? "true" : "false"}
                           onClick={() => setFilterOpen((v) => !v)}
                         >
-                          {type ? `Filter: ${type}` : "Filter"}
+                          <FilterToggleIcon />
+                          <span>{type ? `Filter: ${type}` : "Filter"}</span>
                         </button>
                       ) : (
                         <button
@@ -945,7 +982,8 @@ useEffect(() => {
                           data-active={filterOpen || !!type ? "true" : "false"}
                           onClick={() => setFilterOpen((v) => !v)}
                         >
-                          {type ? "F*" : "F"}
+                          <FilterToggleIcon />
+                          <span>{type ? "Filtered" : "Filter"}</span>
                         </button>
                       )}
                       {!effectiveIsMobile && (q || type) ? (
@@ -1130,6 +1168,7 @@ useEffect(() => {
                         className="eventRow fadeInItem"
                         style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
                         data-active={active ? "true" : "false"}
+                        data-past={eventHasEnded(e) ? "true" : "false"}
                         onClick={() => {
                           const key = e.uid ?? e.id;
                           setClientSelectedKey(key);
@@ -1252,6 +1291,7 @@ useEffect(() => {
                                 key={key}
                                 type="button"
                                 className="eventCard"
+                                data-past={eventHasEnded(e) ? "true" : "false"}
                                 onClick={() => {
                                   setClientSelectedKey(key);
                                   setParam("event", key);
@@ -1441,6 +1481,7 @@ useEffect(() => {
                                   key={e.id}
                                   type="button"
                                   className="weeklyCard weeklyCardSelectable"
+                                  data-past={eventHasEnded(e) ? "true" : "false"}
                                   onClick={() => openSelected(e.uid ?? e.id)}
                                 >
                                   <div className="weeklyCardMedia">
@@ -1528,6 +1569,7 @@ useEffect(() => {
                             key={key}
                             type="button"
                             className="dayRightRow"
+                            data-past={eventHasEnded(e) ? "true" : "false"}
                             onClick={() => openSelected(key)}
                             role="listitem"
                           >

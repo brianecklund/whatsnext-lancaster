@@ -41,6 +41,14 @@ type Props = {
 
 const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
+function FilterToggleIcon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="btnIconSvg">
+      <path d="M5 7H19M8.5 12H15.5M10.5 17H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function LocationsSplitClient({ locations = [] }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -251,19 +259,18 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
   }, [visibleLetters, activeLetter]);
 
   useEffect(() => {
-    if (effectiveIsMobile) return;
     const container = leftScrollRef.current;
     if (!container || visibleLetters.length === 0) return;
 
     const syncActiveLetter = () => {
-      const containerRect = container.getBoundingClientRect();
+      const stickyHeight = leftStickyRef.current?.offsetHeight ?? 0;
+      const threshold = container.scrollTop + stickyHeight + 20;
       let current = visibleLetters[0] ?? "#";
 
       for (const letter of visibleLetters) {
         const section = sectionRefs.current[letter];
         if (!section) continue;
-        const top = section.getBoundingClientRect().top - containerRect.top;
-        if (top <= 140) current = letter;
+        if (section.offsetTop <= threshold) current = letter;
         else break;
       }
 
@@ -278,7 +285,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
       container.removeEventListener("scroll", syncActiveLetter);
       window.removeEventListener("resize", syncActiveLetter);
     };
-  }, [effectiveIsMobile, visibleLetters]);
+  }, [visibleLetters, q, cat, featuredPartners.length]);
 
   function jumpToLetter(letter: string) {
     const section = sectionRefs.current[letter];
@@ -369,7 +376,8 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                       aria-expanded={filterOpen ? "true" : "false"}
                       onClick={() => setFilterOpen((v) => !v)}
                     >
-                      {activeFilterLabel}
+                      <FilterToggleIcon />
+                      <span>{activeFilterLabel}</span>
                     </button>
                   ) : q || cat ? (
                     <button
@@ -440,7 +448,8 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                         aria-expanded={desktopFilterOpen ? "true" : "false"}
                         onClick={() => setDesktopFilterOpen((value) => !value)}
                       >
-                        {activeFilterLabel}
+                        <FilterToggleIcon />
+                        <span>{activeFilterLabel}</span>
                       </button>
 
                       {desktopFilterOpen ? (

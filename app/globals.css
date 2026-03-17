@@ -4715,3 +4715,120 @@ svg:not(:root) {
   font-size: 0.74rem;
   color: var(--muted);
 }
+
+
+/* March 16 repo fixes: icon buttons, overscroll, past events, mobile one-line controls */
+html, body {
+  overflow-x: clip;
+}
+
+body {
+  overscroll-behavior-x: none;
+}
+
+.pageShell,
+.split,
+.pane,
+.scroll,
+.leftSticky,
+.leftControls,
+.searchRow,
+.calendarToolbar,
+.directoryToolbar,
+.directoryListWrap,
+.mobileDetail,
+.mobileDetailScroll {
+  max-width: 100%;
+}
+
+.iconBtn,
+.filterBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btnIconSvg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+}
+
+.filterBtnSquare {
+  min-width: auto;
+  padding: 0 12px;
+}
+
+.filterBtnSquare .btnIconSvg,
+.filterBtnSquare span {
+  display: inline-flex;
+}
+
+.eventRow[data-past="true"],
+.dayRightRow[data-past="true"],
+.eventCard[data-past="true"],
+.weeklyCard[data-past="true"] {
+  opacity: 0.62;
+}
+
+.eventRow[data-past="true"][data-active="true"],
+.dayRightRow[data-past="true"]:hover,
+.dayRightRow[data-past="true"]:focus-visible,
+.eventCard[data-past="true"]:hover,
+.eventCard[data-past="true"]:focus-visible,
+.weeklyCard[data-past="true"]:hover,
+.weeklyCard[data-past="true"]:focus-visible {
+  opacity: 0.9;
+}
+
+@media (max-width: 980px) {
+  .calendarToolbar {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .dayJumpRail {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    min-width: 0;
+    width: 100%;
+  }
+
+  .calendarSearchRowMobile,
+  .searchRow.calendarSearchRowMobile {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 8px !important;
+    align-items: center;
+    width: 100%;
+  }
+
+  .calendarSearchRowMobile .searchInput,
+  .calendarSearchRowMobile .viewBtn,
+  .calendarSearchRowMobile .filterBtn {
+    min-width: 0;
+    margin: 0;
+  }
+
+  .calendarSearchRowMobile .viewBtn,
+  .calendarSearchRowMobile .filterBtn {
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+    white-space: nowrap;
+  }
+
+  .calendarSearchRowMobile .viewBtn span,
+  .calendarSearchRowMobile .filterBtn span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .paneLeft > .scroll,
+  .paneRight > .scroll,
+  .mobileDetail > .scroll,
+  .mobileDetailScroll {
+    overscroll-behavior-y: contain;
+  }
+}
