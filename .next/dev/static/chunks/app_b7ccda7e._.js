@@ -903,46 +903,7 @@ function UpdatesSplitClient({ updates }) {
                                 fileName: "[project]/app/updates/UpdatesSplitClient.tsx",
                                 lineNumber: 410,
                                 columnNumber: 13
-                            }, this),
-                            !isMobile ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                className: "splitPageMiniFooter",
-                                "aria-hidden": "true",
-                                children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
-                                    className: "splitPageMiniFooterInner",
-                                    children: [
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            children: "Lancaster updates"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/updates/UpdatesSplitClient.tsx",
-                                            lineNumber: 415,
-                                            columnNumber: 19
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            className: "dot",
-                                            children: "•"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/updates/UpdatesSplitClient.tsx",
-                                            lineNumber: 416,
-                                            columnNumber: 19
-                                        }, this),
-                                        /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
-                                            children: "End of listings"
-                                        }, void 0, false, {
-                                            fileName: "[project]/app/updates/UpdatesSplitClient.tsx",
-                                            lineNumber: 417,
-                                            columnNumber: 19
-                                        }, this)
-                                    ]
-                                }, void 0, true, {
-                                    fileName: "[project]/app/updates/UpdatesSplitClient.tsx",
-                                    lineNumber: 414,
-                                    columnNumber: 17
-                                }, this)
-                            }, void 0, false, {
-                                fileName: "[project]/app/updates/UpdatesSplitClient.tsx",
-                                lineNumber: 413,
-                                columnNumber: 15
-                            }, this) : null
+                            }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/updates/UpdatesSplitClient.tsx",
@@ -963,23 +924,23 @@ function UpdatesSplitClient({ updates }) {
                             children: "Select an update to view details."
                         }, void 0, false, {
                             fileName: "[project]/app/updates/UpdatesSplitClient.tsx",
-                            lineNumber: 428,
+                            lineNumber: 418,
                             columnNumber: 17
                         }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$compiled$2f$react$2f$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["jsxDEV"])(UpdateDetail, {
                             update: selectedDesktop
                         }, void 0, false, {
                             fileName: "[project]/app/updates/UpdatesSplitClient.tsx",
-                            lineNumber: 430,
+                            lineNumber: 420,
                             columnNumber: 17
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/updates/UpdatesSplitClient.tsx",
-                        lineNumber: 426,
+                        lineNumber: 416,
                         columnNumber: 13
                     }, this)
                 }, void 0, false, {
                     fileName: "[project]/app/updates/UpdatesSplitClient.tsx",
-                    lineNumber: 425,
+                    lineNumber: 415,
                     columnNumber: 11
                 }, this) : null
             ]
