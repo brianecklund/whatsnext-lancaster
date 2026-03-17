@@ -1122,6 +1122,16 @@ useBodyScrollLock(mobileDetailOpen);
                   })}
                 </section>
               ))}
+
+              {!effectiveIsMobile ? (
+                <div className="splitPageMiniFooter" aria-hidden="true">
+                  <div className="splitPageMiniFooterInner">
+                    <span>What’s Next Lancaster</span>
+                    <span className="dot">•</span>
+                    <span>End of listings</span>
+                  </div>
+                </div>
+              ) : null}
                 </>
               ) : (
                 <>

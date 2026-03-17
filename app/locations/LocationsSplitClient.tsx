@@ -599,6 +599,16 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
               </div>
             )}
             </div>
+
+            {!effectiveIsMobile ? (
+              <div className="splitPageMiniFooter" aria-hidden="true">
+                <div className="splitPageMiniFooterInner">
+                  <span>Lancaster directory</span>
+                  <span className="dot">•</span>
+                  <span>End of listings</span>
+                </div>
+              </div>
+            ) : null}
           </div>
         </div>
 

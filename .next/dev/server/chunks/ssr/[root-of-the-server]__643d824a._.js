@@ -491,14 +491,18 @@ function resolveVenueByName(venues, name, address) {
 "use strict";
 
 __turbopack_context__.s([
+    "createLocationLiteFromManualFields",
+    ()=>createLocationLiteFromManualFields,
     "createLocationLiteFromVenue",
     ()=>createLocationLiteFromVenue,
+    "getLocationDocLookupKey",
+    ()=>getLocationDocLookupKey,
     "getLocationDocSummary",
     ()=>getLocationDocSummary,
+    "getVenueFields",
+    ()=>getVenueFields,
     "matchVenueFromDocData",
     ()=>matchVenueFromDocData,
-    "parseIntegrationVenue",
-    ()=>parseIntegrationVenue,
     "resolveLocationUrl",
     ()=>resolveLocationUrl
 ]);
@@ -514,30 +518,15 @@ function asText(value) {
     }
     return null;
 }
-function asVenueBlob(value) {
-    if (!value || typeof value !== 'object') return null;
-    if (value.blob && typeof value.blob === 'object') return value.blob;
-    return value;
+function normalize(value) {
+    return (value || '').trim().toLowerCase();
 }
-function parseIntegrationVenue(value) {
-    const blob = asVenueBlob(value);
-    if (!blob) return null;
-    const externalId = blob.externalId || blob.external_id || blob.place_id || blob.id || value?.id || null;
-    const name = blob.name || value?.title || value?.name || null;
-    if (!externalId && !name) return null;
+function getVenueFields(data) {
+    const venueName = typeof data?.venue_name === 'string' && data.venue_name.trim() ? data.venue_name.trim() : null;
+    const venuePlaceId = typeof data?.venue_place_id === 'string' && data.venue_place_id.trim() ? data.venue_place_id.trim() : null;
     return {
-        id: externalId || name,
-        key: externalId || name,
-        uid: null,
-        name,
-        address: blob.address || value?.description || null,
-        category: blob.category || null,
-        website: blob.website || null,
-        description: blob.description || null,
-        phone: blob.phone || null,
-        rating: typeof blob.rating === 'number' ? blob.rating : null,
-        venue_external_id: externalId,
-        source: blob.source || 'google'
+        venueName,
+        venuePlaceId
     };
 }
 function createLocationLiteFromVenue(venue, customPage) {
@@ -555,7 +544,32 @@ function createLocationLiteFromVenue(venue, customPage) {
         venue_external_id: venue.externalId,
         source: venue.source,
         customPageUid: customPage?.uid ?? null,
-        customPageUrl: customPage?.uid ? `/locations/${customPage.uid}` : null
+        customPageUrl: customPage?.uid ? `/locations/${customPage.uid}` : null,
+        googleMapsUri: null
+    };
+}
+function createLocationLiteFromManualFields(data, customPage) {
+    const { venueName, venuePlaceId } = getVenueFields(data);
+    const fallbackName = typeof data?.name === 'string' && data.name.trim() ? data.name.trim() : null;
+    const fallbackAddress = typeof data?.address === 'string' && data.address.trim() ? data.address.trim() : null;
+    const fallbackCategory = typeof data?.category === 'string' && data.category.trim() ? data.category.trim() : null;
+    const fallbackWebsite = __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$prismicio$2f$client$2f$dist$2f$index$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__prismic$3e$__["prismic"].asLink(data?.website) ?? null;
+    const name = venueName ?? fallbackName;
+    if (!name && !venuePlaceId) return null;
+    return {
+        id: venuePlaceId || name || 'location',
+        key: venuePlaceId ? `google:${venuePlaceId}` : name || 'location',
+        uid: null,
+        name,
+        address: fallbackAddress,
+        category: fallbackCategory,
+        website: fallbackWebsite,
+        description: asText(data?.description),
+        venue_external_id: venuePlaceId,
+        source: 'google',
+        customPageUid: customPage?.uid ?? null,
+        customPageUrl: customPage?.uid ? `/locations/${customPage.uid}` : null,
+        googleMapsUri: null
     };
 }
 function resolveLocationUrl(location) {
@@ -570,20 +584,27 @@ function resolveLocationUrl(location) {
     return '/locations';
 }
 function matchVenueFromDocData(venues, data) {
-    const venueField = parseIntegrationVenue(data?.venue);
-    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$resolve$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["resolveVenueById"])(venues, venueField?.venue_external_id || data?.venue_place_id, venueField?.id || null) || (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$resolve$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["resolveVenueByName"])(venues, data?.name || venueField?.name, data?.address || venueField?.address) || null;
+    const { venueName, venuePlaceId } = getVenueFields(data);
+    return (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$resolve$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["resolveVenueById"])(venues, venuePlaceId, null) || (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$venue$2d$import$2f$resolve$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["resolveVenueByName"])(venues, venueName || data?.name, data?.address) || null;
 }
 function getLocationDocSummary(doc) {
-    const venue = parseIntegrationVenue(doc.data?.venue);
+    const { venueName, venuePlaceId } = getVenueFields(doc.data);
     return {
         id: doc.id,
         uid: doc.uid ?? null,
-        name: doc.data?.name ?? venue?.name ?? null,
+        name: doc.data?.name ?? venueName ?? null,
         description: asText(doc.data?.description),
-        address: doc.data?.address ?? venue?.address ?? null,
-        website: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$prismicio$2f$client$2f$dist$2f$index$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__prismic$3e$__["prismic"].asLink(doc.data?.website) ?? venue?.website ?? null,
-        category: doc.data?.category ?? venue?.category ?? null,
-        venue_external_id: venue?.venue_external_id ?? null
+        address: doc.data?.address ?? null,
+        website: __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f40$prismicio$2f$client$2f$dist$2f$index$2e$js__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__$3c$export__$2a$__as__prismic$3e$__["prismic"].asLink(doc.data?.website) ?? null,
+        category: doc.data?.category ?? null,
+        venue_external_id: venuePlaceId ?? null
+    };
+}
+function getLocationDocLookupKey(doc) {
+    const { venueName, venuePlaceId } = getVenueFields(doc.data);
+    return {
+        venueIdKey: normalize(venuePlaceId),
+        venueNameKey: normalize(venueName || doc.data?.name)
     };
 }
 }),
@@ -626,10 +647,9 @@ async function LocationsPage() {
     const customPageByVenueId = new Map();
     const customPageByName = new Map();
     for (const doc of docs){
-        const matchedVenue = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prismic$2d$venue$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["matchVenueFromDocData"])(importedVenues, doc.data);
-        const explicitId = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prismic$2d$venue$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["parseIntegrationVenue"])(doc.data?.venue)?.venue_external_id || matchedVenue?.externalId || null;
-        if (explicitId) customPageByVenueId.set(String(explicitId).trim().toLowerCase(), doc);
-        if (doc.data?.name) customPageByName.set(String(doc.data.name).trim().toLowerCase(), doc);
+        const lookup = (0, __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$prismic$2d$venue$2e$ts__$5b$app$2d$rsc$5d$__$28$ecmascript$29$__["getLocationDocLookupKey"])(doc);
+        if (lookup.venueIdKey) customPageByVenueId.set(lookup.venueIdKey, doc);
+        if (lookup.venueNameKey) customPageByName.set(lookup.venueNameKey, doc);
     }
     const apiLocations = importedVenues.map((venue)=>{
         const customPage = customPageByVenueId.get(String(venue.externalId).trim().toLowerCase()) || customPageByName.get(String(venue.name).trim().toLowerCase()) || null;
@@ -661,7 +681,7 @@ async function LocationsPage() {
         locations: locations
     }, void 0, false, {
         fileName: "[project]/app/locations/page.tsx",
-        lineNumber: 69,
+        lineNumber: 73,
         columnNumber: 10
     }, this);
 }

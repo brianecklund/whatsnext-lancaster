@@ -408,6 +408,16 @@ export default function UpdatesSplitClient({ updates }: Props) {
             ) : null}
 
             <div className="splitPageListBody">{list}</div>
+
+            {!isMobile ? (
+              <div className="splitPageMiniFooter" aria-hidden="true">
+                <div className="splitPageMiniFooterInner">
+                  <span>Lancaster updates</span>
+                  <span className="dot">•</span>
+                  <span>End of listings</span>
+                </div>
+              </div>
+            ) : null}
           </div>
         </aside>
 
