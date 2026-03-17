@@ -2,7 +2,7 @@
 
 import type { CSSProperties, ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import type { SegmentedView } from "@/app/components/SegmentedTabs";
+import SegmentedTabs, { type SegmentedView } from "@/app/components/SegmentedTabs";
 
 type PageKey = SegmentedView;
 
@@ -46,32 +46,7 @@ export default function SplitPageLayout({
       </section>
       {children}
       {isMobile ? (
-        <div className="mobileTabs mobilePrimaryTabs" aria-label="Primary navigation">
-          <button
-            type="button"
-            className="tabBtn"
-            data-active={current === "calendar" ? "true" : "false"}
-            onClick={() => change("calendar")}
-          >
-            Calendar
-          </button>
-          <button
-            type="button"
-            className="tabBtn"
-            data-active={current === "directory" ? "true" : "false"}
-            onClick={() => change("directory")}
-          >
-            Directory
-          </button>
-          <button
-            type="button"
-            className="tabBtn"
-            data-active={current === "updates" ? "true" : "false"}
-            onClick={() => change("updates")}
-          >
-            Updates
-          </button>
-        </div>
+        <SegmentedTabs className="mobileTabs mobilePrimaryTabs" activeView={current} onChange={change} />
       ) : null}
       {mobileOverlay}
     </div>

@@ -1581,37 +1581,7 @@ useBodyScrollLock(mobileDetailOpen);
 
       {/* Mobile bottom tabs */}
       {effectiveIsMobile ? (
-        mobileDetailOpen ? (
-          <div className="mobileTabs mobileTabsDetail" aria-label="Event navigation">
-            <button
-              type="button"
-              className="tabBtn"
-              onClick={() => previousEventKey && openSelected(previousEventKey)}
-              disabled={!previousEventKey}
-              aria-disabled={!previousEventKey}
-            >
-              Previous
-            </button>
-            <button
-              type="button"
-              className="tabBtn"
-              onClick={clearSelected}
-            >
-              Cal
-            </button>
-            <button
-              type="button"
-              className="tabBtn"
-              onClick={() => nextEventKey && openSelected(nextEventKey)}
-              disabled={!nextEventKey}
-              aria-disabled={!nextEventKey}
-            >
-              Next
-            </button>
-          </div>
-        ) : (
-          <SegmentedTabs className="mobileTabs" activeView={activeView} onChange={onViewChange} />
-        )
+        <SegmentedTabs className="mobileTabs mobilePrimaryTabs" activeView={activeView} onChange={onViewChange} />
       ) : null}
 
       {/* Mobile detail overlay */}
