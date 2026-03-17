@@ -687,18 +687,6 @@ export default function HomeSplitClient({ events }: Props) {
     return weekBuckets.find((bucket) => bucket.key === selectedDisplayKey) ?? defaultWeekBucket;
   }, [defaultWeekBucket, selectedDisplayKey, weekBuckets]);
 
-  const selectedWeekIndex = useMemo(() => {
-    if (!selectedWeekBucket) return -1;
-    return weekBuckets.findIndex((bucket) => bucket.key === selectedWeekBucket.key);
-  }, [selectedWeekBucket, weekBuckets]);
-
-  const previousWeekKey =
-    selectedWeekIndex > 0 ? weekBuckets[selectedWeekIndex - 1]?.key ?? null : null;
-  const nextWeekKey =
-    selectedWeekIndex >= 0 && selectedWeekIndex < weekBuckets.length - 1
-      ? weekBuckets[selectedWeekIndex + 1]?.key ?? null
-      : null;
-
   const weekEvents = selectedWeekBucket?.events ?? [];
   const weekEventsCount = weekEvents.length;
   const weekLabel = selectedWeekBucket?.rangeLabel ?? defaultWeekBucket?.rangeLabel ?? "";
@@ -927,7 +915,7 @@ useEffect(() => {
                       />
                       <button
                         type="button"
-                        className={`viewBtn ${effectiveIsMobile ? "viewBtnSquare viewBtnIcon" : ""}`}
+                        className="viewBtn"
                         aria-label={viewMode === "month" ? "Switch to list view" : "Switch to calendar view"}
                         onClick={() => {
                           clearSelected();
@@ -935,26 +923,18 @@ useEffect(() => {
                           setParam("view", viewMode === "month" ? "list" : "month");
                         }}
                       >
-                        {effectiveIsMobile ? (
-                          <span className="controlIconWrap" aria-hidden="true">
-                            <img src="/calendar-mobile.svg" alt="" className="controlIcon" />
-                          </span>
-                        ) : (
-                          viewMode === "month" ? "List view" : "Calendar view"
-                        )}
+                        {viewMode === "month" ? (effectiveIsMobile ? "List" : "List view") : (effectiveIsMobile ? "Cal" : "Calendar view")}
                       </button>
                       {effectiveIsMobile ? (
                         <button
                           type="button"
-                          className="filterBtn filterBtnSquare filterBtnIcon"
+                          className="filterBtn"
                           aria-label={filterOpen ? "Close filters" : "Open filters"}
                           aria-expanded={filterOpen ? "true" : "false"}
                           data-active={filterOpen || !!type ? "true" : "false"}
                           onClick={() => setFilterOpen((v) => !v)}
                         >
-                          <span className="controlIconWrap" aria-hidden="true">
-                            <img src="/filter-mobile.svg" alt="" className="controlIcon" />
-                          </span>
+                          {type ? `Filter: ${type}` : "Filter"}
                         </button>
                       ) : (
                         <button
@@ -1647,33 +1627,63 @@ useEffect(() => {
       </div>
 
       {/* Mobile bottom tabs */}
-      {effectiveIsMobile && !mobileDetailOpen ? (
-        <div className="mobileTabs" aria-label="Primary navigation">
-          <button
-            type="button"
-            className="tabBtn"
-            data-active={pathname === "/" ? "true" : "false"}
-            onClick={() => router.push("/")}
-          >
-            Calendar
-          </button>
-          <button
-            type="button"
-            className="tabBtn"
-            data-active={pathname?.startsWith("/locations") ? "true" : "false"}
-            onClick={() => router.push("/locations")}
-          >
-            Directory
-          </button>
-          <button
-            type="button"
-            className="tabBtn"
-            data-active={pathname?.startsWith("/updates") ? "true" : "false"}
-            onClick={() => router.push("/updates")}
-          >
-            Updates
-          </button>
-        </div>
+      {effectiveIsMobile ? (
+        mobileDetailOpen ? (
+          <div className="mobileTabs mobileTabsDetail" aria-label="Event navigation">
+            <button
+              type="button"
+              className="tabBtn"
+              onClick={() => previousEventKey && openSelected(previousEventKey)}
+              disabled={!previousEventKey}
+              aria-disabled={!previousEventKey}
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              onClick={clearSelected}
+            >
+              Cal
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              onClick={() => nextEventKey && openSelected(nextEventKey)}
+              disabled={!nextEventKey}
+              aria-disabled={!nextEventKey}
+            >
+              Next
+            </button>
+          </div>
+        ) : (
+          <div className="mobileTabs" aria-label="Primary navigation">
+            <button
+              type="button"
+              className="tabBtn"
+              data-active={pathname === "/" ? "true" : "false"}
+              onClick={() => router.push("/")}
+            >
+              Calendar
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+              onClick={() => router.push("/locations")}
+            >
+              Directory
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+              onClick={() => router.push("/updates")}
+            >
+              Updates
+            </button>
+          </div>
+        )
       ) : null}
 
       {/* Mobile detail overlay */}
@@ -1794,66 +1804,6 @@ useEffect(() => {
             </div>
           ) : null}
         </div>
-
-        {effectiveIsMobile && mobileDetailOpen ? (
-          mobileWeeklyOpen ? (
-            <div className="mobileTabsDetail" aria-label="Week navigation">
-              <button
-                type="button"
-                className="tabBtn"
-                onClick={() => previousWeekKey && openWeek(previousWeekKey)}
-                disabled={!previousWeekKey}
-                aria-disabled={!previousWeekKey}
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                className="tabBtn"
-                onClick={clearSelected}
-              >
-                Cal
-              </button>
-              <button
-                type="button"
-                className="tabBtn"
-                onClick={() => nextWeekKey && openWeek(nextWeekKey)}
-                disabled={!nextWeekKey}
-                aria-disabled={!nextWeekKey}
-              >
-                Next
-              </button>
-            </div>
-          ) : (
-            <div className="mobileTabsDetail" aria-label="Event navigation">
-              <button
-                type="button"
-                className="tabBtn"
-                onClick={() => previousEventKey && openSelected(previousEventKey)}
-                disabled={!previousEventKey}
-                aria-disabled={!previousEventKey}
-              >
-                Previous
-              </button>
-              <button
-                type="button"
-                className="tabBtn"
-                onClick={clearSelected}
-              >
-                Cal
-              </button>
-              <button
-                type="button"
-                className="tabBtn"
-                onClick={() => nextEventKey && openSelected(nextEventKey)}
-                disabled={!nextEventKey}
-                aria-disabled={!nextEventKey}
-              >
-                Next
-              </button>
-            </div>
-          )
-        ) : null}
       </div>
 
 </div>
