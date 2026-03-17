@@ -4715,3 +4715,209 @@ svg:not(:root) {
   font-size: 0.74rem;
   color: var(--muted);
 }
+
+
+/* Smooth motion + overscroll containment refinements */
+html,
+body{
+  overscroll-behavior-x: none;
+  overscroll-behavior-y: none;
+}
+
+.main,
+.pageShell,
+.routeFrame,
+.split,
+.left,
+.right,
+.scroll,
+.leftScroll,
+.rightScroll,
+.paneLeft,
+.paneRight,
+.paneLeft > .scroll,
+.paneRight > .scroll,
+.mobileDetail,
+.mobileDetailScroll,
+.menuOverlay,
+.menuOverlayInner,
+.mobileSheetOverlay,
+.mobileSheet{
+  overscroll-behavior: none;
+}
+
+.routeFrame{
+  animation: routeFadeIn 1200ms cubic-bezier(.16,1,.3,1) both;
+  will-change: opacity, transform, filter;
+}
+
+.reveal-ready{
+  opacity: 0;
+  transform: translate3d(0, 26px, 0) scale(0.992);
+  filter: blur(10px);
+  transition:
+    opacity 980ms cubic-bezier(.16,1,.3,1),
+    transform 1180ms cubic-bezier(.16,1,.3,1),
+    filter 1180ms cubic-bezier(.16,1,.3,1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+}
+
+.reveal-visible{
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: blur(0);
+}
+
+@keyframes routeFadeIn{
+  0%{ opacity: 0; transform: translate3d(0, 18px, 0) scale(0.994); filter: blur(12px); }
+  100%{ opacity: 1; transform: translate3d(0, 0, 0) scale(1); filter: blur(0); }
+}
+
+/* Make interactive elements feel smoother as users move through the site */
+.eventRow,
+.weeklyCondRow,
+.weeklyOverview,
+.weeklyCard,
+.detailCard,
+.directoryCard,
+.directoryFeaturedCard,
+.updateCard,
+.updateRow,
+.tabBtn,
+.filterBtn,
+.clearBtn,
+.typePill,
+.dayJumpBtn,
+.directoryAlphaBtn{
+  transition:
+    transform 420ms cubic-bezier(.16,1,.3,1),
+    opacity 420ms cubic-bezier(.16,1,.3,1),
+    box-shadow 420ms cubic-bezier(.16,1,.3,1),
+    background-color 320ms ease,
+    border-color 320ms ease,
+    color 320ms ease;
+}
+
+.eventRow:hover,
+.weeklyCondRow:hover,
+.weeklyOverview:hover,
+.weeklyCard:hover,
+.directoryCard:hover,
+.directoryFeaturedCard:hover,
+.updateCard:hover,
+.updateRow:hover{
+  transform: translateY(-2px);
+}
+
+@media (prefers-reduced-motion: reduce){
+  html, body, .main, .pageShell, .routeFrame, .split, .scroll, .mobileDetail, .mobileDetailScroll{
+    scroll-behavior: auto !important;
+  }
+
+  .routeFrame{
+    animation: none !important;
+    filter: none !important;
+    transform: none !important;
+  }
+
+  .reveal-ready,
+  .reveal-visible{
+    opacity: 1 !important;
+    transform: none !important;
+    filter: none !important;
+    transition: none !important;
+  }
+}
+
+
+/* Seamless page switching refinements: no blur, no shell/UI flashing */
+.routeFrame,
+.siteHeader,
+.newsBar,
+.leftSticky,
+.mobileTabs,
+.mobileTabsDetail{
+  animation: none !important;
+  filter: none !important;
+}
+
+/* Only content should reveal; keep shell elements stable */
+.reveal-ready{
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
+  filter: none !important;
+  transition:
+    opacity 900ms cubic-bezier(.16,1,.3,1),
+    transform 1050ms cubic-bezier(.16,1,.3,1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal-visible{
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  filter: none !important;
+}
+
+/* Prevent shell controls from visually reloading between pages */
+.siteHeader *,
+.newsBar *,
+.leftSticky *,
+.mobileTabs *,
+.mobileTabsDetail *{
+  animation: none !important;
+}
+
+/* Disable any blur-based route/page transitions left in earlier styles */
+.routeFrame,
+.routeFrame *{
+  filter: none;
+}
+
+/* Keep page containers visually stable while content swaps */
+.pageShell,
+.split,
+.paneLeft,
+.paneRight{
+  opacity: 1 !important;
+  transform: none !important;
+}
+
+/* Smooth content-only transitions for cards/rows/details */
+.eventRow,
+.weeklyCondRow,
+.weeklyOverview,
+.weeklyCard,
+.detailCard,
+.directoryCard,
+.directoryFeaturedCard,
+.updateCard,
+.updateRow,
+.locationCard{
+  transition:
+    opacity 320ms ease,
+    transform 320ms ease,
+    box-shadow 320ms ease,
+    background-color 220ms ease,
+    border-color 220ms ease,
+    color 220ms ease;
+}
+
+@media (prefers-reduced-motion: reduce){
+  .reveal-ready,
+  .reveal-visible,
+  .routeFrame,
+  .siteHeader,
+  .newsBar,
+  .leftSticky,
+  .mobileTabs,
+  .mobileTabsDetail{
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+    filter: none !important;
+  }
+}

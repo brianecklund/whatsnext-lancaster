@@ -4,10 +4,6 @@ import { useEffect } from "react";
 import { usePathname } from "next/navigation";
 
 const SELECTOR = [
-  ".newsBar",
-  ".tagline",
-  ".weeklyOverview",
-  ".weeklyMobilePanel",
   ".eventRow",
   ".weeklyCondensed .weeklyCondRow",
   ".weeklyCards .weeklyCard",
@@ -20,7 +16,6 @@ const SELECTOR = [
   ".filterOverlayPanel > *",
   ".mobileDetail .detailCard",
   ".mobileDetail .detailCard > *",
-  ".menuOverlayLink",
   ".newsBar .nw__slider__item",
   ".directoryCard",
   ".directoryFeaturedCard",
@@ -36,35 +31,13 @@ export default function RevealFX() {
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) return;
 
-    try {
-      const KEY = "wnl_ui_load_v2";
-      if (!window.sessionStorage.getItem(KEY)) {
-        document.body.classList.add("ui-load-in");
-        window.sessionStorage.setItem(KEY, "1");
-        const t = window.setTimeout(() => {
-          document.body.classList.remove("ui-load-in");
-        }, 1900);
-        return () => window.clearTimeout(t);
-      }
-    } catch (e) {
-      // ignore storage issues
-    }
-  }, []);
-
-  useEffect(() => {
-    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduce) return;
-
-    const all = Array.from(document.querySelectorAll<HTMLElement>(SELECTOR)).filter(
-      (el) => !el.closest(".routeFrame .routeFrame")
-    );
-
+    const all = Array.from(document.querySelectorAll<HTMLElement>(SELECTOR));
     const unique = Array.from(new Set(all));
 
-    unique.forEach((el, index) => {
+    unique.forEach((el) => {
       el.classList.remove("reveal-visible");
       el.classList.add("reveal-ready");
-      el.style.setProperty("--reveal-delay", `${Math.min(index * 70, 720)}ms`);
+      el.style.removeProperty("--reveal-delay");
     });
 
     const observer = new IntersectionObserver(
@@ -74,10 +47,10 @@ export default function RevealFX() {
           if (!entry.isIntersecting) return;
 
           const siblings = Array.from(el.parentElement?.children || []).filter((node) =>
-            (node as HTMLElement).classList?.contains("reveal-ready")
+            (node as HTMLElement).matches?.(SELECTOR)
           ) as HTMLElement[];
           const siblingIndex = Math.max(0, siblings.indexOf(el));
-          el.style.setProperty("--reveal-delay", `${Math.min(siblingIndex * 120, 760)}ms`);
+          el.style.setProperty("--reveal-delay", `${Math.min(siblingIndex * 85, 520)}ms`);
 
           window.requestAnimationFrame(() => {
             el.classList.add("reveal-visible");
