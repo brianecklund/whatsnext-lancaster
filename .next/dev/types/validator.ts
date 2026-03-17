@@ -47,15 +47,6 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 }
 
 
-// Validate ../../../app/about/page.tsx
-{
-  type __IsExpected<Specific extends AppPageConfig<"/about">> = Specific
-  const handler = {} as typeof import("../../../app/about/page.js")
-  type __Check = __IsExpected<typeof handler>
-  // @ts-ignore
-  type __Unused = __Check
-}
-
 // Validate ../../../app/admin/venue-search/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/admin/venue-search">> = Specific
@@ -101,15 +92,6 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
-// Validate ../../../app/updates/page.tsx
-{
-  type __IsExpected<Specific extends AppPageConfig<"/updates">> = Specific
-  const handler = {} as typeof import("../../../app/updates/page.js")
-  type __Check = __IsExpected<typeof handler>
-  // @ts-ignore
-  type __Unused = __Check
-}
-
 // Validate ../../../app/api/places/details/route.ts
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/places/details">> = Specific
@@ -132,15 +114,6 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
 {
   type __IsExpected<Specific extends RouteHandlerConfig<"/api/prismic-debug">> = Specific
   const handler = {} as typeof import("../../../app/api/prismic-debug/route.js")
-  type __Check = __IsExpected<typeof handler>
-  // @ts-ignore
-  type __Unused = __Check
-}
-
-// Validate ../../../app/api/venues/import/route.ts
-{
-  type __IsExpected<Specific extends RouteHandlerConfig<"/api/venues/import">> = Specific
-  const handler = {} as typeof import("../../../app/api/venues/import/route.js")
   type __Check = __IsExpected<typeof handler>
   // @ts-ignore
   type __Unused = __Check

@@ -546,6 +546,17 @@ export default function HomeSplitClient({ events }: Props) {
     if (!root || didInitialScroll || viewMode !== "list" || !leftDayGroups.length) return;
 
     const scrollToAnchor = () => {
+      // On the default page load, keep the list at the natural top so the
+      // Weekly Overview card starts directly underneath the sticky search /
+      // filter controls instead of being scrolled up behind them.
+      if (!dayParam) {
+        root.scrollTop = 0;
+        syncVisibleDayFromScroll(0);
+        setScrollDayKey(dayKey(leftDayGroups[0].date));
+        setDidInitialScroll(true);
+        return;
+      }
+
       const target = daySectionRefs.current[selectedDayStr];
       const top = target ? Math.max(target.offsetTop - getListScrollOffset(), 0) : 0;
       root.scrollTop = top;
@@ -555,7 +566,7 @@ export default function HomeSplitClient({ events }: Props) {
     };
 
     window.requestAnimationFrame(scrollToAnchor);
-  }, [didInitialScroll, leftDayGroups, selectedDayStr, viewMode]);
+  }, [dayParam, didInitialScroll, leftDayGroups, selectedDayStr, viewMode]);
 
   useEffect(() => {
     if (dayParam) setDidInitialScroll(true);
@@ -1122,16 +1133,6 @@ useBodyScrollLock(mobileDetailOpen);
                   })}
                 </section>
               ))}
-
-              {!effectiveIsMobile ? (
-                <div className="splitPageMiniFooter" aria-hidden="true">
-                  <div className="splitPageMiniFooterInner">
-                    <span>What’s Next Lancaster</span>
-                    <span className="dot">•</span>
-                    <span>End of listings</span>
-                  </div>
-                </div>
-              ) : null}
                 </>
               ) : (
                 <>
