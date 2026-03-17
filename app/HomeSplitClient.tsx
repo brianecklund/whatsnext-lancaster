@@ -1,6 +1,9 @@
 "use client";
 
 import NewsTickerBar from "./components/NewsTickerBar";
+import ToolbarIcon from "./components/ToolbarIcon";
+import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
+import { dayKey, eventHasEnded, nearestDayWithEvents, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
@@ -47,54 +50,10 @@ type Props = {
   events: EventLite[];
 };
 
-function CalendarToggleIcon({ monthView }: { monthView: boolean }) {
-  return monthView ? (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="btnIconSvg">
-      <rect x="4" y="5" width="16" height="15" rx="3" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M8 3.75V6.25M16 3.75V6.25M4 9.25H20" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-      <path d="M8 12.5H11M8 16H11M13 12.5H16M13 16H16" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  ) : (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="btnIconSvg">
-      <rect x="4.5" y="6" width="15" height="2.2" rx="1.1" fill="currentColor" />
-      <rect x="4.5" y="10.9" width="15" height="2.2" rx="1.1" fill="currentColor" />
-      <rect x="4.5" y="15.8" width="15" height="2.2" rx="1.1" fill="currentColor" />
-    </svg>
-  );
-}
-
-function FilterToggleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="btnIconSvg">
-      <path d="M5 7H19M8.5 12H15.5M10.5 17H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}
-
 const WEEKLY_KEY = "__weekly__";
 
 function norm(v: string) {
   return (v || "").toLowerCase().trim();
-}
-
-function safeDateFromEvent(e: EventLite): Date | null {
-  const raw = e.start_datetime || e.end_datetime;
-  if (!raw) return null;
-  const d = new Date(raw);
-  return Number.isNaN(d.getTime()) ? null : d;
-}
-
-function eventHasEnded(e: EventLite): boolean {
-  const raw = e.end_datetime || e.start_datetime;
-  if (!raw) return false;
-  const d = new Date(raw);
-  return !Number.isNaN(d.getTime()) && d.getTime() < Date.now();
-}
-
-function startOfToday(): Date {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  return d;
 }
 
 function endOfWeekSaturdayFromDate(d: Date): Date {
@@ -132,38 +91,7 @@ function formatWeekRange(start: Date, end: Date): string {
   return `${startLabel}–${endLabel}`;
 }
 
-function startOfDay(d: Date): Date {
-  const x = new Date(d);
-  x.setHours(0, 0, 0, 0);
-  return x;
-}
-
-function dayKey(d: Date): string {
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const dd = String(d.getDate()).padStart(2, "0");
-  return `${y}-${m}-${dd}`;
-}
-
 const DAY_ABBR = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
-
-function nearestDayWithEvents(events: EventLite[]): Date {
-  const today = startOfToday();
-  const dated = events
-    .map((e) => safeDateFromEvent(e))
-    .filter((d): d is Date => !!d)
-    .sort((a, b) => a.getTime() - b.getTime());
-
-  if (!dated.length) return today;
-
-  const todayMatch = dated.find((d) => dayKey(d) === dayKey(today));
-  if (todayMatch) return startOfDay(todayMatch);
-
-  const upcoming = dated.find((d) => d.getTime() >= today.getTime());
-  if (upcoming) return startOfDay(upcoming);
-
-  return startOfDay(dated[dated.length - 1]);
-}
 
 function parseDayKey(ymd: string): Date | null {
   if (!ymd) return null;
@@ -780,20 +708,7 @@ const mobileWeeklyOpen =
   const mobileDetailOpen =
     effectiveIsMobile && (!!selectedEvent || mobileWeeklyOpen);
 
-useEffect(() => {
-  if (typeof document === "undefined") return;
-  if (!mobileDetailOpen) {
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-    return;
-  }
-  document.body.style.overflow = "hidden";
-  document.documentElement.style.overflow = "hidden";
-  return () => {
-    document.body.style.overflow = "";
-    document.documentElement.style.overflow = "";
-  };
-}, [mobileDetailOpen]);
+useBodyScrollLock(mobileDetailOpen);
 
   const showLeft = true;
 
@@ -958,7 +873,7 @@ useEffect(() => {
                           setParam("view", viewMode === "month" ? "list" : "month");
                         }}
                       >
-                        <CalendarToggleIcon monthView={viewMode !== "month"} />
+                        <ToolbarIcon src="/icons/calendar-alt.svg" alt="Calendar view" />
                         <span>{viewMode === "month" ? (effectiveIsMobile ? "List" : "List view") : (effectiveIsMobile ? "Calendar" : "Calendar view")}</span>
                       </button>
                       {effectiveIsMobile ? (
@@ -970,7 +885,7 @@ useEffect(() => {
                           data-active={filterOpen || !!type ? "true" : "false"}
                           onClick={() => setFilterOpen((v) => !v)}
                         >
-                          <FilterToggleIcon />
+                          <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
                           <span>{type ? `Filter: ${type}` : "Filter"}</span>
                         </button>
                       ) : (
@@ -982,7 +897,7 @@ useEffect(() => {
                           data-active={filterOpen || !!type ? "true" : "false"}
                           onClick={() => setFilterOpen((v) => !v)}
                         >
-                          <FilterToggleIcon />
+                          <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
                           <span>{type ? "Filtered" : "Filter"}</span>
                         </button>
                       )}

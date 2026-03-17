@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import ToolbarIcon from "@/app/components/ToolbarIcon";
+import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -152,31 +154,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
     }
   }, [isMobile]);
 
-  useEffect(() => {
-    const shouldLock = filterOpen || mobileDetailOpen;
-    const prevHtml = document.documentElement.style.overflow;
-    const prevBody = document.body.style.overflow;
-    const prevTouch = document.body.style.touchAction;
-
-    if (shouldLock) {
-      document.documentElement.style.overflow = "hidden";
-      document.body.style.overflow = "hidden";
-      document.body.style.touchAction = "none";
-      document.body.classList.add("overlay-open");
-    } else {
-      document.documentElement.style.overflow = prevHtml;
-      document.body.style.overflow = prevBody;
-      document.body.style.touchAction = prevTouch;
-      document.body.classList.remove("overlay-open");
-    }
-
-    return () => {
-      document.documentElement.style.overflow = prevHtml;
-      document.body.style.overflow = prevBody;
-      document.body.style.touchAction = prevTouch;
-      document.body.classList.remove("overlay-open");
-    };
-  }, [filterOpen, mobileDetailOpen]);
+  useBodyScrollLock(filterOpen || mobileDetailOpen);
 
   function setParam(key: string, value: string | null) {
     const params = new URLSearchParams(sp.toString());
@@ -239,8 +217,9 @@ export default function UpdatesSplitClient({ updates }: Props) {
               aria-label={filterOpen ? "Close filters" : "Open filters"}
               aria-expanded={filterOpen ? "true" : "false"}
               onClick={() => setFilterOpen((v) => !v)}
-            >
-              {tag ? `Filter: ${tag}` : "Filter"}
+>
+              <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
+              <span>{tag ? `Filter: ${tag}` : "Filter"}</span>
             </button>
           </div>
         ) : (

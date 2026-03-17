@@ -1,3 +1,35 @@
+
+html,
+body {
+  max-width: 100%;
+  overflow-x: clip;
+  overscroll-behavior-x: none;
+}
+
+body {
+  position: relative;
+}
+
+img, svg, video, canvas {
+  max-width: 100%;
+}
+
+.scroll,
+.paneLeft,
+.paneRight,
+.split,
+.main-container,
+.siteShell {
+  min-width: 0;
+}
+
+.btnIconImg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 16px;
+  display: block;
+}
+
 :root{
   /* Type */
   --font-sans: "Inter", "Gabarito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
@@ -4769,7 +4801,8 @@ body {
 .dayRightRow[data-past="true"],
 .eventCard[data-past="true"],
 .weeklyCard[data-past="true"] {
-  opacity: 0.62;
+  opacity: 0.52;
+  filter: grayscale(0.28);
 }
 
 .eventRow[data-past="true"][data-active="true"],
@@ -4787,6 +4820,7 @@ body {
     display: grid !important;
     grid-template-columns: minmax(0, 1fr);
     gap: 8px;
+    width: 100%;
   }
 
   .dayJumpRail {
@@ -4830,5 +4864,44 @@ body {
   .mobileDetail > .scroll,
   .mobileDetailScroll {
     overscroll-behavior-y: contain;
+  }
+}
+
+
+@media (max-width: 980px){
+  .calendarSearchRowMobile,
+  .searchRow.calendarSearchRowMobile{
+    grid-template-columns: minmax(0, 1fr) 44px 44px !important;
+  }
+
+  .calendarSearchRowMobile .viewBtn,
+  .calendarSearchRowMobile .filterBtn{
+    width: 44px;
+    min-width: 44px;
+    padding: 0 !important;
+    justify-content: center;
+  }
+
+  .calendarSearchRowMobile .viewBtn span,
+  .calendarSearchRowMobile .filterBtn span{
+    display: none;
+  }
+
+  .calendarSearchRowMobile .btnIconImg{
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+  }
+
+  .calendarSearchRowMobile .searchInput{
+    width: 100%;
+  }
+
+  .paneLeft > .scroll,
+  .paneRight > .scroll,
+  .mobileDetail > .scroll,
+  .mobileDetailScroll,
+  .directoryListScroll{
+    overscroll-behavior: contain;
   }
 }

@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import ToolbarIcon from "@/app/components/ToolbarIcon";
+import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
 import type { LocationLite } from "@/lib/types";
@@ -40,14 +42,6 @@ type Props = {
 };
 
 const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
-
-function FilterToggleIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" className="btnIconSvg">
-      <path d="M5 7H19M8.5 12H15.5M10.5 17H13.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}
 
 export default function LocationsSplitClient({ locations = [] }: Props) {
   const router = useRouter();
@@ -100,21 +94,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
     if (effectiveIsMobile) setDesktopFilterOpen(false);
   }, [effectiveIsMobile]);
 
-  useEffect(() => {
-    const shouldLock = filterOpen || (effectiveIsMobile && Boolean(selectedKey));
-    const previousHtmlOverflow = document.documentElement.style.overflow;
-    const previousBodyOverflow = document.body.style.overflow;
-
-    if (shouldLock) {
-      document.documentElement.style.overflow = "hidden";
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      document.documentElement.style.overflow = previousHtmlOverflow;
-      document.body.style.overflow = previousBodyOverflow;
-    };
-  }, [filterOpen, effectiveIsMobile, selectedKey]);
+    useBodyScrollLock(filterOpen || (effectiveIsMobile && Boolean(selectedKey)));
 
   useEffect(() => {
     if (!effectiveIsMobile) {
@@ -263,29 +243,48 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
     if (!container || visibleLetters.length === 0) return;
 
     const syncActiveLetter = () => {
+      const containerTop = container.getBoundingClientRect().top;
       const stickyHeight = leftStickyRef.current?.offsetHeight ?? 0;
-      const threshold = container.scrollTop + stickyHeight + 20;
+      const activationLine = containerTop + stickyHeight + 28;
       let current = visibleLetters[0] ?? "#";
+      let minPositive = Number.POSITIVE_INFINITY;
 
       for (const letter of visibleLetters) {
         const section = sectionRefs.current[letter];
         if (!section) continue;
-        if (section.offsetTop <= threshold) current = letter;
-        else break;
+        const top = section.getBoundingClientRect().top;
+        const delta = top - activationLine;
+        if (delta <= 0) current = letter;
+        if (delta > 0 && delta < minPositive) {
+          minPositive = delta;
+        }
       }
 
-      setActiveLetter(current);
+      if (current !== activeLetter) setActiveLetter(current);
     };
+
+    const observer = typeof IntersectionObserver !== "undefined"
+      ? new IntersectionObserver(
+          () => syncActiveLetter(),
+          { root: container, rootMargin: "-35% 0px -55% 0px", threshold: [0, 0.01, 0.1, 0.5, 1] },
+        )
+      : null;
+
+    for (const letter of visibleLetters) {
+      const section = sectionRefs.current[letter];
+      if (section && observer) observer.observe(section);
+    }
 
     syncActiveLetter();
     container.addEventListener("scroll", syncActiveLetter, { passive: true });
     window.addEventListener("resize", syncActiveLetter);
 
     return () => {
+      observer?.disconnect();
       container.removeEventListener("scroll", syncActiveLetter);
       window.removeEventListener("resize", syncActiveLetter);
     };
-  }, [visibleLetters, q, cat, featuredPartners.length]);
+  }, [visibleLetters, q, cat, featuredPartners.length, activeLetter]);
 
   function jumpToLetter(letter: string) {
     const section = sectionRefs.current[letter];
@@ -376,7 +375,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                       aria-expanded={filterOpen ? "true" : "false"}
                       onClick={() => setFilterOpen((v) => !v)}
                     >
-                      <FilterToggleIcon />
+                      <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
                       <span>{activeFilterLabel}</span>
                     </button>
                   ) : q || cat ? (
@@ -448,7 +447,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                         aria-expanded={desktopFilterOpen ? "true" : "false"}
                         onClick={() => setDesktopFilterOpen((value) => !value)}
                       >
-                        <FilterToggleIcon />
+                        <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
                         <span>{activeFilterLabel}</span>
                       </button>
 
