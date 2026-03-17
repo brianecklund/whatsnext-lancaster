@@ -18,9 +18,15 @@ export type UpdateLite = {
   title: string;
   tags: string[];
   date?: string | null;
+  sortDate?: string | null;
+  summary?: string | null;
   body?: string | null;
   link?: string | null;
+  linkLabel?: string | null;
   pinned?: boolean | null;
+  pdfUrl?: string | null;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  content_blocks?: any[] | null;
 };
 
 type LocationRow = LocationLite & { key: string };
@@ -43,6 +49,17 @@ function asText(value: unknown) {
   if (typeof value === 'string') return value || null;
   if (Array.isArray(value) && value.length > 0) {
     return prismic.asText(value as RichTextField) || null;
+  }
+  return null;
+}
+
+function extractPdfUrl(data: any) {
+  const candidates = ["pdf", "pdf_file", "attachment", "document", "file", "pdf_document"];
+  for (const key of candidates) {
+    const field = data?.[key];
+    if (!field) continue;
+    if (typeof field === "string" && field) return field;
+    if (typeof field?.url === "string" && field.url) return field.url;
   }
   return null;
 }
@@ -209,16 +226,33 @@ export async function getSiteData() {
         ? doc.data.tags.map((tag: any) => tag?.tag || tag?.text || '').filter(Boolean)
         : [],
       date: pickDateLike(doc.data, ['publish_date', 'date', 'published_at']) ?? null,
+      sortDate: pickDateLike(doc.data, ['publish_date', 'date', 'published_at']) ?? null,
+      summary: doc.data?.summary || null,
       body: asText(doc.data?.body) || asText(doc.data?.summary) || null,
       link: prismic.asLink(doc.data?.link) || prismic.asLink(doc.data?.cta_link) || null,
+      linkLabel: doc.data?.link_label || null,
       pinned: Boolean(doc.data?.pinned),
-    })).sort((a, b) => Number(Boolean(b.pinned)) - Number(Boolean(a.pinned)));
+      pdfUrl: extractPdfUrl(doc.data),
+      content_blocks: (doc.data?.content_blocks ?? doc.data?.slices ?? null) as any,
+    })).sort((a, b) => {
+      if (Boolean(a.pinned) !== Boolean(b.pinned)) return Number(Boolean(b.pinned)) - Number(Boolean(a.pinned));
+      const ta = a.sortDate ? Date.parse(a.sortDate) : Number.NaN;
+      const tb = b.sortDate ? Date.parse(b.sortDate) : Number.NaN;
+      const aValid = Number.isFinite(ta);
+      const bValid = Number.isFinite(tb);
+      if (aValid && bValid) return tb - ta;
+      if (aValid && !bValid) return -1;
+      if (!aValid && bValid) return 1;
+      return 0;
+    });
   } else {
     updates = [
       {
         id: 'u-1',
         title: 'New seasonal menu at West Art',
         date: 'This week',
+        sortDate: '2026-03-16',
+        summary: 'Seasonal menu update',
         tags: ['new seasonal menu', 'opening'],
         body: 'A handful of new drinks and a few rotating food items just hit the board. If you’re planning a night out, check the latest menu before you go.',
         link: null,
@@ -228,6 +262,8 @@ export async function getSiteData() {
         id: 'u-2',
         title: 'Parking PSA for First Friday',
         date: 'Feb 2026',
+        sortDate: '2026-02-01',
+        summary: 'Heads up for downtown traffic',
         tags: ['PSA', 'downtown'],
         body: 'Heads up: expect heavier-than-normal traffic near Gallery Row. Give yourself a few extra minutes or consider parking a few blocks out and walking in.',
         link: null,
@@ -237,6 +273,8 @@ export async function getSiteData() {
         id: 'u-3',
         title: 'Pop-up weekend: local makers market',
         date: 'Upcoming',
+        sortDate: '2026-03-22',
+        summary: 'Weekend pop-up market',
         tags: ['pop-up', 'market'],
         body: 'A short, sweet weekend market with local makers and artists. More details will land on the calendar as soon as they’re confirmed.',
         link: null,
