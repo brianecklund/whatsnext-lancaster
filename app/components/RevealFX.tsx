@@ -21,15 +21,7 @@ const SELECTOR = [
   ".paneRight .weeklyCards > *",
   ".filterOverlayPanel > *",
   ".mobileDetail .detailCard > *",
-  ".menuOverlayLink",
-  ".newsBar",
-  ".newsBar .nw__slider__item",
-  ".directoryCard",
-  ".directoryFeaturedCard",
-  ".locationCard",
-  ".updateCard",
-  ".updateRow",
-  ".dayJumpBtn"
+  ".menuOverlayLink"
 ].join(",");
 
 export default function RevealFX() {
@@ -53,24 +45,20 @@ export default function RevealFX() {
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
-          const el = entry.target as HTMLElement;
           if (!entry.isIntersecting) return;
-
+          const el = entry.target as HTMLElement;
           const siblings = Array.from(el.parentElement?.children || []).filter((node) =>
             (node as HTMLElement).classList?.contains("reveal-ready")
           ) as HTMLElement[];
           const siblingIndex = Math.max(0, siblings.indexOf(el));
-          el.style.setProperty("--reveal-delay", `${Math.min(siblingIndex * 95, 620)}ms`);
-
-          window.requestAnimationFrame(() => {
-            el.classList.add("reveal-visible");
-          });
+          el.style.setProperty("--reveal-delay", `${Math.min(siblingIndex * 70, 420)}ms`);
+          el.classList.add("reveal-visible");
           observer.unobserve(el);
         });
       },
       {
-        threshold: 0.1,
-        rootMargin: "0px 0px -8% 0px",
+        threshold: 0.14,
+        rootMargin: "0px 0px -10% 0px",
       }
     );
 
