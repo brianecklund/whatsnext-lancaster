@@ -40,11 +40,13 @@ type PlaceDetailsResponse = {
 
 type Props = {
   locations?: LocationRow[];
+  activeView?: "calendar" | "directory" | "updates";
+  onViewChange?: (view: "calendar" | "directory" | "updates") => void;
 };
 
 const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
-export default function LocationsSplitClient({ locations = [] }: Props) {
+export default function LocationsSplitClient({ locations = [], activeView = "directory", onViewChange }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -306,7 +308,8 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
       tagline="A directory of places in Lancaster to explore."
       taglineHidden={taglineHidden}
       isMobile={effectiveIsMobile}
-      current="directory"
+      current={activeView}
+      onTabChange={onViewChange}
       style={
         effectiveIsMobile
           ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties)
@@ -330,7 +333,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
         <div className="pane paneLeft">
           <div className="scroll" ref={leftScrollRef} onScroll={(e) => { if (effectiveIsMobile) setTaglineHidden((e.currentTarget as HTMLDivElement).scrollTop > 2); }}>
             <div className="leftSticky splitPageStickySurface" ref={leftStickyRef}>
-              <SegmentedTabs className="tabs" />
+              <SegmentedTabs className="tabs" activeView={activeView} onChange={onViewChange} />
 
               <div className="leftControls directoryLeftControls">
                 <div className={`searchRow${!effectiveIsMobile ? " directorySearchRowDesktop" : ""}`}>

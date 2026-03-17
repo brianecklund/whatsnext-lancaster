@@ -49,6 +49,8 @@ type EventLite = {
 
 type Props = {
   events: EventLite[];
+  activeView?: "calendar" | "directory" | "updates";
+  onViewChange?: (view: "calendar" | "directory" | "updates") => void;
 };
 
 const WEEKLY_KEY = "__weekly__";
@@ -238,7 +240,7 @@ function buildWeekInsights(items: EventLite[]) {
   return { buckets, busiestDayLabel, peakWindowLabel };
 }
 
-export default function HomeSplitClient({ events }: Props) {
+export default function HomeSplitClient({ events, activeView = "calendar", onViewChange }: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
@@ -821,7 +823,7 @@ useBodyScrollLock(mobileDetailOpen);
               }}
             >
               <div className="leftSticky" ref={leftStickyRef}>
-                <SegmentedTabs className="tabs" />
+                <SegmentedTabs className="tabs" activeView={activeView} onChange={onViewChange} />
 
                 <div className="leftControls">
                   <div className="calendarToolbar">
@@ -1608,7 +1610,7 @@ useBodyScrollLock(mobileDetailOpen);
             </button>
           </div>
         ) : (
-          <SegmentedTabs className="mobileTabs" />
+          <SegmentedTabs className="mobileTabs" activeView={activeView} onChange={onViewChange} />
         )
       ) : null}
 

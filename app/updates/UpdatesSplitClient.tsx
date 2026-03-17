@@ -19,6 +19,8 @@ export type UpdateLite = {
 
 type Props = {
   updates: UpdateLite[];
+  activeView?: "calendar" | "directory" | "updates";
+  onViewChange?: (view: "calendar" | "directory" | "updates") => void;
 };
 
 function norm(v: string) {
@@ -81,7 +83,7 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
   );
 }
 
-export default function UpdatesSplitClient({ updates }: Props) {
+export default function UpdatesSplitClient({ updates, activeView = "updates", onViewChange }: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
@@ -175,7 +177,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
 
   const leftSticky = (
     <div className="leftSticky splitPageStickySurface">
-      <SegmentedTabs className="tabs" />
+      <SegmentedTabs className="tabs" activeView={activeView} onChange={onViewChange} />
 
       <div className="leftControls">
         {isMobile ? (
@@ -289,7 +291,8 @@ export default function UpdatesSplitClient({ updates }: Props) {
       tagline="Updates, openings, menu changes, PSAs, and quick announcements."
       taglineHidden={taglineHidden}
       isMobile={isMobile}
-      current="updates"
+      current={activeView}
+      onTabChange={onViewChange}
       mobileOverlay={
         <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
           <div className="mobileDetailHeader">
