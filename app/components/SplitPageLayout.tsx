@@ -45,10 +45,10 @@ export default function SplitPageLayout({
         <div className="newsBar__intro">{tagline}</div>
       </section>
       {children}
+      {mobileOverlay}
       {isMobile ? (
         <SegmentedTabs className="mobileTabs mobilePrimaryTabs" activeView={current} onChange={change} />
       ) : null}
-      {mobileOverlay}
     </div>
   );
 }

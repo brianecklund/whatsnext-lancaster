@@ -5224,3 +5224,75 @@ body {
     overscroll-behavior: contain;
   }
 }
+
+
+/* March 17 final mobile fixes: keep sticky nav visible, restore 3-row mobile alphabet, remove top gap on detail views */
+@media (max-width: 980px){
+  .mobileTabs.mobilePrimaryTabs{
+    display: grid !important;
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px)) !important;
+    z-index: 500 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+
+  .directoryToolbarMobile{
+    display: block !important;
+    margin-top: 8px !important;
+  }
+
+  .directoryAlphabetNavMobile{
+    display: grid !important;
+    grid-template-columns: repeat(9, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    margin: 8px 0 0 0 !important;
+    padding: 0 !important;
+  }
+
+  .directoryAlphabetNavMobile .directoryAlphaBtn{
+    width: 100% !important;
+    aspect-ratio: 1 / 1 !important;
+    min-width: 0 !important;
+    min-height: 32px !important;
+    height: auto !important;
+    padding: 0 !important;
+    border-radius: 999px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    font-size: 0.72rem !important;
+  }
+
+  .mobileDetail{
+    inset: var(--headerH) 0 calc(74px + env(safe-area-inset-bottom, 0px)) 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .mobileDetailScroll,
+  .mobileDetail > .scroll{
+    padding: 0 16px calc(96px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    margin: 0 !important;
+  }
+
+  .mobileDetail .detailCard,
+  .mobileEventDetailCard,
+  .mobileWeeklyOverviewOpen,
+  .mobileDetail .detailCard > :first-child,
+  .mobileEventDetailCard > :first-child,
+  .mobileWeeklyOverviewOpen > :first-child{
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .mobileDetail .detailTitle,
+  .mobileDetail .detailMeta,
+  .mobileDetail .media16x9,
+  .mobileDetail .heroImage{
+    margin-top: 0 !important;
+  }
+}

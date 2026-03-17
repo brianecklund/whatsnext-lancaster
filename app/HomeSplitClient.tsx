@@ -1579,11 +1579,6 @@ useBodyScrollLock(mobileDetailOpen);
         ) : null}
       </div>
 
-      {/* Mobile bottom tabs */}
-      {effectiveIsMobile ? (
-        <SegmentedTabs className="mobileTabs mobilePrimaryTabs" activeView={activeView} onChange={onViewChange} />
-      ) : null}
-
       {/* Mobile detail overlay */}
       <div
         className="mobileDetail"
@@ -1704,7 +1699,10 @@ useBodyScrollLock(mobileDetailOpen);
         </div>
       </div>
 
-</div>
+      {effectiveIsMobile ? (
+        <SegmentedTabs className="mobileTabs mobilePrimaryTabs" activeView={activeView} onChange={onViewChange} />
+      ) : null}
+    </div>
     </>
   );
 }
