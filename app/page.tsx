@@ -21,30 +21,11 @@ function pickDateLike(data: any, keys: string[]) {
     if (typeof value === 'string' && value.trim()) return value;
     if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString();
     if (typeof value === 'object') {
-      const objectValue = value?.value ?? value?.iso ?? value?.start ?? value?.end;
+      const objectValue = value?.value ?? value?.iso;
       if (typeof objectValue === 'string' && objectValue.trim()) return objectValue;
     }
   }
   return null;
-}
-
-function combineDateAndTime(dateValue: string | null | undefined, timeValue: string | null | undefined, fallbackHour = 0) {
-  if (!dateValue) return null;
-  const datePart = String(dateValue).slice(0, 10);
-  if (!datePart) return null;
-
-  const rawTime = (timeValue || '').trim();
-  if (rawTime) {
-    const normalized = /^\d{2}:\d{2}$/.test(rawTime) ? `${rawTime}:00` : rawTime;
-    const iso = `${datePart}T${normalized}`;
-    const d = new Date(iso);
-    if (!Number.isNaN(d.getTime())) return d.toISOString();
-  }
-
-  const fallback = new Date(`${datePart}T00:00:00`);
-  if (Number.isNaN(fallback.getTime())) return null;
-  fallback.setHours(fallbackHour, 0, 0, 0);
-  return fallback.toISOString();
 }
 
 function asText(value: unknown) {
@@ -103,14 +84,7 @@ export default async function HomePage() {
     const tagsArr = Array.isArray(doc.data?.tags) ? doc.data.tags.map((tag: any) => tag?.tag).filter(Boolean) : [];
     const startVal = pickDateLike(doc.data, ['start_datetime', 'start_date', 'date', 'start', 'datetime', 'event_date']) ?? null;
     const endVal = pickDateLike(doc.data, ['end_datetime', 'end_date', 'end', 'end_time', 'endtime']) ?? null;
-    const simpleDate = pickDateLike(doc.data, ['event_date', 'date', 'start_date']) ?? null;
-    const simpleEndDate = pickDateLike(doc.data, ['end_date']) ?? simpleDate;
-    const startTime = (typeof doc.data?.start_time === 'string' ? doc.data.start_time : null) ?? null;
-    const endTime = (typeof doc.data?.end_time_simple === 'string' ? doc.data.end_time_simple : null) ?? (typeof doc.data?.end_time === 'string' ? doc.data.end_time : null) ?? null;
-    const simplifiedStart = combineDateAndTime(simpleDate, startTime, 9);
-    const simplifiedEnd = combineDateAndTime(simpleEndDate, endTime, 23);
-    const effectiveStart = startVal ?? simplifiedStart ?? endVal ?? simplifiedEnd;
-    const effectiveEnd = endVal ?? simplifiedEnd;
+    const effectiveStart = startVal ?? endVal;
 
     const locationPage = doc.data?.location_page ?? null;
     const { venueName, venuePlaceId } = getVenueFields(doc.data);
@@ -153,7 +127,7 @@ export default async function HomePage() {
       venue_external_id: location?.venue_external_id ?? venuePlaceId ?? null,
       location_page_uid: location?.customPageUid ?? null,
       start_datetime: effectiveStart,
-      end_datetime: effectiveEnd,
+      end_datetime: endVal,
       all_day: doc.data?.all_day ?? null,
       event_type: doc.data?.event_type ?? null,
       status: doc.data?.status ?? null,

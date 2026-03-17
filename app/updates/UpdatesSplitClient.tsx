@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import MediaBlocks from "@/app/components/MediaBlocks";
 import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
@@ -13,15 +12,8 @@ export type UpdateLite = {
   title: string;
   tags: string[];
   date?: string | null;
-  sortDate?: string | null;
-  summary?: string | null;
   body?: string | null;
   link?: string | null;
-  linkLabel?: string | null;
-  pinned?: boolean | null;
-  pdfUrl?: string | null;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  content_blocks?: any[] | null;
 };
 
 type Props = {
@@ -55,13 +47,10 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
             {update.title}
           </div>
           <div className="detailMeta fadeInItem" style={{ animationDelay: "320ms" }}>
-            {update.pinned ? <span className="pinnedBadge">Pinned</span> : null}
             {update.date ? <span>{update.date}</span> : null}
           </div>
         </div>
       </div>
-
-      {update.summary ? <div className="detailLead fadeInItem" style={{ animationDelay: "340ms" }}>{update.summary}</div> : null}
 
       {update.tags?.length ? (
         <div className="tagRow" style={{ marginTop: 10 }}>
@@ -80,19 +69,10 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
         </div>
       ) : null}
 
-      {update.pdfUrl ? (
-        <div className="updatePdfFrame fadeInItem" style={{ animationDelay: "400ms" }}>
-          <div className="updatePdfFrameLabel">Attached PDF</div>
-          <iframe src={update.pdfUrl} title={`${update.title} PDF`} className="updatePdfEmbed" />
-        </div>
-      ) : null}
-
-      {update.content_blocks?.length ? <MediaBlocks slices={update.content_blocks} /> : null}
-
       {update.link ? (
         <div className="detailLinks">
           <a className="pillBtn" href={update.link} target="_blank" rel="noreferrer">
-            {update.linkLabel || "Learn more"}
+            Learn more
           </a>
         </div>
       ) : null}
@@ -237,7 +217,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
               aria-label={filterOpen ? "Close filters" : "Open filters"}
               aria-expanded={filterOpen ? "true" : "false"}
               onClick={() => setFilterOpen((v) => !v)}
-            >
+>
               <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
               <span>{tag ? `Filter: ${tag}` : "Filter"}</span>
             </button>
@@ -311,9 +291,8 @@ export default function UpdatesSplitClient({ updates }: Props) {
         >
           <span className="eventRowTitle">{u.title}</span>
           <span className="eventRowMeta updateRowMeta">
-            {u.pinned ? <span className="updateDateBadge">Pinned</span> : null}{u.date ? <span className="updateDateBadge">{u.date}</span> : null}
+            {u.date ? <span className="updateDateBadge">{u.date}</span> : null}
           </span>
-          {u.summary ? <span className="eventRowMeta">{u.summary}</span> : null}
           {u.tags?.length ? (
             <span className="tagRow" aria-label="Update tags">
               {u.tags.slice(0, 3).map((t) => (
