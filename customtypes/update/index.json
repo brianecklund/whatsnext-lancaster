@@ -1,5 +1,8 @@
 {
-  "id": "location",
+  "id": "update",
+  "label": "Update",
+  "repeatable": true,
+  "status": true,
   "json": {
     "Main": {
       "uid": {
@@ -9,67 +12,78 @@
           "placeholder": ""
         }
       },
-      "name": {
+      "title": {
         "type": "Text",
         "config": {
-          "label": "Name",
+          "label": "Title",
           "placeholder": ""
         }
       },
-      "venue_name": {
+      "summary": {
         "type": "Text",
         "config": {
-          "label": "Venue Name",
-          "placeholder": "Venue name from the cached directory feed."
+          "label": "Summary",
+          "placeholder": "Short preview for the list view"
         }
       },
-      "venue_place_id": {
-        "type": "Text",
+      "publish_date": {
+        "type": "Date",
         "config": {
-          "label": "Venue Place ID",
-          "placeholder": "Paste the cached venue ID from the venue search helper."
+          "label": "Publish Date",
+          "placeholder": ""
         }
       },
-      "description": {
+      "pinned": {
+        "type": "Boolean",
+        "config": {
+          "label": "Pin to top",
+          "default_value": false
+        }
+      },
+      "body": {
         "type": "StructuredText",
         "config": {
-          "label": "Description",
-          "placeholder": "",
-          "allowTargetBlank": true,
-          "multi": "paragraph,preformatted,heading1,heading2,heading3,heading4,heading5,heading6,strong,em,hyperlink,image,embed,list-item,o-list-item,rtl"
+          "label": "Body",
+          "multi": "paragraph,heading2,heading3,strong,em,hyperlink,list-item,o-list-item"
         }
       },
-      "address": {
+      "tags": {
+        "type": "Group",
+        "config": {
+          "label": "Tags",
+          "repeat": true,
+          "fields": {
+            "tag": {
+              "type": "Text",
+              "config": {
+                "label": "Tag",
+                "placeholder": "opening, PSA, menu"
+              }
+            }
+          }
+        }
+      },
+      "link_label": {
         "type": "Text",
         "config": {
-          "label": "Address",
-          "placeholder": ""
+          "label": "Link Label",
+          "placeholder": "Learn more"
         }
       },
-      "website": {
+      "link": {
         "type": "Link",
         "config": {
-          "label": "Website",
-          "placeholder": "",
-          "select": null,
-          "allowTargetBlank": true,
-          "allowText": true,
-          "repeat": false
+          "label": "Link",
+          "select": "web",
+          "allowTargetBlank": true
         }
       },
-      "category": {
-        "type": "Select",
+      "pdf": {
+        "type": "Link",
         "config": {
-          "label": "Category",
-          "placeholder": "",
-          "options": [
-            "Restaurant",
-            "Bar",
-            "Shop",
-            "Gallery",
-            "Venue",
-            "Organization"
-          ]
+          "label": "PDF attachment",
+          "select": "media",
+          "allowTargetBlank": true
         }
       },
       "content_blocks": {
@@ -521,32 +535,7 @@
             }
           }
         }
-      },
-      "subtitle": {
-        "type": "Text",
-        "config": {
-          "label": "Subtitle / Eyebrow",
-          "placeholder": "Optional short line"
-        }
-      },
-      "phone": {
-        "type": "Text",
-        "config": {
-          "label": "Phone",
-          "placeholder": "(717) 555-1234"
-        }
-      },
-      "hours_note": {
-        "type": "Text",
-        "config": {
-          "label": "Hours note",
-          "placeholder": "Kitchen closes at 9 / By appointment / Seasonal hours"
-        }
       }
     }
-  },
-  "label": "Custom Venue Page",
-  "repeatable": true,
-  "status": true,
-  "format": "custom"
+  }
 }

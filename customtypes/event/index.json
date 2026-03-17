@@ -231,7 +231,7 @@
                 "media_video_file": {
                   "type": "Link",
                   "config": {
-                    "label": "Video file (mp4/webm)",
+                    "label": "Video file",
                     "select": "media",
                     "allowTargetBlank": false
                   }
@@ -245,7 +245,7 @@
                 "poster": {
                   "type": "Image",
                   "config": {
-                    "label": "Poster (optional)",
+                    "label": "Poster",
                     "constraint": {
                       "width": 2400,
                       "height": 2400
@@ -265,7 +265,7 @@
             "showcase_text": {
               "type": "Slice",
               "fieldset": "Showcase Text",
-              "description": "Text block (supports marquee kicker)",
+              "description": "Kicker, heading, and body copy",
               "icon": "text_fields",
               "display": "list",
               "non-repeat": {
@@ -285,7 +285,7 @@
                   "type": "StructuredText",
                   "config": {
                     "label": "Body",
-                    "multi": "paragraph,strong,em,hyperlink"
+                    "multi": "paragraph,heading2,heading3,strong,em,hyperlink,list-item,o-list-item"
                   }
                 },
                 "style": {
@@ -314,17 +314,17 @@
             "showcase_row": {
               "type": "Slice",
               "fieldset": "Showcase Row",
-              "description": "2-up / 3-up media row",
-              "icon": "view_column",
-              "display": "grid",
+              "description": "2-up or 3-up mixed media row",
+              "icon": "view_module",
+              "display": "list",
               "non-repeat": {
                 "layout": {
                   "type": "Select",
                   "config": {
                     "label": "Layout",
                     "options": [
-                      "2",
-                      "3"
+                      "2-up",
+                      "3-up"
                     ]
                   }
                 }
@@ -333,10 +333,10 @@
                 "image": {
                   "type": "Image",
                   "config": {
-                    "label": "Image/GIF",
+                    "label": "Image",
                     "constraint": {
-                      "width": 2400,
-                      "height": 2400
+                      "width": 1800,
+                      "height": 1800
                     },
                     "thumbnails": []
                   }
@@ -344,7 +344,7 @@
                 "video_file": {
                   "type": "Link",
                   "config": {
-                    "label": "Video file (mp4/webm)",
+                    "label": "Video file",
                     "select": "media",
                     "allowTargetBlank": false
                   }
@@ -358,10 +358,10 @@
                 "poster": {
                   "type": "Image",
                   "config": {
-                    "label": "Poster (optional)",
+                    "label": "Poster",
                     "constraint": {
-                      "width": 2400,
-                      "height": 2400
+                      "width": 1800,
+                      "height": 1800
                     },
                     "thumbnails": []
                   }
@@ -375,7 +375,7 @@
                 "behavior": {
                   "type": "Select",
                   "config": {
-                    "label": "Behavior",
+                    "label": "Hover / motion",
                     "options": [
                       "none",
                       "tilt",
@@ -388,9 +388,9 @@
             "showcase_gallery": {
               "type": "Slice",
               "fieldset": "Showcase Gallery",
-              "description": "Image grid gallery",
-              "icon": "photo_library",
-              "display": "grid",
+              "description": "Gallery of images",
+              "icon": "collections",
+              "display": "list",
               "non-repeat": {
                 "hover": {
                   "type": "Select",
@@ -409,8 +409,8 @@
                   "config": {
                     "label": "Image",
                     "constraint": {
-                      "width": 2400,
-                      "height": 2400
+                      "width": 1800,
+                      "height": 1800
                     },
                     "thumbnails": []
                   }
@@ -426,8 +426,8 @@
             "showcase_video": {
               "type": "Slice",
               "fieldset": "Showcase Video",
-              "description": "Video embed or file",
-              "icon": "ondemand_video",
+              "description": "Single video or embed",
+              "icon": "smart_display",
               "display": "list",
               "non-repeat": {
                 "video": {
@@ -439,7 +439,7 @@
                 "video_file": {
                   "type": "Link",
                   "config": {
-                    "label": "Video file (mp4/webm)",
+                    "label": "Video file",
                     "select": "media",
                     "allowTargetBlank": false
                   }
@@ -447,37 +447,10 @@
                 "poster": {
                   "type": "Image",
                   "config": {
-                    "label": "Poster (optional)",
+                    "label": "Poster",
                     "constraint": {
-                      "width": 2400,
-                      "height": 2400
-                    },
-                    "thumbnails": []
-                  }
-                },
-                "caption": {
-                  "type": "Text",
-                  "config": {
-                    "label": "Caption"
-                  }
-                }
-              },
-              "repeat": {}
-            },
-            "showcase_gif": {
-              "type": "Slice",
-              "fieldset": "Showcase GIF",
-              "description": "Single GIF/image",
-              "icon": "gif",
-              "display": "list",
-              "non-repeat": {
-                "gif": {
-                  "type": "Image",
-                  "config": {
-                    "label": "GIF",
-                    "constraint": {
-                      "width": 2400,
-                      "height": 2400
+                      "width": 2000,
+                      "height": 1200
                     },
                     "thumbnails": []
                   }
@@ -494,7 +467,7 @@
             "showcase_embed": {
               "type": "Slice",
               "fieldset": "Showcase Embed",
-              "description": "Embed (maps, widgets, etc.)",
+              "description": "Embedded map, playlist, form, etc.",
               "icon": "code",
               "display": "list",
               "non-repeat": {
@@ -515,9 +488,9 @@
             },
             "showcase_cta": {
               "type": "Slice",
-              "fieldset": "Showcase CTA",
-              "description": "Button row",
-              "icon": "call_to_action",
+              "fieldset": "CTA Buttons",
+              "description": "Call-to-action buttons",
+              "icon": "launch",
               "display": "list",
               "non-repeat": {},
               "repeat": {
@@ -546,8 +519,197 @@
                   }
                 }
               }
+            },
+            "info_grid": {
+              "type": "Slice",
+              "fieldset": "Info Grid",
+              "description": "Quick facts or details in cards",
+              "icon": "dashboard",
+              "display": "list",
+              "non-repeat": {
+                "heading": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Heading"
+                  }
+                }
+              },
+              "repeat": {
+                "label": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Label"
+                  }
+                },
+                "value": {
+                  "type": "StructuredText",
+                  "config": {
+                    "label": "Value",
+                    "multi": "paragraph,strong,em,hyperlink"
+                  }
+                }
+              }
+            },
+            "schedule": {
+              "type": "Slice",
+              "fieldset": "Schedule",
+              "description": "Agenda, timeline, or running order",
+              "icon": "schedule",
+              "display": "list",
+              "non-repeat": {
+                "heading": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Heading"
+                  }
+                }
+              },
+              "repeat": {
+                "time": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Time"
+                  }
+                },
+                "title": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Title"
+                  }
+                },
+                "body": {
+                  "type": "StructuredText",
+                  "config": {
+                    "label": "Body",
+                    "multi": "paragraph,strong,em,hyperlink"
+                  }
+                }
+              }
+            },
+            "quote": {
+              "type": "Slice",
+              "fieldset": "Quote",
+              "description": "Pull quote or testimonial",
+              "icon": "format_quote",
+              "display": "list",
+              "non-repeat": {
+                "quote": {
+                  "type": "StructuredText",
+                  "config": {
+                    "label": "Quote",
+                    "multi": "paragraph,strong,em"
+                  }
+                },
+                "attribution": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Attribution"
+                  }
+                }
+              },
+              "repeat": {}
+            },
+            "downloads": {
+              "type": "Slice",
+              "fieldset": "Downloads",
+              "description": "Attach files, menus, PDFs, maps, and one-sheets",
+              "icon": "download",
+              "display": "list",
+              "non-repeat": {
+                "heading": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Heading"
+                  }
+                }
+              },
+              "repeat": {
+                "label": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Label"
+                  }
+                },
+                "file": {
+                  "type": "Link",
+                  "config": {
+                    "label": "File",
+                    "select": "media",
+                    "allowTargetBlank": true
+                  }
+                }
+              }
+            },
+            "showcase_gif": {
+              "type": "Slice",
+              "fieldset": "Showcase GIF",
+              "description": "Animated GIF",
+              "icon": "gif_box",
+              "display": "list",
+              "non-repeat": {
+                "gif": {
+                  "type": "Image",
+                  "config": {
+                    "label": "GIF",
+                    "constraint": {
+                      "width": 1800,
+                      "height": 1800
+                    },
+                    "thumbnails": []
+                  }
+                },
+                "caption": {
+                  "type": "Text",
+                  "config": {
+                    "label": "Caption"
+                  }
+                }
+              },
+              "repeat": {}
             }
           }
+        }
+      },
+      "event_date": {
+        "type": "Date",
+        "config": {
+          "label": "Event Date (simple)",
+          "placeholder": ""
+        }
+      },
+      "start_time": {
+        "type": "Text",
+        "config": {
+          "label": "Start Time (simple)",
+          "placeholder": "19:00"
+        }
+      },
+      "end_time_simple": {
+        "type": "Text",
+        "config": {
+          "label": "End Time (simple)",
+          "placeholder": "21:30"
+        }
+      },
+      "end_date": {
+        "type": "Date",
+        "config": {
+          "label": "End Date (optional)",
+          "placeholder": ""
+        }
+      },
+      "subtitle": {
+        "type": "Text",
+        "config": {
+          "label": "Subtitle / Eyebrow",
+          "placeholder": "Optional short line above body content"
+        }
+      },
+      "cta_label": {
+        "type": "Text",
+        "config": {
+          "label": "Primary CTA Label",
+          "placeholder": "Get tickets / RSVP / Learn more"
         }
       }
     }
