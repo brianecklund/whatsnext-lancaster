@@ -5059,3 +5059,37 @@ body{
     padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
+
+
+/* Keep mobile sticky controls fully inside the viewport */
+@media (max-width: 980px){
+  .mobileTabs,
+  .mobileTabsDetail{
+    inset: auto 0 0 0 !important;
+    bottom: 0 !important;
+    padding: 8px 12px 8px 12px !important;
+    min-height: 62px;
+    align-items: center;
+    transform: translateY(0) !important;
+  }
+
+  .mobileTabs::after,
+  .mobileTabsDetail::after{
+    content: "";
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+  }
+
+  .mobileTabs .tabBtn,
+  .mobileTabsDetail .tabBtn{
+    position: relative;
+    z-index: 1;
+  }
+
+  .paneLeft > .scroll,
+  .mobileDetailScroll,
+  .mobileDetail > .scroll{
+    padding-bottom: 94px !important;
+  }
+}

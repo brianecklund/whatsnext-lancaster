@@ -687,6 +687,18 @@ export default function HomeSplitClient({ events }: Props) {
     return weekBuckets.find((bucket) => bucket.key === selectedDisplayKey) ?? defaultWeekBucket;
   }, [defaultWeekBucket, selectedDisplayKey, weekBuckets]);
 
+  const selectedWeekIndex = useMemo(() => {
+    if (!selectedWeekBucket) return -1;
+    return weekBuckets.findIndex((bucket) => bucket.key === selectedWeekBucket.key);
+  }, [selectedWeekBucket, weekBuckets]);
+
+  const previousWeekKey =
+    selectedWeekIndex > 0 ? weekBuckets[selectedWeekIndex - 1]?.key ?? null : null;
+  const nextWeekKey =
+    selectedWeekIndex >= 0 && selectedWeekIndex < weekBuckets.length - 1
+      ? weekBuckets[selectedWeekIndex + 1]?.key ?? null
+      : null;
+
   const weekEvents = selectedWeekBucket?.events ?? [];
   const weekEventsCount = weekEvents.length;
   const weekLabel = selectedWeekBucket?.rangeLabel ?? defaultWeekBucket?.rangeLabel ?? "";
@@ -1637,33 +1649,63 @@ useEffect(() => {
       {/* Mobile bottom tabs */}
       {effectiveIsMobile ? (
         mobileDetailOpen ? (
-          <div className="mobileTabs mobileTabsDetail" aria-label="Event navigation">
-            <button
-              type="button"
-              className="tabBtn"
-              onClick={() => previousEventKey && openSelected(previousEventKey)}
-              disabled={!previousEventKey}
-              aria-disabled={!previousEventKey}
-            >
-              Previous
-            </button>
-            <button
-              type="button"
-              className="tabBtn"
-              onClick={clearSelected}
-            >
-              Cal
-            </button>
-            <button
-              type="button"
-              className="tabBtn"
-              onClick={() => nextEventKey && openSelected(nextEventKey)}
-              disabled={!nextEventKey}
-              aria-disabled={!nextEventKey}
-            >
-              Next
-            </button>
-          </div>
+          mobileWeeklyOpen ? (
+            <div className="mobileTabs mobileTabsDetail" aria-label="Week navigation">
+              <button
+                type="button"
+                className="tabBtn"
+                onClick={() => previousWeekKey && openWeek(previousWeekKey)}
+                disabled={!previousWeekKey}
+                aria-disabled={!previousWeekKey}
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                className="tabBtn"
+                onClick={clearSelected}
+              >
+                Cal
+              </button>
+              <button
+                type="button"
+                className="tabBtn"
+                onClick={() => nextWeekKey && openWeek(nextWeekKey)}
+                disabled={!nextWeekKey}
+                aria-disabled={!nextWeekKey}
+              >
+                Next
+              </button>
+            </div>
+          ) : (
+            <div className="mobileTabs mobileTabsDetail" aria-label="Event navigation">
+              <button
+                type="button"
+                className="tabBtn"
+                onClick={() => previousEventKey && openSelected(previousEventKey)}
+                disabled={!previousEventKey}
+                aria-disabled={!previousEventKey}
+              >
+                Previous
+              </button>
+              <button
+                type="button"
+                className="tabBtn"
+                onClick={clearSelected}
+              >
+                Cal
+              </button>
+              <button
+                type="button"
+                className="tabBtn"
+                onClick={() => nextEventKey && openSelected(nextEventKey)}
+                disabled={!nextEventKey}
+                aria-disabled={!nextEventKey}
+              >
+                Next
+              </button>
+            </div>
+          )
         ) : (
           <div className="mobileTabs" aria-label="Primary navigation">
             <button
