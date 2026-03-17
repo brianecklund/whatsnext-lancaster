@@ -100,7 +100,7 @@ export async function getSiteData() {
       ],
     }).catch(() => [] as any[]),
     client.getAllByType('location').catch(() => [] as any[]),
-    client.getAllByType('update').catch(() => [] as any[]),
+    client.getAllByType('update' as any).catch(() => [] as any[]),
   ]);
 
   const customLocationByVenueId = new Map<string, any>();
