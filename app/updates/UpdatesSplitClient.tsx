@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import MediaBlocks from "@/app/components/MediaBlocks";
+import SegmentedControl from "@/app/components/SegmentedControl";
 import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export type UpdateLite = {
   id: string;
@@ -24,8 +25,12 @@ export type UpdateLite = {
   content_blocks?: any[] | null;
 };
 
+type SectionKey = "calendar" | "directory" | "updates";
+
 type Props = {
   updates: UpdateLite[];
+  activeSection?: SectionKey;
+  onChangeSection?: (section: SectionKey) => void;
 };
 
 function norm(v: string) {
@@ -100,15 +105,21 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
   );
 }
 
-export default function UpdatesSplitClient({ updates }: Props) {
+export default function UpdatesSplitClient({ updates, activeSection = "updates", onChangeSection }: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
-  const pathname = usePathname();
 
   const q = sp.get("q") || "";
   const tag = sp.get("tag") || "";
   const selectedKey = sp.get("u") || "";
+
+  function handleSectionChange(section: SectionKey) {
+    if (onChangeSection) onChangeSection(section);
+    else if (section === "calendar") router.push("/");
+    else if (section === "directory") router.push("/locations");
+    else router.push("/updates");
+  }
 
   const [isMobile, setIsMobile] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
@@ -194,34 +205,19 @@ export default function UpdatesSplitClient({ updates }: Props) {
 
   const leftSticky = (
     <div className="leftSticky splitPageStickySurface">
-      <div className="tabs" aria-label="Primary navigation">
-        <button
-          type="button"
-          className="tabBtn"
-          data-active={pathname === "/" ? "true" : "false"}
-          onClick={() => router.push("/")}
-        >
-          Calendar
-        </button>
-        <button
-          type="button"
-          className="tabBtn"
-          data-active={pathname?.startsWith("/locations") ? "true" : "false"}
-          onClick={() => router.push("/locations")}
-        >
-          Directory
-        </button>
-        <button
-          type="button"
-          className="tabBtn"
-          data-active={pathname?.startsWith("/updates") ? "true" : "false"}
-          onClick={() => router.push("/updates")}
-        >
-          Updates
-        </button>
-      </div>
+      <SegmentedControl
+                className="tabs tabsSegmented"
+                ariaLabel="Primary navigation"
+                activeKey={activeSection}
+                onChange={(key) => handleSectionChange(key as SectionKey)}
+                options={[
+                  { key: "calendar", label: "Calendar" },
+                  { key: "directory", label: "Directory" },
+                  { key: "updates", label: "Updates" },
+                ]}
+              />
 
-      <div className="leftControls">
+              <div className="leftControls">
         {isMobile ? (
           <div className="searchRow">
             <input
@@ -335,6 +331,21 @@ export default function UpdatesSplitClient({ updates }: Props) {
       taglineHidden={taglineHidden}
       isMobile={isMobile}
       current="updates"
+      mobileTabs={
+        <div className="mobileTabs" aria-label="Primary navigation">
+          <SegmentedControl
+            className="mobileSegmentedControl"
+            ariaLabel="Primary navigation"
+            activeKey={activeSection}
+            onChange={(key) => handleSectionChange(key as SectionKey)}
+            options={[
+              { key: "calendar", label: "Calendar" },
+              { key: "directory", label: "Directory" },
+              { key: "updates", label: "Updates" },
+            ]}
+          />
+        </div>
+      }
       mobileOverlay={
         <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
           <div className="mobileDetailHeader">

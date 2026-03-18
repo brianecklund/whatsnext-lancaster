@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import SegmentedControl from "@/app/components/SegmentedControl";
 import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
 import type { LocationLite } from "@/lib/types";
 import { mergeDirectoryCategories } from "@/lib/directoryCategories";
@@ -37,15 +38,18 @@ type PlaceDetailsResponse = {
 };
 
 
+type SectionKey = "calendar" | "directory" | "updates";
+
 type Props = {
   locations?: LocationRow[];
+  activeSection?: SectionKey;
+  onChangeSection?: (section: SectionKey) => void;
 };
 
 const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
-export default function LocationsSplitClient({ locations = [] }: Props) {
+export default function LocationsSplitClient({ locations = [], activeSection = "directory", onChangeSection }: Props) {
   const router = useRouter();
-  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const safeLocations = useMemo<LocationRow[]>(
@@ -68,6 +72,13 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
   const selectedKey = searchParams.get("location");
   const q = searchParams.get("q") ?? "";
   const cat = searchParams.get("cat") ?? "";
+
+  function handleSectionChange(section: SectionKey) {
+    if (onChangeSection) onChangeSection(section);
+    else if (section === "calendar") router.push("/");
+    else if (section === "directory") router.push("/locations");
+    else router.push("/updates");
+  }
 
   useEffect(() => {
     setMounted(true);
@@ -311,6 +322,21 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
           ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties)
           : undefined
       }
+      mobileTabs={
+        <div className="mobileTabs" aria-label="Primary navigation">
+          <SegmentedControl
+            className="mobileSegmentedControl"
+            ariaLabel="Primary navigation"
+            activeKey={activeSection}
+            onChange={(key) => handleSectionChange(key as SectionKey)}
+            options={[
+              { key: "calendar", label: "Calendar" },
+              { key: "directory", label: "Directory" },
+              { key: "updates", label: "Updates" },
+            ]}
+          />
+        </div>
+      }
       mobileOverlay={
         <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
           <div className="mobileDetailHeader">
@@ -329,32 +355,17 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
         <div className="pane paneLeft">
           <div className="scroll" ref={leftScrollRef} onScroll={(e) => { if (effectiveIsMobile) setTaglineHidden((e.currentTarget as HTMLDivElement).scrollTop > 2); }}>
             <div className="leftSticky splitPageStickySurface" ref={leftStickyRef}>
-              <div className="tabs" aria-label="Primary navigation">
-                <button
-                  type="button"
-                  className="tabBtn"
-                  data-active={pathname === "/" ? "true" : "false"}
-                  onClick={() => router.push("/")}
-                >
-                  Calendar
-                </button>
-                <button
-                  type="button"
-                  className="tabBtn"
-                  data-active={pathname.startsWith("/locations") ? "true" : "false"}
-                  onClick={() => router.push("/locations")}
-                >
-                  Directory
-                </button>
-                <button
-                  type="button"
-                  className="tabBtn"
-                  data-active={pathname.startsWith("/updates") ? "true" : "false"}
-                  onClick={() => router.push("/updates")}
-                >
-                  Updates
-                </button>
-              </div>
+              <SegmentedControl
+                className="tabs tabsSegmented"
+                ariaLabel="Primary navigation"
+                activeKey={activeSection}
+                onChange={(key) => handleSectionChange(key as SectionKey)}
+                options={[
+                  { key: "calendar", label: "Calendar" },
+                  { key: "directory", label: "Directory" },
+                  { key: "updates", label: "Updates" },
+                ]}
+              />
 
               <div className="leftControls directoryLeftControls">
                 <div className={`searchRow${!effectiveIsMobile ? " directorySearchRowDesktop" : ""}`}>
