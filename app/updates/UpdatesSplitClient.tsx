@@ -6,7 +6,6 @@ import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
-import SegmentedTabs from "@/app/components/SegmentedTabs";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export type UpdateLite = {
@@ -27,8 +26,6 @@ export type UpdateLite = {
 
 type Props = {
   updates: UpdateLite[];
-  activeView?: "calendar" | "directory" | "updates";
-  onViewChange?: (view: "calendar" | "directory" | "updates") => void;
 };
 
 function norm(v: string) {
@@ -103,7 +100,7 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
   );
 }
 
-export default function UpdatesSplitClient({ updates, activeView = "updates", onViewChange }: Props) {
+export default function UpdatesSplitClient({ updates }: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
@@ -197,7 +194,32 @@ export default function UpdatesSplitClient({ updates, activeView = "updates", on
 
   const leftSticky = (
     <div className="leftSticky splitPageStickySurface">
-      <SegmentedTabs className="tabs" activeView={activeView} onChange={onViewChange} />
+      <div className="tabs" aria-label="Primary navigation">
+        <button
+          type="button"
+          className="tabBtn"
+          data-active={pathname === "/" ? "true" : "false"}
+          onClick={() => router.push("/")}
+        >
+          Calendar
+        </button>
+        <button
+          type="button"
+          className="tabBtn"
+          data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+          onClick={() => router.push("/locations")}
+        >
+          Directory
+        </button>
+        <button
+          type="button"
+          className="tabBtn"
+          data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+          onClick={() => router.push("/updates")}
+        >
+          Updates
+        </button>
+      </div>
 
       <div className="leftControls">
         {isMobile ? (
@@ -312,8 +334,7 @@ export default function UpdatesSplitClient({ updates, activeView = "updates", on
       tagline="Updates, openings, menu changes, PSAs, and quick announcements."
       taglineHidden={taglineHidden}
       isMobile={isMobile}
-      current={activeView}
-      onTabChange={onViewChange}
+      current="updates"
       mobileOverlay={
         <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
           <div className="mobileDetailHeader">

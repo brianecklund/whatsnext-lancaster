@@ -433,6 +433,100 @@ if (
           );
         }
 
+
+        // --- Info grid / quick facts ---
+        if (type.includes("info_grid") || type.includes("facts") || type.includes("details_grid")) {
+          const heading = asText(primary?.heading ?? primary?.title ?? "");
+          const rows = items
+            .map((it: any) => ({
+              label: asText(it?.label ?? it?.title ?? ""),
+              value: asText(it?.value ?? it?.text ?? it?.body ?? ""),
+            }))
+            .filter((row: any) => row.label || row.value);
+          if (!rows.length) return null;
+          return (
+            <section className="mbSection motionReveal" key={`${type}-${idx}`}>
+              {heading ? <div className="mbHeading">{heading}</div> : null}
+              <div className="infoGrid">
+                {rows.map((row: any, j: number) => (
+                  <div className="infoGridItem" key={`${idx}-info-${j}`}>
+                    {row.label ? <div className="infoGridLabel">{row.label}</div> : null}
+                    {row.value ? <div className="infoGridValue">{row.value}</div> : null}
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        }
+
+        // --- Schedule / agenda ---
+        if (type.includes("schedule") || type.includes("agenda") || type.includes("timeline")) {
+          const heading = asText(primary?.heading ?? primary?.title ?? "");
+          const rows = items
+            .map((it: any) => ({
+              time: asText(it?.time ?? it?.label ?? ""),
+              title: asText(it?.title ?? it?.heading ?? ""),
+              body: asText(it?.body ?? it?.description ?? it?.text ?? ""),
+            }))
+            .filter((row: any) => row.time || row.title || row.body);
+          if (!rows.length) return null;
+          return (
+            <section className="mbSection motionReveal" key={`${type}-${idx}`}>
+              {heading ? <div className="mbHeading">{heading}</div> : null}
+              <div className="scheduleList">
+                {rows.map((row: any, j: number) => (
+                  <div className="scheduleItem" key={`${idx}-schedule-${j}`}>
+                    <div className="scheduleTime">{row.time}</div>
+                    <div className="scheduleContent">
+                      {row.title ? <div className="scheduleTitle">{row.title}</div> : null}
+                      {row.body ? <div className="scheduleBody">{row.body}</div> : null}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          );
+        }
+
+        // --- Quote / pull quote ---
+        if (type.includes("quote") || type.includes("testimonial")) {
+          const quote = asText(primary?.quote ?? primary?.body ?? primary?.text ?? "");
+          const attribution = asText(primary?.attribution ?? primary?.source ?? primary?.cite ?? "");
+          if (!quote) return null;
+          return (
+            <section className="mbSection motionReveal" key={`${type}-${idx}`}>
+              <blockquote className="mbQuote">
+                <p>{quote}</p>
+                {attribution ? <footer>{attribution}</footer> : null}
+              </blockquote>
+            </section>
+          );
+        }
+
+        // --- Downloads / files ---
+        if (type.includes("download") || type.includes("file")) {
+          const heading = asText(primary?.heading ?? primary?.title ?? "");
+          const files = items
+            .map((it: any) => ({
+              label: asText(it?.label ?? it?.title ?? ""),
+              url: asUrl(it?.file ?? it?.url ?? it?.link),
+            }))
+            .filter((row: any) => row.label && row.url);
+          if (!files.length) return null;
+          return (
+            <section className="mbSection motionReveal" key={`${type}-${idx}`}>
+              {heading ? <div className="mbHeading">{heading}</div> : null}
+              <div className="mbButtons">
+                {files.map((file: any, j: number) => (
+                  <a key={`${idx}-file-${j}`} className="mbBtn" href={file.url} target="_blank" rel="noreferrer">
+                    {file.label}
+                  </a>
+                ))}
+              </div>
+            </section>
+          );
+        }
+
         // Unknown slice type: no-op (keeps the UI resilient)
         return null;
       })}

@@ -5,7 +5,6 @@ import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
-import SegmentedTabs from "@/app/components/SegmentedTabs";
 import type { LocationLite } from "@/lib/types";
 import { mergeDirectoryCategories } from "@/lib/directoryCategories";
 
@@ -40,13 +39,11 @@ type PlaceDetailsResponse = {
 
 type Props = {
   locations?: LocationRow[];
-  activeView?: "calendar" | "directory" | "updates";
-  onViewChange?: (view: "calendar" | "directory" | "updates") => void;
 };
 
 const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
-export default function LocationsSplitClient({ locations = [], activeView = "directory", onViewChange }: Props) {
+export default function LocationsSplitClient({ locations = [] }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -308,8 +305,7 @@ export default function LocationsSplitClient({ locations = [], activeView = "dir
       tagline="A directory of places in Lancaster to explore."
       taglineHidden={taglineHidden}
       isMobile={effectiveIsMobile}
-      current={activeView}
-      onTabChange={onViewChange}
+      current="directory"
       style={
         effectiveIsMobile
           ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties)
@@ -333,7 +329,32 @@ export default function LocationsSplitClient({ locations = [], activeView = "dir
         <div className="pane paneLeft">
           <div className="scroll" ref={leftScrollRef} onScroll={(e) => { if (effectiveIsMobile) setTaglineHidden((e.currentTarget as HTMLDivElement).scrollTop > 2); }}>
             <div className="leftSticky splitPageStickySurface" ref={leftStickyRef}>
-              <SegmentedTabs className="tabs" activeView={activeView} onChange={onViewChange} />
+              <div className="tabs" aria-label="Primary navigation">
+                <button
+                  type="button"
+                  className="tabBtn"
+                  data-active={pathname === "/" ? "true" : "false"}
+                  onClick={() => router.push("/")}
+                >
+                  Calendar
+                </button>
+                <button
+                  type="button"
+                  className="tabBtn"
+                  data-active={pathname.startsWith("/locations") ? "true" : "false"}
+                  onClick={() => router.push("/locations")}
+                >
+                  Directory
+                </button>
+                <button
+                  type="button"
+                  className="tabBtn"
+                  data-active={pathname.startsWith("/updates") ? "true" : "false"}
+                  onClick={() => router.push("/updates")}
+                >
+                  Updates
+                </button>
+              </div>
 
               <div className="leftControls directoryLeftControls">
                 <div className={`searchRow${!effectiveIsMobile ? " directorySearchRowDesktop" : ""}`}>

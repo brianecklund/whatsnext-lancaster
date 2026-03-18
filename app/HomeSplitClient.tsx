@@ -1,7 +1,6 @@
 "use client";
 
 import NewsTickerBar from "./components/NewsTickerBar";
-import SegmentedTabs from "./components/SegmentedTabs";
 import ToolbarIcon from "./components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { dayKey, eventHasEnded, nearestDayWithEvents, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
@@ -49,8 +48,6 @@ type EventLite = {
 
 type Props = {
   events: EventLite[];
-  activeView?: "calendar" | "directory" | "updates";
-  onViewChange?: (view: "calendar" | "directory" | "updates") => void;
 };
 
 const WEEKLY_KEY = "__weekly__";
@@ -240,7 +237,7 @@ function buildWeekInsights(items: EventLite[]) {
   return { buckets, busiestDayLabel, peakWindowLabel };
 }
 
-export default function HomeSplitClient({ events, activeView = "calendar", onViewChange }: Props) {
+export default function HomeSplitClient({ events }: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
@@ -823,7 +820,32 @@ useBodyScrollLock(mobileDetailOpen);
               }}
             >
               <div className="leftSticky" ref={leftStickyRef}>
-                <SegmentedTabs className="tabs" activeView={activeView} onChange={onViewChange} />
+                <div className="tabs" aria-label="Primary navigation">
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname === "/" ? "true" : "false"}
+                    onClick={() => router.push("/")}
+                  >
+                    Calendar
+                  </button>
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+                    onClick={() => router.push("/locations")}
+                  >
+                    Directory
+                  </button>
+                  <button
+                    type="button"
+                    className="tabBtn"
+                    data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+                    onClick={() => router.push("/updates")}
+                  >
+                    Updates
+                  </button>
+                </div>
 
                 <div className="leftControls">
                   <div className="calendarToolbar">
@@ -1579,6 +1601,66 @@ useBodyScrollLock(mobileDetailOpen);
         ) : null}
       </div>
 
+      {/* Mobile bottom tabs */}
+      {effectiveIsMobile ? (
+        mobileDetailOpen ? (
+          <div className="mobileTabs mobileTabsDetail" aria-label="Event navigation">
+            <button
+              type="button"
+              className="tabBtn"
+              onClick={() => previousEventKey && openSelected(previousEventKey)}
+              disabled={!previousEventKey}
+              aria-disabled={!previousEventKey}
+            >
+              Previous
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              onClick={clearSelected}
+            >
+              Cal
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              onClick={() => nextEventKey && openSelected(nextEventKey)}
+              disabled={!nextEventKey}
+              aria-disabled={!nextEventKey}
+            >
+              Next
+            </button>
+          </div>
+        ) : (
+          <div className="mobileTabs" aria-label="Primary navigation">
+            <button
+              type="button"
+              className="tabBtn"
+              data-active={pathname === "/" ? "true" : "false"}
+              onClick={() => router.push("/")}
+            >
+              Calendar
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              data-active={pathname?.startsWith("/locations") ? "true" : "false"}
+              onClick={() => router.push("/locations")}
+            >
+              Directory
+            </button>
+            <button
+              type="button"
+              className="tabBtn"
+              data-active={pathname?.startsWith("/updates") ? "true" : "false"}
+              onClick={() => router.push("/updates")}
+            >
+              Updates
+            </button>
+          </div>
+        )
+      ) : null}
+
       {/* Mobile detail overlay */}
       <div
         className="mobileDetail"
@@ -1699,10 +1781,7 @@ useBodyScrollLock(mobileDetailOpen);
         </div>
       </div>
 
-      {effectiveIsMobile ? (
-        <SegmentedTabs className="mobileTabs mobileViewportTabs mobilePrimaryTabs" activeView={activeView} onChange={onViewChange} />
-      ) : null}
-    </div>
+</div>
     </>
   );
 }
