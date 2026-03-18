@@ -733,6 +733,77 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   gap: 12px;
 }
 
+.segmentedControl{
+  --segPad: 4px;
+  --segRadius: 999px;
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: repeat(var(--segments), minmax(0, 1fr));
+  gap: 0;
+  width: 100%;
+  padding: var(--segPad);
+  border: 1px solid var(--border);
+  border-radius: var(--segRadius);
+  background: color-mix(in srgb, var(--btnBg) 88%, white 12%);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.04);
+  overflow: hidden;
+}
+
+.segmentedControl__pill{
+  position: absolute;
+  top: var(--segPad);
+  bottom: var(--segPad);
+  left: var(--segPad);
+  width: calc((100% - (var(--segPad) * 2)) / var(--segments));
+  border-radius: calc(var(--segRadius) - 4px);
+  background: var(--accent);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.12);
+  transform: translateX(calc(100% * var(--active-index)));
+  transition: transform 220ms cubic-bezier(.2,.8,.2,1), width 220ms cubic-bezier(.2,.8,.2,1);
+  z-index: 0;
+}
+
+.segmentedControl__button{
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 0;
+  width: 100%;
+  height: 46px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: calc(var(--segRadius) - 4px);
+  background: transparent;
+  color: var(--muted);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  transition: color 180ms ease, opacity 180ms ease, transform 180ms ease;
+}
+
+.segmentedControl__button[data-active="true"],
+.segmentedControl__button[data-visual-active="true"]{
+  color: #fff;
+}
+
+.segmentedControl__button:hover{
+  text-decoration: none;
+}
+
+.segmentedControl__button:disabled{
+  opacity: 0.45;
+}
+
+.segmentedControl--detail .segmentedControl__pill{
+  background: #111;
+}
+
+.segmentedControl--primary{
+  margin-bottom: 0;
+}
+
 .tabBtn{
   display:inline-flex;
   align-items:center;
@@ -1077,6 +1148,20 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   .mobileTabs .tabBtn{
     flex: 1;
     min-width: 0;
+    height: 48px;
+    font-size: var(--fs-body);
+  }
+
+  .mobileTabs .segmentedControl,
+  .mobileTabsDetail .segmentedControl{
+    width: 100%;
+  }
+
+  .segmentedControl--mobile{
+    --segPad: 4px;
+  }
+
+  .segmentedControl--mobile .segmentedControl__button{
     height: 48px;
     font-size: var(--fs-body);
   }
@@ -5089,73 +5174,13 @@ body {
   background:white;
 }
 
-.segmentedControl{
-  position:relative;
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  align-items:center;
-  gap:0;
-  padding:4px;
-  border-radius:999px;
-  border:1px solid rgba(18,18,18,.12);
-  background:rgba(255,255,255,.88);
-  backdrop-filter:blur(14px);
-  -webkit-backdrop-filter:blur(14px);
-  overflow:hidden;
+
+::view-transition-old(root),
+::view-transition-new(root){
+  animation-duration: 180ms;
 }
 
-.segmentedThumb{
-  position:absolute;
-  top:4px;
-  bottom:4px;
-  left:4px;
-  border-radius:999px;
-  background:#111;
-  transition:transform .28s cubic-bezier(.22,1,.36,1);
-  box-shadow:0 10px 22px rgba(0,0,0,.14);
-}
-
-.segmentedButton{
-  position:relative;
-  z-index:1;
-  min-height:42px;
-  border:0;
-  background:transparent;
-  border-radius:999px;
-  font:inherit;
-  color:rgba(17,17,17,.72);
-  transition:color .22s ease, opacity .22s ease;
-}
-
-.segmentedButton[data-active="true"]{
-  color:#fff;
-}
-
-.segmentedButton:disabled{
-  opacity:.42;
-}
-
-.tabsSegmented{
-  width:100%;
-  margin-bottom:10px;
-}
-
-.mobileSegmentedControl{
-  width:min(100%, 520px);
-  margin:0 auto;
-}
-
-.mobileTabs,
-.mobileTabsDetail{
-  display:flex;
-  justify-content:center;
-}
-
-.unifiedShellContent{
-  animation:unifiedSectionFade .28s ease;
-}
-
-@keyframes unifiedSectionFade{
-  from{opacity:.55; transform:translateY(10px)}
-  to{opacity:1; transform:translateY(0)}
+.pageShell,
+.split{
+  view-transition-name: page-shell;
 }

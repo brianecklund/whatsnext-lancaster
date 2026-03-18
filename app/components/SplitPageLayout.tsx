@@ -1,8 +1,9 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import SegmentedControl from "@/app/components/SegmentedControl";
 
-export type PageKey = "calendar" | "directory" | "updates";
+type PageKey = "calendar" | "directory" | "updates";
 
 type Props = {
   tagline: string;
@@ -12,7 +13,6 @@ type Props = {
   children: ReactNode;
   mobileOverlay?: ReactNode;
   style?: CSSProperties;
-  mobileTabs?: ReactNode;
 };
 
 export default function SplitPageLayout({
@@ -23,16 +23,27 @@ export default function SplitPageLayout({
   children,
   mobileOverlay,
   style,
-  mobileTabs,
 }: Props) {
-
   return (
     <div className="pageShell" style={style}>
       <section className={`newsBar pageIntroBar ${taglineHidden ? "pageIntroBarHidden" : ""}`} aria-label="Page introduction">
         <div className="newsBar__intro">{tagline}</div>
       </section>
       {children}
-      {isMobile ? mobileTabs ?? null : null}
+      {isMobile ? (
+        <div className="mobileTabs mobilePrimaryTabs" aria-label="Primary navigation">
+          <SegmentedControl
+            className="segmentedControl--mobile"
+            ariaLabel="Primary navigation"
+            currentKey={current}
+            items={[
+              { key: "calendar", label: "Calendar", href: "/" },
+              { key: "directory", label: "Directory", href: "/locations" },
+              { key: "updates", label: "Updates", href: "/updates" },
+            ]}
+          />
+        </div>
+      ) : null}
       {mobileOverlay}
     </div>
   );

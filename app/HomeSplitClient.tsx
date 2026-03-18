@@ -1,7 +1,6 @@
 "use client";
 
 import NewsTickerBar from "./components/NewsTickerBar";
-import SegmentedControl from "@/app/components/SegmentedControl";
 import ToolbarIcon from "./components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { dayKey, eventHasEnded, nearestDayWithEvents, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
@@ -9,6 +8,7 @@ import { dayKey, eventHasEnded, nearestDayWithEvents, safeDateFromEvent, startOf
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
+import SegmentedControl from "@/app/components/SegmentedControl";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 type EventLite = {
@@ -47,12 +47,8 @@ type EventLite = {
   content_blocks?: any[] | null;
 };
 
-type SectionKey = "calendar" | "directory" | "updates";
-
 type Props = {
   events: EventLite[];
-  activeSection?: SectionKey;
-  onChangeSection?: (section: SectionKey) => void;
 };
 
 const WEEKLY_KEY = "__weekly__";
@@ -242,31 +238,22 @@ function buildWeekInsights(items: EventLite[]) {
   return { buckets, busiestDayLabel, peakWindowLabel };
 }
 
-export default function HomeSplitClient({ events, activeSection = "calendar", onChangeSection }: Props) {
+export default function HomeSplitClient({ events }: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
-  const currentSection: SectionKey = activeSection;
 
   const q = sp.get("q") || "";
   const type = sp.get("type") || "";
   const view = sp.get("view") || "list";
   const dayParam = sp.get("day");
 
-  function handleSectionChange(section: SectionKey) {
-    if (onChangeSection) onChangeSection(section);
-    else if (section === "calendar") router.push("/");
-    else if (section === "directory") router.push("/locations");
-    else router.push("/updates");
-  }
-
   const listRef = useRef<HTMLDivElement | null>(null);
   const daySectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const [scrollDayKey, setScrollDayKey] = useState<string | null>(null);
   const leftStickyRef = useRef<HTMLDivElement | null>(null);
   const [didInitialScroll, setDidInitialScroll] = useState(false);
-  const [detailNavState, setDetailNavState] = useState<"prev" | "cal" | "next">("cal");
 
   // Staged intro animation (runs once per session): UI first, then list + right content.
   useEffect(() => {
@@ -396,7 +383,7 @@ export default function HomeSplitClient({ events, activeSection = "calendar", on
   }
   function pushParams(next: URLSearchParams) {
     const qs = next.toString();
-    router.push(`/${qs ? `?${qs}` : ""}`);
+    router.push(`${pathname}${qs ? `?${qs}` : ""}`);
   }
 
   function setParam(key: string, value: string | null) {
@@ -835,14 +822,13 @@ useBodyScrollLock(mobileDetailOpen);
             >
               <div className="leftSticky" ref={leftStickyRef}>
                 <SegmentedControl
-                  className="tabs tabsSegmented"
+                  className="tabs segmentedControl--primary"
                   ariaLabel="Primary navigation"
-                  activeKey={currentSection}
-                  onChange={(key) => handleSectionChange(key as SectionKey)}
-                  options={[
-                    { key: "calendar", label: "Calendar" },
-                    { key: "directory", label: "Directory" },
-                    { key: "updates", label: "Updates" },
+                  currentKey={pathname?.startsWith("/updates") ? "updates" : pathname?.startsWith("/locations") ? "directory" : "calendar"}
+                  items={[
+                    { key: "calendar", label: "Calendar", href: "/" },
+                    { key: "directory", label: "Directory", href: "/locations" },
+                    { key: "updates", label: "Updates", href: "/updates" },
                   ]}
                 />
 
@@ -1605,49 +1591,27 @@ useBodyScrollLock(mobileDetailOpen);
         mobileDetailOpen ? (
           <div className="mobileTabs mobileTabsDetail" aria-label="Event navigation">
             <SegmentedControl
-              className="mobileSegmentedControl"
+              className="segmentedControl--mobile segmentedControl--detail"
               ariaLabel="Event navigation"
-              activeKey={detailNavState}
-              onChange={(key) => {
-                if (key === "prev") {
-                  if (!previousEventKey) return;
-                  setDetailNavState("prev");
-                  window.setTimeout(() => {
-                    openSelected(previousEventKey);
-                    setDetailNavState("cal");
-                  }, 160);
-                  return;
-                }
-                if (key === "next") {
-                  if (!nextEventKey) return;
-                  setDetailNavState("next");
-                  window.setTimeout(() => {
-                    openSelected(nextEventKey);
-                    setDetailNavState("cal");
-                  }, 160);
-                  return;
-                }
-                setDetailNavState("cal");
-                clearSelected();
-              }}
-              options={[
-                { key: "prev", label: "Prev.", disabled: !previousEventKey },
-                { key: "cal", label: "Cal." },
-                { key: "next", label: "Next", disabled: !nextEventKey },
+              currentKey="cal"
+              resetToKeyAfterAction="cal"
+              items={[
+                { key: "previous", label: "Prev.", onClick: () => previousEventKey && openSelected(previousEventKey), disabled: !previousEventKey },
+                { key: "cal", label: "Cal.", onClick: clearSelected },
+                { key: "next", label: "Next", onClick: () => nextEventKey && openSelected(nextEventKey), disabled: !nextEventKey },
               ]}
             />
           </div>
         ) : (
           <div className="mobileTabs" aria-label="Primary navigation">
             <SegmentedControl
-              className="mobileSegmentedControl"
+              className="segmentedControl--mobile"
               ariaLabel="Primary navigation"
-              activeKey={currentSection}
-              onChange={(key) => handleSectionChange(key as SectionKey)}
-              options={[
-                { key: "calendar", label: "Calendar" },
-                { key: "directory", label: "Directory" },
-                { key: "updates", label: "Updates" },
+              currentKey={pathname?.startsWith("/updates") ? "updates" : pathname?.startsWith("/locations") ? "directory" : "calendar"}
+              items={[
+                { key: "calendar", label: "Calendar", href: "/" },
+                { key: "directory", label: "Directory", href: "/locations" },
+                { key: "updates", label: "Updates", href: "/updates" },
               ]}
             />
           </div>
