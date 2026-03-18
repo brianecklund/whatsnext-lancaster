@@ -1700,7 +1700,7 @@ useBodyScrollLock(mobileDetailOpen);
       </div>
 
       {effectiveIsMobile ? (
-        <SegmentedTabs className="mobileTabs mobilePrimaryTabs" activeView={activeView} onChange={onViewChange} />
+        <SegmentedTabs className="mobileTabs mobileViewportTabs mobilePrimaryTabs" activeView={activeView} onChange={onViewChange} />
       ) : null}
     </div>
     </>

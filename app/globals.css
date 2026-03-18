@@ -5613,3 +5613,65 @@ body {
     padding-top: 12px !important;
   }
 }
+
+
+/* March 17 hard fix: viewport-pinned mobile segmented nav */
+.mobileViewportTabs{
+  display:none;
+}
+
+@media (max-width: 980px){
+  .mobileViewportTabs{
+    display:grid !important;
+    position:fixed !important;
+    left:12px !important;
+    right:12px !important;
+    bottom:max(12px, env(safe-area-inset-bottom, 0px)) !important;
+    top:auto !important;
+    width:auto !important;
+    max-width:calc(100vw - 24px) !important;
+    margin:0 !important;
+    padding:6px !important;
+    border-radius:999px !important;
+    z-index:2147483000 !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    pointer-events:auto !important;
+    transform:none !important;
+    overflow:visible !important;
+    box-shadow:0 14px 34px rgba(0,0,0,0.18) !important;
+    background:rgba(255,255,255,0.96) !important;
+    -webkit-backdrop-filter:blur(14px);
+    backdrop-filter:blur(14px);
+  }
+
+  .mobileViewportTabs .tabBtn{
+    min-width:0 !important;
+    height:46px !important;
+  }
+
+  .mobileViewportTabs .segmentedTabsThumb{
+    border-radius:999px !important;
+  }
+
+  .pageShell,
+  .split,
+  .paneLeft,
+  .paneRight,
+  .scroll,
+  .mobileDetail,
+  .mobileDetailScroll{
+    overflow-x:hidden !important;
+  }
+
+  .splitPageListBody,
+  .paneLeft > .scroll,
+  .leftScroll,
+  .directoryListWrap,
+  .calendarList,
+  .eventsList,
+  .mobileDetail > .scroll,
+  .mobileDetailScroll{
+    padding-bottom:calc(104px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}

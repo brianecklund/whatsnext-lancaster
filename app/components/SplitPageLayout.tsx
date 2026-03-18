@@ -47,7 +47,7 @@ export default function SplitPageLayout({
       {children}
       {mobileOverlay}
       {isMobile ? (
-        <SegmentedTabs className="mobileTabs mobilePrimaryTabs" activeView={current} onChange={change} />
+        <SegmentedTabs className="mobileTabs mobileViewportTabs mobilePrimaryTabs" activeView={current} onChange={change} />
       ) : null}
     </div>
   );
