@@ -5460,3 +5460,156 @@ body {
     padding-top: 0 !important;
   }
 }
+
+/* March 17 final hardfix: mobile bottom tabs must stay fixed in viewport, calendar mobile detail must render inline under nav (not overlay), and directory A–Z must stay in a 3-row grid */
+@media (max-width: 980px){
+  html, body {
+    overflow-x: hidden !important;
+    width: 100% !important;
+    max-width: 100vw !important;
+  }
+
+  body {
+    padding-bottom: calc(86px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .pageShell,
+  .split,
+  .pane,
+  .paneLeft,
+  .paneRight,
+  .scroll,
+  .leftSticky,
+  .leftControls,
+  .searchRow,
+  .directoryToolbar,
+  .directoryToolbarMobile,
+  .directoryAlphabetNav,
+  .directoryAlphabetNavMobile,
+  .weeklyCard,
+  .eventRow,
+  .detailCard,
+  .mobileDetail,
+  .mobileDetailScroll {
+    width: 100% !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    overflow-x: hidden !important;
+    box-sizing: border-box !important;
+  }
+
+  .mobileTabs.mobilePrimaryTabs {
+    position: fixed !important;
+    left: 12px !important;
+    right: 12px !important;
+    bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    top: auto !important;
+    width: auto !important;
+    max-width: calc(100vw - 24px) !important;
+    display: grid !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    z-index: 10000 !important;
+    transform: none !important;
+    margin: 0 !important;
+  }
+
+  .mobileTabs.mobilePrimaryTabs .tabBtn {
+    min-width: 0 !important;
+  }
+
+  .directoryToolbarMobile {
+    display: block !important;
+    width: 100% !important;
+    margin-top: 8px !important;
+  }
+
+  .directoryAlphabetNavMobile {
+    display: grid !important;
+    grid-template-columns: repeat(9, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 8px 0 0 0 !important;
+    padding: 0 !important;
+  }
+
+  .directoryAlphabetNavMobile .directoryAlphaBtn {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto !important;
+    min-height: 34px !important;
+    aspect-ratio: 1 / 1 !important;
+    border-radius: 999px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .paneLeft > .scroll,
+  .leftScroll,
+  .directoryListWrap,
+  .mobileDetail > .scroll,
+  .mobileDetailScroll {
+    padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] {
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .split {
+    display: none !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail {
+    position: relative !important;
+    inset: auto !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: 1 !important;
+    display: block !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    background: var(--bg) !important;
+    min-height: calc(100dvh - var(--headerH) - 96px) !important;
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    border-top: 0 !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail[data-open="false"] {
+    display: none !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetailHeader {
+    display: none !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail > .scroll,
+  .pageShell[data-mobile-detail-open="true"] .mobileDetailScroll {
+    height: auto !important;
+    min-height: calc(100dvh - var(--headerH) - 96px) !important;
+    overflow-y: auto !important;
+    padding: 0 16px calc(112px + env(safe-area-inset-bottom, 0px)) 16px !important;
+    margin: 0 !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail .detailCard,
+  .pageShell[data-mobile-detail-open="true"] .mobileEventDetailCard,
+  .pageShell[data-mobile-detail-open="true"] .mobileWeeklyOverviewOpen,
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail .detailTitle,
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail .detailMeta,
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail .media16x9 {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail .detailTitle {
+    padding-top: 12px !important;
+  }
+}
