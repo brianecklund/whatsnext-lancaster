@@ -26,7 +26,7 @@ export default function SegmentedControl({
   currentKey,
   ariaLabel,
   className = "",
-  delayMs = 140,
+  delayMs = 320,
   resetToKeyAfterAction = null,
   resetDelayMs = 220,
 }: Props) {
@@ -35,6 +35,7 @@ export default function SegmentedControl({
   const [isPending, setIsPending] = useState(false);
   const timeoutRef = useRef<number | null>(null);
   const resetRef = useRef<number | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     items.forEach((item) => {
@@ -71,6 +72,10 @@ export default function SegmentedControl({
     setVisualKey(item.key);
     setIsPending(true);
 
+    if (typeof document !== "undefined") {
+      document.documentElement.dataset.routeSwitching = "true";
+    }
+
     if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
     timeoutRef.current = window.setTimeout(() => {
       if (isRoute && item.href) {
@@ -90,6 +95,9 @@ export default function SegmentedControl({
           resetRef.current = window.setTimeout(() => {
             setVisualKey(resetToKeyAfterAction);
             setIsPending(false);
+            if (typeof document !== "undefined") {
+              delete document.documentElement.dataset.routeSwitching;
+            }
           }, resetDelayMs);
           return;
         }
@@ -100,10 +108,12 @@ export default function SegmentedControl({
 
   return (
     <div
+      ref={rootRef}
       className={`segmentedControl ${className}`.trim()}
       style={{ ["--segments" as string]: cols, ["--active-index" as string]: activeIndex } as CSSProperties}
       role="tablist"
       aria-label={ariaLabel}
+      data-pending={isPending ? "true" : "false"}
     >
       <div className="segmentedControl__pill" aria-hidden="true" />
       {items.map((item) => {

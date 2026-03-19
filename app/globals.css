@@ -425,7 +425,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .routeFrame{
   height: 100%;
-  animation: routeFadeIn 820ms var(--ease-out) both;
+  animation: routeFadeIn 460ms cubic-bezier(.22,1,.36,1) both;
 }
 
 .tagline{
@@ -760,7 +760,8 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   background: var(--accent);
   box-shadow: 0 8px 18px rgba(0,0,0,0.12);
   transform: translateX(calc(100% * var(--active-index)));
-  transition: transform 220ms cubic-bezier(.2,.8,.2,1), width 220ms cubic-bezier(.2,.8,.2,1);
+  transition: transform 380ms cubic-bezier(.22,1,.36,1), width 380ms cubic-bezier(.22,1,.36,1), box-shadow 220ms ease;
+  will-change: transform;
   z-index: 0;
 }
 
@@ -790,6 +791,15 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .segmentedControl__button:hover{
   text-decoration: none;
+}
+
+
+.segmentedControl[data-pending="true"] .segmentedControl__pill{
+  box-shadow: 0 10px 24px rgba(0,0,0,0.16);
+}
+
+.segmentedControl[data-pending="true"] .segmentedControl__button{
+  pointer-events: none;
 }
 
 .segmentedControl__button:disabled{
@@ -5177,7 +5187,14 @@ body {
 
 ::view-transition-old(root),
 ::view-transition-new(root){
-  animation-duration: 180ms;
+  animation-duration: 320ms;
+  animation-timing-function: cubic-bezier(.22,1,.36,1);
+}
+
+html[data-route-switching="true"] .routeFrame{
+  opacity: 0.94;
+  transform: translateY(4px);
+  transition: opacity 220ms ease, transform 320ms cubic-bezier(.22,1,.36,1);
 }
 
 .pageShell,
