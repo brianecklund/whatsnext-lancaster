@@ -140,7 +140,7 @@ export default function SiteHeader() {
       </Link>
 
       <nav className="topNav" aria-label="Primary">
-        {DESKTOP_LINKS.map((l) => (
+        {DESKTOP_LINKS.map((l, idx) => (
           <Link
             key={l.href}
             className="navLink"
@@ -213,7 +213,7 @@ export default function SiteHeader() {
                 </div>
 
                 <nav className="mobileSheetList mobileMenuList" aria-label="Mobile primary">
-                  {DESKTOP_LINKS.map((l) => (
+                  {DESKTOP_LINKS.map((l, idx) => (
                     <Link
                       key={l.href}
                       className="mobileSheetAction mobileMenuAction"
