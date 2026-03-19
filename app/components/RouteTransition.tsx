@@ -14,9 +14,5 @@ export default function RouteTransition({ children }: { children: ReactNode }) {
     return () => window.clearTimeout(t);
   }, [pathname]);
 
-  return (
-    <div key={pathname} className="routeFrame">
-      {children}
-    </div>
-  );
+  return <div className="routeFrame">{children}</div>;
 }

@@ -57,7 +57,6 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
-  const [desktopFilterOpen, setDesktopFilterOpen] = useState(false);
   const [mobileOverlayOffset, setMobileOverlayOffset] = useState(0);
   const [activeLetter, setActiveLetter] = useState("#");
   const [taglineHidden, setTaglineHidden] = useState(false);
@@ -92,7 +91,6 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
       setFilterOpen(false);
       setTaglineHidden(false);
     }
-    if (effectiveIsMobile) setDesktopFilterOpen(false);
   }, [effectiveIsMobile]);
 
     useBodyScrollLock(filterOpen || (effectiveIsMobile && Boolean(selectedKey)));
@@ -120,7 +118,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
       window.removeEventListener("resize", updateOffset);
       ro?.disconnect();
     };
-  }, [effectiveIsMobile, q, cat, filterOpen, desktopFilterOpen]);
+  }, [effectiveIsMobile, q, cat, filterOpen]);
 
   function navigate(params: URLSearchParams) {
     const qs = params.toString();
@@ -365,51 +363,16 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                     </button>
                   ) : (
                     <>
-                      <div className="directoryFilterWrap">
-                        <button
-                          type="button"
-                          className="filterBtn filterBtnSquare squareIconBtn"
-                          data-active={desktopFilterOpen || !!cat ? "true" : "false"}
-                          aria-label={desktopFilterOpen ? "Close filters" : activeFilterLabel}
-                          aria-expanded={desktopFilterOpen ? "true" : "false"}
-                          onClick={() => setDesktopFilterOpen((value) => !value)}
-                        >
-                          <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
-                        </button>
-
-                        {desktopFilterOpen ? (
-                          <div className="directoryFilterMenu" role="dialog" aria-label="Directory filters">
-                            <button
-                              type="button"
-                              className="directoryFilterOption"
-                              data-active={!cat ? "true" : "false"}
-                              onClick={() => {
-                                setCategory(null);
-                                setDesktopFilterOpen(false);
-                              }}
-                            >
-                              All
-                            </button>
-                            {categories.map((t) => {
-                              const on = normalize(cat) === normalize(t);
-                              return (
-                                <button
-                                  key={t}
-                                  type="button"
-                                  className="directoryFilterOption"
-                                  data-active={on ? "true" : "false"}
-                                  onClick={() => {
-                                    setCategory(on ? null : t);
-                                    setDesktopFilterOpen(false);
-                                  }}
-                                >
-                                  {t}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        ) : null}
-                      </div>
+<button
+                        type="button"
+                        className="filterBtn filterBtnSquare squareIconBtn"
+                        data-active={filterOpen || !!cat ? "true" : "false"}
+                        aria-label={filterOpen ? "Close filters" : activeFilterLabel}
+                        aria-expanded={filterOpen ? "true" : "false"}
+                        onClick={() => setFilterOpen((value) => !value)}
+                      >
+                        <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
+                      </button>
 
                       {q || cat ? (
                         <button
@@ -418,7 +381,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                           onClick={() => {
                             setQuery("");
                             setCategory(null);
-                            setDesktopFilterOpen(false);
+                            
                           }}
                         >
                           Clear
@@ -452,14 +415,14 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
               </div>
             </div>
 
-            {effectiveIsMobile && filterOpen ? (
-              <div className="mobileSheetOverlay" role="dialog" aria-modal="true" onClick={() => setFilterOpen(false)}>
-                <div className="mobileSheet" onClick={(e) => e.stopPropagation()}>
-                  <div className="mobileSheetHeader">
-                    <div className="mobileSheetTitle">Directory filters</div>
+            {filterOpen ? (
+              <div className={`filterOverlay filterOverlay--pane${effectiveIsMobile ? " filterOverlay--mobilePane" : ""}`} role="dialog" aria-modal="true" aria-label="Directory filters" onClick={() => setFilterOpen(false)}>
+                <div className="filterOverlayPanel filterOverlayPanel--pane" onClick={(e) => e.stopPropagation()}>
+                  <div className="filterOverlayHeader">
+                    <div className="filterOverlayTitle">Directory filters</div>
                     <button
                       type="button"
-                      className="mobileSheetClose"
+                      className="filterOverlayClose"
                       onClick={() => setFilterOpen(false)}
                       aria-label="Close filters"
                     >
@@ -467,10 +430,10 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                     </button>
                   </div>
 
-                  <div className="mobileSheetList" role="group" aria-label="Directory filters">
+                  <div className="typePills" role="group" aria-label="Directory filters">
                     <button
                       type="button"
-                      className="mobileSheetAction"
+                      className="typePill"
                       data-active={!cat ? "true" : "false"}
                       onClick={() => {
                         setCategory(null);
@@ -485,7 +448,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                         <button
                           key={t}
                           type="button"
-                          className="mobileSheetAction"
+                          className="typePill"
                           data-active={on ? "true" : "false"}
                           onClick={() => {
                             setCategory(on ? null : t);
@@ -501,7 +464,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
                   {q || cat ? (
                     <button
                       type="button"
-                      className="mobileSheetClear"
+                      className="filterOverlayClear"
                       onClick={() => {
                         setQuery("");
                         setCategory(null);

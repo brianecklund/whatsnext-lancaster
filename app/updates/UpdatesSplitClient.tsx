@@ -228,7 +228,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
             </button>
           </div>
         ) : (
-          <>
+          <div className="searchRow directorySearchRowDesktop">
             <input
               className="searchInput"
               placeholder="Search updates…"
@@ -236,6 +236,16 @@ export default function UpdatesSplitClient({ updates }: Props) {
               onChange={(e) => setParam("q", e.target.value)}
               aria-label="Search updates"
             />
+            <button
+              type="button"
+              className="filterBtn filterBtnSquare squareIconBtn"
+              aria-label={filterOpen ? "Close filters" : "Open filters"}
+              aria-expanded={filterOpen ? "true" : "false"}
+              data-active={filterOpen || !!tag ? "true" : "false"}
+              onClick={() => setFilterOpen((v) => !v)}
+            >
+              <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
+            </button>
             {q || tag ? (
               <button
                 className="clearBtn"
@@ -248,36 +258,9 @@ export default function UpdatesSplitClient({ updates }: Props) {
                 Clear
               </button>
             ) : null}
-          </>
+          </div>
         )}
       </div>
-
-      {!isMobile ? (
-        <div className="typePills" role="group" aria-label="Update filters">
-          <button
-            type="button"
-            className="typePill"
-            data-active={!tag ? "true" : "false"}
-            onClick={() => setParam("tag", null)}
-          >
-            All
-          </button>
-          {tags.map((t) => {
-            const on = norm(tag) === norm(t);
-            return (
-              <button
-                key={t}
-                type="button"
-                className="typePill"
-                data-active={on ? "true" : "false"}
-                onClick={() => setParam("tag", on ? null : t)}
-              >
-                {t}
-              </button>
-            );
-          })}
-        </div>
-      ) : null}
     </div>
   );
 
@@ -344,15 +327,15 @@ export default function UpdatesSplitClient({ updates }: Props) {
           >
             {leftSticky}
 
-            {isMobile && filterOpen ? (
+            {filterOpen ? (
               <div
-                className="filterOverlay"
+                className={`filterOverlay filterOverlay--pane${isMobile ? " filterOverlay--mobilePane" : ""}`}
                 role="dialog"
                 aria-modal="true"
                 aria-label="Filters"
                 onClick={() => setFilterOpen(false)}
               >
-                <div className="filterOverlayPanel" onClick={(e) => e.stopPropagation()}>
+                <div className="filterOverlayPanel filterOverlayPanel--pane" onClick={(e) => e.stopPropagation()}>
                   <div className="filterOverlayHeader">
                     <div className="filterOverlayTitle">Filters</div>
                     <button

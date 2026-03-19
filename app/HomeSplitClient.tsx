@@ -727,7 +727,7 @@ const mobileWeeklyOpen =
   const mobileDetailOpen =
     effectiveIsMobile && (!!selectedEvent || mobileWeeklyOpen);
 
-useBodyScrollLock(mobileDetailOpen);
+useBodyScrollLock(filterOpen || mobileDetailOpen);
 
   const showLeft = true;
 
@@ -922,70 +922,15 @@ useBodyScrollLock(mobileDetailOpen);
 
               </div>
 
-              {!effectiveIsMobile ? (
+              {filterOpen ? (
                 <div
-                  className="filterDropdown"
-                  data-open={filterOpen ? "true" : "false"}
-                  aria-hidden={filterOpen ? "false" : "true"}
-                >
-                  <div className="filterDropdownInner">
-                    <div className="typePills" role="group" aria-label="Event type filters">
-                      <button
-                        type="button"
-                        className="typePill"
-                        data-active={!type ? "true" : "false"}
-                        onClick={() => {
-                          setParam("type", null);
-                          setFilterOpen(false);
-                        }}
-                      >
-                        All
-                      </button>
-                      {eventTypes.map((t) => {
-                        const on = norm(type) === norm(t);
-                        return (
-                          <button
-                            key={t}
-                            type="button"
-                            className="typePill"
-                            data-active={on ? "true" : "false"}
-                            onClick={() => {
-                              setParam("type", on ? null : t);
-                              setFilterOpen(false);
-                            }}
-                          >
-                            {t}
-                          </button>
-                        );
-                      })}
-                    </div>
-                    {(q || type) ? (
-                      <button
-                        type="button"
-                        className="filterDropdownClear"
-                        onClick={() => {
-                          setParam("q", null);
-                          setParam("type", null);
-                          setFilterOpen(false);
-                        }}
-                      >
-                        Clear search & filters
-                      </button>
-                    ) : null}
-                  </div>
-                </div>
-              ) : null}
-
-              {/* Mobile filter overlay */}
-              {effectiveIsMobile && filterOpen ? (
-                <div
-                  className="filterOverlay"
+                  className={`filterOverlay filterOverlay--pane${effectiveIsMobile ? " filterOverlay--mobilePane" : ""}`}
                   role="dialog"
                   aria-modal="true"
                   aria-label="Filters"
                   onClick={() => setFilterOpen(false)}
                 >
-                  <div className="filterOverlayPanel" onClick={(e) => e.stopPropagation()}>
+                  <div className="filterOverlayPanel filterOverlayPanel--pane" onClick={(e) => e.stopPropagation()}>
                     <div className="filterOverlayHeader">
                       <div className="filterOverlayTitle">Filters</div>
                       <button

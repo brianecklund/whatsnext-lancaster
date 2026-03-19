@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 type Item = {
@@ -31,6 +32,7 @@ export default function SegmentedControl({
   resetDelayMs = 220,
 }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const [visualKey, setVisualKey] = useState(currentKey);
   const [isPending, setIsPending] = useState(false);
   const timeoutRef = useRef<number | null>(null);
@@ -44,8 +46,30 @@ export default function SegmentedControl({
   }, [items, router]);
 
   useEffect(() => {
-    if (!isPending) setVisualKey(currentKey);
-  }, [currentKey, isPending]);
+    try {
+      const pending = window.sessionStorage.getItem("wnl-segmented-pending");
+      if (pending && items.some((item) => item.key === pending)) {
+        setVisualKey(pending);
+        setIsPending(pending !== currentKey);
+      } else if (!isPending) {
+        setVisualKey(currentKey);
+      }
+    } catch {
+      if (!isPending) setVisualKey(currentKey);
+    }
+  }, [currentKey, isPending, items]);
+
+  useEffect(() => {
+    try {
+      const pending = window.sessionStorage.getItem("wnl-segmented-pending");
+      if (pending && pending === currentKey) {
+        window.sessionStorage.removeItem("wnl-segmented-pending");
+        setVisualKey(currentKey);
+        setIsPending(false);
+        if (typeof document !== "undefined") delete document.documentElement.dataset.routeSwitching;
+      }
+    } catch {}
+  }, [currentKey, pathname]);
 
   useEffect(() => {
     return () => {
@@ -71,6 +95,7 @@ export default function SegmentedControl({
 
     setVisualKey(item.key);
     setIsPending(true);
+    try { window.sessionStorage.setItem("wnl-segmented-pending", item.key); } catch {}
 
     if (typeof document !== "undefined") {
       document.documentElement.dataset.routeSwitching = "true";
@@ -102,7 +127,7 @@ export default function SegmentedControl({
           return;
         }
       }
-      setIsPending(false);
+      if (!isRoute) setIsPending(false);
     }, delayMs);
   }
 

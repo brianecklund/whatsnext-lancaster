@@ -7,10 +7,17 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { DEFAULT_THEME, THEME_PALETTES, type ThemeKey } from "./theme-palettes";
 
-const LINKS = [
+const DESKTOP_LINKS = [
+  { href: "/donate", label: "Donate" },
+  { href: "/about", label: "About" },
+  { href: "/contact", label: "Contact" },
+];
+
+const MOBILE_LINKS = [
   { href: "/", label: "Calendar" },
   { href: "/locations", label: "Directory" },
   { href: "/updates", label: "Updates" },
+  { href: "/donate", label: "Donate" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
@@ -133,10 +140,10 @@ export default function SiteHeader() {
       </Link>
 
       <nav className="topNav" aria-label="Primary">
-        {LINKS.map((l, idx) => (
+        {DESKTOP_LINKS.map((l) => (
           <Link
-            key={idx < 3 ? `${l.href}-${flashKey}` : l.href}
-            className={idx < 3 ? "navLink navFlash" : "navLink"}
+            key={l.href}
+            className="navLink"
             href={l.href}
             data-active={pathname === l.href ? "true" : "false"}
             onClick={() => setOpen(false)}
@@ -206,7 +213,7 @@ export default function SiteHeader() {
                 </div>
 
                 <nav className="mobileSheetList mobileMenuList" aria-label="Mobile primary">
-                  {LINKS.map((l, idx) => (
+                  {DESKTOP_LINKS.map((l) => (
                     <Link
                       key={l.href}
                       className="mobileSheetAction mobileMenuAction"
