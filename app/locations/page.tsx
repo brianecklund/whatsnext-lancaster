@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import LocationsSplitClient from './LocationsSplitClient';
 import { unstable_cache } from 'next/cache';
 import { createClient } from '@/prismicio';
@@ -79,5 +80,9 @@ export default async function LocationsPage() {
     });
 
   const locations = dedupeLocations([...apiLocations, ...customOnlyLocations]).sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''));
-  return <LocationsSplitClient locations={locations} />;
+  return (
+    <Suspense fallback={null}>
+      <LocationsSplitClient locations={locations} />
+    </Suspense>
+  );
 }

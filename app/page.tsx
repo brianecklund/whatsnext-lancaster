@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import type { RichTextField } from '@prismicio/client';
 import HomeSplitClient from './HomeSplitClient';
 import { unstable_cache } from 'next/cache';
@@ -210,5 +211,9 @@ export default async function HomePage() {
     );
   }
 
-  return <HomeSplitClient events={events} />;
+  return (
+    <Suspense fallback={null}>
+      <HomeSplitClient events={events} />
+    </Suspense>
+  );
 }
