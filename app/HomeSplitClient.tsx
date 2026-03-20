@@ -333,6 +333,9 @@ export default function HomeSplitClient({ events, currentSection, onNavigateSect
 
   // Mobile-only: hide the subhead tagline when the user starts scrolling the left list.
   const [taglineHidden, setTaglineHidden] = useState(false);
+  const [mobileControlsCollapsed, setMobileControlsCollapsed] = useState(false);
+  const [mobileControlsPinnedOpen, setMobileControlsPinnedOpen] = useState(false);
+  const lastScrollTopRef = useRef(0);
 
   useEffect(() => {
     setMounted(true);
@@ -374,6 +377,41 @@ export default function HomeSplitClient({ events, currentSection, onNavigateSect
       ro?.disconnect();
     };
   }, [effectiveIsMobile, q, type, viewMode, filterOpen]);
+
+  useEffect(() => {
+    if (!effectiveIsMobile) {
+      setMobileControlsCollapsed(false);
+      setMobileControlsPinnedOpen(false);
+      lastScrollTopRef.current = 0;
+      return;
+    }
+
+    const listEl = listRef.current;
+    if (!listEl) return;
+
+    const syncFromScroll = () => {
+      const st = Math.max(0, listEl.scrollTop || 0);
+      const delta = st - lastScrollTopRef.current;
+      lastScrollTopRef.current = st;
+
+      if (mobileControlsPinnedOpen) {
+        if (st <= 8) setMobileControlsCollapsed(false);
+        return;
+      }
+
+      if (st <= 12) {
+        setMobileControlsCollapsed(false);
+        return;
+      }
+
+      if (delta > 10) setMobileControlsCollapsed(true);
+      else if (delta < -14) setMobileControlsCollapsed(false);
+    };
+
+    syncFromScroll();
+    listEl.addEventListener('scroll', syncFromScroll, { passive: true });
+    return () => listEl.removeEventListener('scroll', syncFromScroll);
+  }, [effectiveIsMobile, mobileControlsPinnedOpen]);
 
   // Keep the optimistic client key in sync with the URL when navigation completes.
   useEffect(() => {
@@ -845,7 +883,12 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 syncVisibleDayFromScroll(st);
               }}
             >
-              <div className="leftSticky" ref={leftStickyRef}>
+              <div
+                className="leftSticky"
+                ref={leftStickyRef}
+                data-mobile-collapsed={effectiveIsMobile && mobileControlsCollapsed ? "true" : "false"}
+                data-mobile-pinned={effectiveIsMobile && mobileControlsPinnedOpen ? "true" : "false"}
+              >
                 <SegmentedControl
                   className="tabs segmentedControl--primary"
                   ariaLabel="Primary navigation"
@@ -856,6 +899,23 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
                   ]}
                 />
+
+                {effectiveIsMobile ? (
+                  <button
+                    type="button"
+                    className="mobileControlsToggle"
+                    aria-label={mobileControlsCollapsed ? "Show search, filters, and day buttons" : "Hide search, filters, and day buttons"}
+                    aria-expanded={mobileControlsCollapsed ? "false" : "true"}
+                    onClick={() => {
+                      const nextCollapsed = !mobileControlsCollapsed;
+                      setMobileControlsCollapsed(nextCollapsed);
+                      setMobileControlsPinnedOpen(!nextCollapsed);
+                    }}
+                  >
+                    <span className="mobileControlsToggleLabel">{mobileControlsCollapsed ? "Show controls" : "Hide controls"}</span>
+                    <span className="mobileControlsToggleIcon" aria-hidden="true">▾</span>
+                  </button>
+                ) : null}
 
                 <div className="leftControls">
                   <div className="calendarToolbar">
