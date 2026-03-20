@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 
 import type { RichTextField } from "@prismicio/client";
 import { createClient, prismic } from "@/prismicio";
@@ -122,5 +123,11 @@ export default async function UpdatesPage() {
     },
   ];
 
-  return <UpdatesSplitClient updates={updatesFromPrismic.length ? updatesFromPrismic : fallbackUpdates} />;
+  const resolvedUpdates = updatesFromPrismic.length ? updatesFromPrismic : fallbackUpdates;
+
+  return (
+    <Suspense fallback={null}>
+      <UpdatesSplitClient updates={resolvedUpdates} />
+    </Suspense>
+  );
 }
