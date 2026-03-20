@@ -5762,3 +5762,281 @@ html[data-route-switching="true"] .routeFrame{
     padding-bottom: calc(112px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
+
+/* --- 2026-03-20 full-width control bars + left pane content containment + weekly mobile preview rail --- */
+:root{
+  --panePadX: 44px;
+  --panePadY: 30px;
+}
+
+@media (max-width: 980px){
+  :root{
+    --panePadX: 20px;
+    --panePadY: 20px;
+  }
+}
+
+@media (min-width: 981px){
+  .split{
+    gap: 0 !important;
+  }
+
+  .paneLeft,
+  .paneRight{
+    min-width: 0;
+  }
+
+  .paneLeft > .scroll,
+  .paneRight > .scroll{
+    padding: 0 !important;
+    overflow-x: hidden !important;
+    scrollbar-gutter: auto !important;
+  }
+
+  .paneRight{
+    padding-left: 0 !important;
+    border-left: 1px solid var(--border);
+  }
+
+  .paneRight > .scroll{
+    padding: var(--panePadY) var(--panePadX) 56px var(--panePadX) !important;
+  }
+
+  .leftSticky{
+    margin: 0 !important;
+    padding: 12px 0 14px 0 !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky > .directoryAlphabetNav,
+  .leftSticky > .weekdayRow{
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
+  }
+
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList{
+    box-sizing: border-box;
+    padding-left: var(--panePadX) !important;
+    padding-right: calc(var(--panePadX) + 10px) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .weeklyOverview,
+  .dayBlock,
+  .directoryLetterSection,
+  .monthWrap,
+  .emptyList{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .dayBlock{
+    padding-right: 0 !important;
+  }
+
+  .eventRow,
+  .directoryCard,
+  .partnerCard,
+  .updateRow,
+  .weeklyCard,
+  .weekSummary,
+  .detailCard,
+  .weekSelectorRail,
+  .weeklyInsightsBar{
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .filterOverlay--pane{
+    inset: 0 !important;
+  }
+
+  .filterOverlayPanel--pane{
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100%;
+    border-radius: 0 !important;
+    padding: 20px var(--panePadX) 26px var(--panePadX) !important;
+  }
+}
+
+@media (max-width: 980px){
+  .paneLeft > .scroll,
+  .paneRight > .scroll{
+    padding: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .leftSticky{
+    margin: 0 !important;
+    padding: 10px 0 12px 0 !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky > .directoryAlphabetNav,
+  .leftSticky > .weekdayRow{
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
+  }
+
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList{
+    box-sizing: border-box;
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .weeklyOverview,
+  .dayBlock,
+  .monthWrap,
+  .emptyList{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .filterOverlay--pane{
+    inset: 0 0 calc(82px + env(safe-area-inset-bottom, 0px)) 0 !important;
+  }
+
+  .filterOverlayPanel--pane{
+    width: 100% !important;
+    max-width: none !important;
+    min-height: 100%;
+    border-radius: 0 !important;
+    padding: 16px var(--panePadX) 22px var(--panePadX) !important;
+  }
+
+  .mobileTabs,
+  .mobileTabsDetail,
+  .mobilePrimaryTabs{
+    position: fixed !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    z-index: 560 !important;
+    display: flex !important;
+  }
+
+  .mobileTabsDetail{
+    display: flex !important;
+  }
+
+  .mobileDetail{
+    inset: var(--headerH) 0 0 0 !important;
+    z-index: 430 !important;
+  }
+
+  .mobileDetail > .scroll,
+  .mobileDetailScroll,
+  .mobileEventDetailCard,
+  .mobileWeeklyOverviewOpen{
+    padding: 0 var(--panePadX) calc(116px + env(safe-area-inset-bottom, 0px)) var(--panePadX) !important;
+    box-sizing: border-box;
+  }
+}
+
+.weeklyPreviewRail{
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(240px, 84vw);
+  gap: 12px;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  padding: 4px 2px 8px 2px;
+  margin: 2px 0 14px 0;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
+}
+
+.weeklyPreviewRail::-webkit-scrollbar{
+  height: 6px;
+}
+
+.weeklyPreviewRail::-webkit-scrollbar-thumb{
+  background: rgba(17,17,17,0.18);
+  border-radius: 999px;
+}
+
+.weeklyPreviewCard{
+  scroll-snap-align: start;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 10px 24px rgba(0,0,0,0.06);
+}
+
+.weeklyPreviewMedia{
+  width: 100%;
+}
+
+.weeklyPreviewContent{
+  padding: 12px 12px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.weeklyPreviewTime{
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+.weeklyPreviewTitle{
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+}
+
+.weeklyPreviewMeta{
+  font-size: var(--fs-meta);
+  color: var(--muted);
+}
+
+.weeklyPreviewDesc{
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text);
+  opacity: 0.9;
+}
+
+@media (min-width: 981px){
+  .weeklyPreviewRail{
+    display: none;
+  }
+}

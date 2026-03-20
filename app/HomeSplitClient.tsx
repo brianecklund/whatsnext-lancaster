@@ -1638,6 +1638,44 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               </div>
 
               <div className="weeklyLanding fadeInItem" style={{ animationDelay: "260ms" }}>
+                {selectedWeekBucket.events.length ? (
+                  <div className="weeklyPreviewRail" aria-label="Swipe through upcoming events this week">
+                    {selectedWeekBucket.events.map((e) => {
+                      const title = e.title || "Untitled event";
+                      const d = safeDateFromEvent(e);
+                      const timeLabel = d ? `${formatDayHeading(d)} • ${formatTimeShort(d)}` : "Time TBD";
+                      const img = pickImageUrl(e);
+                      const desc = pickDescriptionText(e);
+                      const meta = [e.locationName, e.event_type].filter(Boolean).join(" • ");
+                      return (
+                        <button
+                          key={`preview-${e.id}`}
+                          type="button"
+                          className="weeklyPreviewCard"
+                          onClick={() => openSelected(e.uid ?? e.id)}
+                        >
+                          <div className="weeklyPreviewMedia">
+                            {img ? (
+                              <div className="media16x9">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img className="weeklyThumb" src={img} alt="" />
+                              </div>
+                            ) : (
+                              <div className="media16x9 weeklyThumbPlaceholder" aria-hidden />
+                            )}
+                          </div>
+                          <div className="weeklyPreviewContent">
+                            <div className="weeklyPreviewTime">{timeLabel}</div>
+                            <div className="weeklyPreviewTitle">{title}</div>
+                            {meta ? <div className="weeklyPreviewMeta">{meta}</div> : null}
+                            {desc ? <div className="weeklyPreviewDesc">{desc.length > 110 ? `${desc.slice(0, 110).trim()}…` : desc}</div> : null}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : null}
+
                 <div className="weeklyCards">
                   {weekGroups.map((g) => (
                     <div key={dayKey(g.date)} className="weeklyDayGroup">
