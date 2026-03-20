@@ -20,6 +20,8 @@ type Props = {
   delayMs?: number;
   resetToKeyAfterAction?: string | null;
   resetDelayMs?: number;
+  visualKeyOverride?: string | null;
+  pendingOverride?: boolean | null;
 };
 
 export default function SegmentedControl({
@@ -30,6 +32,8 @@ export default function SegmentedControl({
   delayMs = 320,
   resetToKeyAfterAction = null,
   resetDelayMs = 220,
+  visualKeyOverride = null,
+  pendingOverride = null,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
@@ -39,6 +43,9 @@ export default function SegmentedControl({
   const resetRef = useRef<number | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
 
+  const effectiveVisualKey = visualKeyOverride ?? visualKey;
+  const effectivePending = pendingOverride ?? isPending;
+
   useEffect(() => {
     items.forEach((item) => {
       if (item.href) router.prefetch(item.href);
@@ -46,6 +53,7 @@ export default function SegmentedControl({
   }, [items, router]);
 
   useEffect(() => {
+    if (visualKeyOverride !== null) return;
     try {
       const pending = window.sessionStorage.getItem("wnl-segmented-pending");
       if (pending && items.some((item) => item.key === pending)) {
@@ -57,9 +65,10 @@ export default function SegmentedControl({
     } catch {
       if (!isPending) setVisualKey(currentKey);
     }
-  }, [currentKey, isPending, items]);
+  }, [currentKey, isPending, items, visualKeyOverride]);
 
   useEffect(() => {
+    if (visualKeyOverride !== null) return;
     try {
       const pending = window.sessionStorage.getItem("wnl-segmented-pending");
       if (pending && pending === currentKey) {
@@ -69,7 +78,7 @@ export default function SegmentedControl({
         if (typeof document !== "undefined") delete document.documentElement.dataset.routeSwitching;
       }
     } catch {}
-  }, [currentKey, pathname]);
+  }, [currentKey, pathname, visualKeyOverride]);
 
   useEffect(() => {
     return () => {
@@ -79,14 +88,14 @@ export default function SegmentedControl({
   }, []);
 
   const activeIndex = useMemo(() => {
-    const idx = items.findIndex((item) => item.key === visualKey);
+    const idx = items.findIndex((item) => item.key === effectiveVisualKey);
     return idx >= 0 ? idx : 0;
-  }, [items, visualKey]);
+  }, [items, effectiveVisualKey]);
 
   const cols = Math.max(items.length, 1);
 
   function handleSelect(item: Item) {
-    if (item.disabled || isPending) return;
+    if (item.disabled || effectivePending) return;
     const isRoute = typeof item.href === "string";
     const isSameRoute = isRoute && item.key === currentKey;
     const isActionOnly = !isRoute && typeof item.onClick === "function";
@@ -138,12 +147,12 @@ export default function SegmentedControl({
       style={{ ["--segments" as string]: cols, ["--active-index" as string]: activeIndex } as CSSProperties}
       role="tablist"
       aria-label={ariaLabel}
-      data-pending={isPending ? "true" : "false"}
+      data-pending={effectivePending ? "true" : "false"}
     >
       <div className="segmentedControl__pill" aria-hidden="true" />
       {items.map((item) => {
         const isActive = item.key === currentKey;
-        const isVisualActive = item.key === visualKey;
+        const isVisualActive = item.key === effectiveVisualKey;
         return (
           <button
             key={item.key}

@@ -731,6 +731,27 @@ const mobileWeeklyOpen =
   const mobileDetailOpen =
     effectiveIsMobile && (!!selectedEvent || mobileWeeklyOpen);
 
+  const [mobileDetailVisualKey, setMobileDetailVisualKey] = useState<"cal" | "previous" | "next">("cal");
+  const [mobileDetailNavPending, setMobileDetailNavPending] = useState(false);
+
+  useEffect(() => {
+    if (!effectiveIsMobile || !mobileDetailOpen) {
+      setMobileDetailVisualKey("cal");
+      setMobileDetailNavPending(false);
+      return;
+    }
+
+    if (mobileDetailNavPending) {
+      const timer = window.setTimeout(() => {
+        setMobileDetailVisualKey("cal");
+        setMobileDetailNavPending(false);
+      }, 90);
+      return () => window.clearTimeout(timer);
+    }
+
+    setMobileDetailVisualKey("cal");
+  }, [effectiveIsMobile, mobileDetailOpen, mobileDetailNavPending, detailFlashKey]);
+
 useBodyScrollLock(filterOpen || mobileDetailOpen);
 
   const showLeft = true;
@@ -1543,11 +1564,40 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               className="segmentedControl--mobile segmentedControl--detail"
               ariaLabel="Event navigation"
               currentKey="cal"
-              resetToKeyAfterAction="cal"
+              visualKeyOverride={mobileDetailVisualKey}
+              pendingOverride={mobileDetailNavPending}
               items={[
-                { key: "previous", label: "Prev.", onClick: () => previousEventKey && openSelected(previousEventKey), disabled: !previousEventKey },
-                { key: "cal", label: "Cal.", onClick: clearSelected },
-                { key: "next", label: "Next", onClick: () => nextEventKey && openSelected(nextEventKey), disabled: !nextEventKey },
+                {
+                  key: "previous",
+                  label: "Prev.",
+                  onClick: () => {
+                    if (!previousEventKey) return;
+                    setMobileDetailVisualKey("previous");
+                    setMobileDetailNavPending(true);
+                    openSelected(previousEventKey);
+                  },
+                  disabled: !previousEventKey,
+                },
+                {
+                  key: "cal",
+                  label: "Cal.",
+                  onClick: () => {
+                    setMobileDetailVisualKey("cal");
+                    setMobileDetailNavPending(false);
+                    clearSelected();
+                  },
+                },
+                {
+                  key: "next",
+                  label: "Next",
+                  onClick: () => {
+                    if (!nextEventKey) return;
+                    setMobileDetailVisualKey("next");
+                    setMobileDetailNavPending(true);
+                    openSelected(nextEventKey);
+                  },
+                  disabled: !nextEventKey,
+                },
               ]}
             />
           </div>
