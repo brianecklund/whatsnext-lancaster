@@ -390,7 +390,7 @@ export default function HomeSplitClient({ events, currentSection, onNavigateSect
 
     if (!mobileControlsInitRef.current) {
       setMobileControlsCollapsed(false);
-      setMobileControlsPinnedOpen(true);
+      setMobileControlsPinnedOpen(false);
       mobileControlsInitRef.current = true;
     }
 
