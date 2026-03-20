@@ -6677,3 +6677,62 @@ body{
     flex: 0 0 auto;
   }
 }
+
+
+/* --- 2026-03-20 symmetry pass: match left pane padding to right pane + keep end space visible --- */
+@media (min-width: 981px){
+  .paneLeft > .scroll,
+  .paneRight > .scroll{
+    padding-top: var(--panePadY) !important;
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+    padding-bottom: 128px !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+  }
+
+  .leftSticky{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky > .directoryAlphabetNav,
+  .leftSticky > .directoryAlphabetNavMobile,
+  .leftSticky > .weekdayRow,
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow,
+  .leftSticky .directoryToolbar,
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList,
+  .weeklyOverview,
+  .dayBlock{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .splitPageListBody{
+    padding-top: 12px !important;
+    padding-bottom: 72px !important;
+  }
+
+  .paneLeft > .scroll::after,
+  .paneRight > .scroll::after{
+    content: "";
+    display: block;
+    width: 100%;
+    height: 112px !important;
+    flex: 0 0 auto;
+  }
+}
