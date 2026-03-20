@@ -14,6 +14,8 @@ type Props = {
   mobileOverlay?: ReactNode;
   style?: CSSProperties;
   onNavigateSection?: (section: PageKey) => void;
+  topBar?: ReactNode;
+  hideDefaultIntro?: boolean;
 };
 
 export default function SplitPageLayout({
@@ -25,12 +27,16 @@ export default function SplitPageLayout({
   mobileOverlay,
   style,
   onNavigateSection,
+  topBar,
+  hideDefaultIntro = false,
 }: Props) {
   return (
     <div className="pageShell" style={style}>
-      <section className={`newsBar pageIntroBar ${taglineHidden ? "pageIntroBarHidden" : ""}`} aria-label="Page introduction">
-        <div className="newsBar__intro">{tagline}</div>
-      </section>
+      {topBar ?? (!hideDefaultIntro ? (
+        <section className={`newsBar pageIntroBar ${taglineHidden ? "pageIntroBarHidden" : ""}`} aria-label="Page introduction">
+          <div className="newsBar__intro">{tagline}</div>
+        </section>
+      ) : null)}
       {children}
       {isMobile ? (
         <div className="mobileTabs mobilePrimaryTabs" aria-label="Primary navigation">

@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import MediaBlocks from "@/app/components/MediaBlocks";
+import NewsTickerBar from "@/app/components/NewsTickerBar";
 import SegmentedControl from "@/app/components/SegmentedControl";
 import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
@@ -158,6 +159,18 @@ export default function UpdatesSplitClient({ updates, currentSection, onNavigate
     });
   }, [safeUpdates, q, tag]);
 
+  const newsTickerItems = useMemo(() => {
+    const upcoming = filtered.slice(0, 6).map((update) => ({
+      label: update.pinned ? "NEWS" : "UPDATE",
+      text: `${update.title}${update.summary ? ` • ${update.summary}` : update.tags?.[0] ? ` • ${update.tags[0]}` : ""}`,
+      href: "#",
+    }));
+
+    return upcoming.length
+      ? upcoming
+      : [{ label: "NEWS", text: "Upcoming Lancaster events, specials, and pop-ups.", href: "#" }];
+  }, [filtered]);
+
   const selectedDesktop = useMemo(() => {
     if (!filtered.length) return null;
     if (!selectedKey) return filtered[0];
@@ -308,6 +321,13 @@ export default function UpdatesSplitClient({ updates, currentSection, onNavigate
       isMobile={isMobile}
       current={resolvedSection === "calendar" ? "calendar" : resolvedSection === "directory" ? "directory" : "updates"}
       onNavigateSection={onNavigateSection}
+      hideDefaultIntro={isMobile && !mobileDetailOpen}
+      topBar={isMobile && !mobileDetailOpen ? (
+        <NewsTickerBar
+          introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
+          items={newsTickerItems}
+        />
+      ) : undefined}
       mobileOverlay={
         <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
           <div className="mobileDetailHeader">

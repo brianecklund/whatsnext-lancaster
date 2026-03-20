@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import ToolbarIcon from "@/app/components/ToolbarIcon";
+import NewsTickerBar from "@/app/components/NewsTickerBar";
 import SegmentedControl from "@/app/components/SegmentedControl";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -220,6 +221,19 @@ export default function LocationsSplitClient({ locations = [], currentSection, o
     [featuredPartners, standardListings],
   );
 
+
+  const newsTickerItems = useMemo(() => {
+    const upcoming = orderedLocations.slice(0, 6).map((location) => ({
+      label: "NEWS",
+      text: `${location.name ?? "Featured listing"} • ${location.category ?? "Directory"}${location.address ? ` • ${location.address}` : ""}`,
+      href: "#",
+    }));
+
+    return upcoming.length
+      ? upcoming
+      : [{ label: "NEWS", text: "Local Lancaster venues, shops, and places to explore.", href: "#" }];
+  }, [orderedLocations]);
+
   const selectedDesktop = useMemo(() => {
     if (orderedLocations.length === 0) return null;
     if (!selectedKey) return orderedLocations[0] ?? null;
@@ -310,6 +324,13 @@ export default function LocationsSplitClient({ locations = [], currentSection, o
       isMobile={effectiveIsMobile}
       current={resolvedSection === "calendar" ? "calendar" : resolvedSection === "updates" ? "updates" : "directory"}
       onNavigateSection={onNavigateSection}
+      hideDefaultIntro={effectiveIsMobile && !mobileDetailOpen}
+      topBar={effectiveIsMobile && !mobileDetailOpen ? (
+        <NewsTickerBar
+          introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
+          items={newsTickerItems}
+        />
+      ) : undefined}
       style={
         effectiveIsMobile
           ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties)

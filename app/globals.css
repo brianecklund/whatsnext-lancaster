@@ -6040,3 +6040,89 @@ html[data-route-switching="true"] .routeFrame{
     display: none;
   }
 }
+
+/* --- 2026-03-20 directory-matched left pane + mobile ticker alignment --- */
+@media (min-width: 981px){
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow,
+  .leftSticky .directoryToolbar,
+  .leftSticky .directoryAlphabetNav,
+  .leftSticky .weekdayRow{
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList,
+  .weeklyOverview,
+  .dayBlock{
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+    overflow-x: clip;
+  }
+
+  .splitPageListBody > *,
+  .directoryHeroList > *,
+  .directoryLetterSection > *,
+  .weeklyOverview > *,
+  .dayBlock > *,
+  .dayBlock .eventRow,
+  .splitPageListBody .updateRow,
+  .splitPageListBody .directoryCard,
+  .splitPageListBody .partnerCard{
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+}
+
+@media (max-width: 980px){
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow,
+  .leftSticky .directoryToolbar,
+  .leftSticky .directoryAlphabetNav,
+  .leftSticky .weekdayRow{
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList,
+  .weeklyOverview,
+  .dayBlock{
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+    overflow-x: clip;
+  }
+
+  .splitPageListBody > *,
+  .directoryHeroList > *,
+  .directoryLetterSection > *,
+  .weeklyOverview > *,
+  .dayBlock > *,
+  .dayBlock .eventRow,
+  .splitPageListBody .updateRow,
+  .splitPageListBody .directoryCard,
+  .splitPageListBody .partnerCard{
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobilePrimaryTabs{
+    display: flex !important;
+    z-index: 620 !important;
+  }
+}
