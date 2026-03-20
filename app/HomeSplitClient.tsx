@@ -1707,11 +1707,14 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   <img src={selectedImg} alt="" />
                 </div>
               ) : null}
+              {selectedEvent.summary ? (
+                <p className="summary mobileEventSummary">{selectedEvent.summary}</p>
+              ) : null}
               {selectedDesc ? (
                 <div className="detailBody mobileEventDetailBody">
                   <p>{selectedDesc}</p>
                 </div>
-              ) : (
+              ) : selectedEvent.summary ? null : (
                 <div className="detailBody mobileEventDetailBody">
                   <p className="muted">No description yet.</p>
                 </div>
