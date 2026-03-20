@@ -335,6 +335,7 @@ export default function HomeSplitClient({ events, currentSection, onNavigateSect
   const [taglineHidden, setTaglineHidden] = useState(false);
   const [mobileControlsCollapsed, setMobileControlsCollapsed] = useState(false);
   const [mobileControlsPinnedOpen, setMobileControlsPinnedOpen] = useState(false);
+  const mobileControlsInitRef = useRef(false);
   const lastScrollTopRef = useRef(0);
 
   useEffect(() => {
@@ -382,8 +383,15 @@ export default function HomeSplitClient({ events, currentSection, onNavigateSect
     if (!effectiveIsMobile) {
       setMobileControlsCollapsed(false);
       setMobileControlsPinnedOpen(false);
+      mobileControlsInitRef.current = false;
       lastScrollTopRef.current = 0;
       return;
+    }
+
+    if (!mobileControlsInitRef.current) {
+      setMobileControlsCollapsed(false);
+      setMobileControlsPinnedOpen(true);
+      mobileControlsInitRef.current = true;
     }
 
     const listEl = listRef.current;
