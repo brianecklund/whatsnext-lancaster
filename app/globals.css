@@ -6631,45 +6631,49 @@ body{
   }
 }
 
-/* --- 2026-03-20 pane-only desktop scroll fix: lock page height to viewport and keep scrolling inside panes --- */
+/* --- 2026-03-20 desktop left pane full-width + end-spacing fix --- */
 @media (min-width: 981px){
-  html,
-  body{
-    height: 100dvh;
-    overflow: hidden;
+  .paneLeft > .scroll{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-bottom: 120px !important;
   }
 
-  body:has(> .pageShell){
-    height: 100dvh;
-    overflow: hidden;
+  .paneRight > .scroll{
+    padding-bottom: 120px !important;
   }
 
-  body:has(> .pageShell) > .pageShell{
-    height: calc(100dvh - var(--headerH)) !important;
-    min-height: 0 !important;
-    overflow: hidden !important;
+  .leftSticky{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
-  body:has(> .pageShell) > .pageShell > .split{
-    flex: 1 1 auto;
-    min-height: 0 !important;
-    height: 100%;
-    overflow: hidden;
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow,
+  .leftSticky .directoryToolbar,
+  .leftSticky .directoryAlphabetNav,
+  .leftSticky .weekdayRow,
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList,
+  .weeklyOverview,
+  .dayBlock{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
-  body:has(> .pageShell) > .pageShell > .split > .paneLeft,
-  body:has(> .pageShell) > .pageShell > .split > .paneRight{
-    min-height: 0 !important;
-    height: 100%;
-    overflow: hidden;
-  }
-
-  body:has(> .pageShell) > .pageShell > .split > .paneLeft > .scroll,
-  body:has(> .pageShell) > .pageShell > .split > .paneRight > .scroll{
-    height: 100%;
-    min-height: 0 !important;
-    overflow-y: auto !important;
-    overflow-x: hidden !important;
-    overscroll-behavior: none !important;
+  .paneLeft > .scroll::after,
+  .paneRight > .scroll::after{
+    content: "";
+    display: block;
+    width: 100%;
+    height: 96px;
+    flex: 0 0 auto;
   }
 }
