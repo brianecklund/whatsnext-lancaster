@@ -14,7 +14,8 @@ export const revalidate = 60;
 
 const getLocationDocsCached = unstable_cache(
   async () => {
-      return client.getAllByType('location').catch(() => [] as any[]);
+    const client = createClient();
+    return client.getAllByType('location').catch(() => [] as any[]);
   },
   ['wnl-location-docs-v1'],
   { revalidate: 60 },
