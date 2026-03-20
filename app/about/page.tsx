@@ -1,66 +1,53 @@
 export default function AboutPage() {
   return (
-    <div className="aboutPage">
-      {/* Hero */}
-      <section className="aboutHero">
-        <div className="aboutHeroInner">
-          <h1 className="aboutHeroTitle">What’s Next Lancaster</h1>
-          <p className="aboutHeroLead">
-            A simple, community-first way to find what’s happening around Lancaster — events,
-            specials, pop-ups, openings, and more.
-          </p>
-        </div>
+    <main className="contentPage aboutPage">
+      <section className="contentHero">
+        <p className="contentEyebrow">About the project</p>
+        <h1 className="contentHeroTitle">A more useful way to find what’s happening in Lancaster.</h1>
+        <p className="contentHeroLead">
+          What’s Next Lancaster brings together events, places, and community updates in one clear experience so people can browse quickly and discover more of the city.
+        </p>
       </section>
 
-      {/* Title + body */}
-      <section className="aboutStory">
-        <div className="aboutStoryInner">
-          <h2 className="aboutStoryTitle">Why this exists</h2>
-          <div className="aboutStoryBody">
-            <p>
-              Lancaster has an amazing mix of venues, restaurants, galleries, makers, and
-              community spaces — and a lot of great things get announced in a dozen different
-              places.
-            </p>
-            <p>
-              What’s Next Lancaster is a clean, no-friction hub to browse what’s going on right
-              now, save time planning, and discover places you haven’t visited yet.
-            </p>
+      <section className="contentGridTwo">
+        <article className="contentCard">
+          <h2 className="contentCardTitle">Why it exists</h2>
+          <p>So many good things in Lancaster are announced across scattered channels. This project creates a single, easy-to-scan hub that makes local discovery feel immediate instead of fragmented.</p>
+          <p>It is built to support casual browsing, trip planning, neighborhood exploration, and a stronger connection between residents, visitors, and local businesses.</p>
+        </article>
+        <article className="contentCard">
+          <h2 className="contentCardTitle">What it includes</h2>
+          <div className="contentChecklist">
+            <div><strong>Calendar</strong><span>Upcoming events, weekly overviews, and fast filters.</span></div>
+            <div><strong>Directory</strong><span>Places and venues with rich information and visuals.</span></div>
+            <div><strong>Updates</strong><span>Announcements, openings, alerts, and featured local changes.</span></div>
           </div>
-        </div>
+        </article>
       </section>
 
-      {/* 3-up */}
-      <section className="aboutGrid" aria-label="How it works">
-        <div className="aboutGridInner">
-          <div className="aboutCard">
-            <img className="aboutCardImg" src="/about/browse.svg" alt="Browse events" />
-            <h3 className="aboutCardTitle">Browse fast</h3>
-            <p className="aboutCardBody">
-              Scan the calendar list, filter by type, and click into details without losing your
-              place.
-            </p>
-          </div>
+      <section className="contentGridThree">
+        <article className="contentCard">
+          <h3 className="contentMiniTitle">Community-first</h3>
+          <p>The site is designed around utility, clarity, and local relevance rather than clutter.</p>
+        </article>
+        <article className="contentCard">
+          <h3 className="contentMiniTitle">Fast to browse</h3>
+          <p>Information is organized so users can move through listings and details without losing context.</p>
+        </article>
+        <article className="contentCard">
+          <h3 className="contentMiniTitle">Built to grow</h3>
+          <p>The platform supports richer content, featured updates, PDFs, expanded place details, and more.</p>
+        </article>
+      </section>
 
-          <div className="aboutCard">
-            <img className="aboutCardImg" src="/about/discover.svg" alt="Discover places" />
-            <h3 className="aboutCardTitle">Discover places</h3>
-            <p className="aboutCardBody">
-              Use the directory to explore new venues and businesses, then jump right to their
-              website.
-            </p>
-          </div>
-
-          <div className="aboutCard">
-            <img className="aboutCardImg" src="/about/share.svg" alt="Share updates" />
-            <h3 className="aboutCardTitle">Stay in the loop</h3>
-            <p className="aboutCardBody">
-              Updates highlight things like openings, menu changes, and PSAs so you don’t miss
-              what’s new.
-            </p>
-          </div>
+      <section className="contentCard contentWideCard">
+        <h2 className="contentCardTitle">How the experience works</h2>
+        <div className="contentSteps">
+          <div><span>01</span><p>Browse the current calendar and jump straight into event details.</p></div>
+          <div><span>02</span><p>Explore directory entries to discover places worth visiting.</p></div>
+          <div><span>03</span><p>Check updates for new openings, announcements, and featured notices.</p></div>
         </div>
       </section>
-    </div>
+    </main>
   );
 }

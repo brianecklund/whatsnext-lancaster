@@ -25,6 +25,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
   const [activeSection, setActiveSection] = useState<SectionKey>(initialSection);
   const [renderedSection, setRenderedSection] = useState<SectionKey>(initialSection);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [contentSwitching, setContentSwitching] = useState(false);
   const [introActive, setIntroActive] = useState(false);
   const shellRef = useRef<HTMLDivElement | null>(null);
 
@@ -40,6 +41,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
       setActiveSection(next);
       setRenderedSection(next);
       setIsTransitioning(false);
+      setContentSwitching(false);
     };
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
@@ -59,6 +61,40 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
 
     return () => window.clearTimeout(timeoutId);
   }, []);
+
+  useEffect(() => {
+    const root = shellRef.current;
+    if (!root) return;
+
+    const selector = [
+      ".paneLeft .weeklyOverview",
+      ".paneLeft .daySection",
+      ".paneLeft .weeklyCondensed > *",
+      ".paneLeft .splitPageListBody > *",
+      ".paneLeft .directoryHeroList > *",
+      ".paneLeft .directoryLetterSection",
+      ".paneLeft .eventRow",
+      ".paneRight > .scroll > *",
+      ".mobileDetail[data-open='true'] > *",
+      ".mobileDetail[data-open='true'] .scroll > *"
+    ].join(", ");
+
+    const seen = new Set<HTMLElement>();
+    const nodes = Array.from(root.querySelectorAll<HTMLElement>(selector)).filter((el) => {
+      if (seen.has(el)) return false;
+      seen.add(el);
+      return el.offsetParent !== null;
+    });
+
+    nodes.forEach((el, index) => {
+      el.dataset.switchItem = contentSwitching ? "true" : "false";
+      el.style.setProperty("--switch-index", String(index));
+    });
+
+    return () => {
+      nodes.forEach((el) => delete el.dataset.switchItem);
+    };
+  }, [renderedSection, contentSwitching]);
 
   useEffect(() => {
     if (!introActive) return;
@@ -102,17 +138,19 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
   function switchSection(next: SectionKey) {
     if (next === activeSection) return;
     setActiveSection(next);
+    setRenderedSection(next);
     setIsTransitioning(true);
+    setContentSwitching(true);
+    const target = SECTION_PATHS[next];
+    if (window.location.pathname !== target) {
+      window.history.pushState({}, '', target);
+    }
     window.setTimeout(() => {
-      setRenderedSection(next);
-      const target = SECTION_PATHS[next];
-      if (window.location.pathname !== target) {
-        window.history.pushState({}, '', target);
-      }
-      window.setTimeout(() => {
-        setIsTransitioning(false);
-      }, 180);
+      setIsTransitioning(false);
     }, 120);
+    window.setTimeout(() => {
+      setContentSwitching(false);
+    }, 560);
   }
 
   const sharedProps = useMemo(() => ({
@@ -121,7 +159,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
   }), [activeSection]);
 
   return (
-    <div ref={shellRef} className={`shellSwap${introActive ? " shellIntro--active" : ""}`} data-transitioning={isTransitioning ? 'true' : 'false'}>
+    <div ref={shellRef} className={`shellSwap${introActive ? " shellIntro--active" : ""}`} data-transitioning={isTransitioning ? 'true' : 'false'} data-content-switching={contentSwitching ? 'true' : 'false'}>
       <div key={renderedSection} className="shellSwap__panel">
         {renderedSection === 'calendar' ? (
           <HomeSplitClient events={events} {...sharedProps} />
