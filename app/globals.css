@@ -6586,59 +6586,47 @@ body{
   }
 }
 
-
-/* --- 2026-03-20 desktop width + scroll edge refinements --- */
+/* --- 2026-03-20 follow-up fix: full-width desktop controls without inner side padding --- */
 @media (min-width: 981px){
-  :root{
-    --panePadX: 22px;
-    --panePadY: 24px;
-  }
-
   .leftSticky{
-    padding-left: var(--panePadX) !important;
-    padding-right: var(--panePadX) !important;
+    padding: 8px 0 10px 0 !important;
   }
 
-  .leftControls,
-  .calendarToolbar,
-  .directoryToolbar,
-  .directoryAlphabetNav,
-  .searchRow,
-  .searchRow.calendarSearchRow,
-  .searchRow.directorySearchRowDesktop,
-  .splitPageListBody{
-    width: 100%;
-    max-width: 100%;
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky > .directoryAlphabetNav,
+  .leftSticky > .directoryAlphabetNavMobile,
+  .leftSticky > .weekdayRow,
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow,
+  .leftSticky .directoryToolbar{
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .leftSticky > .leftControls{
+    padding-top: 8px !important;
+    padding-bottom: 6px !important;
   }
 
   .paneLeft > .scroll,
-  .paneRight > .scroll,
-  .splitPageListBody,
-  .mobileDetail > .scroll,
-  .mobileDetailScroll{
-    overscroll-behavior: none !important;
-  }
-
-  .paneLeft > .scroll{
-    padding-bottom: 40px !important;
-    scroll-padding-bottom: 40px;
-  }
-
   .paneRight > .scroll{
-    padding-bottom: 40px !important;
-    scroll-padding-bottom: 40px;
+    overscroll-behavior: none !important;
+    padding-bottom: 72px !important;
   }
 
   .splitPageListBody{
-    padding-top: 14px !important;
-    padding-bottom: 18px !important;
+    padding-bottom: 56px !important;
   }
 
-  .splitPageListBody > :last-child,
-  .dayBlock:last-child,
-  .monthWrap:last-child,
-  .emptyList:last-child,
-  .weeklyOverview:last-child{
-    margin-bottom: 0 !important;
+  .paneLeft > .scroll::after,
+  .mobileDetail > .scroll::after,
+  .mobileDetailScroll::after{
+    height: 56px !important;
   }
 }
