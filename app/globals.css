@@ -5527,3 +5527,155 @@ html[data-route-switching="true"] .routeFrame{
     grid-template-columns: repeat(2, minmax(0,1fr));
   }
 }
+
+
+/* --- 2026-03-20 layout refinements: full-width left UI, slimmer divider scrollbar, stable mobile detail tabs --- */
+:root{
+  --panePadX: 40px;
+  --panePadY: 28px;
+}
+
+.paneLeft > .scroll,
+.paneRight > .scroll,
+.mobileDetail > .scroll,
+.mobileDetailScroll{
+  scrollbar-width: thin;
+  scrollbar-color: rgba(17,17,17,0.26) transparent;
+}
+
+.paneLeft > .scroll::-webkit-scrollbar,
+.paneRight > .scroll::-webkit-scrollbar,
+.mobileDetail > .scroll::-webkit-scrollbar,
+.mobileDetailScroll::-webkit-scrollbar{
+  width: 8px;
+  height: 8px;
+}
+
+.paneLeft > .scroll::-webkit-scrollbar-track,
+.paneRight > .scroll::-webkit-scrollbar-track,
+.mobileDetail > .scroll::-webkit-scrollbar-track,
+.mobileDetailScroll::-webkit-scrollbar-track{
+  background: transparent;
+}
+
+.paneLeft > .scroll::-webkit-scrollbar-thumb,
+.paneRight > .scroll::-webkit-scrollbar-thumb,
+.mobileDetail > .scroll::-webkit-scrollbar-thumb,
+.mobileDetailScroll::-webkit-scrollbar-thumb{
+  background: rgba(17,17,17,0.24);
+  border-radius: 999px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+@media (min-width: 981px){
+  .paneLeft > .scroll{
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 0 56px 0 !important;
+    scrollbar-gutter: stable;
+  }
+
+  .paneRight{
+    border-left: 0;
+    padding-left: calc(var(--gutter) + 4px);
+  }
+
+  .paneRight > .scroll{
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: var(--panePadY) 0 56px var(--panePadX) !important;
+    scrollbar-gutter: stable;
+  }
+
+  .leftSticky{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 12px var(--panePadX) 14px var(--panePadX) !important;
+    width: 100%;
+  }
+
+  .filterOverlay--pane{
+    inset: 0 !important;
+  }
+
+  .filterOverlayPanel--pane{
+    padding: 18px var(--panePadX) 22px var(--panePadX) !important;
+  }
+
+  .splitPageListBody{
+    padding: 14px var(--panePadX) 0 var(--panePadX) !important;
+  }
+
+  .weeklyOverview,
+  .dayBlock,
+  .monthWrap,
+  .emptyList,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding{
+    margin-left: var(--panePadX);
+    margin-right: var(--panePadX);
+  }
+}
+
+@media (max-width: 980px){
+  :root{
+    --panePadX: 18px;
+    --panePadY: 18px;
+  }
+
+  .paneLeft > .scroll{
+    overflow-y: auto;
+    overflow-x: hidden;
+    padding: 0 0 calc(108px + env(safe-area-inset-bottom, 0px)) 0 !important;
+  }
+
+  .leftSticky{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 10px var(--panePadX) 12px var(--panePadX) !important;
+  }
+
+  .filterOverlay--pane{
+    inset: 0 0 calc(82px + env(safe-area-inset-bottom, 0px)) 0 !important;
+  }
+
+  .filterOverlayPanel--pane{
+    padding: 16px var(--panePadX) 18px var(--panePadX) !important;
+  }
+
+  .splitPageListBody{
+    padding: 10px var(--panePadX) calc(104px + env(safe-area-inset-bottom, 0px)) var(--panePadX) !important;
+  }
+
+  .weeklyOverview,
+  .dayBlock,
+  .monthWrap,
+  .emptyList,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding{
+    margin-left: var(--panePadX);
+    margin-right: var(--panePadX);
+  }
+
+  .mobileTabs,
+  .mobileTabsDetail,
+  .mobilePrimaryTabs{
+    position: fixed !important;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 380 !important;
+    display: flex;
+  }
+
+  .mobileDetail{
+    inset: var(--headerH) 0 calc(82px + env(safe-area-inset-bottom, 0px)) 0 !important;
+    z-index: 260 !important;
+  }
+
+  .mobileDetailScroll,
+  .mobileDetail > .scroll{
+    padding: 0 var(--panePadX) calc(110px + env(safe-area-inset-bottom, 0px)) var(--panePadX) !important;
+  }
+}
