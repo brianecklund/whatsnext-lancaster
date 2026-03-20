@@ -1,5 +1,6 @@
 import type { RichTextField } from '@prismicio/client';
 import HomeSplitClient from './HomeSplitClient';
+import { unstable_cache } from 'next/cache';
 import type { EventLite, LocationLite } from '@/lib/types';
 import { createClient, prismic } from '@/prismicio';
 import { getCachedVenueImport } from '@/lib/venue-import';
@@ -12,7 +13,35 @@ import {
 } from '@/lib/prismic-venue';
 import { resolveVenueById, resolveVenueByName } from '@/lib/venue-import/resolve';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
+
+const getEventDocsCached = unstable_cache(
+  async () => {
+    const client = createClient();
+    return client.getAllByType('event', {
+      fetchLinks: [
+        'location.name',
+        'location.description',
+        'location.address',
+        'location.website',
+        'location.category',
+        'location.venue_name',
+        'location.venue_place_id',
+      ],
+    });
+  },
+  ['wnl-events-v1'],
+  { revalidate: 60 },
+);
+
+const getLocationDocsCached = unstable_cache(
+  async () => {
+    const client = createClient();
+    return client.getAllByType('location').catch(() => [] as any[]);
+  },
+  ['wnl-location-docs-v1'],
+  { revalidate: 60 },
+);
 
 function pickDateLike(data: any, keys: string[]) {
   for (const key of keys) {
@@ -60,23 +89,11 @@ function normalize(value: string | null | undefined) {
 }
 
 export default async function HomePage() {
-  const client = createClient();
-
   let docs: any[] = [];
   let prismicError: string | null = null;
 
   try {
-    docs = await client.getAllByType('event', {
-      fetchLinks: [
-        'location.name',
-        'location.description',
-        'location.address',
-        'location.website',
-        'location.category',
-        'location.venue_name',
-        'location.venue_place_id',
-      ],
-    });
+    docs = await getEventDocsCached();
   } catch (err: any) {
     prismicError = err?.message ?? (typeof err === 'string' ? err : 'Unknown error while fetching events from Prismic.');
   }
@@ -84,7 +101,7 @@ export default async function HomePage() {
   const venueCache = await getCachedVenueImport();
   const importedVenues = venueCache.venues || [];
 
-  const customLocationDocs = await client.getAllByType('location').catch(() => [] as any[]);
+  const customLocationDocs = await getLocationDocsCached();
   const customLocationByVenueId = new Map<string, any>();
   const customLocationByName = new Map<string, any>();
 

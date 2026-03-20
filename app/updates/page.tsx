@@ -1,9 +1,23 @@
 
 import type { RichTextField } from "@prismicio/client";
 import { createClient, prismic } from "@/prismicio";
+import { unstable_cache } from "next/cache";
 import UpdatesSplitClient, { type UpdateLite } from "./UpdatesSplitClient";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 60;
+
+const getUpdateDocsCached = unstable_cache(
+  async () => {
+    const client = createClient();
+    try {
+      return await client.getAllByType("update" as any);
+    } catch {
+      return [] as any[];
+    }
+  },
+  ["wnl-updates-v1"],
+  { revalidate: 60 },
+);
 
 function asText(value: unknown) {
   if (typeof value === "string") return value || null;
@@ -46,14 +60,7 @@ function extractPdfUrl(data: any) {
 }
 
 export default async function UpdatesPage() {
-  const client = createClient();
-
-  let docs: any[] = [];
-  try {
-    docs = await client.getAllByType("update" as any);
-  } catch {
-    docs = [];
-  }
+  const docs = await getUpdateDocsCached();
 
   const updatesFromPrismic: UpdateLite[] = docs.map((doc: any) => {
     const rawDate = pickDateLike(doc.data, ["publish_date", "date", "posted_on", "announcement_date"]);

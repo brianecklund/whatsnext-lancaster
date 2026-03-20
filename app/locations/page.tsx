@@ -1,4 +1,5 @@
 import LocationsSplitClient from './LocationsSplitClient';
+import { unstable_cache } from 'next/cache';
 import { createClient } from '@/prismicio';
 import { getCachedVenueImport } from '@/lib/venue-import';
 import type { LocationLite } from '@/lib/types';
@@ -9,7 +10,15 @@ import {
   matchVenueFromDocData,
 } from '@/lib/prismic-venue';
 
-export const dynamic = 'force-dynamic';
+export const revalidate = 60;
+
+const getLocationDocsCached = unstable_cache(
+  async () => {
+      return client.getAllByType('location').catch(() => [] as any[]);
+  },
+  ['wnl-location-docs-v1'],
+  { revalidate: 60 },
+);
 
 type LocationRow = LocationLite & { key: string };
 
@@ -28,10 +37,9 @@ function dedupeLocations(items: LocationRow[]) {
 }
 
 export default async function LocationsPage() {
-  const client = createClient();
   const cache = await getCachedVenueImport();
   const importedVenues = cache.venues || [];
-  const docs = await client.getAllByType('location').catch(() => [] as any[]);
+  const docs = await getLocationDocsCached();
 
   const customPageByVenueId = new Map<string, any>();
   const customPageByName = new Map<string, any>();
