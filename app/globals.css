@@ -6736,3 +6736,64 @@ body{
     flex: 0 0 auto;
   }
 }
+
+/* --- 2026-03-20 final desktop sticky-width + typography tune --- */
+:root{
+  --baseSize: 17px;
+  --fs-title: 1.5rem;
+  --fs-subhead: 1.1rem;
+  --fs-meta: 0.82rem;
+}
+
+.eventRowTitle{
+  font-size: clamp(1.02rem, 0.98rem + 0.16vw, 1.16rem) !important;
+  line-height: 1.06 !important;
+}
+
+.eventRowMeta,
+.updateRowMeta,
+.locationRowMeta,
+.weeklyCardTime,
+.weeklyCardMetaRow,
+.detailMeta,
+.bodyText,
+.richText,
+.detailBody,
+.searchInput,
+.filterBtn,
+.clearBtn,
+.segmentedControl__button{
+  font-size: 0.94rem;
+}
+
+.detailTitle{
+  font-size: clamp(1.8rem, 1.58rem + 0.5vw, 2.28rem) !important;
+  line-height: 0.98 !important;
+}
+
+@media (min-width: 981px){
+  .leftSticky{
+    margin-left: calc(var(--panePadX) * -1) !important;
+    margin-right: calc(var(--panePadX) * -1) !important;
+    width: calc(100% + (var(--panePadX) * 2)) !important;
+    max-width: calc(100% + (var(--panePadX) * 2)) !important;
+    padding: 12px var(--panePadX) 14px var(--panePadX) !important;
+    box-sizing: border-box !important;
+  }
+
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow,
+  .leftSticky .directoryToolbar,
+  .leftSticky .directoryAlphabetNav,
+  .leftSticky .weekdayRow{
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+}
