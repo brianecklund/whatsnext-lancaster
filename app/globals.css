@@ -6586,49 +6586,90 @@ body{
   }
 }
 
-/* --- 2026-03-20 desktop split-pane scrolling fix: prevent page scroll, keep scroll inside panes --- */
-html,
-body{
-  min-height: 100%;
-}
-
-.shellSwap,
-.shellSwap__panel{
-  min-height: 0;
-}
-
-.pageShell{
-  height: calc(100dvh - var(--headerH)) !important;
-  min-height: calc(100dvh - var(--headerH)) !important;
-  max-height: calc(100dvh - var(--headerH)) !important;
-  overflow: hidden !important;
-}
-
-.pageShell > .split{
-  flex: 1 1 auto;
-  min-height: 0;
-  height: 100%;
-}
-
-.pageShell .pane,
-.pageShell .paneLeft,
-.pageShell .paneRight{
-  min-height: 0;
-  height: 100%;
-}
-
-.pageShell .paneLeft > .scroll,
-.pageShell .paneRight > .scroll,
-.pageShell .mobileDetail > .scroll,
-.pageShell .mobileDetailScroll{
-  min-height: 0;
-  height: 100%;
-  overflow-y: auto !important;
-}
-
+/* --- 2026-03-20 follow-up fix: full-width desktop controls without inner side padding --- */
 @media (min-width: 981px){
-  .pageShell .paneLeft > .scroll,
-  .pageShell .paneRight > .scroll{
+  .leftSticky{
+    padding: 8px 0 10px 0 !important;
+  }
+
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky > .directoryAlphabetNav,
+  .leftSticky > .directoryAlphabetNavMobile,
+  .leftSticky > .weekdayRow,
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow,
+  .leftSticky .directoryToolbar{
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .leftSticky > .leftControls{
+    padding-top: 8px !important;
+    padding-bottom: 6px !important;
+  }
+
+  .paneLeft > .scroll,
+  .paneRight > .scroll{
+    overscroll-behavior: none !important;
+    padding-bottom: 72px !important;
+  }
+
+  .splitPageListBody{
     padding-bottom: 56px !important;
+  }
+
+  .paneLeft > .scroll::after,
+  .mobileDetail > .scroll::after,
+  .mobileDetailScroll::after{
+    height: 56px !important;
+  }
+}
+
+/* --- 2026-03-20 pane-only desktop scroll fix: lock page height to viewport and keep scrolling inside panes --- */
+@media (min-width: 981px){
+  html,
+  body{
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  body:has(> .pageShell){
+    height: 100dvh;
+    overflow: hidden;
+  }
+
+  body:has(> .pageShell) > .pageShell{
+    height: calc(100dvh - var(--headerH)) !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  body:has(> .pageShell) > .pageShell > .split{
+    flex: 1 1 auto;
+    min-height: 0 !important;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body:has(> .pageShell) > .pageShell > .split > .paneLeft,
+  body:has(> .pageShell) > .pageShell > .split > .paneRight{
+    min-height: 0 !important;
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body:has(> .pageShell) > .pageShell > .split > .paneLeft > .scroll,
+  body:has(> .pageShell) > .pageShell > .split > .paneRight > .scroll{
+    height: 100%;
+    min-height: 0 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    overscroll-behavior: none !important;
   }
 }
