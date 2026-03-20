@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import HomeSplitClient from "@/app/HomeSplitClient";
 import LocationsSplitClient from "@/app/locations/LocationsSplitClient";
 import UpdatesSplitClient, { type UpdateLite } from "@/app/updates/UpdatesSplitClient";
@@ -25,6 +25,8 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
   const [activeSection, setActiveSection] = useState<SectionKey>(initialSection);
   const [renderedSection, setRenderedSection] = useState<SectionKey>(initialSection);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [introActive, setIntroActive] = useState(false);
+  const shellRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     setActiveSection(initialSection);
@@ -42,6 +44,60 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
     window.addEventListener('popstate', onPopState);
     return () => window.removeEventListener('popstate', onPopState);
   }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const KEY = "wnl_shell_intro_done_v1";
+    if (window.sessionStorage?.getItem(KEY)) return;
+    window.sessionStorage?.setItem(KEY, "1");
+    setIntroActive(true);
+
+    const timeoutId = window.setTimeout(() => {
+      setIntroActive(false);
+    }, 1400);
+
+    return () => window.clearTimeout(timeoutId);
+  }, []);
+
+  useEffect(() => {
+    if (!introActive) return;
+
+    const frame = window.requestAnimationFrame(() => {
+      const root = shellRef.current;
+      if (!root) return;
+
+      const selector = [
+        ".newsBar",
+        ".pageIntroBar",
+        ".leftSticky",
+        ".paneLeft .weeklyOverview",
+        ".paneLeft .daySection",
+        ".paneLeft .weeklyCondensed > *",
+        ".paneLeft .splitPageListBody > *",
+        ".paneLeft .directoryHeroList > *",
+        ".paneLeft .directoryLetterSection",
+        ".paneLeft .eventRow",
+        ".paneRight > .scroll > *",
+        ".mobileDetail[data-open='true'] > *",
+        ".mobileDetail[data-open='true'] .scroll > *"
+      ].join(", ");
+
+      const seen = new Set<HTMLElement>();
+      const nodes = Array.from(root.querySelectorAll<HTMLElement>(selector)).filter((el) => {
+        if (seen.has(el)) return false;
+        seen.add(el);
+        return el.offsetParent !== null;
+      });
+
+      nodes.forEach((el, index) => {
+        el.dataset.introItem = "true";
+        el.style.setProperty("--intro-index", String(index));
+      });
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, [introActive, renderedSection]);
 
   function switchSection(next: SectionKey) {
     if (next === activeSection) return;
@@ -65,7 +121,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
   }), [activeSection]);
 
   return (
-    <div className="shellSwap" data-transitioning={isTransitioning ? 'true' : 'false'}>
+    <div ref={shellRef} className={`shellSwap${introActive ? " shellIntro--active" : ""}`} data-transitioning={isTransitioning ? 'true' : 'false'}>
       <div key={renderedSection} className="shellSwap__panel">
         {renderedSection === 'calendar' ? (
           <HomeSplitClient events={events} {...sharedProps} />
