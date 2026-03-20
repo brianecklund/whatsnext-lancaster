@@ -6126,3 +6126,130 @@ html[data-route-switching="true"] .routeFrame{
     z-index: 620 !important;
   }
 }
+
+/* --- 2026-03-20 pane width + listing containment + mobile overscroll refinements --- */
+html,
+body,
+#__next{
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
+@media (min-width: 981px){
+  .leftSticky{
+    padding: 12px 0 14px 0 !important;
+  }
+
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow,
+  .leftSticky .directoryToolbar,
+  .leftSticky .directoryAlphabetNav,
+  .leftSticky .weekdayRow{
+    width: 100% !important;
+    box-sizing: border-box;
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList,
+  .weeklyOverview,
+  .dayBlock{
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList,
+  .dayBlock{
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+  }
+}
+
+.eventRow,
+.locationRow,
+.updateRow,
+.directoryCard,
+.partnerCard,
+.weeklyCard,
+.weekSummary,
+.weekSummaryCard,
+.weekSummaryMiniCard{
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.eventRowTitle,
+.eventRowMeta,
+.locationRowTitle,
+.updateRowTitle,
+.weeklyCardTitle,
+.weeklyCardTime,
+.weeklyCardMetaRow,
+.weeklyCardDesc,
+.detailTitle,
+.detailMeta{
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.paneLeft > .scroll::after,
+.mobileDetail > .scroll::after,
+.mobileDetailScroll::after{
+  content: "";
+  display: block;
+  height: 28px;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 980px){
+  html,
+  body,
+  .pageShell,
+  .split,
+  .paneLeft,
+  .paneRight,
+  .paneLeft > .scroll,
+  .paneRight > .scroll,
+  .mobileDetail,
+  .mobileDetail > .scroll,
+  .mobileDetailScroll{
+    overscroll-behavior-x: none !important;
+  }
+
+  .paneLeft > .scroll,
+  .paneRight > .scroll,
+  .mobileDetail > .scroll,
+  .mobileDetailScroll{
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .paneLeft > .scroll::after,
+  .mobileDetail > .scroll::after,
+  .mobileDetailScroll::after{
+    height: calc(104px + env(safe-area-inset-bottom, 0px));
+  }
+}
