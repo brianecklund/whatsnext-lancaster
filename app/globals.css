@@ -6126,3 +6126,509 @@ html[data-route-switching="true"] .routeFrame{
     z-index: 620 !important;
   }
 }
+
+/* --- 2026-03-20 pane width + listing containment + mobile overscroll refinements --- */
+html,
+body,
+#__next{
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
+@media (min-width: 981px){
+  .leftSticky{
+    padding: 12px 0 14px 0 !important;
+  }
+
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow,
+  .leftSticky .directoryToolbar,
+  .leftSticky .directoryAlphabetNav,
+  .leftSticky .weekdayRow{
+    width: 100% !important;
+    box-sizing: border-box;
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+  }
+
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList,
+  .weeklyOverview,
+  .dayBlock{
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+  }
+
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList,
+  .dayBlock{
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+  }
+}
+
+.eventRow,
+.locationRow,
+.updateRow,
+.directoryCard,
+.partnerCard,
+.weeklyCard,
+.weekSummary,
+.weekSummaryCard,
+.weekSummaryMiniCard{
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.eventRowTitle,
+.eventRowMeta,
+.locationRowTitle,
+.updateRowTitle,
+.weeklyCardTitle,
+.weeklyCardTime,
+.weeklyCardMetaRow,
+.weeklyCardDesc,
+.detailTitle,
+.detailMeta{
+  min-width: 0;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+
+.paneLeft > .scroll::after,
+.mobileDetail > .scroll::after,
+.mobileDetailScroll::after{
+  content: "";
+  display: block;
+  height: 28px;
+  width: 100%;
+  flex: 0 0 auto;
+}
+
+@media (max-width: 980px){
+  html,
+  body,
+  .pageShell,
+  .split,
+  .paneLeft,
+  .paneRight,
+  .paneLeft > .scroll,
+  .paneRight > .scroll,
+  .mobileDetail,
+  .mobileDetail > .scroll,
+  .mobileDetailScroll{
+    overscroll-behavior-x: none !important;
+  }
+
+  .paneLeft > .scroll,
+  .paneRight > .scroll,
+  .mobileDetail > .scroll,
+  .mobileDetailScroll{
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .paneLeft > .scroll::after,
+  .mobileDetail > .scroll::after,
+  .mobileDetailScroll::after{
+    height: calc(104px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* === March 2026 calendar layout polish === */
+:root{
+  --contentUIPad: var(--panePadX);
+}
+
+.paneLeft > .scroll,
+.paneRight > .scroll{
+  box-sizing: border-box;
+}
+
+/* Keep left/right pane padding visually uniform */
+.paneLeft > .scroll{
+  padding-left: var(--panePadX) !important;
+  padding-right: var(--panePadX) !important;
+}
+
+.paneRight > .scroll{
+  padding-left: var(--panePadX) !important;
+  padding-right: var(--panePadX) !important;
+}
+
+.leftSticky{
+  padding-left: var(--panePadX) !important;
+  padding-right: var(--panePadX) !important;
+}
+
+.leftControls,
+.calendarToolbar,
+.searchRow,
+.calendarSearchRow,
+.calendarSearchRowMobile,
+.monthWrap,
+.weeklyOverview,
+.emptyList,
+.dayEventsMobile,
+.dayEventsHeader,
+.dayEventsList,
+.weekdayRow,
+.monthGrid{
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.calendarToolbar{
+  align-items: stretch;
+}
+
+.searchRow{
+  flex: 1 1 auto;
+}
+
+.searchInput{
+  width: 100%;
+}
+
+/* Mobile collapsible controls in calendar */
+.mobileControlsToggle{
+  display: none;
+}
+
+@media (max-width: 980px){
+  .leftSticky{
+    overflow: clip;
+    transition: padding-bottom 220ms ease, box-shadow 220ms ease;
+  }
+
+  .mobileControlsToggle{
+    display: inline-flex;
+    width: 100%;
+    height: 34px;
+    margin-top: 10px;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.92);
+    color: var(--text);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+  }
+
+  .mobileControlsToggleLabel{
+    line-height: 1;
+  }
+
+  .mobileControlsToggleIcon{
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    line-height: 1;
+    font-size: 14px;
+    transition: transform 220ms ease;
+  }
+
+  .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggleIcon{
+    transform: rotate(0deg);
+  }
+
+  .leftSticky[data-mobile-collapsed="false"] .mobileControlsToggleIcon{
+    transform: rotate(180deg);
+  }
+
+  .leftControls{
+    margin-top: 10px;
+    transition: max-height 240ms ease, opacity 200ms ease, transform 200ms ease, margin-top 200ms ease;
+    transform-origin: top center;
+    overflow: hidden;
+    max-height: 220px;
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+  }
+
+  .leftSticky[data-mobile-collapsed="true"] .leftControls{
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.96);
+    margin-top: 0;
+    pointer-events: none;
+  }
+
+  .calendarToolbar{
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 8px;
+  }
+
+  .dayJumpRail{
+    width: 100%;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 6px;
+    transition: transform 220ms ease, opacity 200ms ease;
+  }
+
+  .dayJumpBtn{
+    width: 100%;
+    min-width: 0;
+    height: 30px;
+    font-size: 10px;
+  }
+
+  .searchRow{
+    width: 100%;
+    gap: 8px;
+  }
+
+  .searchInput,
+  .viewBtn,
+  .filterBtn,
+  .clearBtn{
+    height: 40px;
+  }
+
+  .searchInput{
+    min-width: 0;
+  }
+
+  .viewBtn,
+  .filterBtn{
+    flex: 0 0 auto;
+  }
+
+  .weekdayRow{
+    transition: max-height 240ms ease, opacity 200ms ease, transform 200ms ease, margin-bottom 200ms ease;
+    transform-origin: top center;
+    max-height: 40px;
+    opacity: 1;
+    transform: translateY(0) scaleY(1);
+    overflow: hidden;
+  }
+
+  .leftSticky[data-mobile-collapsed="true"] ~ .monthWrap .weekdayRow,
+  .leftSticky[data-mobile-collapsed="true"] + .filterOverlay + .monthWrap .weekdayRow,
+  .leftSticky[data-mobile-collapsed="true"] + .monthWrap .weekdayRow{
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-6px) scaleY(0.96);
+    margin-bottom: 0;
+  }
+}
+
+
+/* --- 2026-03-20 final pane width + no-overscroll + mobile controls spacing pass --- */
+html,
+body{
+  overscroll-behavior: none;
+}
+
+.paneLeft > .scroll,
+.paneRight > .scroll,
+.mobileDetail > .scroll,
+.mobileDetailScroll{
+  overscroll-behavior: none;
+}
+
+@media (min-width: 981px){
+  .leftSticky{
+    padding: 8px 0 10px 0 !important;
+  }
+
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky > .directoryAlphabetNav,
+  .leftSticky > .directoryAlphabetNavMobile,
+  .leftSticky > .weekdayRow,
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow,
+  .leftSticky .directoryToolbar{
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    padding: 0 var(--panePadX) !important;
+    margin: 0 !important;
+  }
+
+  .leftSticky > .leftControls{
+    padding-top: 8px !important;
+    padding-bottom: 6px !important;
+  }
+
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList,
+  .weeklyOverview,
+  .dayBlock{
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+    margin: 0 !important;
+  }
+
+  .splitPageListBody{
+    padding-top: 12px !important;
+    padding-bottom: 40px !important;
+  }
+
+  .dayBlock:last-child,
+  .monthWrap:last-child,
+  .emptyList:last-child{
+    padding-bottom: 28px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .eventRow,
+  .updateRow,
+  .directoryCard,
+  .partnerCard{
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+  }
+}
+
+@media (max-width: 980px){
+  .leftSticky{
+    padding: 6px 0 8px 0 !important;
+  }
+
+  .leftSticky > .tabs,
+  .leftSticky > .leftControls,
+  .leftSticky > .directoryAlphabetNav,
+  .leftSticky > .directoryAlphabetNavMobile,
+  .leftSticky > .weekdayRow,
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow,
+  .leftSticky .directoryToolbar{
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    padding: 0 var(--panePadX) !important;
+    margin: 0 !important;
+  }
+
+  .leftSticky > .leftControls{
+    padding-top: 6px !important;
+    padding-bottom: 4px !important;
+  }
+
+  .mobileControlsToggle{
+    margin-top: 6px !important;
+    margin-bottom: 4px !important;
+  }
+
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .weeklyOverviewLanding,
+  .paneLeft .weeklyLanding,
+  .paneLeft .monthWrap,
+  .paneLeft .emptyList,
+  .weeklyOverview,
+  .dayBlock{
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box;
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+    margin: 0 !important;
+  }
+
+  .splitPageListBody{
+    padding-top: 8px !important;
+    padding-bottom: calc(118px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .dayBlock:last-child,
+  .monthWrap:last-child,
+  .emptyList:last-child{
+    padding-bottom: 28px !important;
+    margin-bottom: 0 !important;
+  }
+
+  .eventRow,
+  .updateRow,
+  .directoryCard,
+  .partnerCard{
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-right: 0 !important;
+  }
+}
+
+/* --- 2026-03-20 desktop split-pane scrolling fix: prevent page scroll, keep scroll inside panes --- */
+html,
+body{
+  min-height: 100%;
+}
+
+.shellSwap,
+.shellSwap__panel{
+  min-height: 0;
+}
+
+.pageShell{
+  height: calc(100dvh - var(--headerH)) !important;
+  min-height: calc(100dvh - var(--headerH)) !important;
+  max-height: calc(100dvh - var(--headerH)) !important;
+  overflow: hidden !important;
+}
+
+.pageShell > .split{
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+}
+
+.pageShell .pane,
+.pageShell .paneLeft,
+.pageShell .paneRight{
+  min-height: 0;
+  height: 100%;
+}
+
+.pageShell .paneLeft > .scroll,
+.pageShell .paneRight > .scroll,
+.pageShell .mobileDetail > .scroll,
+.pageShell .mobileDetailScroll{
+  min-height: 0;
+  height: 100%;
+  overflow-y: auto !important;
+}
+
+@media (min-width: 981px){
+  .pageShell .paneLeft > .scroll,
+  .pageShell .paneRight > .scroll{
+    padding-bottom: 56px !important;
+  }
+}
