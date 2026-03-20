@@ -1,27 +1,13 @@
 import "./globals.css";
 import type { Metadata } from "next";
-import Script from "next/script";
 import SiteHeader from "./site-header";
+import ThemeBoot from "./ThemeBoot";
 
 export const metadata: Metadata = {
   title: "What's Next Lancaster",
   description: "Events, places, and updates happening around Lancaster.",
 };
 
-const themeBootScript = `
-(function () {
-  try {
-    var stored = localStorage.getItem("theme");
-    if (stored) {
-      document.documentElement.dataset.theme = stored;
-      return;
-    }
-
-    var prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
-    document.documentElement.dataset.theme = prefersDark ? "dark" : "light";
-  } catch (e) {}
-})();
-`;
 
 export default function RootLayout({
   children,
@@ -38,11 +24,7 @@ export default function RootLayout({
         />
       </head>
       <body>
-        <Script
-          id="theme-boot"
-          strategy="beforeInteractive"
-          dangerouslySetInnerHTML={{ __html: themeBootScript }}
-        />
+        <ThemeBoot />
         <SiteHeader />
         {children}
       </body>
