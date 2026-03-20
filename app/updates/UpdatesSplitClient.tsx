@@ -27,6 +27,9 @@ export type UpdateLite = {
 
 type Props = {
   updates: UpdateLite[];
+  currentSection?: "calendar" | "directory" | "updates";
+  onNavigateSection?: (section: "calendar" | "directory" | "updates") => void;
+  basePath?: string;
 };
 
 function norm(v: string) {
@@ -101,11 +104,12 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
   );
 }
 
-export default function UpdatesSplitClient({ updates }: Props) {
+export default function UpdatesSplitClient({ updates, currentSection, onNavigateSection, basePath = "/updates" }: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
+  const resolvedSection = currentSection ?? (pathname?.startsWith("/updates") ? "updates" : pathname?.startsWith("/locations") ? "directory" : "calendar");
 
   const q = sp.get("q") || "";
   const tag = sp.get("tag") || "";
@@ -182,7 +186,7 @@ export default function UpdatesSplitClient({ updates }: Props) {
     if (!value) params.delete(key);
     else params.set(key, value);
     const query = params.toString();
-    router.push(query ? `/updates?${query}` : "/updates");
+    router.push(query ? `${basePath}?${query}` : basePath);
   }
 
   function setSelected(id: string) {
@@ -198,11 +202,11 @@ export default function UpdatesSplitClient({ updates }: Props) {
       <SegmentedControl
         className="tabs segmentedControl--primary"
         ariaLabel="Primary navigation"
-        currentKey={pathname?.startsWith("/updates") ? "updates" : pathname?.startsWith("/locations") ? "directory" : "calendar"}
+        currentKey={resolvedSection}
         items={[
-          { key: "calendar", label: "Calendar", href: "/" },
-          { key: "directory", label: "Directory", href: "/locations" },
-          { key: "updates", label: "Updates", href: "/updates" },
+          { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
+          { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
+          { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
         ]}
       />
 
@@ -302,7 +306,8 @@ export default function UpdatesSplitClient({ updates }: Props) {
       tagline="Updates, openings, menu changes, PSAs, and quick announcements."
       taglineHidden={taglineHidden}
       isMobile={isMobile}
-      current="updates"
+      current={resolvedSection === "calendar" ? "calendar" : resolvedSection === "directory" ? "directory" : "updates"}
+      onNavigateSection={onNavigateSection}
       mobileOverlay={
         <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
           <div className="mobileDetailHeader">

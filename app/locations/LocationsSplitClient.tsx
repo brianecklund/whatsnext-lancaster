@@ -40,13 +40,17 @@ type PlaceDetailsResponse = {
 
 type Props = {
   locations?: LocationRow[];
+  currentSection?: "calendar" | "directory" | "updates";
+  onNavigateSection?: (section: "calendar" | "directory" | "updates") => void;
+  basePath?: string;
 };
 
 const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
-export default function LocationsSplitClient({ locations = [] }: Props) {
+export default function LocationsSplitClient({ locations = [], currentSection, onNavigateSection, basePath = "/locations" }: Props) {
   const router = useRouter();
   const pathname = usePathname();
+  const resolvedSection = currentSection ?? (pathname?.startsWith("/updates") ? "updates" : pathname?.startsWith("/locations") ? "directory" : "calendar");
   const searchParams = useSearchParams();
 
   const safeLocations = useMemo<LocationRow[]>(
@@ -122,7 +126,7 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
 
   function navigate(params: URLSearchParams) {
     const qs = params.toString();
-    router.replace(qs ? `/locations?${qs}` : "/locations");
+    router.replace(qs ? `${basePath}?${qs}` : basePath);
   }
 
   function setSelected(key: string) {
@@ -304,7 +308,8 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
       tagline="A directory of places in Lancaster to explore."
       taglineHidden={taglineHidden}
       isMobile={effectiveIsMobile}
-      current="directory"
+      current={resolvedSection === "calendar" ? "calendar" : resolvedSection === "updates" ? "updates" : "directory"}
+      onNavigateSection={onNavigateSection}
       style={
         effectiveIsMobile
           ? ({ ["--mobileOverlayOffset" as string]: `${mobileOverlayOffset}px` } as CSSProperties)
@@ -331,11 +336,11 @@ export default function LocationsSplitClient({ locations = [] }: Props) {
               <SegmentedControl
                 className="tabs segmentedControl--primary"
                 ariaLabel="Primary navigation"
-                currentKey={pathname.startsWith("/updates") ? "updates" : pathname.startsWith("/locations") ? "directory" : "calendar"}
+                currentKey={resolvedSection}
                 items={[
-                  { key: "calendar", label: "Calendar", href: "/" },
-                  { key: "directory", label: "Directory", href: "/locations" },
-                  { key: "updates", label: "Updates", href: "/updates" },
+                  { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
+                  { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
+                  { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
                 ]}
               />
 

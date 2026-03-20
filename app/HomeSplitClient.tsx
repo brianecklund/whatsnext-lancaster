@@ -49,6 +49,8 @@ type EventLite = {
 
 type Props = {
   events: EventLite[];
+  currentSection?: "calendar" | "directory" | "updates";
+  onNavigateSection?: (section: "calendar" | "directory" | "updates") => void;
 };
 
 const WEEKLY_KEY = "__weekly__";
@@ -238,11 +240,12 @@ function buildWeekInsights(items: EventLite[]) {
   return { buckets, busiestDayLabel, peakWindowLabel };
 }
 
-export default function HomeSplitClient({ events }: Props) {
+export default function HomeSplitClient({ events, currentSection, onNavigateSection }: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
+  const resolvedSection = currentSection ?? (pathname?.startsWith("/updates") ? "updates" : pathname?.startsWith("/locations") ? "directory" : "calendar");
 
   const q = sp.get("q") || "";
   const type = sp.get("type") || "";
@@ -383,7 +386,8 @@ export default function HomeSplitClient({ events }: Props) {
   }
   function pushParams(next: URLSearchParams) {
     const qs = next.toString();
-    router.push(`${pathname}${qs ? `?${qs}` : ""}`);
+    const basePath = resolvedSection === "updates" ? "/updates" : resolvedSection === "directory" ? "/locations" : "/";
+    router.push(`${basePath}${qs ? `?${qs}` : ""}`);
   }
 
   function setParam(key: string, value: string | null) {
@@ -824,11 +828,11 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 <SegmentedControl
                   className="tabs segmentedControl--primary"
                   ariaLabel="Primary navigation"
-                  currentKey={pathname?.startsWith("/updates") ? "updates" : pathname?.startsWith("/locations") ? "directory" : "calendar"}
+                  currentKey={resolvedSection}
                   items={[
-                    { key: "calendar", label: "Calendar", href: "/" },
-                    { key: "directory", label: "Directory", href: "/locations" },
-                    { key: "updates", label: "Updates", href: "/updates" },
+                    { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
+                    { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
+                    { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
                   ]}
                 />
 
@@ -1552,7 +1556,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
             <SegmentedControl
               className="segmentedControl--mobile"
               ariaLabel="Primary navigation"
-              currentKey={pathname?.startsWith("/updates") ? "updates" : pathname?.startsWith("/locations") ? "directory" : "calendar"}
+              currentKey={resolvedSection}
               items={[
                 { key: "calendar", label: "Calendar", href: "/" },
                 { key: "directory", label: "Directory", href: "/locations" },

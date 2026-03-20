@@ -13,6 +13,7 @@ type Props = {
   children: ReactNode;
   mobileOverlay?: ReactNode;
   style?: CSSProperties;
+  onNavigateSection?: (section: PageKey) => void;
 };
 
 export default function SplitPageLayout({
@@ -23,6 +24,7 @@ export default function SplitPageLayout({
   children,
   mobileOverlay,
   style,
+  onNavigateSection,
 }: Props) {
   return (
     <div className="pageShell" style={style}>
@@ -37,9 +39,9 @@ export default function SplitPageLayout({
             ariaLabel="Primary navigation"
             currentKey={current}
             items={[
-              { key: "calendar", label: "Calendar", href: "/" },
-              { key: "directory", label: "Directory", href: "/locations" },
-              { key: "updates", label: "Updates", href: "/updates" },
+              { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
+              { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
+              { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
             ]}
           />
         </div>

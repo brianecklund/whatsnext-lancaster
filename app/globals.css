@@ -5260,3 +5260,23 @@ html[data-route-switching="true"] .routeFrame{
     padding: 16px;
   }
 }
+
+.shellSwap{
+  height: 100%;
+  min-height: 0;
+}
+
+.shellSwap__panel{
+  height: 100%;
+  animation: shellSwapIn 260ms cubic-bezier(.22,1,.36,1) both;
+}
+
+.shellSwap[data-transitioning="true"] .shellSwap__panel{
+  opacity: .985;
+  transform: translateY(2px);
+}
+
+@keyframes shellSwapIn{
+  0%{ opacity: 0; transform: translateY(10px) scale(.995); }
+  100%{ opacity: 1; transform: translateY(0) scale(1); }
+}
