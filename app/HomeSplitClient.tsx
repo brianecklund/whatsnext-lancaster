@@ -61,7 +61,7 @@ function norm(v: string) {
   return (v || "").toLowerCase().trim();
 }
 
-type WeekCategory = "Live music" | "Food & drink" | "Arts & culture" | "Community" | "Other";
+type WeekCategory = "All" | "Live music" | "Food & drink" | "Arts & culture" | "Community" | "Other";
 
 function weekCategoryForEvent(eventType?: string | null): WeekCategory {
   const t = (eventType || "").toLowerCase();
@@ -731,7 +731,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
 
   const weekEvents = selectedWeekBucket?.events ?? [];
   const weekEventsCount = weekEvents.length;
-  const weekCategoryOptions = ["Live music", "Food & drink", "Arts & culture", "Community", "Other"] as const satisfies readonly WeekCategory[];
+  const weekCategoryOptions = ["All","Live music", "Food & drink", "Arts & culture", "Community", "Other"] as const satisfies readonly WeekCategory[];
   const filteredWeekEvents = useMemo(() => {
     if (!selectedWeekCategory) return weekEvents;
     return weekEvents.filter((event) => weekCategoryForEvent(event.event_type) === selectedWeekCategory);
