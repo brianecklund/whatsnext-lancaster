@@ -221,7 +221,7 @@ type WeekBucket = {
 };
 
 function buildWeekInsights(items: EventLite[]) {
-  const buckets: Record<WeekCategory, number> = { "Live music": 0, "Food & drink": 0, "Arts & culture": 0, "Community": 0, "Other": 0 };
+  const buckets: Record<WeekCategory, number> = { All: items.length, "Live music": 0, "Food & drink": 0, "Arts & culture": 0, "Community": 0, "Other": 0 };
   const timeWindows = { Morning: 0, Afternoon: 0, Evening: 0, Late: 0 };
   const dayCounts = new Map<string, { date: Date; count: number }>();
 
@@ -344,7 +344,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const [taglineHidden, setTaglineHidden] = useState(false);
   const [mobileControlsCollapsed, setMobileControlsCollapsed] = useState(false);
   const [mobileControlsPinnedOpen, setMobileControlsPinnedOpen] = useState(false);
-  const [selectedWeekCategory, setSelectedWeekCategory] = useState<WeekCategory | null>(null);
+  const [selectedWeekCategory, setSelectedWeekCategory] = useState<WeekCategory>("All");
   const mobileControlsInitRef = useRef(false);
   const lastScrollTopRef = useRef(0);
 
@@ -731,13 +731,13 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
 
   const weekEvents = selectedWeekBucket?.events ?? [];
   const weekEventsCount = weekEvents.length;
-  const weekCategoryOptions = ["All","Live music", "Food & drink", "Arts & culture", "Community", "Other"] as const satisfies readonly WeekCategory[];
+  const weekCategoryOptions = ["Live music", "Food & drink", "Arts & culture", "Community", "Other"] as const satisfies readonly Exclude<WeekCategory, "All">[];
   const filteredWeekEvents = useMemo(() => {
-    if (!selectedWeekCategory) return weekEvents;
+    if (selectedWeekCategory === "All") return weekEvents;
     return weekEvents.filter((event) => weekCategoryForEvent(event.event_type) === selectedWeekCategory);
   }, [selectedWeekCategory, weekEvents]);
   const filteredWeekGroups = useMemo(() => {
-    if (!selectedWeekCategory) return selectedWeekBucket?.groups ?? [];
+    if (selectedWeekCategory === "All") return selectedWeekBucket?.groups ?? [];
     return (selectedWeekBucket?.groups ?? [])
       .map((group) => ({
         ...group,
@@ -1416,10 +1416,16 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     </div>
 
                     <div className="weekSummaryGrid weekSummaryGridSingle" role="list">
-                      <div className="weekSummaryCard" role="listitem">
+                      <button
+                        type="button"
+                        className="weekSummaryCard weekSummaryCardButton"
+                        role="listitem"
+                        data-active={selectedWeekCategory === "All" ? "true" : "false"}
+                        onClick={() => setSelectedWeekCategory("All")}
+                      >
                         <div className="weekSummaryKicker">Total events</div>
                         <div className="weekSummaryValue">{weekEventsCount}</div>
-                      </div>
+                      </button>
                       <div className="weekCategoryFilters" role="group" aria-label="Weekly overview category filters">
                         {weekCategoryOptions.map((category) => {
                           const isActive = selectedWeekCategory === category;
@@ -1799,10 +1805,16 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 </div>
 
                 <div className="weekSummaryGrid weekSummaryGridSingle" role="list">
-                  <div className="weekSummaryCard" role="listitem">
+                  <button
+                    type="button"
+                    className="weekSummaryCard weekSummaryCardButton"
+                    role="listitem"
+                    data-active={selectedWeekCategory === "All" ? "true" : "false"}
+                    onClick={() => setSelectedWeekCategory("All")}
+                  >
                     <div className="weekSummaryKicker">Events</div>
                     <div className="weekSummaryValue">{selectedWeekBucket.events.length}</div>
-                  </div>
+                  </button>
                   <div className="weekCategoryFilters" role="group" aria-label="Weekly overview category filters">
                     {weekCategoryOptions.map((category) => {
                       const isActive = selectedWeekCategory === category;
