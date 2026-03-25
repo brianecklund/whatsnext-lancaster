@@ -61,6 +61,14 @@ function norm(v: string) {
   return (v || "").toLowerCase().trim();
 }
 
+function weekCategoryForEvent(eventType?: string | null): "All" | "Live music" | "Food & drink" | "Community" | "Other" {
+  const t = (eventType || "").toLowerCase();
+  if (t.includes("music") || t.includes("concert") || t.includes("show")) return "Live music";
+  if (t.includes("food") || t.includes("drink") || t.includes("dining") || t.includes("menu")) return "Food & drink";
+  if (t.includes("community") || t.includes("market") || t.includes("fundraiser") || t.includes("family")) return "Community";
+  return "Other";
+}
+
 function endOfWeekSaturdayFromDate(d: Date): Date {
   const start = startOfWeekSundayFromDate(d);
   const end = new Date(start);
@@ -215,11 +223,7 @@ function buildWeekInsights(items: EventLite[]) {
   const dayCounts = new Map<string, { date: Date; count: number }>();
 
   for (const e of items) {
-    const t = (e.event_type || "").toLowerCase();
-    if (t.includes("music") || t.includes("concert") || t.includes("show")) buckets["Live music"]++;
-    else if (t.includes("food") || t.includes("drink") || t.includes("dining") || t.includes("menu")) buckets["Food & drink"]++;
-    else if (t.includes("community") || t.includes("market") || t.includes("fundraiser") || t.includes("family")) buckets["Community"]++;
-    else buckets["Other"]++;
+    buckets[weekCategoryForEvent(e.event_type)]++;
 
     const d = safeDateFromEvent(e);
     if (!d) continue;
@@ -337,6 +341,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const [taglineHidden, setTaglineHidden] = useState(false);
   const [mobileControlsCollapsed, setMobileControlsCollapsed] = useState(false);
   const [mobileControlsPinnedOpen, setMobileControlsPinnedOpen] = useState(false);
+  const [selectedWeekCategory, setSelectedWeekCategory] = useState<"All" | "Live music" | "Food & drink" | "Community" | "Other">("All");
   const mobileControlsInitRef = useRef(false);
   const lastScrollTopRef = useRef(0);
 
@@ -724,7 +729,21 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const weekEvents = selectedWeekBucket?.events ?? [];
   const weekEventsCount = weekEvents.length;
   const weekLabel = selectedWeekBucket?.rangeLabel ?? defaultWeekBucket?.rangeLabel ?? "";
-  const weekGroups = selectedWeekBucket?.groups ?? [];
+  const weekCategoryOptions = ["All", "Live music", "Food & drink", "Community", "Other"] as const;
+  const filteredWeekEvents = useMemo(() => {
+    if (selectedWeekCategory === "All") return weekEvents;
+    return weekEvents.filter((event) => weekCategoryForEvent(event.event_type) === selectedWeekCategory);
+  }, [selectedWeekCategory, weekEvents]);
+  const filteredWeekGroups = useMemo(() => {
+    if (selectedWeekCategory === "All") return selectedWeekBucket?.groups ?? [];
+    return (selectedWeekBucket?.groups ?? [])
+      .map((group) => ({
+        ...group,
+        items: group.items.filter((event) => weekCategoryForEvent(event.event_type) === selectedWeekCategory),
+      }))
+      .filter((group) => group.items.length > 0);
+  }, [selectedWeekBucket, selectedWeekCategory]);
+  const weekGroups = filteredWeekGroups;
 
   const weekAnnouncements = useMemo(() => {
     const start = selectedWeekBucket?.start?.getTime();
@@ -754,6 +773,10 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
       })
       .slice(0, 4);
   }, [selectedWeekBucket, updates]);
+
+  useEffect(() => {
+    setSelectedWeekCategory("All");
+  }, [selectedWeekBucket?.key]);
 
   const selectedEvent = useMemo(() => {
     if (!filteredEvents.length) return null;
@@ -1398,6 +1421,26 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         <div className="weekSummaryKicker">Total events</div>
                         <div className="weekSummaryValue">{weekEventsCount}</div>
                       </div>
+                      <div className="weekCategoryFilters" role="group" aria-label="Weekly overview category filters">
+                        {weekCategoryOptions.map((category) => {
+                          const isActive = selectedWeekCategory === category;
+                          const count = category === "All"
+                            ? weekEventsCount
+                            : (selectedWeekBucket.insights[category] ?? 0);
+                          return (
+                            <button
+                              key={category}
+                              type="button"
+                              className="weekCategoryFilterBtn"
+                              data-active={isActive ? "true" : "false"}
+                              onClick={() => setSelectedWeekCategory(category)}
+                            >
+                              <span>{category}</span>
+                              <span className="weekCategoryFilterCount">{count}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
 
                     <div className="weekAnnouncements" aria-label="Relevant announcements">
@@ -1432,8 +1475,8 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     </div>
                   </div>
 
-                  {weekEventsCount === 0 ? (
-                    <div className="emptyRight">No events scheduled for this week yet.</div>
+                  {filteredWeekEvents.length === 0 ? (
+                    <div className="emptyRight">No events match this weekly overview filter right now.</div>
                   ) : (
                     <div className="weeklyLanding fadeInItem" style={{ animationDelay: "420ms" }}>
                       <div className="weeklyCards">
@@ -1764,6 +1807,26 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     <div className="weekSummaryKicker">Events</div>
                     <div className="weekSummaryValue">{selectedWeekBucket.events.length}</div>
                   </div>
+                  <div className="weekCategoryFilters" role="group" aria-label="Weekly overview category filters">
+                    {weekCategoryOptions.map((category) => {
+                      const isActive = selectedWeekCategory === category;
+                      const count = category === "All"
+                        ? weekEventsCount
+                        : (selectedWeekBucket.insights[category] ?? 0);
+                      return (
+                        <button
+                          key={category}
+                          type="button"
+                          className="weekCategoryFilterBtn"
+                          data-active={isActive ? "true" : "false"}
+                          onClick={() => setSelectedWeekCategory(category)}
+                        >
+                          <span>{category}</span>
+                          <span className="weekCategoryFilterCount">{count}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 <div className="weekAnnouncements mobileWeekAnnouncements" aria-label="Relevant announcements">
@@ -1797,9 +1860,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               </div>
 
               <div className="weeklyLanding fadeInItem" style={{ animationDelay: "260ms" }}>
-                {selectedWeekBucket.events.length ? (
+                {filteredWeekEvents.length ? (
                   <div className="weeklyPreviewRail" aria-label="Swipe through upcoming events this week">
-                    {selectedWeekBucket.events.map((e) => {
+                    {filteredWeekEvents.map((e) => {
                       const title = e.title || "Untitled event";
                       const d = safeDateFromEvent(e);
                       const timeLabel = d ? `${formatDayHeading(d)} • ${formatTimeShort(d)}` : "Time TBD";
@@ -1869,6 +1932,32 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                   <div className="weeklyCardTitle">{title}</div>
                                   <div className="weeklyCardTime">{timeLabel}</div>
                                 </div>
+                                {e.tickets_url || e.website_url ? (
+                                  <div className="weeklyCardActions">
+                                    {e.tickets_url ? (
+                                      <a
+                                        className="weeklyMiniBtn"
+                                        href={e.tickets_url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        onClick={(ev) => ev.stopPropagation()}
+                                      >
+                                        Tickets
+                                      </a>
+                                    ) : null}
+                                    {e.website_url ? (
+                                      <a
+                                        className="weeklyMiniBtn"
+                                        href={e.website_url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        onClick={(ev) => ev.stopPropagation()}
+                                      >
+                                        Website
+                                      </a>
+                                    ) : null}
+                                  </div>
+                                ) : null}
                               </div>
                               <div className="weeklyCardMetaRow">{[e.locationName].filter(Boolean).join(" • ")}</div>
                               {desc ? <div className="weeklyCardDesc">{desc.length > 180 ? `${desc.slice(0, 180).trim()}…` : desc}</div> : null}
