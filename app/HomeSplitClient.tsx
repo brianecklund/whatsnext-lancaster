@@ -61,11 +61,14 @@ function norm(v: string) {
   return (v || "").toLowerCase().trim();
 }
 
-function weekCategoryForEvent(eventType?: string | null): "All" | "Live music" | "Food & drink" | "Community" | "Other" {
+type WeekCategory = "Live music" | "Food & drink" | "Arts & culture" | "Community" | "Other";
+
+function weekCategoryForEvent(eventType?: string | null): WeekCategory {
   const t = (eventType || "").toLowerCase();
-  if (t.includes("music") || t.includes("concert") || t.includes("show")) return "Live music";
-  if (t.includes("food") || t.includes("drink") || t.includes("dining") || t.includes("menu")) return "Food & drink";
-  if (t.includes("community") || t.includes("market") || t.includes("fundraiser") || t.includes("family")) return "Community";
+  if (t.includes("music") || t.includes("concert") || t.includes("show") || t.includes("dj")) return "Live music";
+  if (t.includes("food") || t.includes("drink") || t.includes("dining") || t.includes("menu") || t.includes("happy hour") || t.includes("bar")) return "Food & drink";
+  if (t.includes("art") || t.includes("gallery") || t.includes("film") || t.includes("movie") || t.includes("theatre") || t.includes("theater") || t.includes("comedy") || t.includes("poetry")) return "Arts & culture";
+  if (t.includes("community") || t.includes("market") || t.includes("fundraiser") || t.includes("family") || t.includes("workshop") || t.includes("outreach")) return "Community";
   return "Other";
 }
 
@@ -218,7 +221,7 @@ type WeekBucket = {
 };
 
 function buildWeekInsights(items: EventLite[]) {
-  const buckets = { "Live music": 0, "Food & drink": 0, "Community": 0, "Other": 0 };
+  const buckets: Record<WeekCategory, number> = { "Live music": 0, "Food & drink": 0, "Arts & culture": 0, "Community": 0, "Other": 0 };
   const timeWindows = { Morning: 0, Afternoon: 0, Evening: 0, Late: 0 };
   const dayCounts = new Map<string, { date: Date; count: number }>();
 
@@ -341,7 +344,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const [taglineHidden, setTaglineHidden] = useState(false);
   const [mobileControlsCollapsed, setMobileControlsCollapsed] = useState(false);
   const [mobileControlsPinnedOpen, setMobileControlsPinnedOpen] = useState(false);
-  const [selectedWeekCategory, setSelectedWeekCategory] = useState<"All" | "Live music" | "Food & drink" | "Community" | "Other">("All");
+  const [selectedWeekCategory, setSelectedWeekCategory] = useState<WeekCategory | null>(null);
   const mobileControlsInitRef = useRef(false);
   const lastScrollTopRef = useRef(0);
 
@@ -728,14 +731,13 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
 
   const weekEvents = selectedWeekBucket?.events ?? [];
   const weekEventsCount = weekEvents.length;
-  const weekLabel = selectedWeekBucket?.rangeLabel ?? defaultWeekBucket?.rangeLabel ?? "";
-  const weekCategoryOptions = ["All", "Live music", "Food & drink", "Community", "Other"] as const;
+  const weekCategoryOptions = ["Live music", "Food & drink", "Arts & culture", "Community", "Other"] as const satisfies readonly WeekCategory[];
   const filteredWeekEvents = useMemo(() => {
-    if (selectedWeekCategory === "All") return weekEvents;
+    if (!selectedWeekCategory) return weekEvents;
     return weekEvents.filter((event) => weekCategoryForEvent(event.event_type) === selectedWeekCategory);
   }, [selectedWeekCategory, weekEvents]);
   const filteredWeekGroups = useMemo(() => {
-    if (selectedWeekCategory === "All") return selectedWeekBucket?.groups ?? [];
+    if (!selectedWeekCategory) return selectedWeekBucket?.groups ?? [];
     return (selectedWeekBucket?.groups ?? [])
       .map((group) => ({
         ...group,
@@ -775,7 +777,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   }, [selectedWeekBucket, updates]);
 
   useEffect(() => {
-    setSelectedWeekCategory("All");
+    setSelectedWeekCategory(null);
   }, [selectedWeekBucket?.key]);
 
   const selectedEvent = useMemo(() => {
@@ -1409,9 +1411,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     <div className="weekSummaryTopline">
                       <div>
                         <h3 className="weekSummaryTitle">{selectedWeekBucket.label}</h3>
-                        <p className="weekSummarySubhead">
-                          Week of {weekLabel}. Browse the current week plus the next four weeks, then open a week for a fuller breakdown.
-                        </p>
                       </div>
                       <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
                     </div>
@@ -1424,16 +1423,14 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       <div className="weekCategoryFilters" role="group" aria-label="Weekly overview category filters">
                         {weekCategoryOptions.map((category) => {
                           const isActive = selectedWeekCategory === category;
-                          const count = category === "All"
-                            ? weekEventsCount
-                            : (selectedWeekBucket.insights[category] ?? 0);
+                          const count = selectedWeekBucket.insights[category] ?? 0;
                           return (
                             <button
                               key={category}
                               type="button"
                               className="weekCategoryFilterBtn"
                               data-active={isActive ? "true" : "false"}
-                              onClick={() => setSelectedWeekCategory(category)}
+                              onClick={() => setSelectedWeekCategory((current) => current === category ? null : category)}
                             >
                               <span>{category}</span>
                               <span className="weekCategoryFilterCount">{count}</span>
@@ -1443,11 +1440,10 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       </div>
                     </div>
 
-                    <div className="weekAnnouncements" aria-label="Relevant announcements">
+                    <div className="weekAnnouncements" aria-label="Pinned announcements">
                       <div className="weekAnnouncementsHeader">
                         <div>
-                          <div className="weekSummaryKicker">Relevant announcements</div>
-                          <div className="weekAnnouncementsSubhead">Surface pinned updates, notices, and linked announcements for this week.</div>
+                          <div className="weekSummaryKicker">Pinned Announcements</div>
                         </div>
                       </div>
 
@@ -1819,7 +1815,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           type="button"
                           className="weekCategoryFilterBtn"
                           data-active={isActive ? "true" : "false"}
-                          onClick={() => setSelectedWeekCategory(category)}
+                          onClick={() => setSelectedWeekCategory((current) => current === category ? null : category)}
                         >
                           <span>{category}</span>
                           <span className="weekCategoryFilterCount">{count}</span>
@@ -1829,11 +1825,10 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   </div>
                 </div>
 
-                <div className="weekAnnouncements mobileWeekAnnouncements" aria-label="Relevant announcements">
+                <div className="weekAnnouncements mobileWeekAnnouncements" aria-label="Pinned announcements">
                   <div className="weekAnnouncementsHeader">
                     <div>
-                      <div className="weekSummaryKicker">Relevant announcements</div>
-                      <div className="weekAnnouncementsSubhead">Pinned updates and linked notices for this week.</div>
+                      <div className="weekSummaryKicker">Pinned Announcements</div>
                     </div>
                   </div>
                   {weekAnnouncements.length ? (

@@ -7679,3 +7679,202 @@ html[data-theme="night-shift"] .weekSummarySubhead{
     padding: 10px 12px;
   }
 }
+
+
+/* --- 2026-03-25 v9 palette, weekly overview, homepage scroll, and pane spacing fixes --- */
+:root,
+html[data-theme="paper-ink"]{
+  --bg: #f5f0e7;
+  --text: #1f1a17;
+  --muted: #655d56;
+  --border: #d7cec2;
+  --panel: #eee6da;
+  --hover: #faf6ef;
+  --panelStrong: #e6ddd0;
+  --accent: #2a2420;
+  --accentSoft: rgba(42,36,32,0.10);
+  --btnBg: #e4dbcf;
+  --btnBgHover: #dad0c2;
+  --bgElevated: rgba(245,240,231,0.94);
+  --btnSurface: #faf6ef;
+  --btnSurfaceAlt: #f1e9de;
+  --themeChip1: #2a2420;
+  --themeChip2: #8f8478;
+  --themeChip3: #f5f0e7;
+}
+
+@media (min-width: 981px){
+  .homeShell{
+    height: calc(100dvh - var(--headerH));
+    overflow: hidden;
+  }
+
+  .homeShell .pageShell,
+  .homeShell .split,
+  .homeShell .pane,
+  .homeShell .scroll{
+    height: 100%;
+    min-height: 0;
+  }
+
+  .homeShell .pageShell{
+    overflow: hidden;
+  }
+
+  .pageShell > .split{
+    margin-top: 0 !important;
+  }
+
+  .paneLeft > .scroll,
+  .paneRight > .scroll{
+    padding-top: 0 !important;
+  }
+
+  .paneRight > .scroll{
+    padding-top: var(--panePadX) !important;
+  }
+
+  .leftSticky{
+    top: 0 !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    padding-bottom: 10px !important;
+  }
+
+  .leftSticky > .tabs{
+    margin-top: 0 !important;
+    margin-bottom: 10px !important;
+  }
+
+  .leftSticky > .leftControls{
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+}
+
+.weekSummaryGridSingle{
+  grid-template-columns: minmax(0, 220px) minmax(0, 1fr) !important;
+  align-items: stretch;
+}
+
+.weekCategoryFilters{
+  grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+}
+
+.weekCategoryFilterBtn{
+  width: 100%;
+  min-height: 78px;
+}
+
+.weekAnnouncementsSubhead{
+  display: none !important;
+}
+
+html[data-theme="night-shift"] .segmentedControl__button[data-active="true"],
+html[data-theme="night-shift"] .segmentedControl__button[data-visual-active="true"],
+html[data-theme="night-shift"] .dayJumpBtn,
+html[data-theme="night-shift"] .dayJumpBtn[data-active="true"],
+html[data-theme="night-shift"] .weekSummary,
+html[data-theme="night-shift"] .weekSummaryCard,
+html[data-theme="night-shift"] .weekCategoryFilterBtn,
+html[data-theme="night-shift"] .weekAnnouncementCard,
+html[data-theme="night-shift"] .weekAnnouncements,
+html[data-theme="night-shift"] .weeklyCard,
+html[data-theme="night-shift"] .weeklyCardTag,
+html[data-theme="night-shift"] .weeklyMiniBtn,
+html[data-theme="night-shift"] .weeklyOverview{
+  color: #171310 !important;
+}
+
+html[data-theme="night-shift"] .weeklyCardDesc,
+html[data-theme="night-shift"] .weeklyCardTitle,
+html[data-theme="night-shift"] .weekAnnouncementTitle,
+html[data-theme="night-shift"] .weekSummaryValue,
+html[data-theme="night-shift"] .weeklyCount,
+html[data-theme="night-shift"] .weeklyTitle{
+  color: #171310 !important;
+}
+
+html[data-theme="night-shift"] .weeklyOverview,
+html[data-theme="night-shift"] .dayJumpBtn,
+html[data-theme="night-shift"] .weekSummary,
+html[data-theme="night-shift"] .weekSummaryCard,
+html[data-theme="night-shift"] .weekCategoryFilterBtn,
+html[data-theme="night-shift"] .weekAnnouncementCard,
+html[data-theme="night-shift"] .weekAnnouncements,
+html[data-theme="night-shift"] .weeklyCard,
+html[data-theme="night-shift"] .weeklyCardTag,
+html[data-theme="night-shift"] .weeklyMiniBtn{
+  background: #efe7dc !important;
+  border-color: #d6c9b8 !important;
+}
+
+html[data-theme="night-shift"] .weeklyCardTime,
+html[data-theme="night-shift"] .weeklyCardMetaRow,
+html[data-theme="night-shift"] .weekAnnouncementDate,
+html[data-theme="night-shift"] .weekAnnouncementLink,
+html[data-theme="night-shift"] .weekAnnouncementEmpty,
+html[data-theme="night-shift"] .weekSummaryKicker,
+html[data-theme="night-shift"] .weeklyTitle{
+  color: #564c41 !important;
+}
+
+html[data-theme="ocean-blueprint"] .segmentedControl__button[data-active="true"],
+html[data-theme="ocean-blueprint"] .segmentedControl__button[data-visual-active="true"],
+html[data-theme="ocean-blueprint"] .dayJumpBtn,
+html[data-theme="ocean-blueprint"] .dayJumpBtn[data-active="true"],
+html[data-theme="ocean-blueprint"] .weekSummary,
+html[data-theme="ocean-blueprint"] .weekSummaryCard,
+html[data-theme="ocean-blueprint"] .weekCategoryFilterBtn,
+html[data-theme="ocean-blueprint"] .weekAnnouncementCard,
+html[data-theme="ocean-blueprint"] .weekAnnouncements,
+html[data-theme="ocean-blueprint"] .weeklyCard,
+html[data-theme="ocean-blueprint"] .weeklyCardTag,
+html[data-theme="ocean-blueprint"] .weeklyMiniBtn,
+html[data-theme="ocean-blueprint"] .weeklyOverview{
+  color: #0f1a23 !important;
+}
+
+html[data-theme="ocean-blueprint"] .weeklyCardDesc,
+html[data-theme="ocean-blueprint"] .weeklyCardTitle,
+html[data-theme="ocean-blueprint"] .weekAnnouncementTitle,
+html[data-theme="ocean-blueprint"] .weekSummaryValue,
+html[data-theme="ocean-blueprint"] .weeklyCount,
+html[data-theme="ocean-blueprint"] .weeklyTitle{
+  color: #0f1a23 !important;
+}
+
+html[data-theme="ocean-blueprint"] .weeklyOverview,
+html[data-theme="ocean-blueprint"] .dayJumpBtn,
+html[data-theme="ocean-blueprint"] .weekSummary,
+html[data-theme="ocean-blueprint"] .weekSummaryCard,
+html[data-theme="ocean-blueprint"] .weekCategoryFilterBtn,
+html[data-theme="ocean-blueprint"] .weekAnnouncementCard,
+html[data-theme="ocean-blueprint"] .weekAnnouncements,
+html[data-theme="ocean-blueprint"] .weeklyCard,
+html[data-theme="ocean-blueprint"] .weeklyCardTag,
+html[data-theme="ocean-blueprint"] .weeklyMiniBtn{
+  background: #dcecf5 !important;
+  border-color: #bdd4e3 !important;
+}
+
+html[data-theme="ocean-blueprint"] .weeklyCardTime,
+html[data-theme="ocean-blueprint"] .weeklyCardMetaRow,
+html[data-theme="ocean-blueprint"] .weekAnnouncementDate,
+html[data-theme="ocean-blueprint"] .weekAnnouncementLink,
+html[data-theme="ocean-blueprint"] .weekAnnouncementEmpty,
+html[data-theme="ocean-blueprint"] .weekSummaryKicker,
+html[data-theme="ocean-blueprint"] .weeklyTitle{
+  color: #445d6f !important;
+}
+
+@media (max-width: 980px){
+  .weekCategoryFilters{
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+
+  .weekCategoryFilterBtn{
+    min-height: 64px;
+    padding: 10px 8px !important;
+  }
+}
