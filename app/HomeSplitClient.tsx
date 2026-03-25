@@ -1806,9 +1806,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   <div className="weekCategoryFilters" role="group" aria-label="Weekly overview category filters">
                     {weekCategoryOptions.map((category) => {
                       const isActive = selectedWeekCategory === category;
-                      const count = category === "All"
-                        ? weekEventsCount
-                        : (selectedWeekBucket.insights[category] ?? 0);
+                      const count = selectedWeekBucket.insights[category] ?? 0;
                       return (
                         <button
                           key={category}
