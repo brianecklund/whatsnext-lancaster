@@ -10,6 +10,7 @@ import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import SegmentedControl from "@/app/components/SegmentedControl";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
 
 type EventLite = {
   id: string;
@@ -49,6 +50,7 @@ type EventLite = {
 
 type Props = {
   events: EventLite[];
+  updates?: UpdateLite[];
   currentSection?: "calendar" | "directory" | "updates";
   onNavigateSection?: (section: "calendar" | "directory" | "updates") => void;
 };
@@ -240,7 +242,7 @@ function buildWeekInsights(items: EventLite[]) {
   return { buckets, busiestDayLabel, peakWindowLabel };
 }
 
-export default function HomeSplitClient({ events, currentSection, onNavigateSection }: Props) {
+export default function HomeSplitClient({ events, updates = [], currentSection, onNavigateSection }: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
@@ -722,8 +724,36 @@ export default function HomeSplitClient({ events, currentSection, onNavigateSect
   const weekEvents = selectedWeekBucket?.events ?? [];
   const weekEventsCount = weekEvents.length;
   const weekLabel = selectedWeekBucket?.rangeLabel ?? defaultWeekBucket?.rangeLabel ?? "";
-  const weekInsights = selectedWeekBucket?.insights ?? ({ "Live music": 0, "Food & drink": 0, "Community": 0, "Other": 0 } as Record<string, number>);
   const weekGroups = selectedWeekBucket?.groups ?? [];
+
+  const weekAnnouncements = useMemo(() => {
+    const start = selectedWeekBucket?.start?.getTime();
+    const end = selectedWeekBucket?.end?.getTime();
+    const items = Array.isArray(updates) ? updates : [];
+
+    return items
+      .filter((update) => {
+        const dateLike = update.sortDate || update.date || null;
+        const ts = dateLike ? new Date(dateLike).getTime() : NaN;
+        if (Number.isFinite(start) && Number.isFinite(end) && Number.isFinite(ts)) {
+          const bufferEnd = (end as number) + 1000 * 60 * 60 * 24 * 7;
+          if (ts >= (start as number) && ts <= bufferEnd) return true;
+        }
+
+        if (update.pinned) return true;
+        const tags = (update.tags || []).map((tag) => (tag || '').toLowerCase());
+        return tags.some((tag) => tag.includes('announcement') || tag.includes('notice') || tag.includes('news') || tag.includes('opening'));
+      })
+      .sort((a, b) => {
+        const ap = a.pinned ? 1 : 0;
+        const bp = b.pinned ? 1 : 0;
+        if (ap !== bp) return bp - ap;
+        const at = new Date(a.sortDate || a.date || 0).getTime() || 0;
+        const bt = new Date(b.sortDate || b.date || 0).getTime() || 0;
+        return bt - at;
+      })
+      .slice(0, 4);
+  }, [selectedWeekBucket, updates]);
 
   const selectedEvent = useMemo(() => {
     if (!filteredEvents.length) return null;
@@ -1363,34 +1393,42 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
                     </div>
 
-                    <div className="weekSummaryGrid" role="list">
+                    <div className="weekSummaryGrid weekSummaryGridSingle" role="list">
                       <div className="weekSummaryCard" role="listitem">
                         <div className="weekSummaryKicker">Total events</div>
                         <div className="weekSummaryValue">{weekEventsCount}</div>
                       </div>
-                      <div className="weekSummaryCard" role="listitem">
-                        <div className="weekSummaryKicker">Live music</div>
-                        <div className="weekSummaryValue">{weekInsights["Live music"]}</div>
-                      </div>
-                      <div className="weekSummaryCard" role="listitem">
-                        <div className="weekSummaryKicker">Food &amp; drink</div>
-                        <div className="weekSummaryValue">{weekInsights["Food & drink"]}</div>
-                      </div>
-                      <div className="weekSummaryCard" role="listitem">
-                        <div className="weekSummaryKicker">Community</div>
-                        <div className="weekSummaryValue">{weekInsights["Community"]}</div>
-                      </div>
                     </div>
 
-                    <div className="weekSummaryGrid weekSummaryGridSecondary" role="list">
-                      <div className="weekSummaryCard" role="listitem">
-                        <div className="weekSummaryKicker">Busiest day</div>
-                        <div className="weekSummaryValueSmall">{selectedWeekBucket.busiestDayLabel}</div>
+                    <div className="weekAnnouncements" aria-label="Relevant announcements">
+                      <div className="weekAnnouncementsHeader">
+                        <div>
+                          <div className="weekSummaryKicker">Relevant announcements</div>
+                          <div className="weekAnnouncementsSubhead">Surface pinned updates, notices, and linked announcements for this week.</div>
+                        </div>
                       </div>
-                      <div className="weekSummaryCard" role="listitem">
-                        <div className="weekSummaryKicker">Peak time</div>
-                        <div className="weekSummaryValueSmall">{selectedWeekBucket.peakWindowLabel}</div>
-                      </div>
+
+                      {weekAnnouncements.length ? (
+                        <div className="weekAnnouncementsList">
+                          {weekAnnouncements.map((update) => (
+                            <button
+                              key={update.id}
+                              type="button"
+                              className="weekAnnouncementCard"
+                              onClick={() => router.push(`/updates?u=${encodeURIComponent(update.id)}`)}
+                            >
+                              <div className="weekAnnouncementTop">
+                                <div className="weekAnnouncementTitle">{update.title}</div>
+                                {update.date ? <div className="weekAnnouncementDate">{update.date}</div> : null}
+                              </div>
+                              {update.summary ? <div className="weekAnnouncementText">{update.summary}</div> : null}
+                              {update.link ? <div className="weekAnnouncementLink">{update.linkLabel || "Open link"}</div> : null}
+                            </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <div className="weekAnnouncementEmpty">Add or pin announcements in the Updates CMS collection to feature them here.</div>
+                      )}
                     </div>
                   </div>
 
@@ -1398,28 +1436,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     <div className="emptyRight">No events scheduled for this week yet.</div>
                   ) : (
                     <div className="weeklyLanding fadeInItem" style={{ animationDelay: "420ms" }}>
-                      <div className="weeklyInsightsBar" aria-label="Week visualizations">
-                        {Object.entries(weekInsights).map(([label, rawCount]) => {
-                          const count = Number(rawCount) || 0;
-                          return (
-                          <div key={label} className="weeklyInsightMetric">
-                            <div className="weeklyInsightTop">
-                              <span>{label}</span>
-                              <span>{count}</span>
-                            </div>
-                            <div className="weeklyInsightTrack">
-                              <span
-                                className="weeklyInsightFill"
-                                style={{
-                                  width: `${weekEventsCount ? Math.max((count / weekEventsCount) * 100, count > 0 ? 12 : 0) : 0}%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        );
-                        })}
-                      </div>
-
                       <div className="weeklyCards">
                         {weekGroups.map((g) => (
                           <div key={dayKey(g.date)} className="weeklyDayGroup">
@@ -1452,6 +1468,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                   </div>
 
                                   <div className="weeklyCardContent weeklyCardContentExpanded">
+                                    {e.event_type ? <div className="weeklyCardTag">{e.event_type}</div> : null}
                                     <div className="weeklyCardTop">
                                       <div className="weeklyCardTitleWrap">
                                         <div className="weeklyCardTitle">{title}</div>
@@ -1487,7 +1504,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                     </div>
 
                                     <div className="weeklyCardMetaRow">
-                                      {[e.locationName, e.event_type].filter(Boolean).join(" • ")}
+                                      {[e.locationName].filter(Boolean).join(" • ")}
                                     </div>
                                     {desc ? <div className="weeklyCardDesc">{desc.length > 200 ? `${desc.slice(0, 200).trim()}…` : desc}</div> : null}
                                   </div>
@@ -1742,19 +1759,40 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
                 </div>
 
-                <div className="weekSummaryGrid" role="list">
+                <div className="weekSummaryGrid weekSummaryGridSingle" role="list">
                   <div className="weekSummaryCard" role="listitem">
                     <div className="weekSummaryKicker">Events</div>
                     <div className="weekSummaryValue">{selectedWeekBucket.events.length}</div>
                   </div>
-                  <div className="weekSummaryCard" role="listitem">
-                    <div className="weekSummaryKicker">Live music</div>
-                    <div className="weekSummaryValue">{weekInsights["Live music"]}</div>
+                </div>
+
+                <div className="weekAnnouncements mobileWeekAnnouncements" aria-label="Relevant announcements">
+                  <div className="weekAnnouncementsHeader">
+                    <div>
+                      <div className="weekSummaryKicker">Relevant announcements</div>
+                      <div className="weekAnnouncementsSubhead">Pinned updates and linked notices for this week.</div>
+                    </div>
                   </div>
-                  <div className="weekSummaryCard" role="listitem">
-                    <div className="weekSummaryKicker">Food & drink</div>
-                    <div className="weekSummaryValue">{weekInsights["Food & drink"]}</div>
-                  </div>
+                  {weekAnnouncements.length ? (
+                    <div className="weekAnnouncementsList">
+                      {weekAnnouncements.map((update) => (
+                        <button
+                          key={update.id}
+                          type="button"
+                          className="weekAnnouncementCard"
+                          onClick={() => router.push(`/updates?u=${encodeURIComponent(update.id)}`)}
+                        >
+                          <div className="weekAnnouncementTop">
+                            <div className="weekAnnouncementTitle">{update.title}</div>
+                            {update.date ? <div className="weekAnnouncementDate">{update.date}</div> : null}
+                          </div>
+                          {update.summary ? <div className="weekAnnouncementText">{update.summary}</div> : null}
+                        </button>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="weekAnnouncementEmpty">Add or pin updates in the CMS to feature them here.</div>
+                  )}
                 </div>
               </div>
 
@@ -1825,13 +1863,14 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                               )}
                             </div>
                             <div className="weeklyCardContent weeklyCardContentExpanded">
+                              {e.event_type ? <div className="weeklyCardTag">{e.event_type}</div> : null}
                               <div className="weeklyCardTop">
                                 <div className="weeklyCardTitleWrap">
                                   <div className="weeklyCardTitle">{title}</div>
                                   <div className="weeklyCardTime">{timeLabel}</div>
                                 </div>
                               </div>
-                              <div className="weeklyCardMetaRow">{[e.locationName, e.event_type].filter(Boolean).join(" • ")}</div>
+                              <div className="weeklyCardMetaRow">{[e.locationName].filter(Boolean).join(" • ")}</div>
                               {desc ? <div className="weeklyCardDesc">{desc.length > 180 ? `${desc.slice(0, 180).trim()}…` : desc}</div> : null}
                             </div>
                           </button>

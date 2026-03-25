@@ -162,7 +162,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
     <div ref={shellRef} className={`shellSwap${introActive ? " shellIntro--active" : ""}`} data-transitioning={isTransitioning ? 'true' : 'false'} data-content-switching={contentSwitching ? 'true' : 'false'}>
       <div key={renderedSection} className="shellSwap__panel">
         {renderedSection === 'calendar' ? (
-          <HomeSplitClient events={events} {...sharedProps} />
+          <HomeSplitClient events={events} updates={updates} {...sharedProps} />
         ) : renderedSection === 'directory' ? (
           <LocationsSplitClient locations={locations} basePath="/locations" {...sharedProps} />
         ) : (

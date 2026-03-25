@@ -7126,3 +7126,277 @@ body{
     height: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }
+
+
+/* --- 2026-03-25 layout lock + weekly overview refresh --- */
+html,
+body{
+  height: 100svh;
+  overflow: hidden;
+}
+
+body{
+  display: flex;
+  flex-direction: column;
+}
+
+body > *{
+  min-height: 0;
+}
+
+.siteHeader{
+  flex: 0 0 auto;
+}
+
+.shellSwap,
+.shellSwap__panel,
+.routeFrame,
+.pageShell{
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+@media (min-width: 981px){
+  .siteHeader{
+    padding-right: calc(var(--gutter) + 8px);
+  }
+
+  .topNav{
+    transform: translateX(-10px);
+    gap: 18px;
+  }
+
+  .topNav .navLink:last-of-type{
+    margin-right: 10px;
+  }
+
+  .leftSticky{
+    padding-top: 1px !important;
+    padding-bottom: 8px !important;
+  }
+
+  .leftSticky > .tabs{
+    margin-top: 0 !important;
+  }
+
+  .weeklyOverview{
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 10px auto 0 auto !important;
+    min-height: 72px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 14px 16px !important;
+  }
+}
+
+.topNav .themeCycleBtn,
+.topNav .themeMenuWrap{
+  margin-left: 8px;
+}
+
+.paneLeft > .scroll,
+.paneRight > .scroll,
+.mobileDetail > .scroll{
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+.paneLeft > .scroll::after,
+.paneRight > .scroll::after,
+.mobileDetail > .scroll::after{
+  content: "";
+  display: block;
+  height: 148px;
+  flex: 0 0 148px;
+}
+
+@media (max-width: 980px){
+  .leftSticky{
+    padding-top: 1px !important;
+  }
+
+  .leftSticky .calendarToolbar,
+  .leftSticky .searchRow.calendarSearchRowMobile,
+  .leftSticky .calendarSearchRowMobile{
+    width: 100% !important;
+  }
+
+  .searchRow.calendarSearchRowMobile{
+    grid-template-columns: minmax(0, 1fr) 40px 40px !important;
+  }
+
+  .paneLeft > .scroll{
+    padding-bottom: calc(168px + env(safe-area-inset-bottom, 0px)) !important;
+    scroll-padding-bottom: calc(168px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .paneLeft > .scroll::after{
+    height: calc(168px + env(safe-area-inset-bottom, 0px)) !important;
+    flex-basis: calc(168px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .mobileDetail > .scroll::after,
+  .paneRight > .scroll::after{
+    height: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+    flex-basis: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .splitPageStickySurface{
+    position: sticky;
+    top: 0;
+    z-index: 80;
+  }
+}
+
+.weekSummaryGridSingle{
+  grid-template-columns: minmax(0, 220px);
+}
+
+.weekAnnouncements{
+  margin-top: 18px;
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--panel) 62%, transparent);
+  padding: 16px;
+}
+
+.weekAnnouncementsHeader{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.weekAnnouncementsSubhead{
+  margin-top: 4px;
+  color: var(--muted);
+  font-size: var(--fs-meta);
+}
+
+.weekAnnouncementsList{
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.weekAnnouncementCard{
+  width: 100%;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg);
+  padding: 12px 14px;
+}
+
+.weekAnnouncementCard:hover{
+  background: var(--hover);
+}
+
+.weekAnnouncementTop{
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.weekAnnouncementTitle{
+  font-weight: 600;
+}
+
+.weekAnnouncementDate,
+.weekAnnouncementLink,
+.weekAnnouncementText,
+.weekAnnouncementEmpty{
+  font-size: 0.92rem;
+}
+
+.weekAnnouncementDate,
+.weekAnnouncementLink,
+.weekAnnouncementEmpty{
+  color: var(--muted);
+}
+
+.weekAnnouncementText{
+  margin-top: 6px;
+  color: var(--text);
+  line-height: 1.45;
+}
+
+.weeklyCard{
+  align-items: stretch;
+}
+
+.weeklyCardMedia{
+  width: clamp(180px, 25%, 240px);
+  min-width: clamp(180px, 25%, 240px);
+  align-self: stretch;
+}
+
+.weeklyCardMedia .media16x9,
+.weeklyCardMedia .weeklyThumbPlaceholder{
+  height: 100%;
+  min-height: 188px;
+}
+
+.weeklyCardMedia .weeklyThumb{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.weeklyCardTag{
+  align-self: flex-start;
+  display: inline-flex;
+  margin-bottom: 10px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.78rem;
+  line-height: 1;
+  background: var(--panel);
+}
+
+.weeklyCardTop{
+  align-items: flex-start;
+}
+
+.weeklyCardTitleWrap{
+  align-items: flex-start;
+}
+
+.weeklyCardTime,
+.weeklyCardMetaRow{
+  text-align: left;
+}
+
+@media (max-width: 980px){
+  .weeklyOverview{
+    margin-top: 8px !important;
+  }
+
+  .mobileWeekAnnouncements{
+    margin-top: 14px;
+    padding: 14px;
+  }
+
+  .weekSummaryGridSingle{
+    grid-template-columns: 1fr;
+  }
+
+  .weeklyCard{
+    grid-template-columns: 1fr !important;
+    display: grid !important;
+  }
+
+  .weeklyCardMedia{
+    width: 100%;
+    min-width: 0;
+  }
+
+  .weeklyCardMedia .media16x9,
+  .weeklyCardMedia .weeklyThumbPlaceholder{
+    min-height: 210px;
+  }
+}
