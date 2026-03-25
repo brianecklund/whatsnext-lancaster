@@ -7939,3 +7939,97 @@ html[data-theme="ocean-blueprint"] .weeklyTitle{
     font-size: 1.35rem;
   }
 }
+
+
+/* 2026-03-25 v12b weekly overview filter parity + mobile week rail */
+.weekSummaryGridSingle{
+  align-items: stretch;
+}
+
+.weekSummaryCardButton,
+.weekCategoryFilterBtn{
+  min-height: 86px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: space-between;
+  text-align: left;
+}
+
+.weekSummaryCardButton .weekSummaryKicker,
+.weekCategoryFilterBtn .weekSummaryKicker,
+.weekSummaryCardButton .weekSummaryValue,
+.weekCategoryFilterBtn .weekSummaryValue{
+  width: 100%;
+  text-align: left;
+}
+
+.weekSummaryCardButton .weekSummaryKicker,
+.weekCategoryFilterBtn .weekSummaryKicker{
+  font-size: 0.76rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.weekSummaryCardButton .weekSummaryValue,
+.weekCategoryFilterBtn .weekSummaryValue{
+  margin-top: 8px;
+  font-size: clamp(1.55rem, 2.2vw, 2.1rem);
+  line-height: 1;
+}
+
+.weekSummaryCardButton[data-active="true"],
+.weekCategoryFilterBtn[data-active="true"]{
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--text) 12%, transparent);
+  background: var(--panelStrong);
+}
+
+@media (max-width: 980px){
+  .weekSelectorRailMobile{
+    display: flex !important;
+    grid-template-columns: none !important;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: 10px;
+    margin-top: 0;
+    margin-bottom: 14px;
+    padding: 0 0 4px 0;
+    scroll-snap-type: x proximity;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .weekSelectorRailMobile .weekSelectorCard{
+    flex: 0 0 min(240px, calc(100vw - 56px));
+    min-width: 0;
+    scroll-snap-align: start;
+  }
+
+  .mobileWeeklyOverviewOpen{
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .mobileWeeklyOverviewOpen .weekSummaryGridSingle{
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 10px;
+  }
+
+  .mobileWeeklyOverviewOpen .weekCategoryFilters{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 10px;
+  }
+
+  .mobileWeeklyOverviewOpen .weekSummaryCardButton,
+  .mobileWeeklyOverviewOpen .weekCategoryFilterBtn{
+    min-height: 78px;
+  }
+}
+
+@media (max-width: 640px){
+  .mobileWeeklyOverviewOpen .weekCategoryFilters{
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}

@@ -1795,6 +1795,22 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
             </div>
           ) : selectedWeekBucket ? (
             <div className="weeklyOverviewLanding mobileWeeklyOverviewOpen">
+              <div className="weekSelectorRail weekSelectorRailMobile fadeInItem" style={{ animationDelay: "140ms" }}>
+                {weekBuckets.map((bucket) => (
+                  <button
+                    key={bucket.key}
+                    type="button"
+                    className="weekSelectorCard"
+                    data-active={selectedWeekBucket.key === bucket.key ? "true" : "false"}
+                    onClick={() => openWeek(bucket.key)}
+                  >
+                    <div className="weekSelectorEyebrow">{bucket.label}</div>
+                    <div className="weekSelectorRange">{bucket.rangeLabel}</div>
+                    <div className="weekSelectorMeta">{bucket.events.length} event{bucket.events.length === 1 ? "" : "s"}</div>
+                  </button>
+                ))}
+              </div>
+
               <div className="weekSummary fadeInItem" style={{ animationDelay: "180ms" }}>
                 <div className="weekSummaryTopline">
                   <div>
@@ -1812,7 +1828,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     data-active={selectedWeekCategory === "All" ? "true" : "false"}
                     onClick={() => setSelectedWeekCategory("All")}
                   >
-                    <div className="weekSummaryKicker">Events</div>
+                    <div className="weekSummaryKicker">Total events</div>
                     <div className="weekSummaryValue">{selectedWeekBucket.events.length}</div>
                   </button>
                   <div className="weekCategoryFilters" role="group" aria-label="Weekly overview category filters">
