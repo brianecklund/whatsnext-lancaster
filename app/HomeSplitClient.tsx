@@ -1436,10 +1436,10 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                               type="button"
                               className="weekCategoryFilterBtn"
                               data-active={isActive ? "true" : "false"}
-                              onClick={() => setSelectedWeekCategory((current) => current === category ? null : category)}
+                              onClick={() => setSelectedWeekCategory(category)}
                             >
-                              <span>{category}</span>
-                              <span className="weekCategoryFilterCount">{count}</span>
+                              <div className="weekSummaryKicker">{category}</div>
+                              <div className="weekSummaryValue weekCategoryFilterCount">{count}</div>
                             </button>
                           );
                         })}
@@ -1825,10 +1825,10 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           type="button"
                           className="weekCategoryFilterBtn"
                           data-active={isActive ? "true" : "false"}
-                          onClick={() => setSelectedWeekCategory((current) => current === category ? null : category)}
+                          onClick={() => setSelectedWeekCategory(category)}
                         >
-                          <span>{category}</span>
-                          <span className="weekCategoryFilterCount">{count}</span>
+                          <div className="weekSummaryKicker">{category}</div>
+                          <div className="weekSummaryValue weekCategoryFilterCount">{count}</div>
                         </button>
                       );
                     })}
