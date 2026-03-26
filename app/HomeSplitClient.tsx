@@ -607,7 +607,8 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
 
   function getListScrollOffset() {
     const stickyH = leftStickyRef.current?.offsetHeight ?? 0;
-    return Math.max(stickyH + 10, 24);
+    // Make the day section snap neatly to the top under the sticky controls.
+    return Math.max(stickyH + 2, 16);
   }
 
 

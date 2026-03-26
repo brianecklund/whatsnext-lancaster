@@ -70,6 +70,7 @@ export default function ClockDayClient({ events }: Props) {
   }, []);
 
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
+  const [dayMenuOpen, setDayMenuOpen] = useState(false);
 
   const selectedDayDate = useMemo(() => {
     const parsed = parseDayKey(dayParam);
@@ -124,6 +125,15 @@ export default function ClockDayClient({ events }: Props) {
     return opts;
   }, []);
 
+  useEffect(() => {
+    if (!dayMenuOpen) return;
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setDayMenuOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [dayMenuOpen]);
+
   const eventsCountByDay = useMemo(() => {
     const m = new Map<string, number>();
     for (const e of events) {
@@ -173,29 +183,51 @@ export default function ClockDayClient({ events }: Props) {
         <p className="clockSubhead">{formatDayHeading(selectedDayDate)}</p>
       </header>
 
-      <nav className="clockDayRail" aria-label="Pick a day">
-        {dayOptions.map((opt) => {
-          const active = opt.key === selectedDayStr;
-          const count = eventsCountByDay.get(opt.key) ?? 0;
-          return (
-            <button
-              key={opt.key}
-              type="button"
-              className="clockDayBtn"
-              data-active={active ? "true" : "false"}
-              onClick={() => {
-                router.push(`/clock?day=${encodeURIComponent(opt.key)}`);
-                setHoveredKey(null);
-              }}
-            >
-              <span className="clockDayBtnLabel">{opt.date.toLocaleDateString(undefined, { weekday: "short" })}</span>
-              <span className="clockDayBtnCount" aria-hidden>
-                {count ? count : ""}
-              </span>
-            </button>
-          );
-        })}
-      </nav>
+      <div className="clockDaySelect" aria-label="Select a day">
+        <button
+          type="button"
+          className="clockDaySelectBtn"
+          aria-haspopup="listbox"
+          aria-expanded={dayMenuOpen ? "true" : "false"}
+          onClick={() => setDayMenuOpen((v) => !v)}
+        >
+          <span className="clockDaySelectLabel">Day</span>
+          <span className="clockDaySelectValue">{selectedDayStr}</span>
+          <span className="clockDaySelectChevron" aria-hidden>▾</span>
+        </button>
+
+        {dayMenuOpen ? (
+          <div className="clockDayMenuOverlay" onClick={() => setDayMenuOpen(false)} role="presentation">
+            <div className="clockDayMenu" role="listbox" aria-label="Choose day" onClick={(e) => e.stopPropagation()}>
+              {dayOptions.map((opt) => {
+                const active = opt.key === selectedDayStr;
+                const count = eventsCountByDay.get(opt.key) ?? 0;
+                return (
+                  <button
+                    key={opt.key}
+                    type="button"
+                    className="clockDayMenuItem"
+                    role="option"
+                    aria-selected={active ? "true" : "false"}
+                    data-active={active ? "true" : "false"}
+                    onClick={() => {
+                      router.push(`/clock?day=${encodeURIComponent(opt.key)}`);
+                      setHoveredKey(null);
+                      setDayMenuOpen(false);
+                    }}
+                  >
+                    <span className="clockDayMenuItemMain">
+                      <span className="clockDayMenuItemDow">{opt.date.toLocaleDateString(undefined, { weekday: "short" })}</span>
+                      <span className="clockDayMenuItemDate">{opt.key}</span>
+                    </span>
+                    <span className="clockDayMenuItemCount" aria-hidden>{count ? `${count}` : ""}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        ) : null}
+      </div>
 
       <section className="clockLayout" aria-label="Analog clock with event markers">
         <div className="clockFaceWrap">

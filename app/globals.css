@@ -8429,54 +8429,114 @@ body[data-layout="content"] .simplePage{
   font-size: var(--fs-body);
 }
 
-.clockDayRail{
+.clockDaySelect{
   margin-top: 14px;
   width: 100%;
   display:flex;
+  justify-content:flex-start;
+  position: relative;
+}
+
+.clockDaySelectBtn{
+  display:inline-flex;
+  align-items:center;
   gap: 10px;
-  overflow-x:auto;
-  padding: 2px 2px 10px;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-}
-
-.clockDayRail::-webkit-scrollbar{
-  display:none;
-}
-
-.clockDayBtn{
-  flex: 0 0 auto;
-  display:flex;
-  align-items:baseline;
-  gap: 8px;
   padding: 10px 12px;
   border-radius: 999px;
   border: 1px solid #111;
   background: transparent;
   cursor: pointer;
   color: #111;
-  opacity: 0.72;
-  transition: opacity 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
-  user-select:none;
+  opacity: 0.85;
+  transition: opacity 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
-.clockDayBtn[data-active="true"]{
+.clockDaySelectBtn:hover{
   opacity: 1;
-  box-shadow: 0 0 0 3px rgba(17,17,17,0.08);
+  box-shadow: 0 0 0 3px rgba(17,17,17,0.06);
 }
 
-.clockDayBtn:active{
+.clockDaySelectBtn:active{
   transform: translateY(1px);
 }
 
-.clockDayBtnLabel{
+.clockDaySelectLabel{
   font-weight: 650;
   letter-spacing: -0.01em;
 }
 
-.clockDayBtnCount{
-  font-size: 0.9rem;
+.clockDaySelectValue{
+  font-variant-numeric: tabular-nums;
+  opacity: 0.8;
+}
+
+.clockDaySelectChevron{
   opacity: 0.75;
+}
+
+.clockDayMenuOverlay{
+  position: fixed;
+  inset: 0;
+  z-index: 900;
+}
+
+.clockDayMenu{
+  position: absolute;
+  top: calc(100% + 10px);
+  left: 0;
+  width: min(520px, calc(100vw - 40px));
+  max-height: min(60vh, 520px);
+  overflow:auto;
+  border-radius: 18px;
+  border: 1px solid #111;
+  background: var(--bg);
+  box-shadow: 0 18px 44px rgba(0,0,0,0.14);
+  padding: 8px;
+}
+
+.clockDayMenuItem{
+  width: 100%;
+  text-align:left;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  color: #111;
+}
+
+.clockDayMenuItem:hover{
+  border-color: rgba(17,17,17,0.22);
+}
+
+.clockDayMenuItem[data-active="true"]{
+  border-color: #111;
+  box-shadow: 0 0 0 3px rgba(17,17,17,0.06);
+}
+
+.clockDayMenuItemMain{
+  display:flex;
+  flex-direction:column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.clockDayMenuItemDow{
+  font-weight: 650;
+}
+
+.clockDayMenuItemDate{
+  opacity: 0.72;
+  font-size: 0.92rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.clockDayMenuItemCount{
+  opacity: 0.7;
   font-variant-numeric: tabular-nums;
 }
 
@@ -8722,13 +8782,13 @@ body[data-layout="content"] .simplePage{
     width: 100%;
   }
 
-  .clockDayRail{
-    gap: 8px;
-    padding-bottom: 8px;
+  .clockDaySelectBtn{
+    width: 100%;
+    justify-content:space-between;
   }
 
-  .clockDayBtn{
-    padding: 9px 11px;
+  .clockDayMenu{
+    width: calc(100vw - 40px);
   }
 
   .clockEventRow{
