@@ -1,0 +1,21 @@
+{
+  "/_global-error/page": "/_global-error",
+  "/_not-found/page": "/_not-found",
+  "/about/page": "/about",
+  "/admin/venue-search/page": "/admin/venue-search",
+  "/api/places/details/route": "/api/places/details",
+  "/api/places/photo/route": "/api/places/photo",
+  "/api/prismic-debug/route": "/api/prismic-debug",
+  "/api/venues/import/route": "/api/venues/import",
+  "/api/venues/refresh/route": "/api/venues/refresh",
+  "/api/venues/route": "/api/venues",
+  "/api/venues/search/route": "/api/venues/search",
+  "/api/venues/status/route": "/api/venues/status",
+  "/clock/page": "/clock",
+  "/contact/page": "/contact",
+  "/donate/page": "/donate",
+  "/locations/[uid]/page": "/locations/[uid]",
+  "/locations/page": "/locations",
+  "/page": "/",
+  "/updates/page": "/updates"
+}

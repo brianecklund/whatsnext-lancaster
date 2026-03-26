@@ -1,0 +1,161 @@
+{
+  "version": 3,
+  "pages404": true,
+  "appType": "app",
+  "caseSensitive": false,
+  "basePath": "",
+  "redirects": [
+    {
+      "source": "/:path+/",
+      "destination": "/:path+",
+      "internal": true,
+      "priority": true,
+      "statusCode": 308,
+      "regex": "^(?:/((?:[^/]+?)(?:/(?:[^/]+?))*))/$"
+    }
+  ],
+  "headers": [],
+  "rewrites": {
+    "beforeFiles": [],
+    "afterFiles": [],
+    "fallback": []
+  },
+  "dynamicRoutes": [
+    {
+      "page": "/locations/[uid]",
+      "regex": "^/locations/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPuid": "nxtPuid"
+      },
+      "namedRegex": "^/locations/(?<nxtPuid>[^/]+?)(?:/)?$"
+    }
+  ],
+  "staticRoutes": [
+    {
+      "page": "/",
+      "regex": "^/(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/(?:/)?$"
+    },
+    {
+      "page": "/_global-error",
+      "regex": "^/_global\\-error(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_global\\-error(?:/)?$"
+    },
+    {
+      "page": "/_not-found",
+      "regex": "^/_not\\-found(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/_not\\-found(?:/)?$"
+    },
+    {
+      "page": "/about",
+      "regex": "^/about(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/about(?:/)?$"
+    },
+    {
+      "page": "/admin/venue-search",
+      "regex": "^/admin/venue\\-search(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/admin/venue\\-search(?:/)?$"
+    },
+    {
+      "page": "/api/places/details",
+      "regex": "^/api/places/details(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/places/details(?:/)?$"
+    },
+    {
+      "page": "/api/places/photo",
+      "regex": "^/api/places/photo(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/places/photo(?:/)?$"
+    },
+    {
+      "page": "/api/prismic-debug",
+      "regex": "^/api/prismic\\-debug(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/prismic\\-debug(?:/)?$"
+    },
+    {
+      "page": "/api/venues",
+      "regex": "^/api/venues(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/venues(?:/)?$"
+    },
+    {
+      "page": "/api/venues/import",
+      "regex": "^/api/venues/import(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/venues/import(?:/)?$"
+    },
+    {
+      "page": "/api/venues/refresh",
+      "regex": "^/api/venues/refresh(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/venues/refresh(?:/)?$"
+    },
+    {
+      "page": "/api/venues/search",
+      "regex": "^/api/venues/search(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/venues/search(?:/)?$"
+    },
+    {
+      "page": "/api/venues/status",
+      "regex": "^/api/venues/status(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/api/venues/status(?:/)?$"
+    },
+    {
+      "page": "/clock",
+      "regex": "^/clock(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/clock(?:/)?$"
+    },
+    {
+      "page": "/contact",
+      "regex": "^/contact(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/contact(?:/)?$"
+    },
+    {
+      "page": "/donate",
+      "regex": "^/donate(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/donate(?:/)?$"
+    },
+    {
+      "page": "/locations",
+      "regex": "^/locations(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/locations(?:/)?$"
+    },
+    {
+      "page": "/updates",
+      "regex": "^/updates(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/updates(?:/)?$"
+    }
+  ],
+  "dataRoutes": [],
+  "rsc": {
+    "header": "rsc",
+    "varyHeader": "rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch",
+    "prefetchHeader": "next-router-prefetch",
+    "didPostponeHeader": "x-nextjs-postponed",
+    "contentTypeHeader": "text/x-component",
+    "suffix": ".rsc",
+    "prefetchSegmentHeader": "next-router-segment-prefetch",
+    "prefetchSegmentSuffix": ".segment.rsc",
+    "prefetchSegmentDirSuffix": ".segments",
+    "clientParamParsing": false,
+    "dynamicRSCPrerender": false
+  },
+  "rewriteHeaders": {
+    "pathHeader": "x-nextjs-rewritten-path",
+    "queryHeader": "x-nextjs-rewritten-query"
+  }
+}

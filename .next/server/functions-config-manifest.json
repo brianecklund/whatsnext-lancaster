@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "functions": {
+    "/api/places/details": {},
+    "/api/places/photo": {},
+    "/api/prismic-debug": {},
+    "/api/venues": {},
+    "/api/venues/refresh": {},
+    "/api/venues/search": {},
+    "/api/venues/status": {}
+  }
+}

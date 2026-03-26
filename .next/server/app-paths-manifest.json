@@ -1,0 +1,21 @@
+{
+  "/_global-error/page": "app/_global-error/page.js",
+  "/_not-found/page": "app/_not-found/page.js",
+  "/about/page": "app/about/page.js",
+  "/admin/venue-search/page": "app/admin/venue-search/page.js",
+  "/api/places/details/route": "app/api/places/details/route.js",
+  "/api/places/photo/route": "app/api/places/photo/route.js",
+  "/api/prismic-debug/route": "app/api/prismic-debug/route.js",
+  "/api/venues/import/route": "app/api/venues/import/route.js",
+  "/api/venues/refresh/route": "app/api/venues/refresh/route.js",
+  "/api/venues/route": "app/api/venues/route.js",
+  "/api/venues/search/route": "app/api/venues/search/route.js",
+  "/api/venues/status/route": "app/api/venues/status/route.js",
+  "/clock/page": "app/clock/page.js",
+  "/contact/page": "app/contact/page.js",
+  "/donate/page": "app/donate/page.js",
+  "/locations/[uid]/page": "app/locations/[uid]/page.js",
+  "/locations/page": "app/locations/page.js",
+  "/page": "app/page.js",
+  "/updates/page": "app/updates/page.js"
+}
