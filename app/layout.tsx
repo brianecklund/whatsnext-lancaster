@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import "./globals.css";
 import type { Metadata } from "next";
 import SiteHeader from "./site-header";
@@ -25,7 +26,9 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeBoot />
-        <SiteHeader />
+        <Suspense fallback={null}>
+          <SiteHeader />
+        </Suspense>
         {children}
       </body>
     </html>

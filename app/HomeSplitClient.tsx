@@ -1814,7 +1814,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
             />
           </div>
         ) : (
-          <div className="mobileTabs" aria-label="Primary navigation">
+          <div className="mobileTabs mobilePrimaryTabs" aria-label="Primary navigation">
             <SegmentedControl
               className="segmentedControl--mobile"
               ariaLabel="Primary navigation"

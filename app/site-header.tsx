@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { DEFAULT_THEME, THEME_PALETTES, type ThemeKey } from "./theme-palettes";
 
@@ -70,6 +70,8 @@ function ThemeIcon({ theme }: { theme: ThemeKey }) {
 
 export default function SiteHeader() {
   const pathname = usePathname();
+  const router = useRouter();
+  const sp = useSearchParams();
   const [open, setOpen] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
   const [flashKey, setFlashKey] = useState(0);
@@ -135,6 +137,20 @@ export default function SiteHeader() {
     cycleTheme();
   }
 
+  const clockHref = useMemo(() => {
+    const base = "/clock";
+    if (pathname !== "/") return base;
+
+    const params = new URLSearchParams();
+    const day = sp.get("day");
+    const event = sp.get("event");
+    if (day) params.set("day", day);
+    if (event) params.set("event", event);
+
+    const q = params.toString();
+    return q ? `${base}?${q}` : base;
+  }, [pathname, sp]);
+
   return (
     <header className="siteHeader">
       <Link className="brand" href="/" aria-label="What’s Next Lancaster">
@@ -179,6 +195,21 @@ export default function SiteHeader() {
         >
           <span className="themeToggleIcon" aria-hidden>
             <ThemeIcon theme={currentTheme} />
+          </span>
+        </button>
+
+        <button
+          type="button"
+          className="clockToggleBtn"
+          aria-label="Open calendar clock"
+          title="Clock view"
+          onClick={() => router.push(clockHref)}
+        >
+          <span className="clockToggleIcon" aria-hidden>
+            <svg viewBox="0 0 24 24" fill="none">
+              <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.8" />
+              <path d="M12 7.8v4.7l3.2 1.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
           </span>
         </button>
 
