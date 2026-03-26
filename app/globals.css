@@ -8278,3 +8278,44 @@ html[data-theme="ocean-blueprint"] .weeklyTitle{
     animation: none !important;
   }
 }
+
+
+/* --- 2026-03-26 desktop nav + inner-page scrolling + pane width alignment --- */
+.contentPage,
+.simplePage{
+  flex: 1 1 auto;
+  min-height: 0;
+  width: 100%;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+}
+
+@media (min-width: 981px){
+  .dayBlock,
+  .splitPageListBody,
+  .directoryHeroList,
+  .directoryLetterSection,
+  .paneLeft .emptyList,
+  .paneLeft .monthWrap,
+  .paneLeft .weeklyLanding,
+  .paneLeft .weeklyOverviewLanding{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .dayBlock .eventRow,
+  .splitPageListBody .updateRow,
+  .splitPageListBody .directoryCard,
+  .splitPageListBody .partnerCard,
+  .splitPageListBody .locationRow,
+  .directoryLetterSection .directoryCard,
+  .directoryHeroList .partnerCard{
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+}
