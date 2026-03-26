@@ -1,6 +1,6 @@
 export default function DonatePage() {
   return (
-    <main className="contentPage donatePage">
+    <main className="contentPage donatePage donatePageFull">
       <section className="contentHero">
         <p className="contentEyebrow">Support local discovery</p>
         <h1 className="contentHeroTitle">Help keep What’s Next Lancaster free, current, and community-driven.</h1>

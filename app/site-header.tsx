@@ -84,6 +84,11 @@ export default function SiteHeader() {
     setOpen(false);
     setThemeMenuOpen(false);
     setFlashKey((k) => k + 1);
+
+    if (typeof document !== "undefined") {
+      const isShellRoute = pathname === "/" || pathname?.startsWith("/locations") || pathname?.startsWith("/updates");
+      document.body.dataset.layout = isShellRoute ? "shell" : "content";
+    }
   }, [pathname]);
 
   useEffect(() => {
