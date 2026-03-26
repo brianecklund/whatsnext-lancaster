@@ -551,12 +551,14 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
 
 
 
+  // Keep the week rail aligned to the currently-selected day so day-of-week buttons
+  // keep working even with non-"today" test data.
   const currentWeekRange = useMemo(() => {
-    const today = startOfToday();
-    const start = startOfWeekSundayFromDate(today);
-    const end = endOfWeekSaturdayFromDate(today);
+    const base = selectedDay ?? startOfToday();
+    const start = startOfWeekSundayFromDate(base);
+    const end = endOfWeekSaturdayFromDate(base);
     return { start, end };
-  }, []);
+  }, [selectedDayStr]);
 
   const leftDayGroups = useMemo(() => {
     const map = new Map<string, { date: Date; items: EventLite[] }>();

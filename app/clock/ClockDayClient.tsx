@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import type { EventLite } from "@/lib/types";
-import { dayKey, safeDateFromEvent, startOfToday } from "@/lib/calendar";
+import { dayKey, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
+import MediaBlocks from "@/app/components/MediaBlocks";
 
 type Props = {
   events: EventLite[];
@@ -30,12 +31,13 @@ function formatUntil(from: Date, to: Date): string {
   const h = Math.floor(abs / 60);
   const m = abs % 60;
 
-  const hPart = h > 0 ? `${h}h` : "";
-  const mPart = `${m}m`;
-  const core = h > 0 ? `${hPart} ${mPart}` : mPart;
+  if (totalMinutes < 0) {
+    if (h > 0) return `${h}h ${m}m ago`;
+    return `${m}m ago`;
+  }
 
-  if (totalMinutes >= 0) return `In ${core}`;
-  return `${core} ago`;
+  if (h > 0) return `${h}h ${m}m`;
+  return `${m}m`;
 }
 
 function dialAngleForEvent(d: Date) {
@@ -55,13 +57,15 @@ function clamp(n: number, min: number, max: number) {
 }
 
 export default function ClockDayClient({ events }: Props) {
+  const router = useRouter();
   const sp = useSearchParams();
   const dayParam = sp.get("day") ?? "";
   const eventParam = sp.get("event") ?? "";
 
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
-    const id = window.setInterval(() => setNow(new Date()), 60_000);
+    // Smooth real-time movement for all hands and inward-moving dots.
+    const id = window.setInterval(() => setNow(new Date()), 250);
     return () => window.clearInterval(id);
   }, []);
 
@@ -81,6 +85,13 @@ export default function ClockDayClient({ events }: Props) {
   }, [dayParam, eventParam, events]);
 
   const selectedDayStr = dayKey(selectedDayDate);
+
+  const selectedDayStart = useMemo(() => startOfDay(selectedDayDate), [selectedDayDate]);
+  const selectedDayEnd = useMemo(() => {
+    const d = new Date(selectedDayStart);
+    d.setDate(d.getDate() + 1);
+    return d;
+  }, [selectedDayStart]);
 
   const dayEvents = useMemo(() => {
     const list = events
@@ -102,6 +113,28 @@ export default function ClockDayClient({ events }: Props) {
     return formatUntil(now, hoveredEvent.d);
   }, [hoveredEvent, now]);
 
+  const dayOptions = useMemo(() => {
+    const base = startOfToday();
+    const opts: Array<{ key: string; date: Date }> = [];
+    for (let i = 0; i < 21; i++) {
+      const d = new Date(base);
+      d.setDate(d.getDate() + i);
+      opts.push({ key: dayKey(d), date: d });
+    }
+    return opts;
+  }, []);
+
+  const eventsCountByDay = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const e of events) {
+      const d = safeDateFromEvent(e);
+      if (!d) continue;
+      const k = dayKey(d);
+      m.set(k, (m.get(k) ?? 0) + 1);
+    }
+    return m;
+  }, [events]);
+
   const faceRef = useRef<HTMLDivElement | null>(null);
   const [facePx, setFacePx] = useState(360);
 
@@ -120,16 +153,18 @@ export default function ClockDayClient({ events }: Props) {
   }, []);
 
   const center = facePx / 2;
-  const innerR = center * 0.64;
-  const outerR = center * 0.80;
+  const dotMinR = center * 0.22; // close to center
+  const dotMaxR = center * 0.82; // near outer ring
   const tickR = center * 0.90;
 
-  const minute = now.getMinutes();
-  const second = now.getSeconds();
-  const hour = now.getHours() % 12;
+  const ms = now.getMilliseconds();
+  const second = now.getSeconds() + ms / 1000;
+  const minute = now.getMinutes() + second / 60;
+  const hour = (now.getHours() % 12) + minute / 60;
 
-  const minuteAngle = (minute + second / 60) * 6; // 360/60
-  const hourAngle = (hour + minute / 60) * 30; // 360/12
+  const secondAngle = second * 6; // 360/60
+  const minuteAngle = minute * 6; // 360/60
+  const hourAngle = hour * 30; // 360/12
 
   return (
     <main className="contentPage clockPage">
@@ -137,6 +172,30 @@ export default function ClockDayClient({ events }: Props) {
         <h1 className="clockTitle">Calendar Clock</h1>
         <p className="clockSubhead">{formatDayHeading(selectedDayDate)}</p>
       </header>
+
+      <nav className="clockDayRail" aria-label="Pick a day">
+        {dayOptions.map((opt) => {
+          const active = opt.key === selectedDayStr;
+          const count = eventsCountByDay.get(opt.key) ?? 0;
+          return (
+            <button
+              key={opt.key}
+              type="button"
+              className="clockDayBtn"
+              data-active={active ? "true" : "false"}
+              onClick={() => {
+                router.push(`/clock?day=${encodeURIComponent(opt.key)}`);
+                setHoveredKey(null);
+              }}
+            >
+              <span className="clockDayBtnLabel">{opt.date.toLocaleDateString(undefined, { weekday: "short" })}</span>
+              <span className="clockDayBtnCount" aria-hidden>
+                {count ? count : ""}
+              </span>
+            </button>
+          );
+        })}
+      </nav>
 
       <section className="clockLayout" aria-label="Analog clock with event markers">
         <div className="clockFaceWrap">
@@ -162,6 +221,11 @@ export default function ClockDayClient({ events }: Props) {
             })}
 
             {/* Hands */}
+            <div
+              className="clockHand clockHand--second"
+              style={{ transform: `translate(-50%,-100%) rotate(${secondAngle}deg)` }}
+              aria-hidden="true"
+            />
             <div
               className="clockHand clockHand--hour"
               style={{ transform: `translate(-50%,-100%) rotate(${hourAngle}deg)` }}
@@ -190,16 +254,21 @@ export default function ClockDayClient({ events }: Props) {
               const key = e.uid ?? e.id;
               const active = hoveredKey === key;
 
-              const { angleDeg, isPM } = dialAngleForEvent(d);
-              const jitterDeg = ((idx % 7) - 3) * 1.2; // reduce exact overlaps
+              const { angleDeg } = dialAngleForEvent(d);
+              // Reduce overlaps when multiple events fall near the same time.
+              const jitterDeg = ((idx % 9) - 4) * 0.9;
               const finalDeg = angleDeg + jitterDeg;
               const rad = (finalDeg * Math.PI) / 180;
 
-              const radius = isPM ? outerR : innerR;
+              // Move each dot inward as time approaches the event start.
+              const dayRangeMs = selectedDayEnd.getTime() - selectedDayStart.getTime();
+              const untilFrac = clamp((d.getTime() - now.getTime()) / dayRangeMs, 0, 1);
+              const radiusBase = dotMinR + untilFrac * (dotMaxR - dotMinR);
+              const radiusJitter = ((idx % 5) - 2) * 3.2;
+              const radius = clamp(radiusBase + radiusJitter, dotMinR, dotMaxR);
+
               const x = center + radius * Math.cos(rad);
               const y = center + radius * Math.sin(rad);
-
-              const ring = isPM ? "pm" : "am";
               const timeLabel = formatTimeShort(d);
               const title = e.title ?? "Untitled event";
 
@@ -209,7 +278,6 @@ export default function ClockDayClient({ events }: Props) {
                   type="button"
                   className="clockMarker"
                   data-active={active ? "true" : "false"}
-                  data-ring={ring}
                   style={{ left: x, top: y }}
                   aria-label={`Event marker: ${title} at ${timeLabel}`}
                   title={`${title} • ${timeLabel}`}
@@ -238,12 +306,12 @@ export default function ClockDayClient({ events }: Props) {
                 const metaBits = [e.event_type, e.locationName].filter(Boolean).join(" • ");
 
                 return (
-                  <button
+                  <div
                     key={key}
-                    type="button"
                     className="clockEventRow"
                     data-active={active ? "true" : "false"}
                     role="listitem"
+                    tabIndex={0}
                     onMouseEnter={() => setHoveredKey(key)}
                     onMouseLeave={() => setHoveredKey((prev) => (prev === key ? null : prev))}
                     onFocus={() => setHoveredKey(key)}
@@ -252,7 +320,13 @@ export default function ClockDayClient({ events }: Props) {
                     <div className="clockEventTime">{timeLabel}</div>
                     <div className="clockEventTitle">{title}</div>
                     {metaBits ? <div className="clockEventMeta">{metaBits}</div> : null}
-                  </button>
+
+                    {active && (e as any)?.content_blocks ? (
+                      <div className="clockEventMedia" aria-live="polite">
+                        <MediaBlocks slices={(e as any).content_blocks} />
+                      </div>
+                    ) : null}
+                  </div>
                 );
               })
             ) : (
