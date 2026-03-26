@@ -1,0 +1,257 @@
+
+import type { EventLite, LocationLite } from '@/lib/types';
+import type { UpdateLite } from '@/app/updates/UpdatesSplitClient';
+
+export const TEST_DATA_TAG = 'WNL_TEST_DATA_2026_03';
+
+const NEXT_WEEK_START = '2026-03-29';
+
+function buildIso(date: string, time: string) {
+  return `${date}T${time}:00`;
+}
+
+function img(seed: string) {
+  return `https://picsum.photos/seed/${seed}/1200/900`;
+}
+
+type TestPartnerPage = {
+  uid: string;
+  name: string;
+  category: string;
+  address: string;
+  description: string;
+  website: string;
+  phone: string;
+  coverImageUrl: string;
+  galleryImageUrls: string[];
+  weekdayDescriptions: string[];
+  mapsUrl: string;
+};
+
+export const testPartnerPages: TestPartnerPage[] = [
+  {
+    uid: 'test-harbor-hall',
+    name: 'Harbor Hall',
+    category: 'Music venue',
+    address: '112 Water St, Lancaster, PA 17603',
+    description: 'A fake featured partner used for staging and layout QA. Remove any content tagged with WNL_TEST_DATA_2026_03 when real partner data is ready.',
+    website: 'https://example.com/harbor-hall',
+    phone: '(717) 555-0101',
+    coverImageUrl: img('harbor-hall-cover'),
+    galleryImageUrls: [img('harbor-hall-1'), img('harbor-hall-2'), img('harbor-hall-3')],
+    weekdayDescriptions: ['Mon: Closed', 'Tue–Thu: 4 PM – 10 PM', 'Fri: 4 PM – 12 AM', 'Sat: 11 AM – 12 AM', 'Sun: 11 AM – 8 PM'],
+    mapsUrl: 'https://maps.google.com/?q=112+Water+St+Lancaster+PA+17603',
+  },
+  {
+    uid: 'test-fig-lane-market',
+    name: 'Fig Lane Market',
+    category: 'Food hall',
+    address: '27 Fig Ln, Lancaster, PA 17602',
+    description: 'A fake featured partner used for CMS and split-view testing. This should be removed along with all WNL_TEST_DATA_2026_03 entries later.',
+    website: 'https://example.com/fig-lane-market',
+    phone: '(717) 555-0102',
+    coverImageUrl: img('fig-lane-cover'),
+    galleryImageUrls: [img('fig-lane-1'), img('fig-lane-2'), img('fig-lane-3')],
+    weekdayDescriptions: ['Daily: 8 AM – 10 PM'],
+    mapsUrl: 'https://maps.google.com/?q=27+Fig+Ln+Lancaster+PA+17602',
+  },
+  {
+    uid: 'test-penn-square-studio',
+    name: 'Penn Square Studio',
+    category: 'Arts & culture',
+    address: '8 Penn Sq, Lancaster, PA 17603',
+    description: 'A fake featured partner page for development. Safe to remove by searching for WNL_TEST_DATA_2026_03.',
+    website: 'https://example.com/penn-square-studio',
+    phone: '(717) 555-0103',
+    coverImageUrl: img('penn-square-cover'),
+    galleryImageUrls: [img('penn-square-1'), img('penn-square-2'), img('penn-square-3')],
+    weekdayDescriptions: ['Wed–Thu: 12 PM – 8 PM', 'Fri–Sat: 12 PM – 10 PM', 'Sun: 11 AM – 6 PM'],
+    mapsUrl: 'https://maps.google.com/?q=8+Penn+Sq+Lancaster+PA+17603',
+  },
+];
+
+export const testFeaturedLocations: LocationLite[] = testPartnerPages.map((page, index) => ({
+  id: `test-location-${index + 1}`,
+  key: page.uid,
+  uid: page.uid,
+  name: page.name,
+  address: page.address,
+  category: page.category,
+  website: page.website,
+  description: page.description,
+  phone: page.phone,
+  rating: 4.7,
+  venue_external_id: `test-featured-${index + 1}`,
+  source: TEST_DATA_TAG,
+  customPageUid: page.uid,
+  customPageUrl: `/locations/${page.uid}`,
+  coverImageUrl: page.coverImageUrl,
+  galleryImageUrls: page.galleryImageUrls,
+  weekdayDescriptions: page.weekdayDescriptions,
+  googleMapsUri: page.mapsUrl,
+}));
+
+const featuredPartnerEvents: EventLite[] = [
+  {
+    id: 'test-event-1', key: 'test-event-1', uid: 'test-event-1',
+    title: 'Lantern Room Sessions', summary: 'An intimate live set with regional indie artists.',
+    description: 'Placeholder copy for a small-ticket live music night at Harbor Hall. Tagged for easy cleanup later.',
+    descriptionText: 'Placeholder copy for a small-ticket live music night at Harbor Hall. Tagged for easy cleanup later.',
+    start_datetime: buildIso('2026-03-29', '19:30'), end_datetime: buildIso('2026-03-29', '22:00'),
+    event_type: 'Live music', status: 'Scheduled', locationName: 'Harbor Hall', address: '112 Water St, Lancaster, PA 17603', locationUrl: '/locations/test-harbor-hall',
+    website_url: 'https://example.com/harbor-hall/lantern-room', tickets_url: 'https://example.com/harbor-hall/lantern-room/tickets', image_url: img('lantern-room-sessions'), imageUrl: img('lantern-room-sessions'), tags: [TEST_DATA_TAG, 'featured-partner', 'harbor-hall'], venue_external_id: 'test-featured-1', location_page_uid: 'test-harbor-hall'
+  },
+  {
+    id: 'test-event-2', key: 'test-event-2', uid: 'test-event-2',
+    title: 'Sunday Vinyl Social', summary: 'Low-key listening lounge night with guest selectors.',
+    description: 'Fake event data for testing the event list, weekly overview, and partner linking.', descriptionText: 'Fake event data for testing the event list, weekly overview, and partner linking.',
+    start_datetime: buildIso('2026-03-29', '14:00'), end_datetime: buildIso('2026-03-29', '17:00'),
+    event_type: 'Music social', status: 'Scheduled', locationName: 'Harbor Hall', address: '112 Water St, Lancaster, PA 17603', locationUrl: '/locations/test-harbor-hall',
+    website_url: 'https://example.com/harbor-hall/vinyl-social', tickets_url: null, image_url: img('vinyl-social'), imageUrl: img('vinyl-social'), tags: [TEST_DATA_TAG, 'featured-partner', 'harbor-hall'], venue_external_id: 'test-featured-1', location_page_uid: 'test-harbor-hall'
+  },
+  {
+    id: 'test-event-3', key: 'test-event-3', uid: 'test-event-3',
+    title: 'Blue Hour Jazz Trio', summary: 'Cocktail-hour jazz set with a rotating trio.',
+    description: 'Fake Harbor Hall event for the next week calendar rail and weekly overview.', descriptionText: 'Fake Harbor Hall event for the next week calendar rail and weekly overview.',
+    start_datetime: buildIso('2026-03-31', '18:00'), end_datetime: buildIso('2026-03-31', '20:30'),
+    event_type: 'Live music', status: 'Scheduled', locationName: 'Harbor Hall', address: '112 Water St, Lancaster, PA 17603', locationUrl: '/locations/test-harbor-hall',
+    website_url: 'https://example.com/harbor-hall/blue-hour-jazz', tickets_url: 'https://example.com/harbor-hall/blue-hour-jazz/tickets', image_url: img('blue-hour-jazz'), imageUrl: img('blue-hour-jazz'), tags: [TEST_DATA_TAG, 'featured-partner', 'harbor-hall'], venue_external_id: 'test-featured-1', location_page_uid: 'test-harbor-hall'
+  },
+  {
+    id: 'test-event-4', key: 'test-event-4', uid: 'test-event-4',
+    title: 'After Dark DJ Window', summary: 'Late-night DJ set with projected visuals.',
+    description: 'Placeholder DJ event built to exercise late-night categories and card layouts.', descriptionText: 'Placeholder DJ event built to exercise late-night categories and card layouts.',
+    start_datetime: buildIso('2026-04-02', '21:00'), end_datetime: buildIso('2026-04-02', '23:59'),
+    event_type: 'DJ set', status: 'Scheduled', locationName: 'Harbor Hall', address: '112 Water St, Lancaster, PA 17603', locationUrl: '/locations/test-harbor-hall',
+    website_url: 'https://example.com/harbor-hall/after-dark', tickets_url: 'https://example.com/harbor-hall/after-dark/tickets', image_url: img('after-dark-dj-window'), imageUrl: img('after-dark-dj-window'), tags: [TEST_DATA_TAG, 'featured-partner', 'harbor-hall'], venue_external_id: 'test-featured-1', location_page_uid: 'test-harbor-hall'
+  },
+  {
+    id: 'test-event-5', key: 'test-event-5', uid: 'test-event-5',
+    title: 'First Look Listening Party', summary: 'Preview tracks from local artists before release day.',
+    description: 'Fake listening-party content for layout and filtering tests.', descriptionText: 'Fake listening-party content for layout and filtering tests.',
+    start_datetime: buildIso('2026-04-04', '17:30'), end_datetime: buildIso('2026-04-04', '20:00'),
+    event_type: 'Live music', status: 'Scheduled', locationName: 'Harbor Hall', address: '112 Water St, Lancaster, PA 17603', locationUrl: '/locations/test-harbor-hall',
+    website_url: 'https://example.com/harbor-hall/first-look', tickets_url: null, image_url: img('first-look-listening-party'), imageUrl: img('first-look-listening-party'), tags: [TEST_DATA_TAG, 'featured-partner', 'harbor-hall'], venue_external_id: 'test-featured-1', location_page_uid: 'test-harbor-hall'
+  },
+  {
+    id: 'test-event-6', key: 'test-event-6', uid: 'test-event-6',
+    title: 'Breakfast Club Pop-Up', summary: 'Coffee, pastries, and guest brunch sandwiches.',
+    description: 'Placeholder brunch pop-up at Fig Lane Market for the next week calendar.', descriptionText: 'Placeholder brunch pop-up at Fig Lane Market for the next week calendar.',
+    start_datetime: buildIso('2026-03-30', '09:00'), end_datetime: buildIso('2026-03-30', '12:00'),
+    event_type: 'Food & drink', status: 'Scheduled', locationName: 'Fig Lane Market', address: '27 Fig Ln, Lancaster, PA 17602', locationUrl: '/locations/test-fig-lane-market',
+    website_url: 'https://example.com/fig-lane-market/breakfast-club', tickets_url: null, image_url: img('breakfast-club-pop-up'), imageUrl: img('breakfast-club-pop-up'), tags: [TEST_DATA_TAG, 'featured-partner', 'fig-lane-market'], venue_external_id: 'test-featured-2', location_page_uid: 'test-fig-lane-market'
+  },
+  {
+    id: 'test-event-7', key: 'test-event-7', uid: 'test-event-7',
+    title: 'Night Market Tasting Flights', summary: 'Small-bite tasting flights with rotating vendors.',
+    description: 'Fake food-hall event used to test category filters and image cards.', descriptionText: 'Fake food-hall event used to test category filters and image cards.',
+    start_datetime: buildIso('2026-03-31', '18:30'), end_datetime: buildIso('2026-03-31', '21:30'),
+    event_type: 'Food & drink', status: 'Scheduled', locationName: 'Fig Lane Market', address: '27 Fig Ln, Lancaster, PA 17602', locationUrl: '/locations/test-fig-lane-market',
+    website_url: 'https://example.com/fig-lane-market/night-market', tickets_url: 'https://example.com/fig-lane-market/night-market/tickets', image_url: img('night-market-tasting-flights'), imageUrl: img('night-market-tasting-flights'), tags: [TEST_DATA_TAG, 'featured-partner', 'fig-lane-market'], venue_external_id: 'test-featured-2', location_page_uid: 'test-fig-lane-market'
+  },
+  {
+    id: 'test-event-8', key: 'test-event-8', uid: 'test-event-8',
+    title: 'Community Dinner Series', summary: 'Communal table dinner with a spring menu.',
+    description: 'Seeded partner event for dinner-series testing and weekly overview cards.', descriptionText: 'Seeded partner event for dinner-series testing and weekly overview cards.',
+    start_datetime: buildIso('2026-04-01', '19:00'), end_datetime: buildIso('2026-04-01', '21:00'),
+    event_type: 'Community dinner', status: 'Scheduled', locationName: 'Fig Lane Market', address: '27 Fig Ln, Lancaster, PA 17602', locationUrl: '/locations/test-fig-lane-market',
+    website_url: 'https://example.com/fig-lane-market/community-dinner', tickets_url: 'https://example.com/fig-lane-market/community-dinner/tickets', image_url: img('community-dinner-series'), imageUrl: img('community-dinner-series'), tags: [TEST_DATA_TAG, 'featured-partner', 'fig-lane-market'], venue_external_id: 'test-featured-2', location_page_uid: 'test-fig-lane-market'
+  },
+  {
+    id: 'test-event-9', key: 'test-event-9', uid: 'test-event-9',
+    title: 'Rooftop Mocktail Hour', summary: 'Zero-proof drinks and sunset snacks.',
+    description: 'Fake rooftop event meant to fill the week with lighter food-and-drink content.', descriptionText: 'Fake rooftop event meant to fill the week with lighter food-and-drink content.',
+    start_datetime: buildIso('2026-04-03', '17:00'), end_datetime: buildIso('2026-04-03', '19:00'),
+    event_type: 'Food & drink', status: 'Scheduled', locationName: 'Fig Lane Market', address: '27 Fig Ln, Lancaster, PA 17602', locationUrl: '/locations/test-fig-lane-market',
+    website_url: 'https://example.com/fig-lane-market/mocktail-hour', tickets_url: null, image_url: img('rooftop-mocktail-hour'), imageUrl: img('rooftop-mocktail-hour'), tags: [TEST_DATA_TAG, 'featured-partner', 'fig-lane-market'], venue_external_id: 'test-featured-2', location_page_uid: 'test-fig-lane-market'
+  },
+  {
+    id: 'test-event-10', key: 'test-event-10', uid: 'test-event-10',
+    title: 'Chef Counter Preview', summary: 'Limited-seat preview of a new rotating menu.',
+    description: 'Test partner event for CTA buttons and rich listing copy.', descriptionText: 'Test partner event for CTA buttons and rich listing copy.',
+    start_datetime: buildIso('2026-04-04', '20:00'), end_datetime: buildIso('2026-04-04', '22:00'),
+    event_type: 'Food & drink', status: 'Scheduled', locationName: 'Fig Lane Market', address: '27 Fig Ln, Lancaster, PA 17602', locationUrl: '/locations/test-fig-lane-market',
+    website_url: 'https://example.com/fig-lane-market/chef-counter-preview', tickets_url: 'https://example.com/fig-lane-market/chef-counter-preview/tickets', image_url: img('chef-counter-preview'), imageUrl: img('chef-counter-preview'), tags: [TEST_DATA_TAG, 'featured-partner', 'fig-lane-market'], venue_external_id: 'test-featured-2', location_page_uid: 'test-fig-lane-market'
+  },
+  {
+    id: 'test-event-11', key: 'test-event-11', uid: 'test-event-11',
+    title: 'Sketchbook Social', summary: 'Open studio sketch session with timed poses.',
+    description: 'Fake art event added for weekly overview previews and partner testing.', descriptionText: 'Fake art event added for weekly overview previews and partner testing.',
+    start_datetime: buildIso('2026-03-30', '18:00'), end_datetime: buildIso('2026-03-30', '20:00'),
+    event_type: 'Arts & culture', status: 'Scheduled', locationName: 'Penn Square Studio', address: '8 Penn Sq, Lancaster, PA 17603', locationUrl: '/locations/test-penn-square-studio',
+    website_url: 'https://example.com/penn-square-studio/sketchbook-social', tickets_url: 'https://example.com/penn-square-studio/sketchbook-social/tickets', image_url: img('sketchbook-social'), imageUrl: img('sketchbook-social'), tags: [TEST_DATA_TAG, 'featured-partner', 'penn-square-studio'], venue_external_id: 'test-featured-3', location_page_uid: 'test-penn-square-studio'
+  },
+  {
+    id: 'test-event-12', key: 'test-event-12', uid: 'test-event-12',
+    title: 'Indie Film Matinee', summary: 'Screening and post-film conversation with local hosts.',
+    description: 'Placeholder film event used to fill out the arts-and-culture category.', descriptionText: 'Placeholder film event used to fill out the arts-and-culture category.',
+    start_datetime: buildIso('2026-04-01', '13:00'), end_datetime: buildIso('2026-04-01', '15:30'),
+    event_type: 'Film screening', status: 'Scheduled', locationName: 'Penn Square Studio', address: '8 Penn Sq, Lancaster, PA 17603', locationUrl: '/locations/test-penn-square-studio',
+    website_url: 'https://example.com/penn-square-studio/indie-film-matinee', tickets_url: null, image_url: img('indie-film-matinee'), imageUrl: img('indie-film-matinee'), tags: [TEST_DATA_TAG, 'featured-partner', 'penn-square-studio'], venue_external_id: 'test-featured-3', location_page_uid: 'test-penn-square-studio'
+  },
+  {
+    id: 'test-event-13', key: 'test-event-13', uid: 'test-event-13',
+    title: 'Print Lab Workshop', summary: 'Hands-on risograph and poster lab for beginners.',
+    description: 'Seeded workshop content for category filtering and fake media coverage.', descriptionText: 'Seeded workshop content for category filtering and fake media coverage.',
+    start_datetime: buildIso('2026-04-02', '18:30'), end_datetime: buildIso('2026-04-02', '21:00'),
+    event_type: 'Workshop', status: 'Scheduled', locationName: 'Penn Square Studio', address: '8 Penn Sq, Lancaster, PA 17603', locationUrl: '/locations/test-penn-square-studio',
+    website_url: 'https://example.com/penn-square-studio/print-lab', tickets_url: 'https://example.com/penn-square-studio/print-lab/tickets', image_url: img('print-lab-workshop'), imageUrl: img('print-lab-workshop'), tags: [TEST_DATA_TAG, 'featured-partner', 'penn-square-studio'], venue_external_id: 'test-featured-3', location_page_uid: 'test-penn-square-studio'
+  },
+  {
+    id: 'test-event-14', key: 'test-event-14', uid: 'test-event-14',
+    title: 'Friday Gallery Circuit', summary: 'Extended-hour gallery walk with artist pop-ins.',
+    description: 'Placeholder gallery event for Friday calendar density and category cards.', descriptionText: 'Placeholder gallery event for Friday calendar density and category cards.',
+    start_datetime: buildIso('2026-04-03', '17:30'), end_datetime: buildIso('2026-04-03', '21:30'),
+    event_type: 'Art gallery', status: 'Scheduled', locationName: 'Penn Square Studio', address: '8 Penn Sq, Lancaster, PA 17603', locationUrl: '/locations/test-penn-square-studio',
+    website_url: 'https://example.com/penn-square-studio/gallery-circuit', tickets_url: null, image_url: img('friday-gallery-circuit'), imageUrl: img('friday-gallery-circuit'), tags: [TEST_DATA_TAG, 'featured-partner', 'penn-square-studio'], venue_external_id: 'test-featured-3', location_page_uid: 'test-penn-square-studio'
+  },
+  {
+    id: 'test-event-15', key: 'test-event-15', uid: 'test-event-15',
+    title: 'Poetry & Projection Night', summary: 'Live spoken word paired with projection art.',
+    description: 'Fake closing-week event for the arts partner test set.', descriptionText: 'Fake closing-week event for the arts partner test set.',
+    start_datetime: buildIso('2026-04-04', '19:30'), end_datetime: buildIso('2026-04-04', '22:00'),
+    event_type: 'Poetry reading', status: 'Scheduled', locationName: 'Penn Square Studio', address: '8 Penn Sq, Lancaster, PA 17603', locationUrl: '/locations/test-penn-square-studio',
+    website_url: 'https://example.com/penn-square-studio/poetry-projection', tickets_url: 'https://example.com/penn-square-studio/poetry-projection/tickets', image_url: img('poetry-projection-night'), imageUrl: img('poetry-projection-night'), tags: [TEST_DATA_TAG, 'featured-partner', 'penn-square-studio'], venue_external_id: 'test-featured-3', location_page_uid: 'test-penn-square-studio'
+  },
+  {
+    id: 'test-event-16', key: 'test-event-16', uid: 'test-event-16',
+    title: 'Neighborhood Cleanup Meetup', summary: 'Volunteer meetup with coffee and cleanup routes.',
+    description: 'General fake event tagged for cleanup later.', descriptionText: 'General fake event tagged for cleanup later.',
+    start_datetime: buildIso('2026-03-29', '10:00'), end_datetime: buildIso('2026-03-29', '12:00'),
+    event_type: 'Community meetup', status: 'Scheduled', locationName: 'Buchanan Park', address: '901 Buchanan Ave, Lancaster, PA 17603', website_url: 'https://example.com/cleanup-meetup', tickets_url: null, image_url: img('cleanup-meetup'), imageUrl: img('cleanup-meetup'), tags: [TEST_DATA_TAG, 'general-test'], venue_external_id: null, location_page_uid: null
+  },
+  {
+    id: 'test-event-17', key: 'test-event-17', uid: 'test-event-17',
+    title: 'Midweek Maker Pop-Up', summary: 'A small vendor market with rotating makers.',
+    description: 'General fake market event for weekly overview density.', descriptionText: 'General fake market event for weekly overview density.',
+    start_datetime: buildIso('2026-04-01', '16:00'), end_datetime: buildIso('2026-04-01', '20:00'),
+    event_type: 'Community market', status: 'Scheduled', locationName: 'Queen Street Commons', address: '100 S Queen St, Lancaster, PA 17603', website_url: 'https://example.com/maker-popup', tickets_url: null, image_url: img('midweek-maker-popup'), imageUrl: img('midweek-maker-popup'), tags: [TEST_DATA_TAG, 'general-test'], venue_external_id: null, location_page_uid: null
+  },
+  {
+    id: 'test-event-18', key: 'test-event-18', uid: 'test-event-18',
+    title: 'Late Skate Video Night', summary: 'Outdoor skate clips and lo-fi soundtrack projections.',
+    description: 'A final fake event to round out the seeded week with an Other-style category.', descriptionText: 'A final fake event to round out the seeded week with an Other-style category.',
+    start_datetime: buildIso('2026-04-03', '20:30'), end_datetime: buildIso('2026-04-03', '22:30'),
+    event_type: 'Outdoor screening', status: 'Scheduled', locationName: 'Warehouse Yard', address: '320 N Mulberry St, Lancaster, PA 17603', website_url: 'https://example.com/late-skate-video-night', tickets_url: null, image_url: img('late-skate-video-night'), imageUrl: img('late-skate-video-night'), tags: [TEST_DATA_TAG, 'general-test'], venue_external_id: null, location_page_uid: null
+  },
+];
+
+export const testEvents: EventLite[] = featuredPartnerEvents;
+
+export const testUpdates: UpdateLite[] = [
+  {
+    id: 'test-update-1',
+    title: 'Test data note',
+    summary: 'Staging-only seeded content is active for the week of Mar 29–Apr 4.',
+    date: 'Mar 25, 2026',
+    sortDate: '2026-03-25',
+    tags: [TEST_DATA_TAG, 'announcement'],
+    body: 'This is a seeded update to make it easier to confirm that weekly overview announcement linking still behaves as expected. Remove items tagged WNL_TEST_DATA_2026_03 when real content is ready.',
+    link: null,
+    pinned: true,
+  },
+];
+
+export function getTestPartnerPage(uid: string) {
+  return testPartnerPages.find((page) => page.uid === uid) ?? null;
+}

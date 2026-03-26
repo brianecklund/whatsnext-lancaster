@@ -345,8 +345,21 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const [mobileControlsCollapsed, setMobileControlsCollapsed] = useState(false);
   const [mobileControlsPinnedOpen, setMobileControlsPinnedOpen] = useState(false);
   const [selectedWeekCategory, setSelectedWeekCategory] = useState<WeekCategory>("All");
+  const [pullDistance, setPullDistance] = useState(0);
+  const [pullRefreshing, setPullRefreshing] = useState(false);
+  const pullDistanceRef = useRef(0);
+  const pullRefreshingRef = useRef(false);
   const mobileControlsInitRef = useRef(false);
   const lastScrollTopRef = useRef(0);
+
+
+  useEffect(() => {
+    pullDistanceRef.current = pullDistance;
+  }, [pullDistance]);
+
+  useEffect(() => {
+    pullRefreshingRef.current = pullRefreshing;
+  }, [pullRefreshing]);
 
   useEffect(() => {
     setMounted(true);
@@ -412,18 +425,14 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
       const delta = st - lastScrollTopRef.current;
       lastScrollTopRef.current = st;
 
-      if (mobileControlsPinnedOpen) {
-        if (st <= 8) setMobileControlsCollapsed(false);
-        return;
-      }
+      if (mobileControlsPinnedOpen) return;
 
-      if (st <= 12) {
+      if (st <= 12 && !mobileControlsCollapsed) {
         setMobileControlsCollapsed(false);
         return;
       }
 
       if (delta > 10) setMobileControlsCollapsed(true);
-      else if (delta < -14) setMobileControlsCollapsed(false);
     };
 
     syncFromScroll();
@@ -435,6 +444,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   useEffect(() => {
     setClientSelectedKey(selectedParam);
   }, [selectedParam]);
+
 
   function isMobileNow() {
     if (typeof window === "undefined") return false;
@@ -853,6 +863,67 @@ const mobileWeeklyOpen =
     setMobileDetailVisualKey("cal");
   }, [effectiveIsMobile, mobileDetailOpen, mobileDetailNavPending, detailFlashKey]);
 
+
+
+  useEffect(() => {
+    const listEl = listRef.current;
+    if (!listEl || !effectiveIsMobile || resolvedSection !== "calendar" || viewMode !== "list") {
+      setPullDistance(0);
+      setPullRefreshing(false);
+      return;
+    }
+
+    let startY = 0;
+    let active = false;
+
+    const onTouchStart = (event: TouchEvent) => {
+      if (pullRefreshingRef.current || mobileDetailOpen || filterOpen) return;
+      if (listEl.scrollTop > 0) return;
+      if (event.touches.length !== 1) return;
+      startY = event.touches[0].clientY;
+      active = true;
+    };
+
+    const onTouchMove = (event: TouchEvent) => {
+      if (!active || listEl.scrollTop > 0) return;
+      const currentY = event.touches[0]?.clientY ?? startY;
+      const delta = Math.max(0, currentY - startY);
+      if (delta <= 0) {
+        setPullDistance(0);
+        return;
+      }
+      event.preventDefault();
+      setPullDistance(Math.min(88, delta * 0.48));
+    };
+
+    const finishPull = () => {
+      active = false;
+      if (pullDistanceRef.current >= 64) {
+        setPullRefreshing(true);
+        setPullDistance(56);
+        router.refresh();
+        window.setTimeout(() => {
+          setPullRefreshing(false);
+          setPullDistance(0);
+        }, 900);
+      } else {
+        setPullDistance(0);
+      }
+    };
+
+    listEl.addEventListener('touchstart', onTouchStart, { passive: true });
+    listEl.addEventListener('touchmove', onTouchMove, { passive: false });
+    listEl.addEventListener('touchend', finishPull);
+    listEl.addEventListener('touchcancel', finishPull);
+
+    return () => {
+      listEl.removeEventListener('touchstart', onTouchStart);
+      listEl.removeEventListener('touchmove', onTouchMove);
+      listEl.removeEventListener('touchend', finishPull);
+      listEl.removeEventListener('touchcancel', finishPull);
+    };
+  }, [effectiveIsMobile, filterOpen, mobileDetailOpen, resolvedSection, router, viewMode]);
+
 useBodyScrollLock(filterOpen || mobileDetailOpen);
 
   const showLeft = true;
@@ -946,6 +1017,17 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 syncVisibleDayFromScroll(st);
               }}
             >
+              {effectiveIsMobile && resolvedSection === "calendar" ? (
+                <div
+                  className="pullRefreshIndicator"
+                  aria-hidden={pullDistance <= 0 && !pullRefreshing ? "true" : "false"}
+                  data-ready={pullDistance >= 64 ? "true" : "false"}
+                  data-refreshing={pullRefreshing ? "true" : "false"}
+                  style={{ height: `${Math.max(0, pullDistance)}px` }}
+                >
+                  <span>{pullRefreshing ? "Refreshing events…" : pullDistance >= 64 ? "Release to refresh" : "Pull to refresh"}</span>
+                </div>
+              ) : null}
               <div
                 className="leftSticky"
                 ref={leftStickyRef}

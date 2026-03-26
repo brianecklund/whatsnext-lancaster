@@ -14,6 +14,7 @@ import {
 } from '@/lib/prismic-venue';
 import { resolveVenueById, resolveVenueByName } from '@/lib/venue-import/resolve';
 import type { UpdateLite } from '@/app/updates/UpdatesSplitClient';
+import { testEvents, testFeaturedLocations, testUpdates } from '@/lib/test-fixtures';
 
 const getEventDocsCached = unstable_cache(
   async () => {
@@ -272,7 +273,7 @@ export async function getSiteData() {
       };
     });
 
-  const locations = dedupeLocations([...apiLocations, ...customOnlyLocations]).sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''));
+  const locations = dedupeLocations([...(testFeaturedLocations as LocationRow[]), ...apiLocations, ...customOnlyLocations]).sort((a, b) => (a.name ?? '').localeCompare(b.name ?? ''));
 
   const updatesFromPrismic: UpdateLite[] = updateDocs.map((doc: any) => {
     const rawDate = pickDateLike(doc.data, ['publish_date', 'date', 'posted_on', 'announcement_date']);
@@ -334,9 +335,22 @@ export async function getSiteData() {
     },
   ];
 
+  const mergedEvents = [...events, ...testEvents].sort((a, b) => {
+    const ta = a.start_datetime ? Date.parse(a.start_datetime) : Number.NaN;
+    const tb = b.start_datetime ? Date.parse(b.start_datetime) : Number.NaN;
+    const aValid = Number.isFinite(ta);
+    const bValid = Number.isFinite(tb);
+    if (aValid && bValid) return ta - tb;
+    if (aValid && !bValid) return -1;
+    if (!aValid && bValid) return 1;
+    return 0;
+  });
+
+  const mergedUpdates = updatesFromPrismic.length ? [...testUpdates, ...updatesFromPrismic] : [...testUpdates, ...fallbackUpdates];
+
   return {
-    events,
+    events: mergedEvents,
     locations,
-    updates: updatesFromPrismic.length ? updatesFromPrismic : fallbackUpdates,
+    updates: mergedUpdates,
   };
 }

@@ -6,6 +6,7 @@ import { createClient, prismic } from '@/prismicio';
 import { getCachedVenueImport } from '@/lib/venue-import';
 import { matchVenueFromDocData } from '@/lib/prismic-venue';
 import { fetchPlaceDetails } from '@/lib/google-places';
+import { getTestPartnerPage, TEST_DATA_TAG } from '@/lib/test-fixtures';
 
 export const dynamic = 'force-dynamic';
 
@@ -17,6 +18,67 @@ function asText(value: unknown) {
 
 export default async function LocationDetailPage({ params }: { params: Promise<{ uid: string }> }) {
   const { uid } = await params;
+  const testPage = getTestPartnerPage(uid);
+  if (testPage) {
+    return (
+      <main className="locationPageShell">
+        <div className="locationPageInner">
+          <a className="locationPageBack" href="/locations">← Back to directory</a>
+          <div className="locationPageHeader">
+            <div className="locationPageEyebrow">Directory</div>
+            <h1 className="locationPageTitle">{testPage.name}</h1>
+            <div className="locationPageMeta">
+              <span>{testPage.category}</span>
+              <span>{testPage.address}</span>
+              <span>{TEST_DATA_TAG}</span>
+            </div>
+            <div style={{ marginTop: 14, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
+              <a className="link" href={testPage.website} target="_blank" rel="noreferrer">Visit website</a>
+              <a className="link" href={testPage.mapsUrl} target="_blank" rel="noreferrer">Open in Maps</a>
+            </div>
+          </div>
+
+          <section className="locationPageIntro">
+            <div className="locationCover">
+              <img src={testPage.coverImageUrl} alt={`${testPage.name} cover`} />
+            </div>
+          </section>
+
+          <section className="locationPageIntro">
+            <div className="detailBody"><p>{testPage.description}</p></div>
+          </section>
+
+          <section className="locationPageVenueCard">
+            <div className="locationPageSectionLabel">Business info</div>
+            <div className="locationPageVenueGrid">
+              <div><div className="locationPageStatLabel">Phone</div><div>{testPage.phone}</div></div>
+              <div><div className="locationPageStatLabel">Website</div><div>{testPage.website}</div></div>
+              <div style={{ gridColumn: '1 / -1' }}>
+                <div className="locationPageStatLabel">Hours</div>
+                <div className="locationHoursList">
+                  {testPage.weekdayDescriptions.map((line) => (
+                    <div key={line} className="locationHoursRow">{line}</div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section className="locationPageVenueCard">
+            <div className="locationPageSectionLabel">Gallery</div>
+            <div className="locationGallery">
+              {testPage.galleryImageUrls.map((src, index) => (
+                <div key={`${src}-${index}`} className="locationGalleryItem">
+                  <img src={src} alt={`${testPage.name} image ${index + 1}`} loading="lazy" />
+                </div>
+              ))}
+            </div>
+          </section>
+        </div>
+      </main>
+    );
+  }
+
   const client = createClient();
   const doc = await client.getByUID('location', uid).catch(() => null);
   if (!doc) notFound();
