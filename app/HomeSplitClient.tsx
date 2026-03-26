@@ -413,17 +413,17 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
       lastScrollTopRef.current = st;
 
       if (mobileControlsPinnedOpen) {
-        if (st <= 8) setMobileControlsCollapsed(false);
+        if (mobileControlsCollapsed) setMobileControlsCollapsed(false);
         return;
       }
 
       if (st <= 12) {
-        setMobileControlsCollapsed(false);
         return;
       }
 
-      if (delta > 10) setMobileControlsCollapsed(true);
-      else if (delta < -14) setMobileControlsCollapsed(false);
+      if (delta > 10 && !mobileControlsCollapsed) {
+        setMobileControlsCollapsed(true);
+      }
     };
 
     syncFromScroll();
@@ -732,6 +732,10 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const weekEvents = selectedWeekBucket?.events ?? [];
   const weekEventsCount = weekEvents.length;
   const weekCategoryOptions = ["Live music", "Food & drink", "Arts & culture", "Community", "Other"] as const satisfies readonly Exclude<WeekCategory, "All">[];
+
+  useEffect(() => {
+    setSelectedWeekCategory("All");
+  }, [selectedWeekBucket?.key]);
   const filteredWeekEvents = useMemo(() => {
     if (selectedWeekCategory === "All") return weekEvents;
     return weekEvents.filter((event) => weekCategoryForEvent(event.event_type) === selectedWeekCategory);
