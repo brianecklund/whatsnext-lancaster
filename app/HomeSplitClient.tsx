@@ -593,20 +593,17 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     return [...leftDayGroups.slice(currentIndex), ...leftDayGroups.slice(0, currentIndex)];
   }, [leftDayGroups, selectedDayStr]);
 
-  const currentWeekDayGroups = useMemo(() => {
-    const start = currentWeekRange.start;
-    const end = currentWeekRange.end;
-    return displayDayGroups.filter((group) => group.date.getTime() >= start.getTime() && group.date.getTime() <= end.getTime());
-  }, [currentWeekRange, displayDayGroups]);
-
   const dayJumpDates = useMemo(() => {
+    // Build the day buttons from the rotated groups (starting at the selected day),
+    // not from a fixed calendar-week window. This makes the rail work reliably
+    // with test data that’s in a different week than “today”.
     const map = new Map<number, Date>();
-    for (const group of currentWeekDayGroups) {
+    for (const group of displayDayGroups) {
       const idx = group.date.getDay();
       if (!map.has(idx)) map.set(idx, group.date);
     }
     return DAY_ABBR.map((label, idx) => ({ label, index: idx, date: map.get(idx) ?? null }));
-  }, [currentWeekDayGroups]);
+  }, [displayDayGroups]);
 
   function getListScrollOffset() {
     const stickyH = leftStickyRef.current?.offsetHeight ?? 0;
@@ -649,9 +646,9 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     const root = listRef.current;
     if (!root) return;
     const threshold = scrollTop + getListScrollOffset() + 16;
-    let active = currentWeekDayGroups[0]?.date ? dayKey(currentWeekDayGroups[0].date) : null;
+    let active = displayDayGroups[0]?.date ? dayKey(displayDayGroups[0].date) : null;
 
-    for (const group of currentWeekDayGroups) {
+    for (const group of displayDayGroups) {
       const key = dayKey(group.date);
       const el = daySectionRefs.current[key];
       if (!el) continue;
