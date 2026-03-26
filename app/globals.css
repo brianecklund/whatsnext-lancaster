@@ -8035,28 +8035,32 @@ html[data-theme="ocean-blueprint"] .weeklyTitle{
 }
 
 
-/* --- 2026-03-26 mobile controls persistence + tighter sticky tabs --- */
+/* 2026-03-25 v15 mobile overscroll + directory heading + mobile menu links */
 @media (max-width: 980px){
-  .leftSticky[data-mobile-collapsed="true"]{
-    padding-bottom: 3px !important;
+  html,
+  body,
+  .homeShell,
+  .pageShell,
+  .split,
+  .pane,
+  .scroll,
+  .paneLeft > .scroll,
+  .paneRight > .scroll,
+  .mobileDetail > .scroll,
+  .mobileDetailScroll{
+    overscroll-behavior-y: none !important;
+    overscroll-behavior-x: none !important;
   }
 
-  .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle{
-    margin-bottom: 0 !important;
+  .paneLeft > .scroll,
+  .paneRight > .scroll,
+  .mobileDetail > .scroll,
+  .mobileDetailScroll{
+    -webkit-overflow-scrolling: touch;
   }
+}
 
-  .mobileTabs,
-  .mobileTabsDetail,
-  .mobilePrimaryTabs{
-    padding: 6px 10px calc(6px + env(safe-area-inset-bottom)) !important;
-    gap: 8px !important;
-  }
-
-  .mobileTabs .tabBtn,
-  .mobileTabsDetail .tabBtn,
-  .segmentedControl--mobile .segmentedControl__button{
-    height: 40px !important;
-    min-height: 40px !important;
-    font-size: 0.92rem !important;
-  }
+.directorySectionHeading{
+  background: transparent !important;
+  background-color: transparent !important;
 }
