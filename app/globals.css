@@ -31,6 +31,10 @@ img, svg, video, canvas {
 }
 
 :root{
+  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-smooth-soft: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-route: 920ms;
+  --dur-reveal: 960ms;
   /* Type */
   --font-sans: "Inter", "Gabarito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-serif: Georgia, "Times New Roman", Times, serif;
@@ -427,7 +431,16 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .routeFrame{
   height: 100%;
-  animation: routeFadeIn 460ms cubic-bezier(.22,1,.36,1) both;
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 720ms var(--ease-smooth),
+    transform 900ms var(--ease-smooth);
+  will-change: opacity, transform;
+}
+
+.routeFrame--entering{
+  animation: routeFadeIn 920ms var(--ease-smooth) both;
 }
 
 .tagline{
@@ -2612,21 +2625,25 @@ a:hover{
 .reveal-ready{
   opacity: 0;
   transform: translate3d(0, 18px, 0);
+  filter: blur(0px);
   transition:
-    opacity 720ms cubic-bezier(.22,1,.36,1),
-    transform 720ms cubic-bezier(.22,1,.36,1);
+    opacity var(--dur-reveal) var(--ease-smooth),
+    transform var(--dur-reveal) var(--ease-smooth),
+    filter var(--dur-reveal) var(--ease-smooth-soft);
   transition-delay: var(--reveal-delay, 0ms);
   will-change: transform, opacity;
+  backface-visibility: hidden;
 }
 
 .reveal-visible{
   opacity: 1;
   transform: translate3d(0, 0, 0);
+  filter: blur(0px);
 }
 
 @keyframes routeFadeIn{
-  0%{ opacity: 0; }
-  100%{ opacity: 1; }
+  0%{ opacity: 0; transform: translate3d(0, 18px, 0); }
+  100%{ opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @keyframes menuOverlayFade{
@@ -5274,9 +5291,11 @@ body {
 }
 
 html[data-route-switching="true"] .routeFrame{
-  opacity: 0.94;
-  transform: translateY(4px);
-  transition: opacity 220ms ease, transform 320ms cubic-bezier(.22,1,.36,1);
+  opacity: 0;
+  transform: translate3d(0, 24px, 0);
+  transition:
+    opacity 420ms var(--ease-smooth-soft),
+    transform 520ms var(--ease-smooth-soft);
 }
 
 .pageShell,
@@ -5359,15 +5378,15 @@ html[data-route-switching="true"] .routeFrame{
 
 .shellSwap[data-content-switching="true"] [data-switch-item="true"]{
   opacity: 0;
-  transform: translateY(12px);
-  animation: shellContentCascade 440ms cubic-bezier(.22,1,.36,1) forwards;
-  animation-delay: calc(var(--switch-index, 0) * 28ms);
+  transform: translate3d(0, 16px, 0);
+  animation: shellContentCascade 720ms var(--ease-smooth) forwards;
+  animation-delay: calc(var(--switch-index, 0) * 44ms);
   will-change: opacity, transform;
 }
 
 @keyframes shellContentCascade{
-  0%{ opacity: 0; transform: translateY(12px); }
-  100%{ opacity: 1; transform: translateY(0); }
+  0%{ opacity: 0; transform: translate3d(0, 16px, 0); }
+  100%{ opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 .shellIntro--active .newsBar,
@@ -5375,8 +5394,8 @@ html[data-route-switching="true"] .routeFrame{
 .shellIntro--active .leftSticky,
 .shellIntro--active [data-intro-item="true"]{
   opacity: 0;
-  transform: translateY(12px);
-  animation: shellIntroCascade 640ms cubic-bezier(.22,1,.36,1) forwards;
+  transform: translate3d(0, 18px, 0);
+  animation: shellIntroCascade 920ms var(--ease-smooth) forwards;
   will-change: opacity, transform;
 }
 
@@ -5394,8 +5413,8 @@ html[data-route-switching="true"] .routeFrame{
 }
 
 @keyframes shellIntroCascade{
-  0%{ opacity: 0; transform: translateY(12px); }
-  100%{ opacity: 1; transform: translateY(0); }
+  0%{ opacity: 0; transform: translate3d(0, 18px, 0); }
+  100%{ opacity: 1; transform: translate3d(0, 0, 0); }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -8784,4 +8803,28 @@ body[data-layout="content"] .simplePage{
     border-radius: 16px;
     padding: 11px 11px;
   }
+}
+
+
+.siteHeader,
+.pageIntroBar,
+.newsBar,
+.leftSticky,
+.detailCard,
+.weeklyCard,
+.eventRow,
+.weeklyOverview,
+.weeklyCondRow,
+.contentCard,
+.calloutCard,
+.contactForm,
+.donateFormCard,
+.mobileSheet,
+.filterOverlayPanel{
+  transition:
+    opacity 420ms var(--ease-smooth-soft),
+    transform 520ms var(--ease-smooth-soft),
+    box-shadow 420ms var(--ease-smooth-soft),
+    background-color 420ms var(--ease-smooth-soft),
+    border-color 420ms var(--ease-smooth-soft);
 }
