@@ -71,6 +71,7 @@ export default function ClockDayClient({ events }: Props) {
 
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [dayMenuOpen, setDayMenuOpen] = useState(false);
+  const daySelectRef = useRef<HTMLDivElement | null>(null);
 
   const selectedDayDate = useMemo(() => {
     const parsed = parseDayKey(dayParam);
@@ -130,8 +131,18 @@ export default function ClockDayClient({ events }: Props) {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") setDayMenuOpen(false);
     };
+    const onPointerDown = (e: PointerEvent) => {
+      const root = daySelectRef.current;
+      if (!root) return;
+      if (root.contains(e.target as Node)) return;
+      setDayMenuOpen(false);
+    };
     window.addEventListener("keydown", onKeyDown);
-    return () => window.removeEventListener("keydown", onKeyDown);
+    window.addEventListener("pointerdown", onPointerDown);
+    return () => {
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("pointerdown", onPointerDown);
+    };
   }, [dayMenuOpen]);
 
   const eventsCountByDay = useMemo(() => {
@@ -180,25 +191,20 @@ export default function ClockDayClient({ events }: Props) {
     <main className="contentPage clockPage">
       <header className="clockHeader">
         <h1 className="clockTitle">Calendar Clock</h1>
-        <p className="clockSubhead">{formatDayHeading(selectedDayDate)}</p>
-      </header>
+        <div ref={daySelectRef} className="clockDaySelect" aria-label="Select a day">
+          <button
+            type="button"
+            className="clockDaySelectBtn"
+            aria-haspopup="listbox"
+            aria-expanded={dayMenuOpen ? "true" : "false"}
+            onClick={() => setDayMenuOpen((v) => !v)}
+          >
+            <span className="clockDaySelectValue">{formatDayHeading(selectedDayDate)}</span>
+            <span className="clockDaySelectChevron" aria-hidden>▾</span>
+          </button>
 
-      <div className="clockDaySelect" aria-label="Select a day">
-        <button
-          type="button"
-          className="clockDaySelectBtn"
-          aria-haspopup="listbox"
-          aria-expanded={dayMenuOpen ? "true" : "false"}
-          onClick={() => setDayMenuOpen((v) => !v)}
-        >
-          <span className="clockDaySelectLabel">Day</span>
-          <span className="clockDaySelectValue">{selectedDayStr}</span>
-          <span className="clockDaySelectChevron" aria-hidden>▾</span>
-        </button>
-
-        {dayMenuOpen ? (
-          <div className="clockDayMenuOverlay" onClick={() => setDayMenuOpen(false)} role="presentation">
-            <div className="clockDayMenu" role="listbox" aria-label="Choose day" onClick={(e) => e.stopPropagation()}>
+          {dayMenuOpen ? (
+            <div className="clockDayMenu" role="listbox" aria-label="Choose day">
               {dayOptions.map((opt) => {
                 const active = opt.key === selectedDayStr;
                 const count = eventsCountByDay.get(opt.key) ?? 0;
@@ -225,9 +231,9 @@ export default function ClockDayClient({ events }: Props) {
                 );
               })}
             </div>
-          </div>
-        ) : null}
-      </div>
+          ) : null}
+        </div>
+      </header>
 
       <section className="clockLayout" aria-label="Analog clock with event markers">
         <div className="clockFaceWrap">

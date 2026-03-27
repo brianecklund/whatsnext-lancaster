@@ -8430,10 +8430,9 @@ body[data-layout="content"] .simplePage{
 }
 
 .clockDaySelect{
-  margin-top: 14px;
-  width: 100%;
+  width: auto;
   display:flex;
-  justify-content:flex-start;
+  justify-content:flex-end;
   position: relative;
 }
 
@@ -8460,11 +8459,6 @@ body[data-layout="content"] .simplePage{
   transform: translateY(1px);
 }
 
-.clockDaySelectLabel{
-  font-weight: 650;
-  letter-spacing: -0.01em;
-}
-
 .clockDaySelectValue{
   font-variant-numeric: tabular-nums;
   opacity: 0.8;
@@ -8474,16 +8468,10 @@ body[data-layout="content"] .simplePage{
   opacity: 0.75;
 }
 
-.clockDayMenuOverlay{
-  position: fixed;
-  inset: 0;
-  z-index: 900;
-}
-
 .clockDayMenu{
   position: absolute;
   top: calc(100% + 10px);
-  left: 0;
+  right: 0;
   width: min(520px, calc(100vw - 40px));
   max-height: min(60vh, 520px);
   overflow:auto;
@@ -8492,6 +8480,7 @@ body[data-layout="content"] .simplePage{
   background: var(--bg);
   box-shadow: 0 18px 44px rgba(0,0,0,0.14);
   padding: 8px;
+  z-index: 900;
 }
 
 .clockDayMenuItem{
