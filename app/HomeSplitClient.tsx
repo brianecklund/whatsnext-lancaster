@@ -982,12 +982,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
 
   function clearSelected() {
     setClientSelectedKey(null);
-
-    const params = new URLSearchParams(sp.toString());
-    params.delete("event");
-    const qs = params.toString();
-    const basePath = resolvedSection === "updates" ? "/updates" : resolvedSection === "directory" ? "/locations" : "/";
-    router.replace(`${basePath}${qs ? `?${qs}` : ""}`, { scroll: false });
+    setParam("event", null);
   }
 
   function openSelected(key: string) {

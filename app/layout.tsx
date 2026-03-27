@@ -3,8 +3,6 @@ import "./globals.css";
 import type { Metadata } from "next";
 import SiteHeader from "./site-header";
 import ThemeBoot from "./ThemeBoot";
-import RouteTransition from "./components/RouteTransition";
-import RevealFX from "./components/RevealFX";
 
 export const metadata: Metadata = {
   title: "What's Next Lancaster",
@@ -31,12 +29,7 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <SiteHeader />
         </Suspense>
-        <Suspense fallback={null}>
-          <RouteTransition>
-            {children}
-          </RouteTransition>
-          <RevealFX />
-        </Suspense>
+        {children}
       </body>
     </html>
   );
