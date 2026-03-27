@@ -31,8 +31,12 @@ export default function RootLayout({
         <Suspense fallback={null}>
           <SiteHeader />
         </Suspense>
-        <RouteTransition>{children}</RouteTransition>
-        <RevealFX />
+        <Suspense fallback={null}>
+          <RouteTransition>
+            {children}
+          </RouteTransition>
+          <RevealFX />
+        </Suspense>
       </body>
     </html>
   );

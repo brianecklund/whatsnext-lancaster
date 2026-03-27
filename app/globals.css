@@ -31,10 +31,6 @@ img, svg, video, canvas {
 }
 
 :root{
-  --ease-smooth: cubic-bezier(0.22, 1, 0.36, 1);
-  --ease-smooth-soft: cubic-bezier(0.16, 1, 0.3, 1);
-  --dur-route: 920ms;
-  --dur-reveal: 960ms;
   /* Type */
   --font-sans: "Inter", "Gabarito", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
   --font-serif: Georgia, "Times New Roman", Times, serif;
@@ -431,16 +427,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .routeFrame{
   height: 100%;
-  opacity: 1;
-  transform: translate3d(0, 0, 0);
-  transition:
-    opacity 720ms var(--ease-smooth),
-    transform 900ms var(--ease-smooth);
-  will-change: opacity, transform;
-}
-
-.routeFrame--entering{
-  animation: routeFadeIn 920ms var(--ease-smooth) both;
+  animation: routeFadeIn 460ms cubic-bezier(.22,1,.36,1) both;
 }
 
 .tagline{
@@ -2625,25 +2612,21 @@ a:hover{
 .reveal-ready{
   opacity: 0;
   transform: translate3d(0, 18px, 0);
-  filter: blur(0px);
   transition:
-    opacity var(--dur-reveal) var(--ease-smooth),
-    transform var(--dur-reveal) var(--ease-smooth),
-    filter var(--dur-reveal) var(--ease-smooth-soft);
+    opacity 720ms cubic-bezier(.22,1,.36,1),
+    transform 720ms cubic-bezier(.22,1,.36,1);
   transition-delay: var(--reveal-delay, 0ms);
   will-change: transform, opacity;
-  backface-visibility: hidden;
 }
 
 .reveal-visible{
   opacity: 1;
   transform: translate3d(0, 0, 0);
-  filter: blur(0px);
 }
 
 @keyframes routeFadeIn{
-  0%{ opacity: 0; transform: translate3d(0, 18px, 0); }
-  100%{ opacity: 1; transform: translate3d(0, 0, 0); }
+  0%{ opacity: 0; }
+  100%{ opacity: 1; }
 }
 
 @keyframes menuOverlayFade{
@@ -5291,11 +5274,9 @@ body {
 }
 
 html[data-route-switching="true"] .routeFrame{
-  opacity: 0;
-  transform: translate3d(0, 24px, 0);
-  transition:
-    opacity 420ms var(--ease-smooth-soft),
-    transform 520ms var(--ease-smooth-soft);
+  opacity: 0.94;
+  transform: translateY(4px);
+  transition: opacity 220ms ease, transform 320ms cubic-bezier(.22,1,.36,1);
 }
 
 .pageShell,
@@ -5378,15 +5359,15 @@ html[data-route-switching="true"] .routeFrame{
 
 .shellSwap[data-content-switching="true"] [data-switch-item="true"]{
   opacity: 0;
-  transform: translate3d(0, 16px, 0);
-  animation: shellContentCascade 720ms var(--ease-smooth) forwards;
-  animation-delay: calc(var(--switch-index, 0) * 44ms);
+  transform: translateY(12px);
+  animation: shellContentCascade 440ms cubic-bezier(.22,1,.36,1) forwards;
+  animation-delay: calc(var(--switch-index, 0) * 28ms);
   will-change: opacity, transform;
 }
 
 @keyframes shellContentCascade{
-  0%{ opacity: 0; transform: translate3d(0, 16px, 0); }
-  100%{ opacity: 1; transform: translate3d(0, 0, 0); }
+  0%{ opacity: 0; transform: translateY(12px); }
+  100%{ opacity: 1; transform: translateY(0); }
 }
 
 .shellIntro--active .newsBar,
@@ -5394,8 +5375,8 @@ html[data-route-switching="true"] .routeFrame{
 .shellIntro--active .leftSticky,
 .shellIntro--active [data-intro-item="true"]{
   opacity: 0;
-  transform: translate3d(0, 18px, 0);
-  animation: shellIntroCascade 920ms var(--ease-smooth) forwards;
+  transform: translateY(12px);
+  animation: shellIntroCascade 640ms cubic-bezier(.22,1,.36,1) forwards;
   will-change: opacity, transform;
 }
 
@@ -5413,8 +5394,8 @@ html[data-route-switching="true"] .routeFrame{
 }
 
 @keyframes shellIntroCascade{
-  0%{ opacity: 0; transform: translate3d(0, 18px, 0); }
-  100%{ opacity: 1; transform: translate3d(0, 0, 0); }
+  0%{ opacity: 0; transform: translateY(12px); }
+  100%{ opacity: 1; transform: translateY(0); }
 }
 
 @media (prefers-reduced-motion: reduce){
@@ -8806,25 +8787,113 @@ body[data-layout="content"] .simplePage{
 }
 
 
-.siteHeader,
-.pageIntroBar,
-.newsBar,
-.leftSticky,
-.detailCard,
-.weeklyCard,
-.eventRow,
-.weeklyOverview,
-.weeklyCondRow,
-.contentCard,
-.calloutCard,
-.contactForm,
-.donateFormCard,
-.mobileSheet,
-.filterOverlayPanel{
+/* --- 2026-03-27 actual mobile calendar return + Night Shift contrast + weekly overview overlay sizing --- */
+.routeFrame{
+  min-height: 100%;
+  animation: routeFadeIn 520ms cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+html[data-route-switching="true"] .routeFrame{
+  opacity: 0.88;
+}
+
+@keyframes routeFadeIn{
+  0%{
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  100%{
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.reveal-ready{
+  opacity: 0;
+  transform: translate3d(0, 16px, 0);
   transition:
-    opacity 420ms var(--ease-smooth-soft),
-    transform 520ms var(--ease-smooth-soft),
-    box-shadow 420ms var(--ease-smooth-soft),
-    background-color 420ms var(--ease-smooth-soft),
-    border-color 420ms var(--ease-smooth-soft);
+    opacity 720ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 720ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: var(--reveal-delay, 0ms);
+  will-change: opacity, transform;
+}
+
+.reveal-visible{
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .routeFrame,
+  .reveal-ready,
+  .reveal-visible{
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+html[data-theme="night-shift"] .segmentedControl__button[data-active="true"],
+html[data-theme="night-shift"] .segmentedControl__button[data-visual-active="true"],
+html[data-theme="night-shift"] .ctaBtn,
+html[data-theme="night-shift"] .filterBtnSquare,
+html[data-theme="night-shift"] .filterBtn,
+html[data-theme="night-shift"] .calendarTypeBtn[data-active="true"],
+html[data-theme="night-shift"] .mobileControlsToggle,
+html[data-theme="night-shift"] .menuOverlay,
+html[data-theme="night-shift"] .menuOverlayLink,
+html[data-theme="night-shift"] .paletteMenuBtn,
+html[data-theme="night-shift"] .topNav .navLink[data-active="true"],
+html[data-theme="night-shift"] .topNav .navLink:hover,
+html[data-theme="night-shift"] .newsBar,
+html[data-theme="night-shift"] .newsTickerItem,
+html[data-theme="night-shift"] .mobileTabs .segmentedControl__button[data-active="true"],
+html[data-theme="night-shift"] .mobileTabsDetail .segmentedControl__button[data-active="true"],
+html[data-theme="night-shift"] .mobilePrimaryTabs .segmentedControl__button[data-active="true"]{
+  color: #ffffff !important;
+}
+
+html[data-theme="night-shift"] .segmentedControl__button[data-active="true"] .segmentedControl__label,
+html[data-theme="night-shift"] .segmentedControl__button[data-visual-active="true"] .segmentedControl__label,
+html[data-theme="night-shift"] .segmentedControl__button[data-active="true"] .segmentedControl__meta,
+html[data-theme="night-shift"] .segmentedControl__button[data-visual-active="true"] .segmentedControl__meta,
+html[data-theme="night-shift"] .ctaBtn *,
+html[data-theme="night-shift"] .filterBtn *,
+html[data-theme="night-shift"] .menuOverlay *,
+html[data-theme="night-shift"] .newsBar *{
+  color: inherit !important;
+}
+
+@media (max-width: 980px){
+  .mobileDetail{
+    top: var(--headerH) !important;
+    bottom: calc(52px + env(safe-area-inset-bottom, 0px)) !important;
+    height: auto !important;
+  }
+
+  .mobileDetailScroll,
+  .mobileDetail > .scroll{
+    height: 100% !important;
+    padding-top: 0 !important;
+    padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .mobileWeeklyOverviewOpen{
+    min-height: 100%;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+    justify-content: flex-start;
+  }
+
+  .mobileWeeklyOverviewOpen .weekSelectorRailMobile{
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .mobileWeeklyOverviewOpen .weekSummary{
+    min-height: 100%;
+    margin-top: 0 !important;
+  }
 }
