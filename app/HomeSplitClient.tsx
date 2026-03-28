@@ -261,6 +261,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const dayParam = sp.get("day");
 
   const listRef = useRef<HTMLDivElement | null>(null);
+  const mobileDetailScrollRef = useRef<HTMLDivElement | null>(null);
   const daySectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const displayDayGroupsRef = useRef<Array<{ date: Date; items: EventLite[] }>>([]);
   const [scrollDayKey, setScrollDayKey] = useState<string | null>(null);
@@ -912,7 +913,12 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     setMobileDetailVisualKey("cal");
   }, [effectiveIsMobile, mobileDetailOpen, mobileDetailNavPending, detailFlashKey]);
 
-
+  useLayoutEffect(() => {
+    if (!effectiveIsMobile || !mobileDetailOpen || !selectedEvent) return;
+    const el = mobileDetailScrollRef.current;
+    if (!el) return;
+    el.scrollTop = 0;
+  }, [detailFlashKey, effectiveIsMobile, mobileDetailOpen, selectedEvent]);
 
   useEffect(() => {
     const listEl = listRef.current;
@@ -1097,7 +1103,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ]}
                 />
 
-                {effectiveIsMobile && resolvedSection === "calendar" && !mobileWeeklyOpen ? (
+                {effectiveIsMobile && resolvedSection === "calendar" && !mobileDetailOpen ? (
                   <button
                     type="button"
                     className="mobileControlsToggle"
@@ -1900,7 +1906,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
         role="dialog"
         aria-modal={mobileDetailOpen ? "true" : "false"}
       >
-        <div className="scroll mobileDetailScroll">
+        <div className="scroll mobileDetailScroll" ref={mobileDetailScrollRef}>
           {selectedEvent ? (
             <div key={detailFlashKey} className="detailCard mobileEventDetailCard calendarListingDetailReveal calendarListingDetailReveal--mobile">
               <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>

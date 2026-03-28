@@ -2951,6 +2951,20 @@ a:hover{
   opacity: 0.95;
 }
 
+.calendarSearchRowMobile .filterBtn[data-active="true"],
+.searchRow.calendarSearchRowMobile .filterBtn[data-active="true"]{
+  background: color-mix(in srgb, var(--text) 72%, var(--panel) 28%) !important;
+  color: #fff !important;
+  border-color: color-mix(in srgb, var(--text) 55%, var(--border) 45%) !important;
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+}
+
+.calendarSearchRowMobile .filterBtn[data-active="true"] .btnIconImg,
+.searchRow.calendarSearchRowMobile .filterBtn[data-active="true"] .btnIconImg{
+  filter: brightness(0) invert(1) !important;
+  opacity: 0.95 !important;
+}
+
 .filterDropdown{
   display: grid;
   grid-template-rows: 0fr;
@@ -3326,7 +3340,16 @@ a:hover{
     padding: 14px 16px 22px;
     border-radius: 0 0 22px 22px;
     box-shadow: 0 20px 48px rgba(0, 0, 0, 0.2);
+    background: var(--bg) !important;
     animation: mobileNavSheetDrop 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  .mobileSheetOverlay--fromNav.mobileSheetOverlay--closing{
+    animation: mobileNavOverlayFadeOut 300ms ease both;
+  }
+
+  .mobileSheetOverlay--fromNav.mobileSheetOverlay--closing .mobileSheet{
+    animation: mobileNavSheetRetract 320ms cubic-bezier(0.55, 0, 1, 0.45) both;
   }
 }
 
@@ -3346,9 +3369,31 @@ a:hover{
   }
 }
 
+@keyframes mobileNavOverlayFadeOut{
+  from{
+    opacity: 1;
+  }
+  to{
+    opacity: 0;
+  }
+}
+
+@keyframes mobileNavSheetRetract{
+  from{
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to{
+    opacity: 0;
+    transform: translateY(calc(-100% - 6px));
+  }
+}
+
 @media (prefers-reduced-motion: reduce){
   .mobileSheetOverlay--fromNav,
-  .mobileSheetOverlay--fromNav .mobileSheet{
+  .mobileSheetOverlay--fromNav .mobileSheet,
+  .mobileSheetOverlay--fromNav.mobileSheetOverlay--closing,
+  .mobileSheetOverlay--fromNav.mobileSheetOverlay--closing .mobileSheet{
     animation: none !important;
   }
 }
@@ -4309,19 +4354,31 @@ svg:not(:root) {
   height: 22px;
 }
 @media (max-width: 980px){
+  .newsBar{
+    min-height: 48px;
+  }
+
   .newsBar .nw__progress{
-    width: 40px;
-    height: 40px;
-    min-width: 40px;
-    min-height: 40px;
+    width: 30px;
+    height: 30px;
+    min-width: 30px;
+    min-height: 30px;
   }
   .newsBar .nw__progress__icon{
-    width: 20px;
-    height: 20px;
+    width: 15px;
+    height: 15px;
   }
 
   .newsBar .nw__progress__indicator path{
-    stroke-width: 2.25;
+    stroke-width: 1.7;
+  }
+
+  .newsBar .nw__wrapper{
+    height: 2em;
+  }
+
+  .newsBar .nw__slider__item{
+    height: 2em;
   }
 
   .mobileDetail{
@@ -6559,7 +6616,8 @@ body,
     display: inline-flex;
     width: 100%;
     height: 34px;
-    margin-top: 10px;
+    margin-top: 6px;
+    margin-bottom: 6px;
     align-items: center;
     justify-content: center;
     gap: 8px;
@@ -6573,7 +6631,8 @@ body,
   }
 
   .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle{
-    margin-bottom: 4px;
+    margin-top: 6px;
+    margin-bottom: 6px;
   }
 
   .leftSticky[data-mobile-weekly-surface="true"] .leftControls{
@@ -6794,7 +6853,7 @@ body{
 
   .mobileControlsToggle{
     margin-top: 6px !important;
-    margin-bottom: 4px !important;
+    margin-bottom: 6px !important;
   }
 
   .splitPageListBody,
@@ -7142,7 +7201,7 @@ body{
 
   .mobileControlsToggle{
     margin-top: 6px !important;
-    margin-bottom: 2px !important;
+    margin-bottom: 6px !important;
   }
 
   .leftControls{
@@ -7241,7 +7300,13 @@ body{
   }
 
   .mobileControlsToggle{
-    margin-top: 4px !important;
+    margin-top: 6px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle{
+    margin-top: 6px !important;
+    margin-bottom: 6px !important;
   }
 
   .leftControls{
@@ -9246,5 +9311,38 @@ body[data-layout="content"] .simplePage{
     transform: none !important;
     transition: none !important;
     animation: none !important;
+  }
+}
+
+/* --- 2026-03-27 mobile: bottom nav safe-area, solid tab bar, detail above tabs, segment height parity --- */
+@media (max-width: 980px){
+  .mobileTabs,
+  .mobileTabsDetail,
+  .mobilePrimaryTabs{
+    background: var(--bg) !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    padding: 8px 12px max(10px, calc(8px + env(safe-area-inset-bottom, 0px))) 12px !important;
+    box-sizing: border-box !important;
+  }
+
+  .segmentedControl--mobile .segmentedControl__button,
+  .mobileTabsDetail .segmentedControl .segmentedControl__button,
+  .mobilePrimaryTabs .segmentedControl .segmentedControl__button{
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail{
+    inset: var(--headerH) 0 calc(52px + env(safe-area-inset-bottom, 0px)) 0 !important;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetailScroll,
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail > .scroll{
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
+    scroll-padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
   }
 }

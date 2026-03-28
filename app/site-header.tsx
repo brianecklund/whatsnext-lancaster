@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -74,8 +74,57 @@ export default function SiteHeader() {
   const sp = useSearchParams();
   const [open, setOpen] = useState(false);
   const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+  const [menuClosing, setMenuClosing] = useState(false);
+  const [themeMenuClosing, setThemeMenuClosing] = useState(false);
+  const menuCloseTimerRef = useRef<number | null>(null);
+  const themeCloseTimerRef = useRef<number | null>(null);
   const [flashKey, setFlashKey] = useState(0);
   const [currentTheme, setCurrentTheme] = useState<ThemeKey>(DEFAULT_THEME);
+
+  const MOBILE_SHEET_CLOSE_MS = 320;
+
+  const clearMenuCloseTimer = useCallback(() => {
+    if (menuCloseTimerRef.current != null) {
+      window.clearTimeout(menuCloseTimerRef.current);
+      menuCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const clearThemeCloseTimer = useCallback(() => {
+    if (themeCloseTimerRef.current != null) {
+      window.clearTimeout(themeCloseTimerRef.current);
+      themeCloseTimerRef.current = null;
+    }
+  }, []);
+
+  const closeMenu = useCallback(() => {
+    if (!open || menuClosing) return;
+    setMenuClosing(true);
+    clearMenuCloseTimer();
+    menuCloseTimerRef.current = window.setTimeout(() => {
+      setOpen(false);
+      setMenuClosing(false);
+      menuCloseTimerRef.current = null;
+    }, MOBILE_SHEET_CLOSE_MS);
+  }, [open, menuClosing, clearMenuCloseTimer]);
+
+  const closeThemeMenu = useCallback(() => {
+    if (!themeMenuOpen || themeMenuClosing) return;
+    setThemeMenuClosing(true);
+    clearThemeCloseTimer();
+    themeCloseTimerRef.current = window.setTimeout(() => {
+      setThemeMenuOpen(false);
+      setThemeMenuClosing(false);
+      themeCloseTimerRef.current = null;
+    }, MOBILE_SHEET_CLOSE_MS);
+  }, [themeMenuOpen, themeMenuClosing, clearThemeCloseTimer]);
+
+  useEffect(() => {
+    return () => {
+      clearMenuCloseTimer();
+      clearThemeCloseTimer();
+    };
+  }, [clearMenuCloseTimer, clearThemeCloseTimer]);
 
   const currentThemeLabel = useMemo(
     () => THEME_PALETTES.find((theme) => theme.key === currentTheme)?.name ?? "Theme",
@@ -83,6 +132,10 @@ export default function SiteHeader() {
   );
 
   useEffect(() => {
+    clearMenuCloseTimer();
+    clearThemeCloseTimer();
+    setMenuClosing(false);
+    setThemeMenuClosing(false);
     setOpen(false);
     setThemeMenuOpen(false);
     setFlashKey((k) => k + 1);
@@ -91,7 +144,7 @@ export default function SiteHeader() {
       const isShellRoute = pathname === "/" || pathname?.startsWith("/locations") || pathname?.startsWith("/updates");
       document.body.dataset.layout = isShellRoute ? "shell" : "content";
     }
-  }, [pathname]);
+  }, [pathname, clearMenuCloseTimer, clearThemeCloseTimer]);
 
   useEffect(() => {
     try {
@@ -106,13 +159,13 @@ export default function SiteHeader() {
   }, []);
 
   useEffect(() => {
-    if (!open && !themeMenuOpen) return;
+    if (!open && !themeMenuOpen && !menuClosing && !themeMenuClosing) return;
     const prev = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
     return () => {
       document.documentElement.style.overflow = prev;
     };
-  }, [open, themeMenuOpen]);
+  }, [open, themeMenuOpen, menuClosing, themeMenuClosing]);
 
   function applyTheme(theme: ThemeKey) {
     setCurrentTheme(theme);
@@ -130,7 +183,11 @@ export default function SiteHeader() {
 
   function onThemeButtonPress() {
     if (typeof window !== "undefined" && window.matchMedia("(max-width: 980px)").matches) {
+      clearMenuCloseTimer();
+      setMenuClosing(false);
       setOpen(false);
+      clearThemeCloseTimer();
+      setThemeMenuClosing(false);
       setThemeMenuOpen(true);
       return;
     }
@@ -220,8 +277,16 @@ export default function SiteHeader() {
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open ? "true" : "false"}
           onClick={() => {
+            clearThemeCloseTimer();
+            setThemeMenuClosing(false);
             setThemeMenuOpen(false);
-            setOpen((v) => !v);
+            if (open) {
+              closeMenu();
+            } else {
+              clearMenuCloseTimer();
+              setMenuClosing(false);
+              setOpen(true);
+            }
           }}
         >
           <span className="hamburgerIcon" aria-hidden>
@@ -235,10 +300,10 @@ export default function SiteHeader() {
       {open && typeof document !== "undefined"
         ? createPortal(
             <div
-              className="mobileSheetOverlay mobileMenuOverlay mobileSheetOverlay--fromNav"
+              className={`mobileSheetOverlay mobileMenuOverlay mobileSheetOverlay--fromNav${menuClosing ? " mobileSheetOverlay--closing" : ""}`}
               role="dialog"
               aria-modal="true"
-              onClick={() => setOpen(false)}
+              onClick={() => closeMenu()}
             >
               <div className="mobileSheet mobileMenuSheet" onClick={(e) => e.stopPropagation()}>
                 <div className="mobileSheetHeader">
@@ -246,7 +311,7 @@ export default function SiteHeader() {
                   <button
                     type="button"
                     className="mobileSheetClose"
-                    onClick={() => setOpen(false)}
+                    onClick={() => closeMenu()}
                     aria-label="Close menu"
                   >
                     ✕
@@ -261,7 +326,7 @@ export default function SiteHeader() {
                       href={l.href}
                       data-active={pathname === l.href ? "true" : "false"}
                       style={{ ["--menuIndex" as string]: idx } as CSSProperties}
-                      onClick={() => setOpen(false)}
+                      onClick={() => closeMenu()}
                     >
                       <span className="mobileMenuActionText">{l.label}</span>
                     </Link>
@@ -276,10 +341,10 @@ export default function SiteHeader() {
       {themeMenuOpen && typeof document !== "undefined"
         ? createPortal(
             <div
-              className="mobileSheetOverlay mobileThemeOverlay mobileSheetOverlay--fromNav"
+              className={`mobileSheetOverlay mobileThemeOverlay mobileSheetOverlay--fromNav${themeMenuClosing ? " mobileSheetOverlay--closing" : ""}`}
               role="dialog"
               aria-modal="true"
-              onClick={() => setThemeMenuOpen(false)}
+              onClick={() => closeThemeMenu()}
             >
               <div className="mobileSheet mobileThemeSheet" onClick={(e) => e.stopPropagation()}>
                 <div className="mobileSheetHeader">
@@ -287,7 +352,7 @@ export default function SiteHeader() {
                   <button
                     type="button"
                     className="mobileSheetClose"
-                    onClick={() => setThemeMenuOpen(false)}
+                    onClick={() => closeThemeMenu()}
                     aria-label="Close color palette menu"
                   >
                     ✕
@@ -303,7 +368,7 @@ export default function SiteHeader() {
                       data-active={currentTheme === theme.key ? "true" : "false"}
                       onClick={() => {
                         applyTheme(theme.key);
-                        setThemeMenuOpen(false);
+                        closeThemeMenu();
                       }}
                     >
                       <span className="mobileThemeActionMain">

@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import "./globals.css";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import ContentLayoutScrollMomentum from "./components/ContentLayoutScrollMomentum";
 import PageRevealRoot from "./components/PageRevealRoot";
 import SiteHeader from "./site-header";
@@ -11,6 +11,11 @@ export const metadata: Metadata = {
   description: "Events, places, and updates happening around Lancaster.",
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+};
 
 export default function RootLayout({
   children,
