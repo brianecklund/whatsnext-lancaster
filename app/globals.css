@@ -895,6 +895,27 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   margin-bottom: 8px;
 }
 
+/* Calendar list: current day heading sticks under the sticky toolbar until the next day reaches it */
+.paneLeft > .scroll{
+  --calendarListStickyTop: 104px;
+}
+
+.paneLeft .dayBlock .dayTitle.dayTitle--sticky{
+  position: sticky;
+  top: var(--calendarListStickyTop);
+  z-index: 6;
+  margin-left: calc(var(--panePadX) * -1);
+  margin-right: calc(var(--panePadX) * -1);
+  padding-left: var(--panePadX);
+  padding-right: var(--panePadX);
+  padding-top: 10px;
+  padding-bottom: 10px;
+  margin-top: -4px;
+  margin-bottom: 10px;
+  background: var(--bg);
+  box-shadow: 0 1px 0 var(--border);
+}
+
 .eventRow{
   width: 100%;
   text-align: left;
@@ -4005,14 +4026,14 @@ svg:not(:root) {
   }
 }
 .nw__progress {
-  width: 3em;
-  height: 3em;
+  width: 2.35em;
+  height: 2.35em;
   flex-shrink: 0;
   position: relative;
 }
 .nw__progress__icon {
-  width: 30px;
-  height: 30px;
+  width: 22px;
+  height: 22px;
   position: absolute;
   top: calc(50% - 1px);
   left: calc(50% - 1px);
@@ -4024,7 +4045,7 @@ svg:not(:root) {
   width: 100%;
 }
 .nw__progress__indicator path {
-  stroke-width: 3;
+  stroke-width: 2.5;
 }
 .nw__progress__indicator path:nth-child(1) {
   stroke: rgba(0, 23, 47, 0.1);
@@ -4192,21 +4213,27 @@ svg:not(:root) {
 
 /* March 16 mobile detail + updates + ticker refinements */
 .newsBar .nw__progress{
-  width: 2.8em;
-  height: 2.8em;
+  width: 2.35em;
+  height: 2.35em;
 }
 .newsBar .nw__progress__icon{
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 @media (max-width: 980px){
   .newsBar .nw__progress{
-    width: 2.25em;
-    height: 2.25em;
+    width: 40px;
+    height: 40px;
+    min-width: 40px;
+    min-height: 40px;
   }
   .newsBar .nw__progress__icon{
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
+  }
+
+  .newsBar .nw__progress__indicator path{
+    stroke-width: 2.25;
   }
 
   .mobileDetail{
@@ -6442,6 +6469,14 @@ body,
     font-size: 12px;
     font-weight: 700;
     letter-spacing: 0.02em;
+  }
+
+  .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle{
+    margin-bottom: 10px;
+  }
+
+  .paneLeft .calendarToolbar .dayJumpRail{
+    display: none !important;
   }
 
   .mobileControlsToggleLabel{

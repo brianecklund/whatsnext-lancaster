@@ -5,7 +5,7 @@ import ToolbarIcon from "./components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { dayKey, eventHasEnded, nearestDayWithEvents, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import SegmentedControl from "@/app/components/SegmentedControl";
@@ -595,17 +595,24 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
 
   displayDayGroupsRef.current = displayDayGroups;
 
+  /** Calendar week that contains the day currently at the top of the list (scroll-synced). */
+  const viewportWeekAnchorDate = useMemo(() => {
+    const k = scrollDayKey ?? selectedDayStr;
+    const parsed = parseDayKey(k);
+    if (parsed) return parsed;
+    return selectedDay;
+  }, [scrollDayKey, selectedDayStr, selectedDay]);
+
+  /** Sun–Sat for that week; each button jumps to that calendar day if it has events. */
   const dayJumpDates = useMemo(() => {
-    // Build the day buttons from the rotated groups (starting at the selected day),
-    // not from a fixed calendar-week window. This makes the rail work reliably
-    // with test data that’s in a different week than “today”.
-    const map = new Map<number, Date>();
-    for (const group of displayDayGroups) {
-      const idx = group.date.getDay();
-      if (!map.has(idx)) map.set(idx, group.date);
-    }
-    return DAY_ABBR.map((label, idx) => ({ label, index: idx, date: map.get(idx) ?? null }));
-  }, [displayDayGroups]);
+    const weekStart = startOfWeekSundayFromDate(viewportWeekAnchorDate);
+    return DAY_ABBR.map((label, idx) => {
+      const d = addDays(weekStart, idx);
+      const dk = dayKey(d);
+      const g = leftDayGroups.find((x) => dayKey(x.date) === dk);
+      return { label, index: idx, date: g ? startOfDay(g.date) : null };
+    });
+  }, [viewportWeekAnchorDate, leftDayGroups]);
 
   function getListScrollOffset() {
     const stickyH = leftStickyRef.current?.offsetHeight ?? 0;
@@ -625,7 +632,6 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
       if (!dayParam) {
         root.scrollTop = 0;
         syncVisibleDayFromScroll(0);
-        setScrollDayKey(dayKey(leftDayGroups[0].date));
         setDidInitialScroll(true);
         return;
       }
@@ -670,6 +676,33 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
       syncVisibleDayFromScroll(el.scrollTop);
     },
   });
+
+  useLayoutEffect(() => {
+    const scrollEl = listRef.current;
+    const stickyEl = leftStickyRef.current;
+    if (!scrollEl || !stickyEl) return;
+    if (resolvedSection !== "calendar" || viewMode !== "list") {
+      scrollEl.style.removeProperty("--calendarListStickyTop");
+      return;
+    }
+
+    const apply = () => {
+      scrollEl.style.setProperty("--calendarListStickyTop", `${stickyEl.offsetHeight}px`);
+    };
+    apply();
+
+    let ro: ResizeObserver | null = null;
+    if (typeof ResizeObserver !== "undefined") {
+      ro = new ResizeObserver(apply);
+      ro.observe(stickyEl);
+    }
+    window.addEventListener("resize", apply);
+    return () => {
+      window.removeEventListener("resize", apply);
+      ro?.disconnect();
+      scrollEl.style.removeProperty("--calendarListStickyTop");
+    };
+  }, [resolvedSection, viewMode, effectiveIsMobile, mobileControlsCollapsed]);
 
   function jumpToDay(target: Date) {
     const key = dayKey(target);
@@ -1054,7 +1087,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   <button
                     type="button"
                     className="mobileControlsToggle"
-                    aria-label={mobileControlsCollapsed ? "Show search, filters, and day buttons" : "Hide search, filters, and day buttons"}
+                    aria-label={mobileControlsCollapsed ? "Show search and filters" : "Hide search and filters"}
                     aria-expanded={mobileControlsCollapsed ? "false" : "true"}
                     onClick={() => {
                       const nextCollapsed = !mobileControlsCollapsed;
@@ -1249,7 +1282,15 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               {/* Left list */}
               {displayDayGroups.map((g) => (
                 <section key={dayKey(g.date)} className="dayBlock" ref={(el) => { daySectionRefs.current[dayKey(g.date)] = el; }}>
-                  <div className="dayTitle">{formatDayHeading(g.date)}</div>
+                  <div
+                    className={
+                      resolvedSection === "calendar" && viewMode === "list"
+                        ? "dayTitle dayTitle--sticky"
+                        : "dayTitle"
+                    }
+                  >
+                    {formatDayHeading(g.date)}
+                  </div>
 
                   {g.items.map((e) => {
                     const active =
