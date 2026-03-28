@@ -356,7 +356,11 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const pullRefreshingRef = useRef(false);
   const mobileControlsInitRef = useRef(false);
   const lastScrollTopRef = useRef(0);
+  const mobileControlsCollapsedRef = useRef(false);
 
+  useEffect(() => {
+    mobileControlsCollapsedRef.current = mobileControlsCollapsed;
+  }, [mobileControlsCollapsed]);
 
   useEffect(() => {
     pullDistanceRef.current = pullDistance;
@@ -432,7 +436,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
 
       if (mobileControlsPinnedOpen || mobileWeeklyOpen) return;
 
-      if (st <= 12 && !mobileControlsCollapsed) {
+      if (st <= 12 && !mobileControlsCollapsedRef.current) {
         setMobileControlsCollapsed(false);
         return;
       }
@@ -444,6 +448,11 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     listEl.addEventListener('scroll', syncFromScroll, { passive: true });
     return () => listEl.removeEventListener('scroll', syncFromScroll);
   }, [effectiveIsMobile, mobileControlsPinnedOpen, mobileWeeklyOpen]);
+
+  useEffect(() => {
+    if (!effectiveIsMobile || !mobileWeeklyOpen) return;
+    setMobileControlsCollapsed(false);
+  }, [effectiveIsMobile, mobileWeeklyOpen]);
 
   // Keep the optimistic client key in sync with the URL when navigation completes.
   useEffect(() => {
@@ -1071,7 +1080,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               <div
                 className="leftSticky"
                 ref={leftStickyRef}
-                data-mobile-collapsed={effectiveIsMobile && mobileControlsCollapsed ? "true" : "false"}
+                data-mobile-collapsed={
+                  effectiveIsMobile && mobileControlsCollapsed && !mobileWeeklyOpen ? "true" : "false"
+                }
                 data-mobile-pinned={effectiveIsMobile && mobileControlsPinnedOpen ? "true" : "false"}
                 data-mobile-weekly-surface={effectiveIsMobile && resolvedSection === "calendar" && mobileWeeklyOpen ? "true" : "false"}
               >
