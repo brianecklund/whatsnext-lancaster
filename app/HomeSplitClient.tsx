@@ -250,7 +250,6 @@ function buildWeekInsights(items: EventLite[]) {
 }
 
 export default function HomeSplitClient({ events, updates = [], currentSection, onNavigateSection }: Props) {
-  useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
@@ -263,6 +262,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
 
   const listRef = useRef<HTMLDivElement | null>(null);
   const daySectionRefs = useRef<Record<string, HTMLElement | null>>({});
+  const displayDayGroupsRef = useRef<Array<{ date: Date; items: EventLite[] }>>([]);
   const [scrollDayKey, setScrollDayKey] = useState<string | null>(null);
   const leftStickyRef = useRef<HTMLDivElement | null>(null);
   const [didInitialScroll, setDidInitialScroll] = useState(false);
@@ -593,6 +593,8 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     return [...leftDayGroups.slice(currentIndex), ...leftDayGroups.slice(0, currentIndex)];
   }, [leftDayGroups, selectedDayStr]);
 
+  displayDayGroupsRef.current = displayDayGroups;
+
   const dayJumpDates = useMemo(() => {
     // Build the day buttons from the rotated groups (starting at the selected day),
     // not from a fixed calendar-week window. This makes the rail work reliably
@@ -647,9 +649,10 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     const root = listRef.current;
     if (!root) return;
     const threshold = scrollTop + getListScrollOffset() + 16;
-    let active = displayDayGroups[0]?.date ? dayKey(displayDayGroups[0].date) : null;
+    const groups = displayDayGroupsRef.current;
+    let active: string | null = groups[0]?.date ? dayKey(groups[0].date) : null;
 
-    for (const group of displayDayGroups) {
+    for (const group of groups) {
       const key = dayKey(group.date);
       const el = daySectionRefs.current[key];
       if (!el) continue;
@@ -657,8 +660,16 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
       else break;
     }
 
-    if (active && active !== scrollDayKey) setScrollDayKey(active);
+    if (active) setScrollDayKey((prev) => (prev === active ? prev : active!));
   }
+
+  useSmoothWheel(".scroll", {
+    onProgrammaticScroll: (el) => {
+      if (el !== listRef.current) return;
+      if (viewMode !== "list") return;
+      syncVisibleDayFromScroll(el.scrollTop);
+    },
+  });
 
   function jumpToDay(target: Date) {
     const key = dayKey(target);
@@ -801,15 +812,9 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     return byUid || byId || null;
   }, [filteredEvents, selectedDisplayKey]);
 
-  const currentDisplayDayKey = useMemo(() => {
-    if (selectedEvent) {
-      const d = safeDateFromEvent(selectedEvent);
-      if (d) return dayKey(d);
-    }
-    return scrollDayKey ?? selectedDayStr;
-  }, [scrollDayKey, selectedDayStr, selectedEvent]);
+  /** Day jump rail follows list scroll position (not the selected event’s date). */
+  const dayRailActiveKey = scrollDayKey ?? selectedDayStr;
 
-  
   const detailFlashKey = useMemo(() => {
     if (!selectedEvent) return "none";
     return `${selectedEvent.uid ?? selectedEvent.id ?? "event"}|${selectedDisplayKey}|${viewMode}|${q}|${type}`;
@@ -1066,10 +1071,10 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   <div className="calendarToolbar">
                     <div className="dayJumpRail" aria-label="Jump to day">
                       {dayJumpDates.map((entry) => {
-                        const isActive = currentDisplayDayKey
+                        const isActive = dayRailActiveKey
                           ? entry.date
-                            ? dayKey(entry.date) === currentDisplayDayKey
-                            : entry.index === parseDayKey(currentDisplayDayKey)?.getDay()
+                            ? dayKey(entry.date) === dayRailActiveKey
+                            : entry.index === parseDayKey(dayRailActiveKey)?.getDay()
                           : false;
 
                         return (
@@ -1685,19 +1690,12 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   )}
                 </div>
               ) : (
-                <div className="rightHeader">
-                  <div
-                    className="rightDayLabel fadeInItem"
-                    style={{ animationDelay: "260ms" }}
-                  >
-                    {selectedEvent.event_type || "Event"}
-                  </div>
+                <div key={detailFlashKey} className="rightHeader calendarListingDetailReveal">
+                  <div className="rightDayLabel">{selectedEvent.event_type || "Event"}</div>
 
-                  <h1 className="detailTitle fadeInItem" style={{ animationDelay: "320ms" }}>
-                    {selectedEvent.title || "Untitled event"}
-                  </h1>
+                  <h1 className="detailTitle">{selectedEvent.title || "Untitled event"}</h1>
 
-                  <div className="detailMeta fadeInItem" style={{ animationDelay: "360ms" }}>
+                  <div className="detailMeta">
                     <span>{selectedTime}</span>
                     {selectedEvent.locationName ? (
                       <>
@@ -1839,7 +1837,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
       >
         <div className="scroll mobileDetailScroll">
           {selectedEvent ? (
-            <div key={detailFlashKey} className="detailCard detailFlash mobileEventDetailCard">
+            <div key={detailFlashKey} className="detailCard mobileEventDetailCard calendarListingDetailReveal calendarListingDetailReveal--mobile">
               <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
               <div className="detailMeta">
                 <span className="muted">{selectedTime ?? "Time TBD"}</span>
