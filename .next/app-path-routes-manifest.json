@@ -17,5 +17,6 @@
   "/locations/[uid]/page": "/locations/[uid]",
   "/locations/page": "/locations",
   "/page": "/",
+  "/spring/page": "/spring",
   "/updates/page": "/updates"
 }

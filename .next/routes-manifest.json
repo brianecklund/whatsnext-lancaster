@@ -134,6 +134,12 @@
       "namedRegex": "^/locations(?:/)?$"
     },
     {
+      "page": "/spring",
+      "regex": "^/spring(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/spring(?:/)?$"
+    },
+    {
       "page": "/updates",
       "regex": "^/updates(?:/)?$",
       "routeKeys": {},

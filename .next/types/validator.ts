@@ -119,6 +119,15 @@ type RouteHandlerConfig<Route extends AppRouteHandlerRoutes = AppRouteHandlerRou
   type __Unused = __Check
 }
 
+// Validate ../../app/spring/page.tsx
+{
+  type __IsExpected<Specific extends AppPageConfig<"/spring">> = Specific
+  const handler = {} as typeof import("../../app/spring/page.js")
+  type __Check = __IsExpected<typeof handler>
+  // @ts-ignore
+  type __Unused = __Check
+}
+
 // Validate ../../app/updates/page.tsx
 {
   type __IsExpected<Specific extends AppPageConfig<"/updates">> = Specific
