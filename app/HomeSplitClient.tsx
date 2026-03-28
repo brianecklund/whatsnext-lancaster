@@ -313,6 +313,11 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const viewMode: "list" | "month" = view === "month" ? "month" : "list";
   const selectedDisplayKey = selectedKey ?? (!effectiveIsMobile && viewMode === "list" ? WEEKLY_KEY : null);
 
+  const mobileWeeklyOpen =
+    effectiveIsMobile &&
+    !!selectedDisplayKey &&
+    (selectedDisplayKey === WEEKLY_KEY || selectedDisplayKey.startsWith("__week__:"));
+
   const selectedDay = useMemo(() => {
     const parsed = dayParam ? parseDayKey(dayParam) : null;
     if (parsed) return parsed;
@@ -425,7 +430,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
       const delta = st - lastScrollTopRef.current;
       lastScrollTopRef.current = st;
 
-      if (mobileControlsPinnedOpen) return;
+      if (mobileControlsPinnedOpen || mobileWeeklyOpen) return;
 
       if (st <= 12 && !mobileControlsCollapsed) {
         setMobileControlsCollapsed(false);
@@ -438,7 +443,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     syncFromScroll();
     listEl.addEventListener('scroll', syncFromScroll, { passive: true });
     return () => listEl.removeEventListener('scroll', syncFromScroll);
-  }, [effectiveIsMobile, mobileControlsPinnedOpen]);
+  }, [effectiveIsMobile, mobileControlsPinnedOpen, mobileWeeklyOpen]);
 
   // Keep the optimistic client key in sync with the URL when navigation completes.
   useEffect(() => {
@@ -874,9 +879,6 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     if (!effectiveIsMobile) setTaglineHidden(false);
   }, [effectiveIsMobile]);
 
-const mobileWeeklyOpen =
-    effectiveIsMobile && !!selectedDisplayKey && (selectedDisplayKey === WEEKLY_KEY || selectedDisplayKey.startsWith("__week__:"));
-
   const mobileDetailOpen =
     effectiveIsMobile && (!!selectedEvent || mobileWeeklyOpen);
 
@@ -1071,6 +1073,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 ref={leftStickyRef}
                 data-mobile-collapsed={effectiveIsMobile && mobileControlsCollapsed ? "true" : "false"}
                 data-mobile-pinned={effectiveIsMobile && mobileControlsPinnedOpen ? "true" : "false"}
+                data-mobile-weekly-surface={effectiveIsMobile && resolvedSection === "calendar" && mobileWeeklyOpen ? "true" : "false"}
               >
                 <SegmentedControl
                   className="tabs segmentedControl--primary"
@@ -1083,7 +1086,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ]}
                 />
 
-                {effectiveIsMobile ? (
+                {effectiveIsMobile && resolvedSection === "calendar" && !mobileWeeklyOpen ? (
                   <button
                     type="button"
                     className="mobileControlsToggle"
@@ -1259,6 +1262,14 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 </div>
               ) : null}
 
+              <div
+                className={
+                  !effectiveIsMobile && resolvedSection === "calendar"
+                    ? "calendarListMonthSwap calendarListMonthSwap--desktopAnim"
+                    : "calendarListMonthSwap"
+                }
+                key={resolvedSection === "calendar" ? viewMode : "static"}
+              >
               {viewMode === "list" ? (
                 <>
                   {/* Weekly Overview (left) */}
@@ -1319,8 +1330,16 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         <div className="eventRowTitle">{title}</div>
                         <div className="eventRowMeta">
                           <span>{timeLabel}</span>
-                          {e.event_type ? <span className="dot">•</span> : null}
-                          {e.event_type ? <span>{e.event_type}</span> : null}
+                          {e.event_type ? (
+                            effectiveIsMobile ? (
+                              <span className="eventRowTypePill">{e.event_type}</span>
+                            ) : (
+                              <>
+                                <span className="dot">•</span>
+                                <span>{e.event_type}</span>
+                              </>
+                            )
+                          ) : null}
                         </div>
                         {(() => {
                           const raw =
@@ -1447,8 +1466,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ) : null}
                 </>
               )}
-
-
+              </div>
 
             </div>
           </aside>
