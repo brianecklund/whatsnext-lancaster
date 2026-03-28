@@ -8,6 +8,7 @@ import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
+import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
 import type { LocationLite } from "@/lib/types";
 import { mergeDirectoryCategories } from "@/lib/directoryCategories";
 
@@ -42,6 +43,7 @@ type PlaceDetailsResponse = {
 
 type Props = {
   locations?: LocationRow[];
+  updates?: UpdateLite[];
   currentSection?: "calendar" | "directory" | "updates";
   onNavigateSection?: (section: "calendar" | "directory" | "updates") => void;
   basePath?: string;
@@ -49,7 +51,13 @@ type Props = {
 
 const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
-export default function LocationsSplitClient({ locations = [], currentSection, onNavigateSection, basePath = "/locations" }: Props) {
+export default function LocationsSplitClient({
+  locations = [],
+  updates = [],
+  currentSection,
+  onNavigateSection,
+  basePath = "/locations",
+}: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const pathname = usePathname();
@@ -331,6 +339,9 @@ export default function LocationsSplitClient({ locations = [], currentSection, o
         <NewsTickerBar
           introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
           items={newsTickerItems}
+          updates={updates}
+          updatesHref="/updates"
+          seasonLandingHref="/spring"
         />
       ) : undefined}
       style={

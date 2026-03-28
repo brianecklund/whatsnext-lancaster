@@ -39,7 +39,7 @@ export default function SplitPageLayout({
       ) : null)}
       {children}
       {isMobile ? (
-        <div className="mobileTabs mobilePrimaryTabs" aria-label="Primary navigation">
+        <div className="mobileTabs mobilePrimaryTabs mobileTabDock" aria-label="Primary navigation">
           <SegmentedControl
             className="segmentedControl--mobile"
             ariaLabel="Primary navigation"

@@ -892,6 +892,10 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const mobileDetailOpen =
     effectiveIsMobile && (!!selectedEvent || mobileWeeklyOpen);
 
+  useEffect(() => {
+    if (mobileDetailOpen) setFilterOpen(false);
+  }, [mobileDetailOpen]);
+
   const [mobileDetailVisualKey, setMobileDetailVisualKey] = useState<"cal" | "previous" | "next">("cal");
   const [mobileDetailNavPending, setMobileDetailNavPending] = useState(false);
 
@@ -1055,6 +1059,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
       <NewsTickerBar
         introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
         items={newsTickerItems}
+        updates={updates}
+        updatesHref="/updates"
+        seasonLandingHref="/spring"
       />
     ) : null}
 
@@ -1087,7 +1094,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 className="leftSticky"
                 ref={leftStickyRef}
                 data-mobile-collapsed={
-                  effectiveIsMobile && mobileControlsCollapsed && !mobileWeeklyOpen ? "true" : "false"
+                  effectiveIsMobile && mobileControlsCollapsed && !mobileWeeklyOpen && !mobileDetailOpen
+                    ? "true"
+                    : "false"
                 }
                 data-mobile-pinned={effectiveIsMobile && mobileControlsPinnedOpen ? "true" : "false"}
                 data-mobile-weekly-surface={effectiveIsMobile && resolvedSection === "calendar" && mobileWeeklyOpen ? "true" : "false"}
@@ -1840,7 +1849,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
       {/* Mobile bottom tabs */}
       {effectiveIsMobile ? (
         mobileDetailOpen ? (
-          <div className="mobileTabs mobileTabsDetail" aria-label="Event navigation">
+          <div className="mobileTabs mobileTabsDetail mobileTabDock" aria-label="Event navigation">
             <SegmentedControl
               className="segmentedControl--mobile segmentedControl--detail"
               ariaLabel="Event navigation"
@@ -1883,7 +1892,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
             />
           </div>
         ) : (
-          <div className="mobileTabs mobilePrimaryTabs" aria-label="Primary navigation">
+          <div className="mobileTabs mobilePrimaryTabs mobileTabDock" aria-label="Primary navigation">
             <SegmentedControl
               className="segmentedControl--mobile"
               ariaLabel="Primary navigation"

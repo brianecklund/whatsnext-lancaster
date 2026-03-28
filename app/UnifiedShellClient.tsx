@@ -164,7 +164,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
         {renderedSection === 'calendar' ? (
           <HomeSplitClient events={events} updates={updates} {...sharedProps} />
         ) : renderedSection === 'directory' ? (
-          <LocationsSplitClient locations={locations} basePath="/locations" {...sharedProps} />
+          <LocationsSplitClient locations={locations} updates={updates} basePath="/locations" {...sharedProps} />
         ) : (
           <UpdatesSplitClient updates={updates} basePath="/updates" {...sharedProps} />
         )}

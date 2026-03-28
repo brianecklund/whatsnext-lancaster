@@ -326,6 +326,9 @@ export default function UpdatesSplitClient({ updates, currentSection, onNavigate
         <NewsTickerBar
           introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
           items={newsTickerItems}
+          updates={safeUpdates}
+          updatesHref={basePath}
+          seasonLandingHref="/spring"
         />
       ) : undefined}
       mobileOverlay={
