@@ -319,6 +319,7 @@ export default function UpdatesSplitClient({ updates, currentSection, onNavigate
       tagline="Updates, openings, menu changes, PSAs, and quick announcements."
       taglineHidden={taglineHidden}
       isMobile={isMobile}
+      mobileDetailOpen={mobileDetailOpen}
       current={resolvedSection === "calendar" ? "calendar" : resolvedSection === "directory" ? "directory" : "updates"}
       onNavigateSection={onNavigateSection}
       hideDefaultIntro={isMobile && !mobileDetailOpen}

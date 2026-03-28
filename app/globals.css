@@ -1257,7 +1257,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
   .mobileDetail{
     display:block;
     position: fixed;
-    inset: var(--headerH) 0 0 0;
+    inset: 0 0 0 0;
     background: var(--bg);
     z-index: 250;
     transform: translateX(100%);
@@ -3115,7 +3115,7 @@ a:hover{
 /* Ensure mobile detail overlays start below sticky search/filter UI */
 @media (max-width: 980px){
   .mobileDetail{
-    inset: var(--headerH) 0 0 0;
+    inset: 0 0 0 0;
     z-index: 210;
   }
 
@@ -4303,7 +4303,7 @@ svg:not(:root) {
   }
 
   .mobileDetail{
-    inset: var(--headerH) 0 0 0;
+    inset: 0 0 0 0;
     z-index: 250;
   }
 
@@ -4382,7 +4382,7 @@ svg:not(:root) {
   }
 
   .mobileDetail{
-    inset: calc(var(--headerH) - 1px) 0 0 0 !important;
+    inset: 0 0 0 0 !important;
     padding-top: 0 !important;
   }
 
@@ -4482,7 +4482,7 @@ svg:not(:root) {
 /* March 16 mobile detail overlay: remove back bar and pin content under nav */
 @media (max-width: 980px){
   .mobileDetail{
-    inset: var(--headerH) 0 0 0 !important;
+    inset: 0 0 0 0 !important;
     padding-top: 0 !important;
   }
 
@@ -4512,7 +4512,8 @@ svg:not(:root) {
 /* March 16 mobile calendar/detail + directory anchor refinements */
 @media (max-width: 980px){
   .pageShell[data-mobile-detail-open="true"]{
-    height: calc(100dvh - var(--headerH));
+    height: 100%;
+    min-height: 0;
     overflow: hidden;
   }
 
@@ -4527,7 +4528,7 @@ svg:not(:root) {
 
   .mobileDetail{
     position: fixed !important;
-    inset: var(--headerH) 0 0 0 !important;
+    inset: 0 0 0 0 !important;
     z-index: 260 !important;
     background: var(--bg) !important;
     overscroll-behavior: contain;
@@ -4678,7 +4679,7 @@ svg:not(:root) {
   }
 
   .mobileDetail{
-    inset: var(--headerH) 0 0 0 !important;
+    inset: 0 0 0 0 !important;
   }
 
   .mobileDetailScroll,
@@ -5961,7 +5962,7 @@ html[data-route-switching="true"] .routeFrame{
   }
 
   .mobileDetail{
-    inset: var(--headerH) 0 calc(82px + env(safe-area-inset-bottom, 0px)) 0 !important;
+    inset: 0 0 calc(82px + env(safe-area-inset-bottom, 0px)) 0 !important;
     z-index: 260 !important;
   }
 
@@ -6244,7 +6245,7 @@ html[data-route-switching="true"] .routeFrame{
   }
 
   .mobileDetail{
-    inset: var(--headerH) 0 0 0 !important;
+    inset: 0 0 0 0 !important;
     z-index: 430 !important;
   }
 
@@ -9335,7 +9336,7 @@ body[data-layout="content"] .simplePage{
   }
 
   .pageShell[data-mobile-detail-open="true"] .mobileDetail{
-    inset: var(--headerH) 0 calc(52px + env(safe-area-inset-bottom, 0px)) 0 !important;
+    inset: 0 0 calc(52px + env(safe-area-inset-bottom, 0px)) 0 !important;
     height: auto !important;
     max-height: none !important;
   }
@@ -9365,7 +9366,6 @@ body[data-layout="content"] .simplePage{
     right: 0 !important;
     bottom: 0 !important;
     z-index: 500000 !important;
-    padding-bottom: calc(10px + max(16px, env(safe-area-inset-bottom, 0px))) !important;
   }
 }
 
@@ -9399,14 +9399,14 @@ body[data-layout="content"] .simplePage{
 }
 
 .nw__slider__text{
+  display: block;
   width: 100%;
+  min-width: 0;
   line-height: 1.2;
   letter-spacing: 0.025em;
-  max-height: 2.2em;
   overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   color: var(--text);
   font-size: inherit;
 }
@@ -9418,6 +9418,12 @@ body[data-layout="content"] .simplePage{
 @media screen and (min-width: 768px){
   .nw__slider__text{
     text-align: right;
+  }
+}
+
+@media (max-width: 980px){
+  .newsBar .nw__slider__text{
+    font-size: 0.79rem;
   }
 }
 

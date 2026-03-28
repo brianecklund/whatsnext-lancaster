@@ -332,6 +332,7 @@ export default function LocationsSplitClient({
       tagline="A directory of places in Lancaster to explore."
       taglineHidden={taglineHidden}
       isMobile={effectiveIsMobile}
+      mobileDetailOpen={mobileDetailOpen}
       current={resolvedSection === "calendar" ? "calendar" : resolvedSection === "updates" ? "updates" : "directory"}
       onNavigateSection={onNavigateSection}
       hideDefaultIntro={effectiveIsMobile && !mobileDetailOpen}

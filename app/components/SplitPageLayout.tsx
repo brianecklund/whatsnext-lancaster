@@ -9,6 +9,7 @@ type Props = {
   tagline: string;
   taglineHidden?: boolean;
   isMobile?: boolean;
+  mobileDetailOpen?: boolean;
   current: PageKey;
   children: ReactNode;
   mobileOverlay?: ReactNode;
@@ -22,6 +23,7 @@ export default function SplitPageLayout({
   tagline,
   taglineHidden = false,
   isMobile = false,
+  mobileDetailOpen = false,
   current,
   children,
   mobileOverlay,
@@ -31,7 +33,11 @@ export default function SplitPageLayout({
   hideDefaultIntro = false,
 }: Props) {
   return (
-    <div className="pageShell" style={style}>
+    <div
+      className="pageShell"
+      style={style}
+      data-mobile-detail-open={isMobile && mobileDetailOpen ? "true" : "false"}
+    >
       {topBar ?? (!hideDefaultIntro ? (
         <section className={`newsBar pageIntroBar ${taglineHidden ? "pageIntroBarHidden" : ""}`} aria-label="Page introduction">
           <div className="newsBar__intro">{tagline}</div>
