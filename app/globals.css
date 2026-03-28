@@ -1463,7 +1463,7 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 
 .eventRowDesc{
   margin-top: 2px;
-  font-size: clamp(0.95rem, 0.92rem + 0.1vw, 1rem);
+  font-size: clamp(0.82rem, 0.8rem + 0.08vw, 0.9rem);
   line-height: 1.32;
   opacity: 0.88;
   transition: transform 220ms ease, opacity 220ms ease;
@@ -2940,9 +2940,15 @@ a:hover{
 
 /* Directory filter dropdown */
 .filterBtn[data-active="true"]{
-  background: var(--text);
+  background: color-mix(in srgb, var(--text) 72%, var(--panel) 28%);
   color: #fff;
-  border-color: var(--text);
+  border-color: color-mix(in srgb, var(--text) 55%, var(--border) 45%);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+}
+
+.filterBtn[data-active="true"] .btnIconImg{
+  filter: brightness(0) invert(1);
+  opacity: 0.95;
 }
 
 .filterDropdown{
@@ -3293,6 +3299,59 @@ a:hover{
 .mobileMenuSheet{ min-height: 100dvh; padding-top: max(16px, env(safe-area-inset-top)); }
 .mobileMenuList{ gap: 14px; }
 .mobileMenuActionText{ display:block; }
+
+/* Mobile: hamburger + palette sheets drop from below the site header */
+@media (max-width: 980px){
+  .mobileSheetOverlay.mobileSheetOverlay--fromNav{
+    inset: var(--headerH) 0 0 0;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    padding: 0;
+    background: rgba(0, 0, 0, 0.42);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    animation: mobileNavOverlayFade 280ms ease both;
+  }
+
+  .mobileSheetOverlay--fromNav .mobileSheet{
+    min-height: 0;
+    flex: 0 1 auto;
+    width: 100%;
+    max-height: min(86dvh, 720px);
+    margin: 0;
+    padding: 14px 16px 22px;
+    border-radius: 0 0 22px 22px;
+    box-shadow: 0 20px 48px rgba(0, 0, 0, 0.2);
+    animation: mobileNavSheetDrop 340ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+}
+
+@keyframes mobileNavOverlayFade{
+  from{ opacity: 0; }
+  to{ opacity: 1; }
+}
+
+@keyframes mobileNavSheetDrop{
+  from{
+    opacity: 0;
+    transform: translateY(calc(-100% - 6px));
+  }
+  to{
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .mobileSheetOverlay--fromNav,
+  .mobileSheetOverlay--fromNav .mobileSheet{
+    animation: none !important;
+  }
+}
 
 @media (min-width: 981px){
   .mobileSheetOverlay{ display:none; }
@@ -4494,7 +4553,8 @@ svg:not(:root) {
   }
 
   .themeToggleBtn,
-  .hamburgerBtn{
+  .hamburgerBtn,
+  .clockToggleBtn{
     width: 34px !important;
     height: 34px !important;
     min-width: 34px;
@@ -4503,8 +4563,20 @@ svg:not(:root) {
     box-shadow: none;
   }
 
+  .clockToggleBtn{
+    border-color: var(--border) !important;
+    background: var(--btnSurface) !important;
+    color: var(--text) !important;
+  }
+
   .themeToggleIcon,
   .themeToggleIcon svg{
+    width: 16px;
+    height: 16px;
+  }
+
+  .clockToggleIcon,
+  .clockToggleIcon svg{
     width: 16px;
     height: 16px;
   }
@@ -6764,11 +6836,15 @@ body{
   }
 
   /* Calendar list: horizontal inset matches nav only (scroll already uses --panePadX) */
-  .paneLeft > .scroll .calendarListMonthSwap .weeklyOverview,
   .paneLeft > .scroll .calendarListMonthSwap .dayBlock,
   .paneLeft > .scroll .calendarListMonthSwap .emptyList{
     padding-left: 0 !important;
     padding-right: 0 !important;
+  }
+
+  .paneLeft > .scroll .calendarListMonthSwap .weeklyOverview{
+    padding-left: 16px !important;
+    padding-right: 16px !important;
   }
 
   .paneLeft > .scroll .calendarListMonthSwap .eventRow{
@@ -8572,6 +8648,8 @@ body[data-layout="content"] .simplePage{
   align-items:baseline;
   justify-content:space-between;
   gap: 12px;
+  position: relative;
+  z-index: 2;
 }
 
 .clockTitle{
@@ -8600,11 +8678,11 @@ body[data-layout="content"] .simplePage{
   gap: 10px;
   padding: 10px 12px;
   border-radius: 999px;
-  border: 1px solid #111;
-  background: transparent;
+  border: 1px solid var(--border);
+  background: var(--btnSurface, #fff);
   cursor: pointer;
-  color: #111;
-  opacity: 0.85;
+  color: var(--text);
+  opacity: 0.92;
   transition: opacity 140ms ease, box-shadow 140ms ease, transform 140ms ease;
 }
 
@@ -8626,19 +8704,39 @@ body[data-layout="content"] .simplePage{
   opacity: 0.75;
 }
 
-.clockDayMenu{
+.clockDayMenuPortal{
+  position: fixed;
+  inset: 0;
+  z-index: 10060;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: calc(var(--headerH) + 10px) 18px 28px;
+  box-sizing: border-box;
+  pointer-events: auto;
+}
+
+.clockDayMenuBackdrop{
   position: absolute;
-  top: calc(100% + 10px);
-  right: 0;
-  width: min(520px, calc(100vw - 40px));
-  max-height: min(60vh, 520px);
-  overflow:auto;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.clockDayMenuPanel{
+  position: relative;
+  width: min(520px, calc(100vw - 36px));
+  max-height: min(70vh, 560px);
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
   border-radius: 18px;
-  border: 1px solid #111;
+  border: 1px solid var(--border);
   background: var(--bg);
-  box-shadow: 0 18px 44px rgba(0,0,0,0.14);
+  box-shadow: var(--shadowCard);
   padding: 8px;
-  z-index: 900;
+  z-index: 1;
+  color: var(--text);
 }
 
 .clockDayMenuItem{
@@ -8653,7 +8751,7 @@ body[data-layout="content"] .simplePage{
   border: 1px solid transparent;
   background: transparent;
   cursor: pointer;
-  color: #111;
+  color: var(--text);
 }
 
 .clockDayMenuItem:hover{
@@ -8661,8 +8759,8 @@ body[data-layout="content"] .simplePage{
 }
 
 .clockDayMenuItem[data-active="true"]{
-  border-color: #111;
-  box-shadow: 0 0 0 3px rgba(17,17,17,0.06);
+  border-color: var(--border);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 35%, transparent);
 }
 
 .clockDayMenuItemMain{
@@ -8728,6 +8826,8 @@ body[data-layout="content"] .simplePage{
   flex-direction:column;
   align-items:center;
   gap: 18px;
+  position: relative;
+  z-index: 0;
 }
 
 .clockFaceWrap{
@@ -8934,8 +9034,8 @@ body[data-layout="content"] .simplePage{
     justify-content:space-between;
   }
 
-  .clockDayMenu{
-    width: calc(100vw - 40px);
+  .clockDayMenuPanel{
+    width: calc(100vw - 32px);
   }
 
   .clockEventRow{

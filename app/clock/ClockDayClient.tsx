@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { EventLite } from "@/lib/types";
 import { dayKey, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
@@ -72,6 +73,7 @@ export default function ClockDayClient({ events }: Props) {
   const [hoveredKey, setHoveredKey] = useState<string | null>(null);
   const [dayMenuOpen, setDayMenuOpen] = useState(false);
   const daySelectRef = useRef<HTMLDivElement | null>(null);
+  const dayMenuPortalRef = useRef<HTMLDivElement | null>(null);
 
   const selectedDayDate = useMemo(() => {
     const parsed = parseDayKey(dayParam);
@@ -132,9 +134,9 @@ export default function ClockDayClient({ events }: Props) {
       if (e.key === "Escape") setDayMenuOpen(false);
     };
     const onPointerDown = (e: PointerEvent) => {
-      const root = daySelectRef.current;
-      if (!root) return;
-      if (root.contains(e.target as Node)) return;
+      const t = e.target as Node;
+      if (daySelectRef.current?.contains(t)) return;
+      if (dayMenuPortalRef.current?.contains(t)) return;
       setDayMenuOpen(false);
     };
     window.addEventListener("keydown", onKeyDown);
@@ -142,6 +144,15 @@ export default function ClockDayClient({ events }: Props) {
     return () => {
       window.removeEventListener("keydown", onKeyDown);
       window.removeEventListener("pointerdown", onPointerDown);
+    };
+  }, [dayMenuOpen]);
+
+  useEffect(() => {
+    if (!dayMenuOpen) return;
+    const prev = document.documentElement.style.overflow;
+    document.documentElement.style.overflow = "hidden";
+    return () => {
+      document.documentElement.style.overflow = prev;
     };
   }, [dayMenuOpen]);
 
@@ -203,37 +214,52 @@ export default function ClockDayClient({ events }: Props) {
             <span className="clockDaySelectChevron" aria-hidden>▾</span>
           </button>
 
-          {dayMenuOpen ? (
-            <div className="clockDayMenu" role="listbox" aria-label="Choose day">
-              {dayOptions.map((opt) => {
-                const active = opt.key === selectedDayStr;
-                const count = eventsCountByDay.get(opt.key) ?? 0;
-                return (
-                  <button
-                    key={opt.key}
-                    type="button"
-                    className="clockDayMenuItem"
-                    role="option"
-                    aria-selected={active ? "true" : "false"}
-                    data-active={active ? "true" : "false"}
-                    onClick={() => {
-                      router.push(`/clock?day=${encodeURIComponent(opt.key)}`);
-                      setHoveredKey(null);
-                      setDayMenuOpen(false);
-                    }}
-                  >
-                    <span className="clockDayMenuItemMain">
-                      <span className="clockDayMenuItemDow">{opt.date.toLocaleDateString(undefined, { weekday: "short" })}</span>
-                      <span className="clockDayMenuItemDate">{opt.key}</span>
-                    </span>
-                    <span className="clockDayMenuItemCount" aria-hidden>{count ? `${count}` : ""}</span>
-                  </button>
-                );
-              })}
-            </div>
-          ) : null}
         </div>
       </header>
+
+      {dayMenuOpen && typeof document !== "undefined"
+        ? createPortal(
+            <div className="clockDayMenuPortal" ref={dayMenuPortalRef}>
+              <div
+                className="clockDayMenuBackdrop"
+                aria-hidden="true"
+                onClick={() => setDayMenuOpen(false)}
+              />
+              <div className="clockDayMenuPanel" role="listbox" aria-label="Choose day">
+                {dayOptions.map((opt) => {
+                  const active = opt.key === selectedDayStr;
+                  const count = eventsCountByDay.get(opt.key) ?? 0;
+                  return (
+                    <button
+                      key={opt.key}
+                      type="button"
+                      className="clockDayMenuItem"
+                      role="option"
+                      aria-selected={active ? "true" : "false"}
+                      data-active={active ? "true" : "false"}
+                      onClick={() => {
+                        router.push(`/clock?day=${encodeURIComponent(opt.key)}`);
+                        setHoveredKey(null);
+                        setDayMenuOpen(false);
+                      }}
+                    >
+                      <span className="clockDayMenuItemMain">
+                        <span className="clockDayMenuItemDow">
+                          {opt.date.toLocaleDateString(undefined, { weekday: "short" })}
+                        </span>
+                        <span className="clockDayMenuItemDate">{opt.key}</span>
+                      </span>
+                      <span className="clockDayMenuItemCount" aria-hidden>
+                        {count ? `${count}` : ""}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>,
+            document.body,
+          )
+        : null}
 
       <section className="clockLayout" aria-label="Analog clock with event markers">
         <div className="clockFaceWrap">

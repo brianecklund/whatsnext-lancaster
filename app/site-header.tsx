@@ -234,7 +234,12 @@ export default function SiteHeader() {
 
       {open && typeof document !== "undefined"
         ? createPortal(
-            <div className="mobileSheetOverlay mobileMenuOverlay" role="dialog" aria-modal="true" onClick={() => setOpen(false)}>
+            <div
+              className="mobileSheetOverlay mobileMenuOverlay mobileSheetOverlay--fromNav"
+              role="dialog"
+              aria-modal="true"
+              onClick={() => setOpen(false)}
+            >
               <div className="mobileSheet mobileMenuSheet" onClick={(e) => e.stopPropagation()}>
                 <div className="mobileSheetHeader">
                   <div className="mobileSheetTitle">Menu</div>
@@ -270,7 +275,12 @@ export default function SiteHeader() {
 
       {themeMenuOpen && typeof document !== "undefined"
         ? createPortal(
-            <div className="mobileSheetOverlay mobileThemeOverlay" role="dialog" aria-modal="true" onClick={() => setThemeMenuOpen(false)}>
+            <div
+              className="mobileSheetOverlay mobileThemeOverlay mobileSheetOverlay--fromNav"
+              role="dialog"
+              aria-modal="true"
+              onClick={() => setThemeMenuOpen(false)}
+            >
               <div className="mobileSheet mobileThemeSheet" onClick={(e) => e.stopPropagation()}>
                 <div className="mobileSheetHeader">
                   <div className="mobileSheetTitle">Choose palette</div>
