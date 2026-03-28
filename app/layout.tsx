@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import "./globals.css";
 import type { Metadata } from "next";
+import PageRevealRoot from "./components/PageRevealRoot";
 import SiteHeader from "./site-header";
 import ThemeBoot from "./ThemeBoot";
 
@@ -26,10 +27,12 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeBoot />
-        <Suspense fallback={null}>
-          <SiteHeader />
-        </Suspense>
-        {children}
+        <PageRevealRoot>
+          <Suspense fallback={null}>
+            <SiteHeader />
+          </Suspense>
+          {children}
+        </PageRevealRoot>
       </body>
     </html>
   );

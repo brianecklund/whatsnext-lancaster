@@ -2556,19 +2556,19 @@ a:hover{
 .wnl-intro .leftTop,
 .wnl-intro .leftSticky{
   opacity: 0;
-  animation: wnlFadeUp 360ms ease forwards;
+  animation: wnlFadeUp 520ms ease forwards;
 }
 .wnl-intro button.eventRow,
 .wnl-intro button.weeklyCondRow,
 .wnl-intro button.weeklyOverview{
   opacity: 0;
-  animation: wnlFadeUp 360ms ease forwards;
-  animation-delay: calc(160ms + (var(--i, 0) * 18ms));
+  animation: wnlFadeUp 520ms ease forwards;
+  animation-delay: calc(200ms + (var(--i, 0) * 26ms));
 }
 .wnl-intro .rightPane{
   opacity: 0;
-  animation: wnlFadeUp 420ms ease forwards;
-  animation-delay: 260ms;
+  animation: wnlFadeUp 580ms ease forwards;
+  animation-delay: 320ms;
 }
 @media (prefers-reduced-motion: reduce){
   .wnl-intro .leftTop,
@@ -5360,8 +5360,8 @@ html[data-route-switching="true"] .routeFrame{
 .shellSwap[data-content-switching="true"] [data-switch-item="true"]{
   opacity: 0;
   transform: translateY(12px);
-  animation: shellContentCascade 440ms cubic-bezier(.22,1,.36,1) forwards;
-  animation-delay: calc(var(--switch-index, 0) * 28ms);
+  animation: shellContentCascade 560ms cubic-bezier(.22,1,.36,1) forwards;
+  animation-delay: calc(var(--switch-index, 0) * 38ms);
   will-change: opacity, transform;
 }
 
@@ -5376,7 +5376,7 @@ html[data-route-switching="true"] .routeFrame{
 .shellIntro--active [data-intro-item="true"]{
   opacity: 0;
   transform: translateY(12px);
-  animation: shellIntroCascade 640ms cubic-bezier(.22,1,.36,1) forwards;
+  animation: shellIntroCascade 900ms cubic-bezier(.22,1,.36,1) forwards;
   will-change: opacity, transform;
 }
 
@@ -5386,11 +5386,11 @@ html[data-route-switching="true"] .routeFrame{
 }
 
 .shellIntro--active .leftSticky{
-  animation-delay: 80ms;
+  animation-delay: 110ms;
 }
 
 .shellIntro--active [data-intro-item="true"]{
-  animation-delay: calc(130ms + (var(--intro-index, 0) * 38ms));
+  animation-delay: calc(180ms + (var(--intro-index, 0) * 52ms));
 }
 
 @keyframes shellIntroCascade{
@@ -8783,5 +8783,165 @@ body[data-layout="content"] .simplePage{
   .clockEventRow{
     border-radius: 16px;
     padding: 11px 11px;
+  }
+}
+
+/* --- Sitewide UI reveal: smooth fade + top-down cascade (PageRevealRoot) --- */
+.wnlPageRevealRoot{
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.wnlPageRevealRoot > .siteHeader{
+  flex: 0 0 auto;
+}
+
+.wnlPageRevealRoot > *:last-child{
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.wnlPageRevealRoot .siteHeader,
+.wnlPageRevealRoot .pageShell,
+.wnlPageRevealRoot .shellSwap,
+.wnlPageRevealRoot .shellSwap__panel,
+.wnlPageRevealRoot main.contentPage,
+.wnlPageRevealRoot .simplePage{
+  will-change: opacity, transform;
+}
+
+.wnlPageRevealRoot .siteHeader{
+  transition:
+    opacity 980ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 980ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wnlPageRevealRoot:not(.wnlPageRevealRoot--headerReady) .siteHeader{
+  opacity: 0;
+  transform: translateY(14px);
+}
+
+.wnlPageRevealRoot--headerReady .siteHeader{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wnlPageRevealRoot .pageShell,
+.wnlPageRevealRoot .shellSwap,
+.wnlPageRevealRoot .shellSwap__panel,
+.wnlPageRevealRoot main.contentPage,
+.wnlPageRevealRoot .simplePage{
+  transition:
+    opacity 1100ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .pageShell,
+.wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .shellSwap,
+.wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .shellSwap__panel,
+.wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) main.contentPage,
+.wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .simplePage{
+  opacity: 0;
+  transform: translateY(22px);
+}
+
+.wnlPageRevealRoot--contentReady .pageShell,
+.wnlPageRevealRoot--contentReady .shellSwap,
+.wnlPageRevealRoot--contentReady .shellSwap__panel,
+.wnlPageRevealRoot--contentReady main.contentPage,
+.wnlPageRevealRoot--contentReady .simplePage{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Inner cascade: split panes + stacked sections */
+.wnlPageRevealRoot .split > *,
+.wnlPageRevealRoot .contentPage > *,
+.wnlPageRevealRoot .simplePage > *{
+  transition:
+    opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .split > *,
+.wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .contentPage > *,
+.wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .simplePage > *{
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.wnlPageRevealRoot--contentReady .split > *,
+.wnlPageRevealRoot--contentReady .contentPage > *,
+.wnlPageRevealRoot--contentReady .simplePage > *{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wnlPageRevealRoot--contentReady .split > *:nth-child(1),
+.wnlPageRevealRoot--contentReady .contentPage > *:nth-child(1),
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(1){ transition-delay: 140ms; }
+
+.wnlPageRevealRoot--contentReady .split > *:nth-child(2),
+.wnlPageRevealRoot--contentReady .contentPage > *:nth-child(2),
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(2){ transition-delay: 230ms; }
+
+.wnlPageRevealRoot--contentReady .split > *:nth-child(3),
+.wnlPageRevealRoot--contentReady .contentPage > *:nth-child(3),
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(3){ transition-delay: 320ms; }
+
+.wnlPageRevealRoot--contentReady .split > *:nth-child(4),
+.wnlPageRevealRoot--contentReady .contentPage > *:nth-child(4),
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(4){ transition-delay: 410ms; }
+
+.wnlPageRevealRoot--contentReady .split > *:nth-child(5),
+.wnlPageRevealRoot--contentReady .contentPage > *:nth-child(5),
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(5){ transition-delay: 500ms; }
+
+.wnlPageRevealRoot--contentReady .split > *:nth-child(6),
+.wnlPageRevealRoot--contentReady .contentPage > *:nth-child(6),
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(6){ transition-delay: 590ms; }
+
+.wnlPageRevealRoot--contentReady .split > *:nth-child(7),
+.wnlPageRevealRoot--contentReady .contentPage > *:nth-child(7),
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(7){ transition-delay: 680ms; }
+
+.wnlPageRevealRoot--contentReady .split > *:nth-child(8),
+.wnlPageRevealRoot--contentReady .contentPage > *:nth-child(8),
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(8){ transition-delay: 770ms; }
+
+.wnlPageRevealRoot--contentReady .split > *:nth-child(n+9),
+.wnlPageRevealRoot--contentReady .contentPage > *:nth-child(n+9),
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(n+9){ transition-delay: 860ms; }
+
+/* Optional blocks: wrap with <RevealSection /> */
+.wnl-reveal{
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wnl-reveal--visible{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce){
+  .wnlPageRevealRoot .siteHeader,
+  .wnlPageRevealRoot .pageShell,
+  .wnlPageRevealRoot .shellSwap,
+  .wnlPageRevealRoot .shellSwap__panel,
+  .wnlPageRevealRoot main.contentPage,
+  .wnlPageRevealRoot .simplePage,
+  .wnlPageRevealRoot .split > *,
+  .wnlPageRevealRoot .contentPage > *,
+  .wnlPageRevealRoot .simplePage > *,
+  .wnl-reveal{
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
   }
 }
