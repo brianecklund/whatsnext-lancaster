@@ -5,6 +5,7 @@ import ToolbarIcon from "@/app/components/ToolbarIcon";
 import NewsTickerBar from "@/app/components/NewsTickerBar";
 import SegmentedControl from "@/app/components/SegmentedControl";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
+import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
 import type { LocationLite } from "@/lib/types";
@@ -49,6 +50,7 @@ type Props = {
 const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 
 export default function LocationsSplitClient({ locations = [], currentSection, onNavigateSection, basePath = "/locations" }: Props) {
+  useSmoothWheel(".scroll");
   const router = useRouter();
   const pathname = usePathname();
   const resolvedSection = currentSection ?? (pathname?.startsWith("/updates") ? "updates" : pathname?.startsWith("/locations") ? "directory" : "calendar");

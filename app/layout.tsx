@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import "./globals.css";
 import type { Metadata } from "next";
+import ContentLayoutScrollMomentum from "./components/ContentLayoutScrollMomentum";
 import PageRevealRoot from "./components/PageRevealRoot";
 import SiteHeader from "./site-header";
 import ThemeBoot from "./ThemeBoot";
@@ -27,6 +28,7 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeBoot />
+        <ContentLayoutScrollMomentum />
         <PageRevealRoot>
           <Suspense fallback={null}>
             <SiteHeader />
