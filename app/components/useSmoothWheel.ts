@@ -42,9 +42,9 @@ export function attachInertialScroll(el: HTMLElement, options?: SmoothWheelOptio
   let raf: number | null = null;
   let velocity = 0;
 
-  const IMPULSE = 0.05;
-  const FRICTION = 0.968;
-  const MAX_V = 52;
+  const IMPULSE = 0.038;
+  const FRICTION = 0.955;
+  const MAX_V = 40;
   const STOP_EPS = 0.055;
 
   const tick = () => {
@@ -55,20 +55,21 @@ export function attachInertialScroll(el: HTMLElement, options?: SmoothWheelOptio
       return;
     }
 
-    let st = el.scrollTop;
-    let v = velocity;
-    st += v;
+    const st = el.scrollTop;
+    const v = velocity;
+    const next = st + v;
 
-    if (st <= 0) {
-      st = 0;
-      v *= -0.16;
-    } else if (st >= maxScroll) {
-      st = maxScroll;
-      v *= -0.16;
+    if (next <= 0) {
+      el.scrollTop = 0;
+      velocity = 0;
+    } else if (next >= maxScroll) {
+      el.scrollTop = maxScroll;
+      velocity = 0;
+    } else {
+      el.scrollTop = next;
+      velocity = v * FRICTION;
     }
 
-    el.scrollTop = st;
-    velocity = v * FRICTION;
     options?.onProgrammaticScroll?.(el);
 
     if (Math.abs(velocity) < STOP_EPS) {

@@ -8973,30 +8973,26 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(n+9),
 .wnlPageRevealRoot--contentReady .simplePage > *:nth-child(n+9){ transition-delay: 860ms; }
 
-/* Calendar weekly overview (nested in right pane): cascade after split columns */
-.wnlPageRevealRoot .weeklyOverviewLanding > *{
-  transition:
-    opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+/* Weekly overview: staggered fade/slide on mount (same timing as main.contentPage sections; runs again when the block remounts, e.g. returning from an event). */
+@keyframes wnlWeeklyOverviewBlockIn{
+  from{ opacity: 0; transform: translateY(18px); }
+  to{ opacity: 1; transform: translateY(0); }
 }
 
-.wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .weeklyOverviewLanding > *{
+.weeklyOverviewLanding > *{
   opacity: 0;
-  transform: translateY(18px);
+  animation: wnlWeeklyOverviewBlockIn 1000ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
 
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *{
-  opacity: 1;
-  transform: translateY(0);
-}
-
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(1){ transition-delay: 360ms; }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(2){ transition-delay: 430ms; }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(3){ transition-delay: 500ms; }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(4){ transition-delay: 570ms; }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(5){ transition-delay: 640ms; }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(6){ transition-delay: 710ms; }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(n+7){ transition-delay: 780ms; }
+.weeklyOverviewLanding > *:nth-child(1){ animation-delay: 140ms; }
+.weeklyOverviewLanding > *:nth-child(2){ animation-delay: 230ms; }
+.weeklyOverviewLanding > *:nth-child(3){ animation-delay: 320ms; }
+.weeklyOverviewLanding > *:nth-child(4){ animation-delay: 410ms; }
+.weeklyOverviewLanding > *:nth-child(5){ animation-delay: 500ms; }
+.weeklyOverviewLanding > *:nth-child(6){ animation-delay: 590ms; }
+.weeklyOverviewLanding > *:nth-child(7){ animation-delay: 680ms; }
+.weeklyOverviewLanding > *:nth-child(8){ animation-delay: 770ms; }
+.weeklyOverviewLanding > *:nth-child(n+9){ animation-delay: 860ms; }
 
 /* Optional blocks: wrap with <RevealSection /> */
 .wnl-reveal{
@@ -9023,7 +9019,6 @@ body[data-layout="content"] .simplePage{
   .wnlPageRevealRoot .contentPage > *,
   .wnlPageRevealRoot main.contentPage > *,
   .wnlPageRevealRoot .simplePage > *,
-  .wnlPageRevealRoot .weeklyOverviewLanding > *,
   .wnl-reveal{
     opacity: 1 !important;
     transform: none !important;

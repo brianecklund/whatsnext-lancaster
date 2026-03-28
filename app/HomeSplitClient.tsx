@@ -1471,14 +1471,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
 
               {viewMode === "list" && selectedWeekBucket ? (
                 <div className="rightHeader weeklyOverviewLanding">
-                  <div
-                    className="rightDayLabel fadeInItem"
-                    style={{ animationDelay: "260ms" }}
-                  >
-                    Weekly Overview
-                  </div>
+                  <div className="rightDayLabel">Weekly Overview</div>
 
-                  <div className="weekSelectorRail fadeInItem" style={{ animationDelay: "320ms" }}>
+                  <div className="weekSelectorRail">
                     {weekBuckets.map((bucket) => (
                       <button
                         key={bucket.key}
@@ -1494,7 +1489,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     ))}
                   </div>
 
-                  <div className="weekSummary fadeInItem" style={{ animationDelay: "360ms" }}>
+                  <div className="weekSummary">
                     <div className="weekSummaryTopline">
                       <div>
                         <h3 className="weekSummaryTitle">{selectedWeekBucket.label}</h3>
@@ -1567,7 +1562,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   {filteredWeekEvents.length === 0 ? (
                     <div className="emptyRight">No events match this weekly overview filter right now.</div>
                   ) : (
-                    <div className="weeklyLanding fadeInItem" style={{ animationDelay: "420ms" }}>
+                    <div className="weeklyLanding">
                       <div className="weeklyCards">
                         {weekGroups.map((g) => (
                           <div key={dayKey(g.date)} className="weeklyDayGroup">
