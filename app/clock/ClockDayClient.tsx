@@ -1,14 +1,17 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { useRouter, useSearchParams } from "next/navigation";
 import type { EventLite } from "@/lib/types";
 import { dayKey, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
 import MediaBlocks from "@/app/components/MediaBlocks";
+import EventClockLink from "@/app/components/EventClockLink";
 
 type Props = {
   events: EventLite[];
+  /** `embedded`: navigate with `/?view=clock&…` (calendar shell). `standalone`: `/clock?…` page. */
+  navigationMode?: "standalone" | "embedded";
 };
 
 function parseDayKey(ymd: string): Date | null {
@@ -57,9 +60,26 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
-export default function ClockDayClient({ events }: Props) {
+export default function ClockDayClient({ events, navigationMode = "standalone" }: Props) {
   const router = useRouter();
   const sp = useSearchParams();
+  const embedded = navigationMode === "embedded";
+
+  const pushClockUrl = useCallback(
+    (nextDay: string) => {
+      if (embedded) {
+        const p = new URLSearchParams();
+        p.set("view", "clock");
+        p.set("day", nextDay);
+        const ev = sp.get("event");
+        if (ev) p.set("event", ev);
+        router.push(`/?${p.toString()}`);
+      } else {
+        router.push(`/clock?day=${encodeURIComponent(nextDay)}`);
+      }
+    },
+    [embedded, router, sp],
+  );
   const dayParam = sp.get("day") ?? "";
   const eventParam = sp.get("event") ?? "";
 
@@ -199,9 +219,9 @@ export default function ClockDayClient({ events }: Props) {
   const hourAngle = hour * 30; // 360/12
 
   return (
-    <main className="contentPage clockPage">
+    <main className={embedded ? "clockPage clockPage--embed" : "contentPage clockPage"}>
       <header className="clockHeader">
-        <h1 className="clockTitle">Calendar Clock</h1>
+        <h1 className="clockTitle">{embedded ? "Clock view" : "Calendar Clock"}</h1>
         <div ref={daySelectRef} className="clockDaySelect" aria-label="Select a day">
           <button
             type="button"
@@ -238,7 +258,7 @@ export default function ClockDayClient({ events }: Props) {
                       aria-selected={active ? "true" : "false"}
                       data-active={active ? "true" : "false"}
                       onClick={() => {
-                        router.push(`/clock?day=${encodeURIComponent(opt.key)}`);
+                        pushClockUrl(opt.key);
                         setHoveredKey(null);
                         setDayMenuOpen(false);
                       }}
@@ -381,7 +401,9 @@ export default function ClockDayClient({ events }: Props) {
                     onFocus={() => setHoveredKey(key)}
                     onBlur={() => setHoveredKey((prev) => (prev === key ? null : prev))}
                   >
-                    <div className="clockEventTime">{timeLabel}</div>
+                    <EventClockLink event={e} className="clockEventTime">
+                      {timeLabel}
+                    </EventClockLink>
                     <div className="clockEventTitle">{title}</div>
                     {metaBits ? <div className="clockEventMeta">{metaBits}</div> : null}
 

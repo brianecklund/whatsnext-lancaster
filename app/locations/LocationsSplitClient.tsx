@@ -462,9 +462,10 @@ export default function LocationsSplitClient({
       mobileDetailOpen={mobileDetailOpen}
       current={resolvedSection === "calendar" ? "calendar" : resolvedSection === "updates" ? "updates" : "directory"}
       onNavigateSection={onNavigateSection}
-      hideDefaultIntro={effectiveIsMobile && !mobileDetailOpen}
-      topBar={effectiveIsMobile && !mobileDetailOpen ? (
+      hideDefaultIntro={effectiveIsMobile && mobileDetailOpen}
+      topBar={!(effectiveIsMobile && mobileDetailOpen) ? (
         <NewsTickerBar
+          className={effectiveIsMobile ? undefined : "newsBar--shellDesktop"}
           introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
           items={newsTickerItems}
           updates={updates}

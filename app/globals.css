@@ -119,6 +119,46 @@ body{
   overflow-x: hidden;
 }
 
+/* Settings: typography + text scale (html font-size drives rem-based UI) */
+html[data-font="dm-sans"]{
+  --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
+}
+html[data-font="source-serif"]{
+  --font-sans: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --font-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+}
+html[data-font="jetbrains-mono"]{
+  --font-sans: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  --font-serif: "JetBrains Mono", ui-monospace, monospace;
+}
+
+html[data-text-scale="smaller"]{
+  font-size: 16px;
+}
+html[data-text-scale="larger"]{
+  font-size: 20px;
+}
+
+html[data-a11y-reduced-motion="true"] *,
+html[data-a11y-reduced-motion="true"] *::before,
+html[data-a11y-reduced-motion="true"] *::after{
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+  scroll-behavior: auto !important;
+}
+
+html[data-a11y-enhanced-focus="true"] :focus-visible{
+  outline: 4px solid var(--accent);
+  outline-offset: 4px;
+}
+
+html[data-a11y-link-underline="true"] a{
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 2px;
+}
+
 /* Mobile Safari / iOS: prevent default blue text + native control styling */
 button, input, select, textarea{
   font: inherit;
@@ -172,6 +212,18 @@ img, video, iframe{ max-width:100%; }
 
 a{ color: inherit; text-decoration: none; }
 a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 3px; }
+
+a.eventTimeLink,
+.eventTimeLink{
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-style: dotted;
+  text-underline-offset: 3px;
+  color: inherit;
+}
+a.eventTimeLink:hover{
+  text-decoration-style: solid;
+}
 
 :focus-visible{
   outline: 3px solid var(--accent);
@@ -256,6 +308,133 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
 }
 .hamburgerBtn[data-open="true"] .hamburgerIcon span:nth-child(3){
   transform: translateY(-7px) rotate(-45deg);
+}
+
+.settingsBtn{
+  position: relative;
+  z-index: 260;
+  display: inline-flex;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: #fff;
+  box-shadow: var(--shadowSoft);
+  align-items: center;
+  justify-content: center;
+  margin-top: 2px;
+  transition: transform 320ms var(--ease-snap), background-color 320ms ease, box-shadow 320ms ease;
+  flex: 0 0 auto;
+  touch-action: manipulation;
+  cursor: pointer;
+  padding: 0;
+  color: var(--text);
+}
+
+.settingsBtn:hover{
+  background: var(--hover);
+}
+
+.settingsBtn:active{
+  transform: scale(0.96);
+}
+
+.settingsBtnIcon{
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.settingsBtnIcon svg{
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.settingsSheetScroll{
+  max-height: min(72vh, 640px);
+  overflow-y: auto;
+  padding: 0 4px 20px 0;
+}
+
+.settingsSection{
+  padding: 16px 0 10px;
+  border-top: 1px solid var(--border);
+}
+
+.settingsSection:first-of-type{
+  border-top: 0;
+  padding-top: 4px;
+}
+
+.settingsSectionTitle{
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+  color: var(--muted);
+  font-weight: 600;
+  font-family: var(--font-sans);
+}
+
+.settingsSectionHint{
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+
+.settingsFieldGroup{
+  margin-bottom: 14px;
+}
+
+.settingsFieldLabel{
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--text);
+}
+
+.settingsChipRow{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.settingsChip{
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 0.78rem;
+  background: var(--btnSurface, var(--panel));
+  color: var(--text);
+  cursor: pointer;
+  line-height: 1.2;
+  text-align: left;
+}
+
+.settingsChip[data-active="true"]{
+  border-color: var(--accent);
+  background: var(--hover);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+
+.settingsToggle{
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 10px 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  cursor: pointer;
+  font-family: var(--font-sans);
+}
+
+.settingsToggle input{
+  margin-top: 4px;
+  flex: 0 0 auto;
 }
 
 .menuOverlay{
@@ -4120,6 +4299,7 @@ html[data-theme="ember-signal"]{
 }
 
 .hamburgerBtn,
+.settingsBtn,
 .themeToggleBtn,
 .mobileSheetClose,
 .menuCloseBtn,
@@ -4268,6 +4448,7 @@ html[data-theme="ember-signal"]{
 @media (max-width: 980px){
   .headerActions{ gap: 8px; }
   .themeToggleBtn,
+  .settingsBtn,
   .hamburgerBtn{
     width: 40px;
     height: 40px;
@@ -4916,6 +5097,7 @@ svg:not(:root) {
   }
 
   .themeToggleBtn,
+  .settingsBtn,
   .hamburgerBtn,
   .clockToggleBtn{
     width: 34px !important;

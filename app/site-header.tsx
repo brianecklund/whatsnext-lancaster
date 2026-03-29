@@ -3,9 +3,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { DEFAULT_THEME, THEME_PALETTES, type ThemeKey } from "./theme-palettes";
+import {
+  FONT_OPTIONS,
+  TEXT_SCALE_OPTIONS,
+  applyA11yEnhancedFocus,
+  applyA11yLinkUnderline,
+  applyA11yReducedMotion,
+  applyFontFamily,
+  applyTextScale,
+  applyTheme,
+  type FontFamilyKey,
+  type TextScaleKey,
+} from "@/lib/site-preferences";
 
 const DESKTOP_LINKS = [
   { href: "/donate", label: "Donate" },
@@ -21,6 +33,8 @@ const MOBILE_LINKS = [
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
 ];
+
+const SHEET_CLOSE_MS = 320;
 
 function ThemeIcon({ theme }: { theme: ThemeKey }) {
   switch (theme) {
@@ -70,18 +84,18 @@ function ThemeIcon({ theme }: { theme: ThemeKey }) {
 
 export default function SiteHeader() {
   const pathname = usePathname();
-  const router = useRouter();
-  const sp = useSearchParams();
   const [open, setOpen] = useState(false);
-  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [menuClosing, setMenuClosing] = useState(false);
-  const [themeMenuClosing, setThemeMenuClosing] = useState(false);
+  const [settingsClosing, setSettingsClosing] = useState(false);
   const menuCloseTimerRef = useRef<number | null>(null);
-  const themeCloseTimerRef = useRef<number | null>(null);
-  const [flashKey, setFlashKey] = useState(0);
+  const settingsCloseTimerRef = useRef<number | null>(null);
   const [currentTheme, setCurrentTheme] = useState<ThemeKey>(DEFAULT_THEME);
-
-  const MOBILE_SHEET_CLOSE_MS = 320;
+  const [fontFamily, setFontFamily] = useState<FontFamilyKey>("default");
+  const [textScale, setTextScale] = useState<TextScaleKey>("default");
+  const [a11yMotion, setA11yMotion] = useState(false);
+  const [a11yFocus, setA11yFocus] = useState(false);
+  const [a11yLinks, setA11yLinks] = useState(false);
 
   const clearMenuCloseTimer = useCallback(() => {
     if (menuCloseTimerRef.current != null) {
@@ -90,10 +104,10 @@ export default function SiteHeader() {
     }
   }, []);
 
-  const clearThemeCloseTimer = useCallback(() => {
-    if (themeCloseTimerRef.current != null) {
-      window.clearTimeout(themeCloseTimerRef.current);
-      themeCloseTimerRef.current = null;
+  const clearSettingsCloseTimer = useCallback(() => {
+    if (settingsCloseTimerRef.current != null) {
+      window.clearTimeout(settingsCloseTimerRef.current);
+      settingsCloseTimerRef.current = null;
     }
   }, []);
 
@@ -105,26 +119,26 @@ export default function SiteHeader() {
       setOpen(false);
       setMenuClosing(false);
       menuCloseTimerRef.current = null;
-    }, MOBILE_SHEET_CLOSE_MS);
+    }, SHEET_CLOSE_MS);
   }, [open, menuClosing, clearMenuCloseTimer]);
 
-  const closeThemeMenu = useCallback(() => {
-    if (!themeMenuOpen || themeMenuClosing) return;
-    setThemeMenuClosing(true);
-    clearThemeCloseTimer();
-    themeCloseTimerRef.current = window.setTimeout(() => {
-      setThemeMenuOpen(false);
-      setThemeMenuClosing(false);
-      themeCloseTimerRef.current = null;
-    }, MOBILE_SHEET_CLOSE_MS);
-  }, [themeMenuOpen, themeMenuClosing, clearThemeCloseTimer]);
+  const closeSettings = useCallback(() => {
+    if (!settingsOpen || settingsClosing) return;
+    setSettingsClosing(true);
+    clearSettingsCloseTimer();
+    settingsCloseTimerRef.current = window.setTimeout(() => {
+      setSettingsOpen(false);
+      setSettingsClosing(false);
+      settingsCloseTimerRef.current = null;
+    }, SHEET_CLOSE_MS);
+  }, [settingsOpen, settingsClosing, clearSettingsCloseTimer]);
 
   useEffect(() => {
     return () => {
       clearMenuCloseTimer();
-      clearThemeCloseTimer();
+      clearSettingsCloseTimer();
     };
-  }, [clearMenuCloseTimer, clearThemeCloseTimer]);
+  }, [clearMenuCloseTimer, clearSettingsCloseTimer]);
 
   const currentThemeLabel = useMemo(
     () => THEME_PALETTES.find((theme) => theme.key === currentTheme)?.name ?? "Theme",
@@ -133,18 +147,17 @@ export default function SiteHeader() {
 
   useEffect(() => {
     clearMenuCloseTimer();
-    clearThemeCloseTimer();
+    clearSettingsCloseTimer();
     setMenuClosing(false);
-    setThemeMenuClosing(false);
+    setSettingsClosing(false);
     setOpen(false);
-    setThemeMenuOpen(false);
-    setFlashKey((k) => k + 1);
+    setSettingsOpen(false);
 
     if (typeof document !== "undefined") {
       const isShellRoute = pathname === "/" || pathname?.startsWith("/locations") || pathname?.startsWith("/updates");
       document.body.dataset.layout = isShellRoute ? "shell" : "content";
     }
-  }, [pathname, clearMenuCloseTimer, clearThemeCloseTimer]);
+  }, [pathname, clearMenuCloseTimer, clearSettingsCloseTimer]);
 
   useEffect(() => {
     try {
@@ -159,54 +172,36 @@ export default function SiteHeader() {
   }, []);
 
   useEffect(() => {
-    if (!open && !themeMenuOpen && !menuClosing && !themeMenuClosing) return;
+    try {
+      const f = window.localStorage.getItem("wnl-font") as FontFamilyKey | null;
+      if (f && FONT_OPTIONS.some((o) => o.key === f)) setFontFamily(f);
+    } catch {
+      /* ignore */
+    }
+    try {
+      const s = window.localStorage.getItem("wnl-text-scale") as TextScaleKey | null;
+      if (s && TEXT_SCALE_OPTIONS.some((o) => o.key === s)) setTextScale(s);
+    } catch {
+      /* ignore */
+    }
+    setA11yMotion(window.localStorage.getItem("wnl-a11y-reduced-motion") === "1");
+    setA11yFocus(window.localStorage.getItem("wnl-a11y-enhanced-focus") === "1");
+    setA11yLinks(window.localStorage.getItem("wnl-a11y-link-underline") === "1");
+  }, []);
+
+  useEffect(() => {
+    if (!open && !settingsOpen && !menuClosing && !settingsClosing) return;
     const prev = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
     return () => {
       document.documentElement.style.overflow = prev;
     };
-  }, [open, themeMenuOpen, menuClosing, themeMenuClosing]);
+  }, [open, settingsOpen, menuClosing, settingsClosing]);
 
-  function applyTheme(theme: ThemeKey) {
+  function onPickTheme(theme: ThemeKey) {
     setCurrentTheme(theme);
-    document.documentElement.setAttribute("data-theme", theme);
-    try {
-      window.localStorage.setItem("wnl-theme", theme);
-    } catch {}
+    applyTheme(theme);
   }
-
-  function cycleTheme() {
-    const currentIndex = THEME_PALETTES.findIndex((theme) => theme.key === currentTheme);
-    const nextTheme = THEME_PALETTES[(currentIndex + 1 + THEME_PALETTES.length) % THEME_PALETTES.length];
-    applyTheme(nextTheme.key);
-  }
-
-  function onThemeButtonPress() {
-    if (typeof window !== "undefined" && window.matchMedia("(max-width: 980px)").matches) {
-      clearMenuCloseTimer();
-      setMenuClosing(false);
-      setOpen(false);
-      clearThemeCloseTimer();
-      setThemeMenuClosing(false);
-      setThemeMenuOpen(true);
-      return;
-    }
-    cycleTheme();
-  }
-
-  const clockHref = useMemo(() => {
-    const base = "/clock";
-    if (pathname !== "/") return base;
-
-    const params = new URLSearchParams();
-    const day = sp.get("day");
-    const event = sp.get("event");
-    if (day) params.set("day", day);
-    if (event) params.set("event", event);
-
-    const q = params.toString();
-    return q ? `${base}?${q}` : base;
-  }, [pathname, sp]);
 
   return (
     <header className="siteHeader">
@@ -218,7 +213,7 @@ export default function SiteHeader() {
       </Link>
 
       <nav className="topNav" aria-label="Primary">
-        {DESKTOP_LINKS.map((l, idx) => (
+        {DESKTOP_LINKS.map((l) => (
           <Link
             key={l.href}
             className="navLink"
@@ -245,27 +240,28 @@ export default function SiteHeader() {
       <div className="headerActions">
         <button
           type="button"
-          className="themeToggleBtn"
-          aria-label={`Change color palette. Current palette: ${currentThemeLabel}`}
-          title={`Palette: ${currentThemeLabel}`}
-          onClick={onThemeButtonPress}
+          className="settingsBtn"
+          aria-label="Settings"
+          aria-expanded={settingsOpen ? "true" : "false"}
+          aria-haspopup="dialog"
+          title="Settings"
+          onClick={() => {
+            clearMenuCloseTimer();
+            setMenuClosing(false);
+            setOpen(false);
+            if (settingsOpen) {
+              closeSettings();
+            } else {
+              clearSettingsCloseTimer();
+              setSettingsClosing(false);
+              setSettingsOpen(true);
+            }
+          }}
         >
-          <span className="themeToggleIcon" aria-hidden>
-            <ThemeIcon theme={currentTheme} />
-          </span>
-        </button>
-
-        <button
-          type="button"
-          className="clockToggleBtn"
-          aria-label="Open calendar clock"
-          title="Clock view"
-          onClick={() => router.push(clockHref)}
-        >
-          <span className="clockToggleIcon" aria-hidden>
-            <svg viewBox="0 0 24 24" fill="none">
-              <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.8" />
-              <path d="M12 7.8v4.7l3.2 1.8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+          <span className="settingsBtnIcon" aria-hidden>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z" />
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.53-.43 1.65 1.65 0 0 0-1.08 1.52V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.52 1.65 1.65 0 0 0-1.53.43l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .43-1.53 1.65 1.65 0 0 0-1.52-1.08H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.52-1.08 1.65 1.65 0 0 0-.43-1.53l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.53.43H12a1.65 1.65 0 0 0 1.08-1.52V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1.08 1.52 1.65 1.65 0 0 0 1.53-.43l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.43 1.53V12c0 .53-.21 1.04-.59 1.41l.01.01Z" />
             </svg>
           </span>
         </button>
@@ -277,9 +273,9 @@ export default function SiteHeader() {
           aria-label={open ? "Close menu" : "Open menu"}
           aria-expanded={open ? "true" : "false"}
           onClick={() => {
-            clearThemeCloseTimer();
-            setThemeMenuClosing(false);
-            setThemeMenuOpen(false);
+            clearSettingsCloseTimer();
+            setSettingsClosing(false);
+            setSettingsOpen(false);
             if (open) {
               closeMenu();
             } else {
@@ -308,12 +304,7 @@ export default function SiteHeader() {
               <div className="mobileSheet mobileMenuSheet" onClick={(e) => e.stopPropagation()}>
                 <div className="mobileSheetHeader">
                   <div className="mobileSheetTitle">Menu</div>
-                  <button
-                    type="button"
-                    className="mobileSheetClose"
-                    onClick={() => closeMenu()}
-                    aria-label="Close menu"
-                  >
+                  <button type="button" className="mobileSheetClose" onClick={() => closeMenu()} aria-label="Close menu">
                     ✕
                   </button>
                 </div>
@@ -338,52 +329,139 @@ export default function SiteHeader() {
           )
         : null}
 
-      {themeMenuOpen && typeof document !== "undefined"
+      {settingsOpen && typeof document !== "undefined"
         ? createPortal(
             <div
-              className={`mobileSheetOverlay mobileThemeOverlay mobileSheetOverlay--fromNav${themeMenuClosing ? " mobileSheetOverlay--closing" : ""}`}
+              className={`mobileSheetOverlay settingsSheetOverlay mobileSheetOverlay--fromNav${settingsClosing ? " mobileSheetOverlay--closing" : ""}`}
               role="dialog"
               aria-modal="true"
-              onClick={() => closeThemeMenu()}
+              aria-label="Settings"
+              onClick={() => closeSettings()}
             >
-              <div className="mobileSheet mobileThemeSheet" onClick={(e) => e.stopPropagation()}>
+              <div className="mobileSheet settingsSheet" onClick={(e) => e.stopPropagation()}>
                 <div className="mobileSheetHeader">
-                  <div className="mobileSheetTitle">Choose palette</div>
-                  <button
-                    type="button"
-                    className="mobileSheetClose"
-                    onClick={() => closeThemeMenu()}
-                    aria-label="Close color palette menu"
-                  >
+                  <div className="mobileSheetTitle">Settings</div>
+                  <button type="button" className="mobileSheetClose" onClick={() => closeSettings()} aria-label="Close settings">
                     ✕
                   </button>
                 </div>
 
-                <div className="mobileSheetList mobileThemeList" aria-label="Color palettes">
-                  {THEME_PALETTES.map((theme) => (
-                    <button
-                      key={theme.key}
-                      type="button"
-                      className="mobileSheetAction mobileThemeAction"
-                      data-active={currentTheme === theme.key ? "true" : "false"}
-                      onClick={() => {
-                        applyTheme(theme.key);
-                        closeThemeMenu();
-                      }}
-                    >
-                      <span className="mobileThemeActionMain">
-                        <span className="mobileThemeIcon" aria-hidden>
-                          <ThemeIcon theme={theme.key} />
-                        </span>
-                        <span>{theme.name}</span>
-                      </span>
-                      <span className="mobileThemeSwatches" aria-hidden>
-                        <span className="mobileThemeSwatch swatchOne" />
-                        <span className="mobileThemeSwatch swatchTwo" />
-                        <span className="mobileThemeSwatch swatchThree" />
-                      </span>
-                    </button>
-                  ))}
+                <div className="settingsSheetScroll">
+                  <section className="settingsSection" aria-labelledby="settings-palette">
+                    <h2 id="settings-palette" className="settingsSectionTitle">
+                      Palette
+                    </h2>
+                    <p className="settingsSectionHint">Current: {currentThemeLabel}</p>
+                    <div className="mobileSheetList mobileThemeList" aria-label="Color palettes">
+                      {THEME_PALETTES.map((theme) => (
+                        <button
+                          key={theme.key}
+                          type="button"
+                          className="mobileSheetAction mobileThemeAction"
+                          data-active={currentTheme === theme.key ? "true" : "false"}
+                          onClick={() => onPickTheme(theme.key)}
+                        >
+                          <span className="mobileThemeActionMain">
+                            <span className="mobileThemeIcon" aria-hidden>
+                              <ThemeIcon theme={theme.key} />
+                            </span>
+                            <span>{theme.name}</span>
+                          </span>
+                          <span className="mobileThemeSwatches" aria-hidden>
+                            <span className="mobileThemeSwatch swatchOne" />
+                            <span className="mobileThemeSwatch swatchTwo" />
+                            <span className="mobileThemeSwatch swatchThree" />
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                  </section>
+
+                  <section className="settingsSection" aria-labelledby="settings-type">
+                    <h2 id="settings-type" className="settingsSectionTitle">
+                      Typography
+                    </h2>
+                    <div className="settingsFieldGroup">
+                      <span className="settingsFieldLabel">Typeface</span>
+                      <div className="settingsChipRow">
+                        {FONT_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.key}
+                            type="button"
+                            className="settingsChip"
+                            data-active={fontFamily === opt.key ? "true" : "false"}
+                            onClick={() => {
+                              setFontFamily(opt.key);
+                              applyFontFamily(opt.key);
+                            }}
+                          >
+                            {opt.label.replace("Default (Inter / Gabarito)", "Default")}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="settingsFieldGroup">
+                      <span className="settingsFieldLabel">Text size</span>
+                      <div className="settingsChipRow">
+                        {TEXT_SCALE_OPTIONS.map((opt) => (
+                          <button
+                            key={opt.key}
+                            type="button"
+                            className="settingsChip"
+                            data-active={textScale === opt.key ? "true" : "false"}
+                            onClick={() => {
+                              setTextScale(opt.key);
+                              applyTextScale(opt.key);
+                            }}
+                          >
+                            {opt.label}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  </section>
+
+                  <section className="settingsSection" aria-labelledby="settings-a11y">
+                    <h2 id="settings-a11y" className="settingsSectionTitle">
+                      Accessibility
+                    </h2>
+                    <label className="settingsToggle">
+                      <input
+                        type="checkbox"
+                        checked={a11yMotion}
+                        onChange={(e) => {
+                          const on = e.target.checked;
+                          setA11yMotion(on);
+                          applyA11yReducedMotion(on);
+                        }}
+                      />
+                      <span>Reduce motion (minimize animations)</span>
+                    </label>
+                    <label className="settingsToggle">
+                      <input
+                        type="checkbox"
+                        checked={a11yFocus}
+                        onChange={(e) => {
+                          const on = e.target.checked;
+                          setA11yFocus(on);
+                          applyA11yEnhancedFocus(on);
+                        }}
+                      />
+                      <span>Stronger focus indicators</span>
+                    </label>
+                    <label className="settingsToggle">
+                      <input
+                        type="checkbox"
+                        checked={a11yLinks}
+                        onChange={(e) => {
+                          const on = e.target.checked;
+                          setA11yLinks(on);
+                          applyA11yLinkUnderline(on);
+                        }}
+                      />
+                      <span>Underline links</span>
+                    </label>
+                  </section>
                 </div>
               </div>
             </div>,

@@ -360,9 +360,10 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
       mobileDetailOpen={mobileDetailOpen}
       current={resolvedSection === "calendar" ? "calendar" : resolvedSection === "directory" ? "directory" : "updates"}
       onNavigateSection={onNavigateSection}
-      hideDefaultIntro={isMobile && !mobileDetailOpen}
-      topBar={isMobile && !mobileDetailOpen ? (
+      hideDefaultIntro={isMobile && mobileDetailOpen}
+      topBar={!(isMobile && mobileDetailOpen) ? (
         <NewsTickerBar
+          className={isMobile ? undefined : "newsBar--shellDesktop"}
           introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
           items={newsTickerItems}
           updates={safeUpdates}
