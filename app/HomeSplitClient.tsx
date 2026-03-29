@@ -835,6 +835,12 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const weekEvents = selectedWeekBucket?.events ?? [];
   const weekEventsCount = weekEvents.length;
   const weekCategoryOptions = ["Live music", "Food & drink", "Arts & culture", "Community", "Other"] as const satisfies readonly Exclude<WeekCategory, "All">[];
+  const mobileWeekCategoryStickyEnabled =
+    effectiveIsMobile &&
+    mobileSpotlightOpen &&
+    !!selectedWeekBucket &&
+    selectedDisplayKey !== GOING_NOW_KEY;
+
   const filteredWeekEvents = useMemo(() => {
     if (selectedWeekCategory === "All") return weekEvents;
     return weekEvents.filter((event) => weekCategoryForEvent(event.event_type) === selectedWeekCategory);
@@ -882,6 +888,55 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   useEffect(() => {
     setSelectedWeekCategory("All");
   }, [selectedWeekBucket?.key]);
+
+  useEffect(() => {
+    if (!mobileWeekCategoryStickyEnabled) {
+      setMobileWeekCategorySticky(false);
+      return;
+    }
+
+    let io: IntersectionObserver | null = null;
+    let raf = 0;
+    let cancelled = false;
+    let attempts = 0;
+
+    const arm = () => {
+      if (cancelled) return;
+      const root = mobileDetailScrollRef.current;
+      const target = weekCategorySentinelRef.current;
+      if (!root || !target) {
+        if (attempts++ < 160) raf = window.requestAnimationFrame(arm);
+        return;
+      }
+      io = new IntersectionObserver(
+        ([e]) => {
+          setMobileWeekCategorySticky(!e.isIntersecting);
+        },
+        { root, rootMargin: "-64px 0px 0px 0px", threshold: 0 },
+      );
+      io.observe(target);
+    };
+
+    raf = window.requestAnimationFrame(arm);
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(raf);
+      io?.disconnect();
+    };
+  }, [mobileWeekCategoryStickyEnabled, selectedWeekBucket?.key]);
+
+  useEffect(() => {
+    if (!mobileWeekCategorySticky) setMobileWeekCategorySheetOpen(false);
+  }, [mobileWeekCategorySticky]);
+
+  useEffect(() => {
+    if (!mobileWeekCategorySheetOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileWeekCategorySheetOpen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [mobileWeekCategorySheetOpen]);
 
   const selectedEvent = useMemo(() => {
     if (!filteredEvents.length) return null;
@@ -2047,6 +2102,81 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
           )
         : null}
 
+      {effectiveIsMobile && mobileTabsPortalReady && mobileWeekCategoryStickyEnabled && mobileDetailOpen && selectedWeekBucket
+        ? createPortal(
+            <>
+              <button
+                type="button"
+                className={`mobileWeekCategorySheetBackdrop${mobileWeekCategorySheetOpen ? " mobileWeekCategorySheetBackdrop--open" : ""}`}
+                aria-label="Close category menu"
+                tabIndex={mobileWeekCategorySheetOpen ? 0 : -1}
+                onClick={() => setMobileWeekCategorySheetOpen(false)}
+              />
+              <div
+                className={["mobileWeekCategoryStickyBar", mobileWeekCategorySticky ? "mobileWeekCategoryStickyBar--visible" : ""]
+                  .filter(Boolean)
+                  .join(" ")}
+              >
+                <button
+                  type="button"
+                  className="mobileWeekCategoryStickyBar__btn"
+                  aria-expanded={mobileWeekCategorySheetOpen}
+                  onClick={() => setMobileWeekCategorySheetOpen((o) => !o)}
+                >
+                  Category
+                  <span className="mobileWeekCategoryStickyBar__chev" aria-hidden>
+                    {mobileWeekCategorySheetOpen ? "▾" : "▸"}
+                  </span>
+                </button>
+              </div>
+              <div
+                className={["mobileWeekCategorySheet", mobileWeekCategorySheetOpen ? "mobileWeekCategorySheet--open" : ""]
+                  .filter(Boolean)
+                  .join(" ")}
+                role="dialog"
+                aria-label="Weekly overview categories"
+              >
+                <div className="mobileWeekCategorySheet__inner">
+                  <button
+                    type="button"
+                    className="weekSummaryCard weekSummaryCardButton mobileWeekCategorySheet__total"
+                    data-active={selectedWeekCategory === "All" ? "true" : "false"}
+                    onClick={() => {
+                      setSelectedWeekCategory("All");
+                      setMobileWeekCategorySheetOpen(false);
+                    }}
+                  >
+                    <div className="weekSummaryKicker">Total events</div>
+                    <div className="weekSummaryValue">{selectedWeekBucket.events.length}</div>
+                  </button>
+                  <div className="weekCategoryFilters weekCategoryFilters--sheet" role="group" aria-label="Categories">
+                    {weekCategoryOptions.map((category) => {
+                      const isActive = selectedWeekCategory === category;
+                      const count = selectedWeekBucket.insights[category] ?? 0;
+                      return (
+                        <button
+                          key={category}
+                          type="button"
+                          className="weekCategoryFilterBtn"
+                          data-active={isActive ? "true" : "false"}
+                          onClick={() => {
+                            setSelectedWeekCategory(category);
+                            setMobileWeekCategorySheetOpen(false);
+                          }}
+                        >
+                          <div className="weekSummaryKicker">{category}</div>
+                          <div className="weekSummaryValue weekCategoryFilterCount">{count}</div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </>,
+            document.body,
+          )
+        : null}
+
       {/* Mobile detail overlay */}
       <div
         className="mobileDetail"
@@ -2055,9 +2185,13 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
         role="dialog"
         aria-modal={mobileDetailOpen ? "true" : "false"}
       >
-        <div className="scroll mobileDetailScroll" ref={mobileDetailScrollRef}>
+        <div className="scroll mobileDetailScroll mobileListingContentScroll" ref={mobileDetailScrollRef}>
           {selectedEvent ? (
-            <div key={detailFlashKey} className="detailCard mobileEventDetailCard calendarListingDetailReveal calendarListingDetailReveal--mobile">
+            <>
+              <div className="mobileListingContentBackWrap">
+                <MobileContentBackButton onBack={handleMobileDetailBack} />
+              </div>
+              <div key={detailFlashKey} className="detailCard mobileEventDetailCard calendarListingDetailReveal calendarListingDetailReveal--mobile">
               <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
               <div className="detailMeta">
                 <span className="muted">{selectedTime ?? "Time TBD"}</span>
@@ -2093,8 +2227,12 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 </div>
               ) : null}
             </div>
+            </>
           ) : selectedDisplayKey === GOING_NOW_KEY ? (
             <div className="weeklyOverviewLanding mobileWeeklyOverviewOpen mobileGoingNowOpen">
+              <div className="mobileListingContentBackWrap">
+                <MobileContentBackButton onBack={handleMobileDetailBack} />
+              </div>
               <div className="weekSummary fadeInItem" style={{ animationDelay: "140ms" }}>
                 <div className="weekSummaryTopline">
                   <div>
@@ -2153,6 +2291,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
             </div>
           ) : selectedWeekBucket ? (
             <div className="weeklyOverviewLanding mobileWeeklyOverviewOpen">
+              <div className="mobileListingContentBackWrap">
+                <MobileContentBackButton onBack={handleMobileDetailBack} />
+              </div>
               <div className="weekSelectorRail weekSelectorRailMobile fadeInItem" style={{ animationDelay: "140ms" }}>
                 {weekBuckets.map((bucket) => (
                   <button
@@ -2189,7 +2330,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     <div className="weekSummaryKicker">Total events</div>
                     <div className="weekSummaryValue">{selectedWeekBucket.events.length}</div>
                   </button>
-                  <div className="weekCategoryFilters" role="group" aria-label="Weekly overview category filters">
+                  <div className="weekCategoryFilters weekCategoryFilters--mobileCompact" role="group" aria-label="Weekly overview category filters">
                     {weekCategoryOptions.map((category) => {
                       const isActive = selectedWeekCategory === category;
                       const count = selectedWeekBucket.insights[category] ?? 0;
@@ -2207,6 +2348,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       );
                     })}
                   </div>
+                  <div ref={weekCategorySentinelRef} className="weekCategoryStickySentinel" aria-hidden />
                 </div>
 
                 <div className="weekAnnouncements mobileWeekAnnouncements" aria-label="Pinned announcements">
