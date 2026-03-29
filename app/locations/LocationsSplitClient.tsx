@@ -68,7 +68,6 @@ function DirectoryListingRow({
       <div className="directoryListingRow__main">
         <span className="eventRowTitle">{l.name ?? "Untitled listing"}</span>
         {l.category ? <span className="directoryListingRow__category">{l.category}</span> : null}
-        {l.address ? <span className="directoryListingRow__address">{l.address}</span> : null}
       </div>
       <div
         className="directoryListingRow__actions"
@@ -324,7 +323,7 @@ export default function LocationsSplitClient({
   const newsTickerItems = useMemo(() => {
     const upcoming = orderedLocations.slice(0, 6).map((location) => ({
       label: "NEWS",
-      text: `${location.name ?? "Featured listing"} • ${location.category ?? "Directory"}${location.address ? ` • ${location.address}` : ""}`,
+      text: `${location.name ?? "Featured listing"} • ${location.category ?? "Directory"}`,
       href: "#",
     }));
 

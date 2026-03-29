@@ -969,6 +969,29 @@ a:hover{ text-decoration: underline; text-decoration-thickness: 2px; text-underl
     width: calc(100% - 36px) !important;
     max-width: calc(100% - 36px) !important;
   }
+
+  .weeklySpotlightPager{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 2px;
+    min-height: 10px;
+  }
+
+  .weeklySpotlightPager__dot{
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--border);
+    opacity: 0.55;
+    flex-shrink: 0;
+  }
+
+  .weeklySpotlightPager__dot--active{
+    background: var(--accent);
+    opacity: 1;
+  }
 }
 
 .dayTitle{
@@ -3600,12 +3623,6 @@ textarea,
   max-width: 100%;
 }
 
-.directoryListingRow__address{
-  font-size: 0.94rem;
-  line-height: 1.45;
-  color: var(--muted);
-}
-
 .directoryListingRow__actions{
   display: flex;
   align-items: center;
@@ -5546,8 +5563,33 @@ body {
     align-items: center;
   }
 
-  .newsBar.newsBar--shellDesktop .nw__wrapper{
-    height: 2.4em;
+}
+
+/* Desktop news ticker: one slide visible (wrapper height must match each .nw__slider__item). */
+@media (min-width: 981px){
+  .newsBar .nw__wrapper{
+    overflow: hidden;
+    height: 1.4em;
+    line-height: 1.4;
+    box-sizing: border-box;
+  }
+
+  .newsBar .nw__slider__item{
+    height: 1.4em;
+    min-height: 1.4em;
+    max-height: 1.4em;
+    flex-shrink: 0;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .newsBar .nw__slider__text{
+    line-height: 1.4;
+    max-height: 1.4em;
+    display: block;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 }
 

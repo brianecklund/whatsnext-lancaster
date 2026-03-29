@@ -368,6 +368,9 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const mobileControlsInitRef = useRef(false);
   const lastScrollTopRef = useRef(0);
   const mobileControlsCollapsedRef = useRef(false);
+  const spotlightRailRef = useRef<HTMLDivElement | null>(null);
+  const [spotlightPagerIndex, setSpotlightPagerIndex] = useState(0);
+
   useEffect(() => {
     mobileControlsCollapsedRef.current = mobileControlsCollapsed;
   }, [mobileControlsCollapsed]);
@@ -463,6 +466,20 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     if (!effectiveIsMobile || !mobileSpotlightOpen) return;
     setMobileControlsCollapsed(false);
   }, [effectiveIsMobile, mobileSpotlightOpen]);
+
+  useEffect(() => {
+    if (!effectiveIsMobile || viewMode !== "list") return;
+    const el = spotlightRailRef.current;
+    if (!el) return;
+    const sync = () => {
+      const w = el.getBoundingClientRect().width;
+      if (w <= 1) return;
+      setSpotlightPagerIndex(el.scrollLeft > w * 0.35 ? 1 : 0);
+    };
+    el.addEventListener("scroll", sync, { passive: true });
+    sync();
+    return () => el.removeEventListener("scroll", sync);
+  }, [effectiveIsMobile, viewMode, resolvedSection]);
 
   // Keep the optimistic client key in sync with the URL when navigation completes.
   useEffect(() => {
@@ -1316,7 +1333,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   {/* Weekly overview + Going on now */}
                   {effectiveIsMobile ? (
                     <div className="weeklySpotlightMobile fadeInItem" style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}>
-                      <div className="weeklySpotlightRail">
+                      <div ref={spotlightRailRef} className="weeklySpotlightRail">
                         <button
                           type="button"
                           className="weeklyOverview weeklyOverview--spotlightCard"
@@ -1339,6 +1356,22 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             {liveEventsNow.length} event{liveEventsNow.length === 1 ? "" : "s"} happening now
                           </div>
                         </button>
+                      </div>
+                      <div className="weeklySpotlightPager" aria-hidden="true">
+                        <span
+                          className={
+                            spotlightPagerIndex === 0
+                              ? "weeklySpotlightPager__dot weeklySpotlightPager__dot--active"
+                              : "weeklySpotlightPager__dot"
+                          }
+                        />
+                        <span
+                          className={
+                            spotlightPagerIndex === 1
+                              ? "weeklySpotlightPager__dot weeklySpotlightPager__dot--active"
+                              : "weeklySpotlightPager__dot"
+                          }
+                        />
                       </div>
                     </div>
                   ) : (
