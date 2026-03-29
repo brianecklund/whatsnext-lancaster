@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useEffect, useMemo } from "react";
 import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
+import type { NewsHubSeasonContent, NewsHubSeasonTile } from "@/lib/news-hub-season";
 
 type Props = {
   open: boolean;
@@ -12,7 +13,7 @@ type Props = {
   introBarText: string;
   hubLead: string;
   updates: UpdateLite[];
-  seasonLandingHref?: string;
+  seasonContent: NewsHubSeasonContent;
   updatesHref?: string;
 };
 
@@ -27,6 +28,66 @@ function tagIconFor(tag: string) {
   return "•";
 }
 
+function SeasonTileInner({ tile }: { tile: NewsHubSeasonTile }) {
+  return (
+    <>
+      {tile.imageUrl ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img className="newsTickerHubSeasonTileBg" src={tile.imageUrl} alt="" />
+      ) : (
+        <div className="newsTickerHubSeasonTileBg newsTickerHubSeasonTileBg--placeholder" aria-hidden />
+      )}
+      <div className="newsTickerHubSeasonTileScrim" aria-hidden />
+      <span className="newsTickerHubSeasonTileTitle">{tile.title}</span>
+    </>
+  );
+}
+
+function SeasonGrid({
+  content,
+  onTileNavigate,
+}: {
+  content: NewsHubSeasonContent;
+  onTileNavigate: () => void;
+}) {
+  return (
+    <div className="newsTickerHubSeasonBlock">
+      <p className="newsTickerHubSeasonEyebrow">{content.eyebrow}</p>
+      <div className="newsTickerHubSeasonGrid">
+        {content.rows.map((row, ri) =>
+          row.kind === "one" ? (
+            <Link
+              key={`${ri}-full`}
+              href={row.tile.href}
+              className="newsTickerHubSeasonTile newsTickerHubSeasonTile--full"
+              onClick={onTileNavigate}
+            >
+              <SeasonTileInner tile={row.tile} />
+            </Link>
+          ) : (
+            <div key={ri} className="newsTickerHubSeasonRow">
+              <Link
+                href={row.left.href}
+                className="newsTickerHubSeasonTile newsTickerHubSeasonTile--half"
+                onClick={onTileNavigate}
+              >
+                <SeasonTileInner tile={row.left} />
+              </Link>
+              <Link
+                href={row.right.href}
+                className="newsTickerHubSeasonTile newsTickerHubSeasonTile--half"
+                onClick={onTileNavigate}
+              >
+                <SeasonTileInner tile={row.right} />
+              </Link>
+            </div>
+          ),
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function NewsTickerHub({
   open,
   closing,
@@ -34,7 +95,7 @@ export default function NewsTickerHub({
   introBarText,
   hubLead,
   updates,
-  seasonLandingHref = "/spring",
+  seasonContent,
   updatesHref = "/updates",
 }: Props) {
   const sorted = useMemo(() => {
@@ -88,14 +149,7 @@ export default function NewsTickerHub({
           <h2 className="newsTickerHubTitle">What’s happening in Lancaster</h2>
           <p className="newsTickerHubLead">{hubLead}</p>
 
-          <p className="newsTickerHubSeason">
-            <span className="newsTickerHubSeasonLabel">This season:</span> Spring brings markets, patios, and energy
-            back to Main Street. Visit the{" "}
-            <Link href={seasonLandingHref} className="newsTickerHubSeasonLink" onClick={onRequestClose}>
-              spring hub
-            </Link>{" "}
-            for suggestions, upcoming events, reviews, and updates in one place.
-          </p>
+          <SeasonGrid content={seasonContent} onTileNavigate={onRequestClose} />
 
           <div className="newsTickerHubSectionHead">
             <h3 className="newsTickerHubSectionTitle">Latest updates</h3>
@@ -109,44 +163,42 @@ export default function NewsTickerHub({
           ) : (
             <ul className="newsTickerHubList" role="list">
               {sorted.map((u) => (
-                <li key={u.id} className="newsTickerHubCard">
-                  <div className="newsTickerHubCardTop">
-                    {u.pinned ? <span className="newsTickerHubPin">Pinned</span> : null}
-                    {u.date ? <span className="newsTickerHubDate">{u.date}</span> : null}
-                  </div>
-                  <div className="newsTickerHubCardTitle">{u.title}</div>
-                  {u.summary ? <p className="newsTickerHubCardSummary">{u.summary}</p> : null}
-                  {u.tags?.length ? (
-                    <div className="newsTickerHubTags">
-                      {u.tags.slice(0, 4).map((t) => (
-                        <span key={t} className="newsTickerHubTag">
-                          <span className="newsTickerHubTagGlyph" aria-hidden>
-                            {tagIconFor(t)}
-                          </span>
-                          {t}
-                        </span>
-                      ))}
+                <li key={u.id} className="newsTickerHubCardWrap">
+                  <Link
+                    href={`${updatesHref}?u=${encodeURIComponent(u.id)}`}
+                    className="newsTickerHubCard newsTickerHubCard--link"
+                    onClick={onRequestClose}
+                  >
+                    <div className="newsTickerHubCardTop">
+                      {u.pinned ? <span className="newsTickerHubPin">Pinned</span> : null}
+                      {u.date ? <span className="newsTickerHubDate">{u.date}</span> : null}
                     </div>
-                  ) : null}
+                    <div className="newsTickerHubCardTitle">{u.title}</div>
+                    {u.summary ? <p className="newsTickerHubCardSummary">{u.summary}</p> : null}
+                    {u.tags?.length ? (
+                      <div className="newsTickerHubTags">
+                        {u.tags.slice(0, 4).map((t) => (
+                          <span key={t} className="newsTickerHubTag">
+                            <span className="newsTickerHubTagGlyph" aria-hidden>
+                              {tagIconFor(t)}
+                            </span>
+                            {t}
+                          </span>
+                        ))}
+                      </div>
+                    ) : null}
+                    <span className="newsTickerHubReadMore">Read on Updates →</span>
+                  </Link>
                   {u.link ? (
                     <a
                       href={u.link}
                       className="newsTickerHubExternal"
                       target="_blank"
                       rel="noreferrer"
-                      onClick={onRequestClose}
                     >
                       {u.linkLabel || "Open link"} →
                     </a>
-                  ) : (
-                    <Link
-                      href={`${updatesHref}?u=${encodeURIComponent(u.id)}`}
-                      className="newsTickerHubReadMore"
-                      onClick={onRequestClose}
-                    >
-                      Read on Updates →
-                    </Link>
-                  )}
+                  ) : null}
                 </li>
               ))}
             </ul>

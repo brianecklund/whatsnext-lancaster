@@ -16,6 +16,7 @@ import {
   type UpdateKind,
 } from "@/lib/updateDisplay";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
 
 export type UpdateLite = {
   id: string;
@@ -37,6 +38,7 @@ export type UpdateLite = {
 
 type Props = {
   updates: UpdateLite[];
+  newsHubSeason: NewsHubSeasonContent;
   currentSection?: "calendar" | "directory" | "updates";
   onNavigateSection?: (section: "calendar" | "directory" | "updates") => void;
   basePath?: string;
@@ -121,7 +123,7 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
   );
 }
 
-export default function UpdatesSplitClient({ updates, currentSection, onNavigateSection, basePath = "/updates" }: Props) {
+export default function UpdatesSplitClient({ updates, newsHubSeason, currentSection, onNavigateSection, basePath = "/updates" }: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
@@ -366,6 +368,7 @@ export default function UpdatesSplitClient({ updates, currentSection, onNavigate
           updates={safeUpdates}
           updatesHref={basePath}
           seasonLandingHref="/spring"
+          seasonContent={newsHubSeason}
         />
       ) : undefined}
       mobileOverlay={

@@ -19,5 +19,6 @@ export function importedVenueToLocationLite(venue: ImportedVenue): LocationLite 
     category: venue.category ?? null,
     website: venue.website ?? null,
     description: venue.description ?? fallbackDescription ?? null,
+    openNow: typeof venue.openNow === "boolean" ? venue.openNow : null,
   };
 }

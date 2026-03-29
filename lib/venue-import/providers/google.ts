@@ -17,6 +17,7 @@ const FIELD_MASK = [
   "places.primaryType",
   "places.types",
   "places.googleMapsUri",
+  "places.currentOpeningHours",
   "nextPageToken",
 ].join(",");
 
@@ -46,6 +47,7 @@ type GooglePlace = {
   primaryType?: string;
   types?: string[];
   googleMapsUri?: string;
+  currentOpeningHours?: { openNow?: boolean };
 };
 
 function getApiKey(): string {
@@ -134,6 +136,8 @@ function normalizePlace(place: GooglePlace): ImportedVenue | null {
       name,
     }),
     description: null,
+    openNow:
+      typeof place.currentOpeningHours?.openNow === "boolean" ? place.currentOpeningHours.openNow : null,
   };
 }
 

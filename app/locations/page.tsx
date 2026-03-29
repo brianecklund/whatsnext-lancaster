@@ -5,10 +5,10 @@ import { getSiteData } from '@/lib/site-data';
 export const revalidate = 60;
 
 export default async function LocationsPage() {
-  const { events, locations, updates } = await getSiteData();
+  const { events, locations, updates, newsHubSeason } = await getSiteData();
   return (
     <Suspense fallback={null}>
-      <UnifiedShellClient initialSection="directory" events={events} locations={locations} updates={updates} />
+      <UnifiedShellClient initialSection="directory" events={events} locations={locations} updates={updates} newsHubSeason={newsHubSeason} />
     </Suspense>
   );
 }

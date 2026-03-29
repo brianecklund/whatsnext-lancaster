@@ -15,6 +15,11 @@ import {
 import { resolveVenueById, resolveVenueByName } from '@/lib/venue-import/resolve';
 import type { UpdateLite } from '@/app/updates/UpdatesSplitClient';
 import { testEvents, testFeaturedLocations, testUpdates } from '@/lib/test-fixtures';
+import {
+  DEFAULT_NEWS_HUB_SEASON,
+  parseNewsHubSeasonFromPrismicData,
+  type NewsHubSeasonContent,
+} from '@/lib/news-hub-season';
 
 const getEventDocsCached = unstable_cache(
   async () => {
@@ -352,9 +357,28 @@ export async function getSiteData() {
 
   const mergedUpdates = updatesFromPrismic.length ? [...testUpdates, ...updatesFromPrismic] : [...testUpdates, ...fallbackUpdates];
 
+  let newsHubSeason: NewsHubSeasonContent = DEFAULT_NEWS_HUB_SEASON;
+  try {
+    const client = createClient();
+    let doc: { data?: Record<string, unknown> } | null = null;
+    try {
+      doc = (await client.getSingle('news_hub_settings' as any)) as { data?: Record<string, unknown> };
+    } catch {
+      const settings = await client.getByType('news_hub_settings' as any, { pageSize: 1 });
+      doc = settings.results[0] ?? null;
+    }
+    if (doc?.data) {
+      const parsed = parseNewsHubSeasonFromPrismicData(doc.data, (f) => prismic.asLink(f as any) || null);
+      if (parsed?.rows?.length) newsHubSeason = parsed;
+    }
+  } catch {
+    /* Optional Prismic custom type — use DEFAULT_NEWS_HUB_SEASON */
+  }
+
   return {
     events: mergedEvents,
     locations,
     updates: mergedUpdates,
+    newsHubSeason,
   };
 }

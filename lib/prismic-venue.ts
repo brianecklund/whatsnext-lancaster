@@ -39,6 +39,7 @@ export function createLocationLiteFromVenue(venue: ImportedVenue, customPage?: {
     customPageUid: customPage?.uid ?? null,
     customPageUrl: customPage?.uid ? `/locations/${customPage.uid}` : null,
     googleMapsUri: null,
+    openNow: typeof venue.openNow === "boolean" ? venue.openNow : null,
   };
 }
 

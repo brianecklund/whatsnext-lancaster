@@ -8,6 +8,7 @@ import { dayKey, eventHasEnded, eventHappeningNow, nearestDayWithEvents, safeDat
 
 import { createPortal } from "react-dom";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
 import WeeklyPreviewRail from "@/app/components/WeeklyPreviewRail";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
@@ -54,6 +55,7 @@ type EventLite = {
 type Props = {
   events: EventLite[];
   updates?: UpdateLite[];
+  newsHubSeason: NewsHubSeasonContent;
   currentSection?: "calendar" | "directory" | "updates";
   onNavigateSection?: (section: "calendar" | "directory" | "updates") => void;
 };
@@ -253,7 +255,7 @@ function buildWeekInsights(items: EventLite[]) {
   return { buckets, busiestDayLabel, peakWindowLabel };
 }
 
-export default function HomeSplitClient({ events, updates = [], currentSection, onNavigateSection }: Props) {
+export default function HomeSplitClient({ events, updates = [], newsHubSeason, currentSection, onNavigateSection }: Props) {
   const router = useRouter();
   const sp = useSearchParams();
   const pathname = usePathname();
@@ -265,6 +267,8 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const dayParam = sp.get("day");
 
   const listRef = useRef<HTMLDivElement | null>(null);
+  const paneRightScrollRef = useRef<HTMLDivElement | null>(null);
+  const openFromWeeklyRef = useRef(false);
   const mobileDetailScrollRef = useRef<HTMLDivElement | null>(null);
   const [mobileTabsPortalReady, setMobileTabsPortalReady] = useState(false);
 
@@ -1014,6 +1018,13 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     el.scrollTop = 0;
   }, [detailFlashKey, effectiveIsMobile, mobileDetailOpen, selectedEvent]);
 
+  useLayoutEffect(() => {
+    if (!openFromWeeklyRef.current) return;
+    if (effectiveIsMobile || !selectedEvent) return;
+    openFromWeeklyRef.current = false;
+    paneRightScrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
+  }, [selectedEvent, effectiveIsMobile]);
+
   useEffect(() => {
     const listEl = listRef.current;
     if (!listEl || !effectiveIsMobile || resolvedSection !== "calendar" || viewMode !== "list") {
@@ -1143,6 +1154,13 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
   }
 
   function openSelected(key: string) {
+    const fromWeeklyContext =
+      selectedDisplayKey === WEEKLY_KEY ||
+      selectedDisplayKey === GOING_NOW_KEY ||
+      Boolean(selectedDisplayKey?.startsWith("__week__:"));
+    if (!effectiveIsMobile && fromWeeklyContext) {
+      openFromWeeklyRef.current = true;
+    }
     setClientSelectedKey(key);
     setParam("event", key);
   }
@@ -1161,6 +1179,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
         updates={updates}
         updatesHref="/updates"
         seasonLandingHref="/spring"
+        seasonContent={newsHubSeason}
       />
     ) : null}
 
@@ -1657,7 +1676,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
         {/* RIGHT */}
         {showRight ? (
           <main className="pane paneRight">
-            <div className="scroll">
+            <div className="scroll" ref={paneRightScrollRef}>
 
 
               {viewMode === "month" ? (

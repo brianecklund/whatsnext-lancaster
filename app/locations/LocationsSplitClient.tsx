@@ -10,6 +10,7 @@ import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
 import MobileContentBackButton from "@/app/components/MobileContentBackButton";
 import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
+import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
 import type { LocationLite } from "@/lib/types";
 import { mergeDirectoryCategories } from "@/lib/directoryCategories";
 
@@ -90,11 +91,17 @@ function DirectoryListingActions({
         </a>
       ) : null}
       <span
-        className={`directoryOpenBadge${openNow === true ? " directoryOpenBadge--open" : ""}`}
+        className={`directoryOpenBadge${
+          openNow === true ? " directoryOpenBadge--open" : openNow === false ? " directoryOpenBadge--closed" : ""
+        }`}
         aria-label={openNow === true ? "Open now" : openNow === false ? "Closed" : "Hours unknown"}
       >
         <span className="directoryOpenBadge__dot" aria-hidden />
-        {openNow === true ? <span className="directoryOpenBadge__label">OPEN</span> : null}
+        {openNow === true ? (
+          <span className="directoryOpenBadge__label">OPEN</span>
+        ) : openNow === false ? (
+          <span className="directoryOpenBadge__label">CLOSED</span>
+        ) : null}
       </span>
     </div>
   );
@@ -154,6 +161,7 @@ type PlaceDetailsResponse = {
 type Props = {
   locations?: LocationRow[];
   updates?: UpdateLite[];
+  newsHubSeason: NewsHubSeasonContent;
   currentSection?: "calendar" | "directory" | "updates";
   onNavigateSection?: (section: "calendar" | "directory" | "updates") => void;
   basePath?: string;
@@ -164,6 +172,7 @@ const ALPHABET = ["#", ..."ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("")];
 export default function LocationsSplitClient({
   locations = [],
   updates = [],
+  newsHubSeason,
   currentSection,
   onNavigateSection,
   basePath = "/locations",
@@ -461,6 +470,7 @@ export default function LocationsSplitClient({
           updates={updates}
           updatesHref="/updates"
           seasonLandingHref="/spring"
+          seasonContent={newsHubSeason}
         />
       ) : undefined}
       style={

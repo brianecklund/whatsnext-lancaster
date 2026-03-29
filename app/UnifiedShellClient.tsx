@@ -5,6 +5,7 @@ import HomeSplitClient from "@/app/HomeSplitClient";
 import LocationsSplitClient from "@/app/locations/LocationsSplitClient";
 import UpdatesSplitClient, { type UpdateLite } from "@/app/updates/UpdatesSplitClient";
 import type { EventLite, LocationLite } from "@/lib/types";
+import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
 
 type SectionKey = "calendar" | "directory" | "updates";
 
@@ -13,6 +14,7 @@ type Props = {
   events: EventLite[];
   locations: (LocationLite & { key: string })[];
   updates: UpdateLite[];
+  newsHubSeason: NewsHubSeasonContent;
 };
 
 const SECTION_PATHS: Record<SectionKey, string> = {
@@ -21,7 +23,7 @@ const SECTION_PATHS: Record<SectionKey, string> = {
   updates: "/updates",
 };
 
-export default function UnifiedShellClient({ initialSection, events, locations, updates }: Props) {
+export default function UnifiedShellClient({ initialSection, events, locations, updates, newsHubSeason }: Props) {
   const [activeSection, setActiveSection] = useState<SectionKey>(initialSection);
   const [renderedSection, setRenderedSection] = useState<SectionKey>(initialSection);
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -162,11 +164,11 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
     <div ref={shellRef} className={`shellSwap homeShell${introActive ? " shellIntro--active" : ""}`} data-transitioning={isTransitioning ? 'true' : 'false'} data-content-switching={contentSwitching ? 'true' : 'false'}>
       <div key={renderedSection} className="shellSwap__panel">
         {renderedSection === 'calendar' ? (
-          <HomeSplitClient events={events} updates={updates} {...sharedProps} />
+          <HomeSplitClient events={events} updates={updates} newsHubSeason={newsHubSeason} {...sharedProps} />
         ) : renderedSection === 'directory' ? (
-          <LocationsSplitClient locations={locations} updates={updates} basePath="/locations" {...sharedProps} />
+          <LocationsSplitClient locations={locations} updates={updates} basePath="/locations" newsHubSeason={newsHubSeason} {...sharedProps} />
         ) : (
-          <UpdatesSplitClient updates={updates} basePath="/updates" {...sharedProps} />
+          <UpdatesSplitClient updates={updates} basePath="/updates" newsHubSeason={newsHubSeason} {...sharedProps} />
         )}
       </div>
     </div>

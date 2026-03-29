@@ -13,6 +13,8 @@ export type ImportedVenue = {
   category?: string | null;
   rawCategories?: string[];
   description?: string | null;
+  /** From Google Places `currentOpeningHours.openNow` when available. */
+  openNow?: boolean | null;
 };
 
 export type VenueImportParams = {

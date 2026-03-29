@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import NewsTickerHub from "@/app/components/NewsTickerHub";
 import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
+import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
 
 type NewsTickerItem = {
   label?: string;
@@ -22,6 +23,7 @@ export default function NewsTickerBar({
   hubLead = DEFAULT_HUB_LEAD,
   seasonLandingHref = "/spring",
   updatesHref = "/updates",
+  seasonContent,
   className = "",
 }: {
   introText: string;
@@ -30,6 +32,7 @@ export default function NewsTickerBar({
   hubLead?: string;
   seasonLandingHref?: string;
   updatesHref?: string;
+  seasonContent: NewsHubSeasonContent;
   className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -185,7 +188,7 @@ export default function NewsTickerBar({
         introBarText={introText}
         hubLead={hubLead}
         updates={updates}
-        seasonLandingHref={seasonLandingHref}
+        seasonContent={seasonContent}
         updatesHref={updatesHref}
       />
     </>
