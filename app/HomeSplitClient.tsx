@@ -24,6 +24,7 @@ import type { EventLite as LibEventLite } from "@/lib/types";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import SegmentedControl from "@/app/components/SegmentedControl";
+import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
 
@@ -43,6 +44,8 @@ type EventLite = {
   locationName?: string | null;
   address?: string | null;
   locationUrl?: string | null;
+  /** Prismic directory location document UID when linked in CMS */
+  location_page_uid?: string | null;
 
   website_url?: string | null;
   tickets_url?: string | null;
@@ -80,6 +83,23 @@ function norm(v: string) {
 
 type WeekCategory = "All" | "Live music" | "Food & drink" | "Arts & culture" | "Community" | "Other";
 
+type WeekCategoryToggle = Exclude<WeekCategory, "All">;
+
+function eventDirectoryPageUid(e: EventLite): string | null {
+  const raw = e.location_page_uid;
+  return typeof raw === "string" && raw.trim() ? raw.trim() : null;
+}
+
+function eventReturnKey(e: EventLite): string {
+  return encodeURIComponent(String(e.uid ?? e.id));
+}
+
+function directoryHrefForEvent(e: EventLite): string | null {
+  const uid = eventDirectoryPageUid(e);
+  if (!uid) return null;
+  return `/locations/${encodeURIComponent(uid)}?fromEvent=${eventReturnKey(e)}`;
+}
+
 function weekCategoryForEvent(eventType?: string | null): WeekCategory {
   const t = (eventType || "").toLowerCase();
   if (t.includes("music") || t.includes("concert") || t.includes("show") || t.includes("dj")) return "Live music";
@@ -87,6 +107,55 @@ function weekCategoryForEvent(eventType?: string | null): WeekCategory {
   if (t.includes("art") || t.includes("gallery") || t.includes("film") || t.includes("movie") || t.includes("theatre") || t.includes("theater") || t.includes("comedy") || t.includes("poetry")) return "Arts & culture";
   if (t.includes("community") || t.includes("market") || t.includes("fundraiser") || t.includes("family") || t.includes("workshop") || t.includes("outreach")) return "Community";
   return "Other";
+}
+
+function EventListingLocation({ e, className }: { e: EventLite; className?: string }) {
+  const name = (e.locationName || "").trim();
+  if (!name) return null;
+  const dir = directoryHrefForEvent(e);
+  const cn = ["eventListingLocation", className].filter(Boolean).join(" ");
+  if (dir) {
+    return (
+      <Link href={dir} className={`${cn} eventListingLocation--directory`} onClick={(ev) => ev.stopPropagation()}>
+        {name}
+      </Link>
+    );
+  }
+  if (e.locationUrl) {
+    return (
+      <a
+        href={e.locationUrl}
+        className={`${cn} eventListingLocation--external`}
+        target="_blank"
+        rel="noreferrer"
+        onClick={(ev) => ev.stopPropagation()}
+      >
+        {name}
+      </a>
+    );
+  }
+  return <span className={cn}>{name}</span>;
+}
+
+function EventDetailLocation({ e }: { e: EventLite }) {
+  const name = (e.locationName || "").trim();
+  if (!name) return null;
+  const dir = directoryHrefForEvent(e);
+  if (dir) {
+    return (
+      <Link href={dir} className="venue link eventDetailLocation--directory">
+        {name}
+      </Link>
+    );
+  }
+  if (e.locationUrl) {
+    return (
+      <a className="venue link" href={e.locationUrl} target="_blank" rel="noreferrer">
+        {name}
+      </a>
+    );
+  }
+  return <span className="venue">{name}</span>;
 }
 
 function endOfWeekSaturdayFromDate(d: Date): Date {
@@ -381,7 +450,9 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   const [taglineHidden, setTaglineHidden] = useState(false);
   const [mobileControlsCollapsed, setMobileControlsCollapsed] = useState(false);
   const [mobileControlsPinnedOpen, setMobileControlsPinnedOpen] = useState(false);
-  const [selectedWeekCategory, setSelectedWeekCategory] = useState<WeekCategory>("All");
+  /** Empty Set = show all categories (same as “All”). */
+  const [weekCategorySelection, setWeekCategorySelection] = useState<Set<WeekCategoryToggle>>(() => new Set());
+  const [pinnedAnnouncementsExpanded, setPinnedAnnouncementsExpanded] = useState(false);
   const [pullDistance, setPullDistance] = useState(0);
   const [pullRefreshing, setPullRefreshing] = useState(false);
   const pullDistanceRef = useRef(0);
@@ -473,7 +544,7 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
 
       if (mobileControlsPinnedOpen || mobileSpotlightOpen) return;
 
-      if (st <= 12 && !mobileControlsCollapsedRef.current) {
+      if (st <= 12) {
         setMobileControlsCollapsed(false);
         return;
       }
@@ -862,18 +933,20 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     selectedDisplayKey !== GOING_NOW_KEY;
 
   const filteredWeekEvents = useMemo(() => {
-    if (selectedWeekCategory === "All") return weekEvents;
-    return weekEvents.filter((event) => weekCategoryForEvent(event.event_type) === selectedWeekCategory);
-  }, [selectedWeekCategory, weekEvents]);
+    if (weekCategorySelection.size === 0) return weekEvents;
+    return weekEvents.filter((event) => weekCategorySelection.has(weekCategoryForEvent(event.event_type) as WeekCategoryToggle));
+  }, [weekCategorySelection, weekEvents]);
   const filteredWeekGroups = useMemo(() => {
-    if (selectedWeekCategory === "All") return selectedWeekBucket?.groups ?? [];
+    if (weekCategorySelection.size === 0) return selectedWeekBucket?.groups ?? [];
     return (selectedWeekBucket?.groups ?? [])
       .map((group) => ({
         ...group,
-        items: group.items.filter((event) => weekCategoryForEvent(event.event_type) === selectedWeekCategory),
+        items: group.items.filter((event) =>
+          weekCategorySelection.has(weekCategoryForEvent(event.event_type) as WeekCategoryToggle),
+        ),
       }))
       .filter((group) => group.items.length > 0);
-  }, [selectedWeekBucket, selectedWeekCategory]);
+  }, [selectedWeekBucket, weekCategorySelection]);
   const weekGroups = filteredWeekGroups;
 
   const weekAnnouncements = useMemo(() => {
@@ -906,8 +979,20 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   }, [selectedWeekBucket, updates]);
 
   useEffect(() => {
-    setSelectedWeekCategory("All");
+    setWeekCategorySelection(new Set());
+    setPinnedAnnouncementsExpanded(false);
   }, [selectedWeekBucket?.key]);
+
+  const selectAllWeekCategories = () => setWeekCategorySelection(new Set());
+
+  const toggleWeekCategory = (cat: WeekCategoryToggle) => {
+    setWeekCategorySelection((prev) => {
+      const next = new Set(prev);
+      if (next.has(cat)) next.delete(cat);
+      else next.add(cat);
+      return next;
+    });
+  };
 
   useEffect(() => {
     if (!mobileWeekCategoryStickyEnabled) {
@@ -1585,18 +1670,23 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         ) : null}
                         <div className="eventRowTitle">{title}</div>
                         <div className="eventRowMeta">
-                          <span>{timeLabel}</span>
+                          <span className="eventListingTime">{timeLabel}</span>
                           {e.event_type ? (
                             effectiveIsMobile ? (
                               <span className="eventRowTypePill">{e.event_type}</span>
                             ) : (
                               <>
                                 <span className="dot">•</span>
-                                <span>{e.event_type}</span>
+                                <span className="eventListingType">{e.event_type}</span>
                               </>
                             )
                           ) : null}
                         </div>
+                        {e.locationName?.trim() ? (
+                          <div className="eventRowLocation">
+                            <EventListingLocation e={e} />
+                          </div>
+                        ) : null}
                         {(() => {
                           const raw =
                             (e.summary ?? "") || (pickDescriptionText(e) ?? "");
@@ -1699,7 +1789,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             const title = e.title || "Untitled event";
                             const d = safeDateFromEvent(e);
                             const timeLabel = d ? formatTimeShort(d) : "Time TBD";
-                            const venueBits = [e.locationName, e.event_type].filter(Boolean).join(" • ");
                             return (
                               <button
                                 key={key}
@@ -1716,9 +1805,21 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                 ) : null}
                                 <div className="eventCardTitle">{title}</div>
                                 <div className="eventMeta">
-                                  {timeLabel}
-                                  {venueBits ? ` • ${venueBits}` : ""}
+                                  <span className="eventListingTime">{timeLabel}</span>
+                                  {e.event_type ? (
+                                    <>
+                                      <span className="dot" aria-hidden>
+                                        •
+                                      </span>
+                                      <span className="eventListingType">{e.event_type}</span>
+                                    </>
+                                  ) : null}
                                 </div>
+                                {e.locationName?.trim() ? (
+                                  <div className="eventCardLocation">
+                                    <EventListingLocation e={e} />
+                                  </div>
+                                ) : null}
                               </button>
                             );
                           })}
@@ -1761,7 +1862,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         const title = e.title || "Untitled event";
                         const d = safeDateFromEvent(e);
                         const timeLabel = d ? formatTimeShort(d) : "Time TBD";
-                        const venueBits = [e.locationName, e.event_type].filter(Boolean).join(" • ");
 
                         return (
                           <button
@@ -1780,9 +1880,14 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             ) : null}
                             <div className="dayRightTop">
                               <div className="dayRightTitle">{title}</div>
-                              <div className="dayRightTime">{timeLabel}</div>
+                              <div className="dayRightTime eventListingTime">{timeLabel}</div>
                             </div>
-                            {venueBits ? <div className="dayRightMeta">{venueBits}</div> : null}
+                            {e.event_type ? <div className="dayRightMeta"><span className="eventListingType">{e.event_type}</span></div> : null}
+                            {e.locationName?.trim() ? (
+                              <div className="dayRightLocation">
+                                <EventListingLocation e={e} />
+                              </div>
+                            ) : null}
                           </button>
                         );
                       })}
@@ -1807,7 +1912,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         const title = e.title || "Untitled event";
                         const d = safeDateFromEvent(e);
                         const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
-                        const venueBits = [e.locationName, e.event_type].filter(Boolean).join(" • ");
                         return (
                           <button
                             key={key}
@@ -1819,9 +1923,14 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           >
                             <div className="dayRightTop">
                               <div className="dayRightTitle">{title}</div>
-                              <div className="dayRightTime">{timeLabel}</div>
+                              <div className="dayRightTime eventListingTime">{timeLabel}</div>
                             </div>
-                            {venueBits ? <div className="dayRightMeta">{venueBits}</div> : null}
+                            {e.event_type ? <div className="dayRightMeta"><span className="eventListingType">{e.event_type}</span></div> : null}
+                            {e.locationName?.trim() ? (
+                              <div className="dayRightLocation">
+                                <EventListingLocation e={e} />
+                              </div>
+                            ) : null}
                           </button>
                         );
                       })}
@@ -1856,30 +1965,28 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
                     </div>
 
-                    <div className="weekCategoryScrollRail" role="tablist" aria-label="Filter events by category">
+                    <div className="weekCategoryChipGrid" role="group" aria-label="Filter events by category (choose one or more)">
                       <button
                         type="button"
-                        role="tab"
-                        aria-selected={selectedWeekCategory === "All"}
+                        aria-pressed={weekCategorySelection.size === 0}
                         className="weekCategoryChip"
-                        data-active={selectedWeekCategory === "All" ? "true" : "false"}
-                        onClick={() => setSelectedWeekCategory("All")}
+                        data-active={weekCategorySelection.size === 0 ? "true" : "false"}
+                        onClick={selectAllWeekCategories}
                       >
                         <span className="weekCategoryChip__label">All</span>
                         <span className="weekCategoryChip__count">{weekEventsCount}</span>
                       </button>
                       {weekCategoryOptions.map((category) => {
-                        const isActive = selectedWeekCategory === category;
+                        const isActive = weekCategorySelection.has(category);
                         const count = selectedWeekBucket.insights[category] ?? 0;
                         return (
                           <button
                             key={category}
                             type="button"
-                            role="tab"
-                            aria-selected={isActive}
+                            aria-pressed={isActive}
                             className="weekCategoryChip"
                             data-active={isActive ? "true" : "false"}
-                            onClick={() => setSelectedWeekCategory(category)}
+                            onClick={() => toggleWeekCategory(category)}
                           >
                             <span className="weekCategoryChip__label">{category}</span>
                             <span className="weekCategoryChip__count">{count}</span>
@@ -1890,29 +1997,47 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     <div ref={weekCategorySentinelRef} className="weekCategoryStickySentinel" aria-hidden />
                   </div>
 
-                  <section className="weekAnnouncements weekAnnouncements--strip" aria-label="Pinned announcements">
-                    <div className="weekAnnouncementsHeader">
-                      <div className="weekSummaryKicker">Pinned announcements</div>
+                  <section
+                    className={`weekAnnouncements weekAnnouncements--strip weekAnnouncements--collapsible${
+                      pinnedAnnouncementsExpanded ? " weekAnnouncements--expanded" : " weekAnnouncements--collapsed"
+                    }`}
+                    aria-label="Pinned announcements"
+                  >
+                    <button
+                      type="button"
+                      className="weekAnnouncementsCollapseToggle"
+                      aria-expanded={pinnedAnnouncementsExpanded}
+                      onClick={() => setPinnedAnnouncementsExpanded((v) => !v)}
+                    >
+                      <span className="weekSummaryKicker">Pinned announcements</span>
+                      <span className="weekAnnouncementsCollapseChev" aria-hidden>
+                        {pinnedAnnouncementsExpanded ? "▴" : "▾"}
+                      </span>
+                    </button>
+                    <div className="weekAnnouncementsCollapseBody">
+                      {weekAnnouncements.length ? (
+                        weekAnnouncements.map((update) => (
+                          <button
+                            key={update.id}
+                            type="button"
+                            className="weekAnnouncementCard"
+                            onClick={() => router.push(`/updates?u=${encodeURIComponent(update.id)}`)}
+                          >
+                            <div className="weekAnnouncementTop">
+                              <div className="weekAnnouncementTitle">{update.title}</div>
+                              {update.date ? <div className="weekAnnouncementDate">{update.date}</div> : null}
+                            </div>
+                            {update.summary ? <div className="weekAnnouncementText">{update.summary}</div> : null}
+                            {update.link ? <div className="weekAnnouncementLink">{update.linkLabel || "Open link"}</div> : null}
+                          </button>
+                        ))
+                      ) : (
+                        <div className="weekAnnouncementEmpty">Add or pin announcements in the Updates CMS collection to feature them here.</div>
+                      )}
                     </div>
-                    {weekAnnouncements.length ? (
-                      weekAnnouncements.map((update) => (
-                        <button
-                          key={update.id}
-                          type="button"
-                          className="weekAnnouncementCard"
-                          onClick={() => router.push(`/updates?u=${encodeURIComponent(update.id)}`)}
-                        >
-                          <div className="weekAnnouncementTop">
-                            <div className="weekAnnouncementTitle">{update.title}</div>
-                            {update.date ? <div className="weekAnnouncementDate">{update.date}</div> : null}
-                          </div>
-                          {update.summary ? <div className="weekAnnouncementText">{update.summary}</div> : null}
-                          {update.link ? <div className="weekAnnouncementLink">{update.linkLabel || "Open link"}</div> : null}
-                        </button>
-                      ))
-                    ) : (
-                      <div className="weekAnnouncementEmpty">Add or pin announcements in the Updates CMS collection to feature them here.</div>
-                    )}
+                    <Link href="/updates" className="weekAnnouncementsAllUpdates">
+                      All updates
+                    </Link>
                   </section>
 
                   {filteredWeekEvents.length === 0 ? (
@@ -1955,7 +2080,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                     <div className="weeklyCardTop">
                                       <div className="weeklyCardTitleWrap">
                                         <div className="weeklyCardTitle">{title}</div>
-                                        <div className="weeklyCardTime">{timeLabel}</div>
+                                        <div className="weeklyCardTime eventListingTime">{timeLabel}</div>
                                       </div>
 
                                       {e.tickets_url || e.website_url ? (
@@ -1987,7 +2112,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                     </div>
 
                                     <div className="weeklyCardMetaRow">
-                                      {[e.locationName].filter(Boolean).join(" • ")}
+                                      {e.locationName?.trim() ? <EventListingLocation e={e} /> : null}
                                     </div>
                                     {desc ? <div className="weeklyCardDesc">{desc.length > 200 ? `${desc.slice(0, 200).trim()}…` : desc}</div> : null}
                                   </div>
@@ -2018,7 +2143,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         const title = e.title || "Untitled event";
                         const d = safeDateFromEvent(e);
                         const timeLabel = d ? formatTimeShort(d) : "Time TBD";
-                        const venueBits = [e.locationName, e.event_type].filter(Boolean).join(" • ");
 
                         return (
                           <button
@@ -2034,9 +2158,14 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             ) : null}
                             <div className="dayRightTop">
                               <div className="dayRightTitle">{title}</div>
-                              <div className="dayRightTime">{timeLabel}</div>
+                              <div className="dayRightTime eventListingTime">{timeLabel}</div>
                             </div>
-                            {venueBits ? <div className="dayRightMeta">{venueBits}</div> : null}
+                            {e.event_type ? <div className="dayRightMeta"><span className="eventListingType">{e.event_type}</span></div> : null}
+                            {e.locationName?.trim() ? (
+                              <div className="dayRightLocation">
+                                <EventListingLocation e={e} />
+                              </div>
+                            ) : null}
                           </button>
                         );
                       })}
@@ -2050,26 +2179,24 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   <h1 className="detailTitle">{selectedEvent.title || "Untitled event"}</h1>
 
                   <div className="detailMeta">
-                    <span>{selectedTime}</span>
-                    {selectedEvent.locationName ? (
+                    <span className="eventDetailMetaTime">{selectedTime}</span>
+                    {selectedEvent.event_type ? (
                       <>
                         <span className="dot">•</span>
-                        {selectedEvent.locationUrl ? (
-                          <a className="venue link" href={selectedEvent.locationUrl}>
-                            {selectedEvent.locationName}
-                          </a>
-                        ) : (
-                          <span className="venue">{selectedEvent.locationName}</span>
-                        )}
-                      </>
-                    ) : null}
-                    {selectedEvent.address ? (
-                      <>
-                        <span className="dot">•</span>
-                        <span className="muted">{selectedEvent.address}</span>
+                        <span className="eventListingType">{selectedEvent.event_type}</span>
                       </>
                     ) : null}
                   </div>
+                  {selectedEvent.locationName?.trim() || selectedEvent.address ? (
+                    <div className="detailLocationBlock">
+                      {selectedEvent.locationName?.trim() ? (
+                        <div className="detailLocationName">
+                          <EventDetailLocation e={selectedEvent} />
+                        </div>
+                      ) : null}
+                      {selectedEvent.address ? <div className="detailAddress muted">{selectedEvent.address}</div> : null}
+                    </div>
+                  ) : null}
 
                   {/* Always render heroImage for placeholder behavior */}
                   <div
@@ -2222,18 +2349,18 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   <button
                     type="button"
                     className="weekSummaryCard weekSummaryCardButton mobileWeekCategorySheet__total"
-                    data-active={selectedWeekCategory === "All" ? "true" : "false"}
+                    data-active={weekCategorySelection.size === 0 ? "true" : "false"}
                     onClick={() => {
-                      setSelectedWeekCategory("All");
+                      selectAllWeekCategories();
                       setMobileWeekCategorySheetOpen(false);
                     }}
                   >
-                    <div className="weekSummaryKicker">Total events</div>
+                    <div className="weekSummaryKicker">All events</div>
                     <div className="weekSummaryValue">{selectedWeekBucket.events.length}</div>
                   </button>
-                  <div className="weekCategoryFilters weekCategoryFilters--sheet" role="group" aria-label="Categories">
+                  <div className="weekCategoryFilters weekCategoryFilters--sheet weekCategoryFilters--sheetMulti" role="group" aria-label="Categories">
                     {weekCategoryOptions.map((category) => {
-                      const isActive = selectedWeekCategory === category;
+                      const isActive = weekCategorySelection.has(category);
                       const count = selectedWeekBucket.insights[category] ?? 0;
                       return (
                         <button
@@ -2241,10 +2368,8 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           type="button"
                           className="weekCategoryFilterBtn"
                           data-active={isActive ? "true" : "false"}
-                          onClick={() => {
-                            setSelectedWeekCategory(category);
-                            setMobileWeekCategorySheetOpen(false);
-                          }}
+                          aria-pressed={isActive}
+                          onClick={() => toggleWeekCategory(category)}
                         >
                           <div className="weekSummaryKicker">{category}</div>
                           <div className="weekSummaryValue weekCategoryFilterCount">{count}</div>
@@ -2276,9 +2401,19 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               <div key={detailFlashKey} className="detailCard mobileEventDetailCard calendarListingDetailReveal calendarListingDetailReveal--mobile">
               <div className="detailTitle">{selectedEvent.title ?? selectedEvent.summary ?? "Untitled event"}</div>
               <div className="detailMeta">
-                <span className="muted">{selectedTime ?? "Time TBD"}</span>
+                <span className="muted eventDetailMetaTime">{selectedTime ?? "Time TBD"}</span>
                 {selectedEvent.event_type ? <span className="badge">{selectedEvent.event_type}</span> : null}
               </div>
+              {selectedEvent.locationName?.trim() || selectedEvent.address ? (
+                <div className="detailLocationBlock detailLocationBlock--mobile">
+                  {selectedEvent.locationName?.trim() ? (
+                    <div className="detailLocationName">
+                      <EventDetailLocation e={selectedEvent} />
+                    </div>
+                  ) : null}
+                  {selectedEvent.address ? <div className="detailAddress muted">{selectedEvent.address}</div> : null}
+                </div>
+              ) : null}
               {selectedImg ? (
                 <div className="media16x9 mobileEventHero">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -2358,10 +2493,12 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             <div className="weeklyCardTop">
                               <div className="weeklyCardTitleWrap">
                                 <div className="weeklyCardTitle">{title}</div>
-                                <div className="weeklyCardTime">{timeLabel}</div>
+                                <div className="weeklyCardTime eventListingTime">{timeLabel}</div>
                               </div>
                             </div>
-                            <div className="weeklyCardMetaRow">{[e.locationName].filter(Boolean).join(" • ")}</div>
+                            <div className="weeklyCardMetaRow">
+                              {e.locationName?.trim() ? <EventListingLocation e={e} /> : null}
+                            </div>
                             {desc ? <div className="weeklyCardDesc">{desc.length > 180 ? `${desc.slice(0, 180).trim()}…` : desc}</div> : null}
                           </div>
                         </button>
@@ -2401,30 +2538,28 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
                 </div>
 
-                <div className="weekCategoryScrollRail" role="tablist" aria-label="Filter events by category">
+                <div className="weekCategoryChipGrid weekCategoryChipGrid--mobile" role="group" aria-label="Filter events by category (choose one or more)">
                   <button
                     type="button"
-                    role="tab"
-                    aria-selected={selectedWeekCategory === "All"}
+                    aria-pressed={weekCategorySelection.size === 0}
                     className="weekCategoryChip"
-                    data-active={selectedWeekCategory === "All" ? "true" : "false"}
-                    onClick={() => setSelectedWeekCategory("All")}
+                    data-active={weekCategorySelection.size === 0 ? "true" : "false"}
+                    onClick={selectAllWeekCategories}
                   >
                     <span className="weekCategoryChip__label">All</span>
                     <span className="weekCategoryChip__count">{selectedWeekBucket.events.length}</span>
                   </button>
                   {weekCategoryOptions.map((category) => {
-                    const isActive = selectedWeekCategory === category;
+                    const isActive = weekCategorySelection.has(category);
                     const count = selectedWeekBucket.insights[category] ?? 0;
                     return (
                       <button
                         key={category}
                         type="button"
-                        role="tab"
-                        aria-selected={isActive}
+                        aria-pressed={isActive}
                         className="weekCategoryChip"
                         data-active={isActive ? "true" : "false"}
-                        onClick={() => setSelectedWeekCategory(category)}
+                        onClick={() => toggleWeekCategory(category)}
                       >
                         <span className="weekCategoryChip__label">{category}</span>
                         <span className="weekCategoryChip__count">{count}</span>
@@ -2436,30 +2571,45 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               </div>
 
               <section
-                className="weekAnnouncements weekAnnouncements--strip mobileWeekAnnouncements"
+                className={`weekAnnouncements weekAnnouncements--strip weekAnnouncements--collapsible mobileWeekAnnouncements${
+                  pinnedAnnouncementsExpanded ? " weekAnnouncements--expanded" : " weekAnnouncements--collapsed"
+                }`}
                 aria-label="Pinned announcements"
               >
-                <div className="weekAnnouncementsHeader">
-                  <div className="weekSummaryKicker">Pinned announcements</div>
+                <button
+                  type="button"
+                  className="weekAnnouncementsCollapseToggle"
+                  aria-expanded={pinnedAnnouncementsExpanded}
+                  onClick={() => setPinnedAnnouncementsExpanded((v) => !v)}
+                >
+                  <span className="weekSummaryKicker">Pinned announcements</span>
+                  <span className="weekAnnouncementsCollapseChev" aria-hidden>
+                    {pinnedAnnouncementsExpanded ? "▴" : "▾"}
+                  </span>
+                </button>
+                <div className="weekAnnouncementsCollapseBody">
+                  {weekAnnouncements.length ? (
+                    weekAnnouncements.map((update) => (
+                      <button
+                        key={update.id}
+                        type="button"
+                        className="weekAnnouncementCard"
+                        onClick={() => router.push(`/updates?u=${encodeURIComponent(update.id)}`)}
+                      >
+                        <div className="weekAnnouncementTop">
+                          <div className="weekAnnouncementTitle">{update.title}</div>
+                          {update.date ? <div className="weekAnnouncementDate">{update.date}</div> : null}
+                        </div>
+                        {update.summary ? <div className="weekAnnouncementText">{update.summary}</div> : null}
+                      </button>
+                    ))
+                  ) : (
+                    <div className="weekAnnouncementEmpty">Add or pin updates in the CMS to feature them here.</div>
+                  )}
                 </div>
-                {weekAnnouncements.length ? (
-                  weekAnnouncements.map((update) => (
-                    <button
-                      key={update.id}
-                      type="button"
-                      className="weekAnnouncementCard"
-                      onClick={() => router.push(`/updates?u=${encodeURIComponent(update.id)}`)}
-                    >
-                      <div className="weekAnnouncementTop">
-                        <div className="weekAnnouncementTitle">{update.title}</div>
-                        {update.date ? <div className="weekAnnouncementDate">{update.date}</div> : null}
-                      </div>
-                      {update.summary ? <div className="weekAnnouncementText">{update.summary}</div> : null}
-                    </button>
-                  ))
-                ) : (
-                  <div className="weekAnnouncementEmpty">Add or pin updates in the CMS to feature them here.</div>
-                )}
+                <Link href="/updates" className="weekAnnouncementsAllUpdates">
+                  Updates
+                </Link>
               </section>
 
               <div className="weeklyLanding fadeInItem" style={{ animationDelay: "260ms" }}>
@@ -2470,7 +2620,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       const d = safeDateFromEvent(e);
                       const img = pickImageUrl(e);
                       const desc = pickDescriptionText(e);
-                      const meta = [e.locationName, e.event_type].filter(Boolean).join(" • ");
                       return (
                         <button
                           key={`preview-${e.id}`}
@@ -2489,11 +2638,17 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             )}
                           </div>
                           <div className="weeklyPreviewContent">
-                            <div className="weeklyPreviewTime">
+                            <div className="weeklyPreviewTime eventListingTime">
                               {d ? `${formatDayHeading(d)} • ${formatTimeShort(d)}` : "Time TBD"}
                             </div>
                             <div className="weeklyPreviewTitle">{title}</div>
-                            {meta ? <div className="weeklyPreviewMeta">{meta}</div> : null}
+                            {e.event_type || e.locationName?.trim() ? (
+                              <div className="weeklyPreviewMeta">
+                                {e.event_type ? <span className="eventListingType">{e.event_type}</span> : null}
+                                {e.event_type && e.locationName?.trim() ? <span className="dot"> • </span> : null}
+                                {e.locationName?.trim() ? <EventListingLocation e={e} /> : null}
+                              </div>
+                            ) : null}
                             {desc ? <div className="weeklyPreviewDesc">{desc.length > 110 ? `${desc.slice(0, 110).trim()}…` : desc}</div> : null}
                           </div>
                         </button>
@@ -2534,7 +2689,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                               <div className="weeklyCardTop">
                                 <div className="weeklyCardTitleWrap">
                                   <div className="weeklyCardTitle">{title}</div>
-                                  <div className="weeklyCardTime">{timeLabel}</div>
+                                  <div className="weeklyCardTime eventListingTime">{timeLabel}</div>
                                 </div>
                                 {e.tickets_url || e.website_url ? (
                                   <div className="weeklyCardActions">
@@ -2563,7 +2718,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                   </div>
                                 ) : null}
                               </div>
-                              <div className="weeklyCardMetaRow">{[e.locationName].filter(Boolean).join(" • ")}</div>
+                              <div className="weeklyCardMetaRow">
+                                {e.locationName?.trim() ? <EventListingLocation e={e} /> : null}
+                              </div>
                               {desc ? <div className="weeklyCardDesc">{desc.length > 180 ? `${desc.slice(0, 180).trim()}…` : desc}</div> : null}
                             </div>
                           </button>

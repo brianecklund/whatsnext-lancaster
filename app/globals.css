@@ -9732,7 +9732,7 @@ html[data-theme="ocean-blueprint"] .weeklyTitle{
     overflow-y: hidden;
     gap: 10px;
     margin-top: 0;
-    margin-bottom: 14px;
+    margin-bottom: 6px;
     padding: 0 0 4px 0;
     scroll-snap-type: x proximity;
     -webkit-overflow-scrolling: touch;
@@ -11712,6 +11712,12 @@ body[data-layout="content"] main.contentPage.clockPage{
   gap: 8px;
 }
 
+.weekCategoryFilters--sheetMulti{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
 @media (prefers-reduced-motion: reduce){
   .mobileWeekCategoryStickyBar,
   .mobileWeekCategorySheet,
@@ -11849,4 +11855,170 @@ body[data-layout="content"] main.contentPage.clockPage{
     min-width: 40px !important;
     max-width: 40px !important;
   }
+}
+
+/* --- 2026-03-27 Calendar listing times, directory links, weekly filters wrap, collapsible pins --- */
+.weekCategoryChipGrid{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 10px;
+  padding: 4px 0 10px;
+  margin: 4px 0 0;
+  align-items: center;
+}
+
+.weekCategoryChipGrid .weekCategoryChip{
+  white-space: normal;
+  flex: 0 1 auto;
+  min-height: 38px;
+}
+
+.weekCategoryChipGrid--mobile .weekCategoryChip__label{
+  max-width: 100%;
+}
+
+@media (max-width: 980px){
+  .mobileWeeklyOverviewOpen .weekSummary.fadeInItem{
+    margin-top: 2px;
+  }
+}
+
+.weekAnnouncements--collapsible{
+  gap: 6px;
+}
+
+.weekAnnouncementsCollapseToggle{
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 6px 0 4px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
+}
+
+.weekAnnouncementsCollapseChev{
+  opacity: 0.55;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.weekAnnouncements--collapsed .weekAnnouncementsCollapseBody{
+  max-height: 5.25rem;
+  overflow: hidden;
+  position: relative;
+  mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 50%, transparent 100%);
+}
+
+.weekAnnouncements--expanded .weekAnnouncementsCollapseBody{
+  max-height: none;
+  overflow: visible;
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+
+.weekAnnouncementsAllUpdates{
+  align-self: flex-start;
+  display: inline-flex;
+  padding: 5px 11px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--btnSurface, #fff);
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--text);
+  text-decoration: none;
+  margin-top: 2px;
+}
+
+@media (hover: hover) and (pointer: fine){
+  .weekAnnouncementsAllUpdates:hover{
+    background: var(--hover);
+  }
+}
+
+.eventListingTime,
+.eventDetailMetaTime,
+.dayRightTime.eventListingTime,
+.weeklyCardTime.eventListingTime,
+.weeklyPreviewTime.eventListingTime{
+  font-size: 0.76rem !important;
+  letter-spacing: 0.01em;
+  opacity: 0.82;
+}
+
+.eventListingType{
+  font-size: 0.76rem;
+  opacity: 0.85;
+}
+
+.eventListingLocation{
+  display: inline;
+  text-align: left;
+  max-width: 100%;
+}
+
+.eventListingLocation--directory{
+  color: color-mix(in srgb, var(--accent) 88%, var(--muted) 12%);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+a.eventListingLocation--external{
+  color: color-mix(in srgb, var(--accent) 88%, var(--muted) 12%);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+span.eventListingLocation{
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.eventRowLocation,
+.dayRightLocation,
+.eventCardLocation{
+  margin-top: 4px;
+  line-height: 1.35;
+  font-size: 0.82rem;
+}
+
+.detailLocationBlock{
+  margin: 10px 0 14px;
+}
+
+.detailLocationBlock--mobile{
+  margin: 8px 0 12px;
+}
+
+.detailLocationName{
+  font-size: 0.92rem;
+  line-height: 1.35;
+}
+
+.detailAddress{
+  margin-top: 4px;
+  font-size: 0.84rem;
+  line-height: 1.4;
+}
+
+.dayRightMeta{
+  margin-top: 4px;
+}
+
+.weeklyPreviewMeta{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 6px;
+  font-size: 0.78rem;
 }

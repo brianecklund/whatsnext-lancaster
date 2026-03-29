@@ -10,20 +10,40 @@ import { getTestPartnerPage, TEST_DATA_TAG } from '@/lib/test-fixtures';
 
 export const dynamic = 'force-dynamic';
 
+function fromEventParam(sp: Record<string, string | string[] | undefined> | undefined): string | undefined {
+  if (!sp) return undefined;
+  const fe = sp.fromEvent;
+  if (typeof fe === "string" && fe) return fe;
+  if (Array.isArray(fe) && typeof fe[0] === "string") return fe[0];
+  return undefined;
+}
+
 function asText(value: unknown) {
   if (typeof value === 'string') return value || null;
   if (Array.isArray(value) && value.length > 0) return prismic.asText(value as RichTextField) || null;
   return null;
 }
 
-export default async function LocationDetailPage({ params }: { params: Promise<{ uid: string }> }) {
+export default async function LocationDetailPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ uid: string }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const { uid } = await params;
+  const sp = searchParams ? await searchParams : {};
+  const fromEvent = fromEventParam(sp);
+  const backToEventHref = fromEvent ? `/?event=${encodeURIComponent(fromEvent)}` : null;
+
   const testPage = getTestPartnerPage(uid);
   if (testPage) {
     return (
       <main className="locationPageShell">
         <div className="locationPageInner">
-          <a className="locationPageBack" href="/locations">← Back to directory</a>
+          <a className="locationPageBack" href={backToEventHref ?? "/locations"}>
+            {backToEventHref ? "← Back to event" : "← Back to directory"}
+          </a>
           <div className="locationPageHeader">
             <div className="locationPageEyebrow">Directory</div>
             <h1 className="locationPageTitle">{testPage.name}</h1>
@@ -118,7 +138,9 @@ export default async function LocationDetailPage({ params }: { params: Promise<{
   return (
     <main className="locationPageShell">
       <div className="locationPageInner">
-        <a className="locationPageBack" href="/locations">← Back to directory</a>
+        <a className="locationPageBack" href={backToEventHref ?? "/locations"}>
+          {backToEventHref ? "← Back to event" : "← Back to directory"}
+        </a>
         <div className="locationPageHeader">
           <div className="locationPageEyebrow">Directory</div>
           <h1 className="locationPageTitle">{doc.data?.name || venue?.name || doc.data?.venue_name || 'Location'}</h1>
