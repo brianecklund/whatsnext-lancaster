@@ -236,6 +236,7 @@ export default function UpdatesSplitClient({ updates, currentSection, onNavigate
             <button
               type="button"
               className="filterBtn"
+              data-active={filterOpen || !!tag ? "true" : "false"}
               aria-label={filterOpen ? "Close filters" : "Open filters"}
               aria-expanded={filterOpen ? "true" : "false"}
               onClick={() => setFilterOpen((v) => !v)}

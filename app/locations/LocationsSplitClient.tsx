@@ -22,6 +22,95 @@ function getLetter(value?: string | null) {
 }
 
 type LocationRow = LocationLite & { key: string };
+
+function normalizePhoneHref(phone?: string | null): string | null {
+  const t = phone?.trim();
+  if (!t) return null;
+  const compact = t.replace(/[^\d+]/g, "");
+  if (!compact) return null;
+  return `tel:${compact}`;
+}
+
+function normalizeWebsiteHref(url?: string | null): string | null {
+  const t = url?.trim();
+  if (!t) return null;
+  if (/^https?:\/\//i.test(t)) return t;
+  return `https://${t}`;
+}
+
+function DirectoryListingRow({
+  l,
+  active,
+  onSelect,
+}: {
+  l: LocationRow;
+  active: boolean;
+  onSelect: () => void;
+}) {
+  const phoneHref = normalizePhoneHref(l.phone);
+  const webHref = normalizeWebsiteHref(l.website);
+  const openNow = l.openNow;
+
+  return (
+    <div
+      className="eventRow directoryListingRow"
+      data-active={active ? "true" : "false"}
+      role="button"
+      tabIndex={0}
+      onClick={onSelect}
+      onKeyDown={(e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
+    >
+      <div className="directoryListingRow__main">
+        <span className="eventRowTitle">{l.name ?? "Untitled listing"}</span>
+        {l.category ? <span className="directoryListingRow__category">{l.category}</span> : null}
+        {l.address ? <span className="directoryListingRow__address">{l.address}</span> : null}
+      </div>
+      <div
+        className="directoryListingRow__actions"
+        onClick={(e) => {
+          e.stopPropagation();
+        }}
+        onKeyDown={(e) => e.stopPropagation()}
+      >
+        {phoneHref ? (
+          <a
+            className="directoryListingIconBtn"
+            href={phoneHref}
+            aria-label={`Call ${l.name ?? "this listing"}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ToolbarIcon src="/icons/phone.svg" alt="" />
+          </a>
+        ) : null}
+        {webHref ? (
+          <a
+            className="directoryListingIconBtn"
+            href={webHref}
+            target="_blank"
+            rel="noreferrer"
+            aria-label={`Website for ${l.name ?? "this listing"}`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ToolbarIcon src="/icons/globe.svg" alt="" />
+          </a>
+        ) : null}
+        <span
+          className={`directoryOpenBadge${openNow === true ? " directoryOpenBadge--open" : ""}`}
+          aria-label={openNow === true ? "Open now" : openNow === false ? "Closed" : "Hours unknown"}
+        >
+          <span className="directoryOpenBadge__dot" aria-hidden />
+          {openNow === true ? <span className="directoryOpenBadge__label">OPEN</span> : null}
+        </span>
+      </div>
+    </div>
+  );
+}
+
 type GroupedSection = { letter: string; rows: LocationRow[] };
 
 
@@ -529,20 +618,7 @@ export default function LocationsSplitClient({
                     {featuredPartners.map((l) => {
                       const active = selectedKey ? selectedKey === l.key : selectedDesktop?.key === l.key;
                       return (
-                        <button
-                          key={l.id}
-                          className="eventRow"
-                          data-active={active ? "true" : "false"}
-                          onClick={() => setSelected(l.key)}
-                          type="button"
-                        >
-                          <span className="eventRowTitle">{l.name ?? "Untitled listing"}</span>
-                          <span className="eventRowMeta">
-                            {l.category ? <span>{l.category}</span> : null}
-                            {l.address ? <span className="dot">•</span> : null}
-                            {l.address ? <span>{l.address}</span> : null}
-                          </span>
-                        </button>
+                        <DirectoryListingRow key={l.id} l={l} active={active} onSelect={() => setSelected(l.key)} />
                       );
                     })}
                   </div>
@@ -564,20 +640,7 @@ export default function LocationsSplitClient({
                         {section.rows.map((l) => {
                           const active = selectedKey ? selectedKey === l.key : selectedDesktop?.key === l.key;
                           return (
-                            <button
-                              key={l.id}
-                              className="eventRow"
-                              data-active={active ? "true" : "false"}
-                              onClick={() => setSelected(l.key)}
-                              type="button"
-                            >
-                              <span className="eventRowTitle">{l.name ?? "Untitled listing"}</span>
-                              <span className="eventRowMeta">
-                                {l.category ? <span>{l.category}</span> : null}
-                                {l.address ? <span className="dot">•</span> : null}
-                                {l.address ? <span>{l.address}</span> : null}
-                              </span>
-                            </button>
+                            <DirectoryListingRow key={l.id} l={l} active={active} onSelect={() => setSelected(l.key)} />
                           );
                         })}
                       </div>

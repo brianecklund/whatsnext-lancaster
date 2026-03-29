@@ -22,6 +22,7 @@ export default function NewsTickerBar({
   hubLead = DEFAULT_HUB_LEAD,
   seasonLandingHref = "/spring",
   updatesHref = "/updates",
+  className = "",
 }: {
   introText: string;
   items: NewsTickerItem[];
@@ -29,6 +30,7 @@ export default function NewsTickerBar({
   hubLead?: string;
   seasonLandingHref?: string;
   updatesHref?: string;
+  className?: string;
 }) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const sliderRef = useRef<HTMLUListElement | null>(null);
@@ -136,7 +138,7 @@ export default function NewsTickerBar({
 
   return (
     <>
-      <section className="newsBar" aria-label="Latest updates — open full list">
+      <section className={["newsBar", className].filter(Boolean).join(" ")} aria-label="Latest updates — open full list">
         <button type="button" className="newsBar__openBtn" onClick={openHub} aria-haspopup="dialog" aria-expanded={hubOpen}>
           <span className="newsBar__intro">{introText}</span>
 

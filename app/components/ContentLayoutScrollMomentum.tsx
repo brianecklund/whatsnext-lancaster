@@ -8,8 +8,19 @@ function isShellPath(pathname: string) {
   return pathname === "/" || pathname.startsWith("/locations") || pathname.startsWith("/updates");
 }
 
+function getContentScrollRoot(): HTMLElement | null {
+  const root = document.querySelector(".wnlPageRevealRoot");
+  if (!root) return null;
+  for (const child of root.children) {
+    if (child instanceof HTMLElement && child.classList.contains("siteHeader")) continue;
+    if (child instanceof HTMLElement) return child;
+  }
+  return null;
+}
+
 /**
- * Content routes scroll the document (about, donate, contact, clock, etc.).
+ * Content routes: inertial scroll on the main content column (not `body`), so the
+ * header stays fixed and scrollbars do not shift nav between shell vs content pages.
  * Shell routes use in-pane `.scroll` via useSmoothWheel in split clients.
  */
 export default function ContentLayoutScrollMomentum() {
@@ -30,10 +41,10 @@ export default function ContentLayoutScrollMomentum() {
 
     const attach = () => {
       if (cancelled) return;
-      const se = document.scrollingElement;
-      if (!(se instanceof HTMLElement)) return;
-      if (se.scrollHeight <= se.clientHeight + 4) return;
-      cleanup = attachInertialScroll(se);
+      const el = getContentScrollRoot();
+      if (!el) return;
+      if (el.scrollHeight <= el.clientHeight + 4) return;
+      cleanup = attachInertialScroll(el);
     };
 
     raf1 = window.requestAnimationFrame(() => {
