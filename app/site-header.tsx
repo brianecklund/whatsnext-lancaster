@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { DEFAULT_THEME, THEME_PALETTES, THEME_PREVIEW_COLORS, type ThemeKey } from "./theme-palettes";
 import {
   FONT_OPTIONS,
@@ -490,13 +491,7 @@ export default function SiteHeader() {
             }}
           >
             <span className="settingsBtnIcon" aria-hidden>
-              <svg viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                  d="M14.34 2.25a.75.75 0 0 1 .73.57l.26 1.08c.52.12 1.02.3 1.5.54l.98-.6a.75.75 0 0 1 .95.14l1.5 1.5a.75.75 0 0 1 .14.95l-.6.98c.24.48.42.98.54 1.5l1.08.26a.75.75 0 0 1 .57.73v2.12a.75.75 0 0 1-.57.73l-1.08.26a8.09 8.09 0 0 1-.54 1.5l.6.98a.75.75 0 0 1-.14.95l-1.5 1.5a.75.75 0 0 1-.95.14l-.98-.6c-.48.24-.98.42-1.5.54l-.26 1.08a.75.75 0 0 1-.73.57H9.66a.75.75 0 0 1-.73-.57l-.26-1.08a8.09 8.09 0 0 1-1.5-.54l-.98.6a.75.75 0 0 1-.95-.14l-1.5-1.5a.75.75 0 0 1-.14-.95l.6-.98a8.09 8.09 0 0 1-.54-1.5l-1.08-.26a.75.75 0 0 1-.57-.73V9.66a.75.75 0 0 1 .57-.73l1.08-.26c.12-.52.3-1.02.54-1.5l-.6-.98a.75.75 0 0 1 .14-.95l1.5-1.5a.75.75 0 0 1 .95-.14l.98.6c.48-.24.98-.42 1.5-.54l.26-1.08a.75.75 0 0 1 .73-.57h4.68ZM12 15.5a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z"
-                />
-              </svg>
+              <ToolbarIcon src="/icons/settings.svg" alt="" />
             </span>
           </button>
 

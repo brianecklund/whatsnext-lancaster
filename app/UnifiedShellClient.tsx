@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { usePathname, useRouter } from "next/navigation";
 import HomeSplitClient from "@/app/HomeSplitClient";
 import LocationsSplitClient from "@/app/locations/LocationsSplitClient";
 import UpdatesSplitClient, { type UpdateLite } from "@/app/updates/UpdatesSplitClient";
@@ -23,31 +24,33 @@ const SECTION_PATHS: Record<SectionKey, string> = {
   updates: "/updates",
 };
 
+function sectionFromPathname(pathname: string | null): SectionKey {
+  if (!pathname) return "calendar";
+  if (pathname.startsWith("/updates")) return "updates";
+  if (pathname.startsWith("/locations")) return "directory";
+  return "calendar";
+}
+
 export default function UnifiedShellClient({ initialSection, events, locations, updates, newsHubSeason }: Props) {
-  const [activeSection, setActiveSection] = useState<SectionKey>(initialSection);
-  const [renderedSection, setRenderedSection] = useState<SectionKey>(initialSection);
+  const router = useRouter();
+  const pathname = usePathname();
+  const sectionFromUrl = useMemo(() => sectionFromPathname(pathname), [pathname]);
+
+  const [activeSection, setActiveSection] = useState<SectionKey>(() => sectionFromUrl ?? initialSection);
+  const [renderedSection, setRenderedSection] = useState<SectionKey>(() => sectionFromUrl ?? initialSection);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [contentSwitching, setContentSwitching] = useState(false);
   const [introActive, setIntroActive] = useState(false);
   const shellRef = useRef<HTMLDivElement | null>(null);
 
+  /** Keep shell in sync with real URL (Next navigation, back/forward, deep links). */
   useEffect(() => {
-    setActiveSection(initialSection);
-    setRenderedSection(initialSection);
-  }, [initialSection]);
-
-  useEffect(() => {
-    const onPopState = () => {
-      const path = window.location.pathname;
-      const next: SectionKey = path.startsWith('/updates') ? 'updates' : path.startsWith('/locations') ? 'directory' : 'calendar';
-      setActiveSection(next);
-      setRenderedSection(next);
-      setIsTransitioning(false);
-      setContentSwitching(false);
-    };
-    window.addEventListener('popstate', onPopState);
-    return () => window.removeEventListener('popstate', onPopState);
-  }, []);
+    const next = sectionFromPathname(pathname);
+    setActiveSection(next);
+    setRenderedSection(next);
+    setIsTransitioning(false);
+    setContentSwitching(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -78,7 +81,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
       ".paneLeft .eventRow",
       ".paneRight > .scroll > *",
       ".mobileDetail[data-open='true'] > *",
-      ".mobileDetail[data-open='true'] .scroll > *"
+      ".mobileDetail[data-open='true'] .scroll > *",
     ].join(", ");
 
     const seen = new Set<HTMLElement>();
@@ -118,7 +121,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
         ".paneLeft .eventRow",
         ".paneRight > .scroll > *",
         ".mobileDetail[data-open='true'] > *",
-        ".mobileDetail[data-open='true'] .scroll > *"
+        ".mobileDetail[data-open='true'] .scroll > *",
       ].join(", ");
 
       const seen = new Set<HTMLElement>();
@@ -138,15 +141,11 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
   }, [introActive, renderedSection]);
 
   function switchSection(next: SectionKey) {
-    if (next === activeSection) return;
-    setActiveSection(next);
-    setRenderedSection(next);
+    if (next === sectionFromUrl) return;
     setIsTransitioning(true);
     setContentSwitching(true);
     const target = SECTION_PATHS[next];
-    if (window.location.pathname !== target) {
-      window.history.pushState({}, '', target);
-    }
+    router.push(target);
     window.setTimeout(() => {
       setIsTransitioning(false);
     }, 120);
@@ -155,17 +154,25 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
     }, 560);
   }
 
-  const sharedProps = useMemo(() => ({
-    currentSection: activeSection,
-    onNavigateSection: switchSection,
-  }), [activeSection]);
+  const sharedProps = useMemo(
+    () => ({
+      currentSection: activeSection,
+      onNavigateSection: switchSection,
+    }),
+    [activeSection],
+  );
 
   return (
-    <div ref={shellRef} className={`shellSwap homeShell${introActive ? " shellIntro--active" : ""}`} data-transitioning={isTransitioning ? 'true' : 'false'} data-content-switching={contentSwitching ? 'true' : 'false'}>
+    <div
+      ref={shellRef}
+      className={`shellSwap homeShell${introActive ? " shellIntro--active" : ""}`}
+      data-transitioning={isTransitioning ? "true" : "false"}
+      data-content-switching={contentSwitching ? "true" : "false"}
+    >
       <div key={renderedSection} className="shellSwap__panel">
-        {renderedSection === 'calendar' ? (
+        {renderedSection === "calendar" ? (
           <HomeSplitClient events={events} updates={updates} newsHubSeason={newsHubSeason} {...sharedProps} />
-        ) : renderedSection === 'directory' ? (
+        ) : renderedSection === "directory" ? (
           <LocationsSplitClient locations={locations} updates={updates} basePath="/locations" newsHubSeason={newsHubSeason} {...sharedProps} />
         ) : (
           <UpdatesSplitClient updates={updates} basePath="/updates" newsHubSeason={newsHubSeason} {...sharedProps} />

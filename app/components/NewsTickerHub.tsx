@@ -139,13 +139,13 @@ export default function NewsTickerHub({
       <button type="button" className="newsTickerHubBackdrop" aria-label="Close" onClick={onRequestClose} />
       <div className="newsTickerHubPanel" onClick={(e) => e.stopPropagation()}>
         <header className="newsTickerHubHeader">
+          <p className="newsTickerHubHeaderKicker">{introBarText}</p>
           <button type="button" className="newsTickerHubClose" onClick={onRequestClose} aria-label="Close">
             ✕
           </button>
         </header>
 
         <div className="newsTickerHubScroll">
-          <p className="newsTickerHubKicker">{introBarText}</p>
           <h2 className="newsTickerHubTitle">What’s happening in Lancaster</h2>
           <p className="newsTickerHubLead">{hubLead}</p>
 
@@ -190,12 +190,7 @@ export default function NewsTickerHub({
                     <span className="newsTickerHubReadMore">Read on Updates →</span>
                   </Link>
                   {u.link ? (
-                    <a
-                      href={u.link}
-                      className="newsTickerHubExternal"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
+                    <a href={u.link} className="newsTickerHubExternal" target="_blank" rel="noreferrer">
                       {u.linkLabel || "Open link"} →
                     </a>
                   ) : null}

@@ -356,6 +356,12 @@ a.eventTimeLink:hover{
   fill: currentColor;
 }
 
+.settingsBtnIcon .btnIconImg{
+  width: 20px;
+  height: 20px;
+  display: block;
+}
+
 .settingsSheetScroll{
   max-height: min(72vh, 640px);
   overflow-y: auto;
@@ -3622,7 +3628,7 @@ a:hover{
   }
 
   .calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px;
   }
 
   .calendarSearchRowMobile .filterBtn{
@@ -3716,6 +3722,132 @@ a:hover{
 }
 .directorySectionHeading:first-child{
   padding-top: 10px;
+}
+
+.directoryGroupBlock--featured .directorySectionHeading{
+  padding-bottom: 10px;
+}
+
+.directoryFeaturedRailWrap{
+  margin-bottom: 6px;
+}
+
+.directoryFeaturedRail{
+  display: flex;
+  gap: 12px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px 2px 12px;
+  margin-left: calc(var(--mobileListPadX, 12px) * -1);
+  margin-right: calc(var(--mobileListPadX, 12px) * -1);
+  padding-left: var(--mobileListPadX, 12px);
+  padding-right: var(--mobileListPadX, 12px);
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+.directoryFeaturedRail::-webkit-scrollbar{
+  display: none;
+}
+
+.directoryFeaturedCard{
+  flex: 0 0 min(280px, 78vw);
+  scroll-snap-align: start;
+  text-align: left;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--panel);
+  padding: 0;
+  overflow: hidden;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  box-shadow: var(--shadowSoft);
+}
+
+.directoryFeaturedCard--active{
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border) 55%);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.08);
+}
+
+.directoryFeaturedCardThumb{
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: color-mix(in srgb, var(--panel) 88%, var(--muted) 12%);
+  overflow: hidden;
+}
+
+.directoryFeaturedCardThumb img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.directoryFeaturedCardThumb--placeholder{
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, color-mix(in srgb, var(--panel) 75%, var(--accent) 25%), var(--panel));
+}
+
+.directoryFeaturedCardBody{
+  padding: 10px 12px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+.directoryFeaturedCardTitle{
+  font-size: 0.98rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+  color: var(--text);
+}
+
+.directoryFeaturedCardMeta{
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.directoryFeaturedDots{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0 14px;
+}
+
+.directoryFeaturedDot{
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  border: 0;
+  padding: 0;
+  background: color-mix(in srgb, var(--muted) 45%, var(--border) 55%);
+  cursor: pointer;
+}
+
+.directoryFeaturedDot--active{
+  background: var(--text);
+  transform: scale(1.15);
+}
+
+@media (min-width: 981px){
+  .directoryFeaturedRail{
+    margin-left: calc(var(--panePadX) * -1);
+    margin-right: calc(var(--panePadX) * -1);
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
+  }
+
+  .directoryFeaturedCard{
+    flex-basis: 260px;
+  }
 }
 
 .mobileSheetOverlay{
@@ -4294,9 +4426,30 @@ textarea,
 }
 
 @media (max-width: 980px){
+  .paneLeft > .scroll{
+    --calendarListStickyTop: 132px;
+  }
+
+  .directoryListWrap .directoryLetterHeading--sticky{
+    position: sticky;
+    top: var(--calendarListStickyTop, 132px);
+    z-index: 6;
+    margin-left: calc(var(--mobileListPadX, 12px) * -1);
+    margin-right: calc(var(--mobileListPadX, 12px) * -1);
+    padding-left: var(--mobileListPadX, 12px);
+    padding-right: var(--mobileListPadX, 12px);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: -4px;
+    margin-bottom: 10px;
+    background: var(--bg);
+    box-shadow: 0 1px 0 var(--border);
+  }
+}
+
+@media (max-width: 980px){
   .directoryToolbar,
-  .directorySectionHeading,
-  .directoryLetterHeading{
+  .directorySectionHeading{
     position: static;
   }
 }
@@ -8092,7 +8245,7 @@ body{
 
   .calendarSearchRowMobile,
   .searchRow.calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) 40px 40px !important;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px !important;
     gap: 6px !important;
     width: 100% !important;
   }
@@ -8185,7 +8338,7 @@ body{
   .calendarSearchRowMobile,
   .searchRow.calendarSearchRowMobile{
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) auto auto !important;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px !important;
     align-items: center !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -10451,7 +10604,8 @@ body[data-layout="content"] .simplePage{
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.22);
   border: 1px solid var(--border);
   border-top: none;
-  animation: newsTickerHubDrop 360ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  transform-origin: top center;
+  animation: newsTickerHubExpand 380ms cubic-bezier(0.22, 1, 0.36, 1) both;
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -10462,17 +10616,35 @@ body[data-layout="content"] .simplePage{
 }
 
 .newsTickerHubOverlay--closing .newsTickerHubPanel{
-  animation: newsTickerHubRetract 320ms cubic-bezier(0.55, 0, 1, 0.45) both;
+  animation: newsTickerHubCollapse 300ms cubic-bezier(0.55, 0, 1, 0.45) both;
 }
 
 .newsTickerHubHeader{
   flex: 0 0 auto;
   display: flex;
-  justify-content: flex-end;
-  padding: 12px 14px 6px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 20px 10px;
+  min-height: 44px;
+  box-sizing: border-box;
+  border-bottom: 1px solid var(--border);
+}
+
+.newsTickerHubHeaderKicker{
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 600;
+  line-height: 1.25;
 }
 
 .newsTickerHubClose{
+  flex: 0 0 auto;
   width: 40px;
   height: 40px;
   border-radius: 12px;
@@ -10751,25 +10923,25 @@ body[data-layout="content"] .simplePage{
   }
 }
 
-@keyframes newsTickerHubDrop{
+@keyframes newsTickerHubExpand{
   from{
-    opacity: 0;
-    transform: translateY(calc(-100% - 8px));
+    opacity: 0.96;
+    transform: scaleY(0.88) translateY(-6px);
   }
   to{
     opacity: 1;
-    transform: translateY(0);
+    transform: scaleY(1) translateY(0);
   }
 }
 
-@keyframes newsTickerHubRetract{
+@keyframes newsTickerHubCollapse{
   from{
     opacity: 1;
-    transform: translateY(0);
+    transform: scaleY(1) translateY(0);
   }
   to{
     opacity: 0;
-    transform: translateY(calc(-100% - 8px));
+    transform: scaleY(0.92) translateY(-6px);
   }
 }
 
@@ -10830,6 +11002,7 @@ body[data-layout="content"] .simplePage{
   .newsTickerHubOverlay--closing,
   .newsTickerHubOverlay--closing .newsTickerHubPanel{
     animation: none !important;
+    transform: none !important;
   }
 }
 

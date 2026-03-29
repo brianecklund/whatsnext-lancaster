@@ -18,6 +18,18 @@ function normalize(v?: string | null) {
   return (v || "").toLowerCase().trim();
 }
 
+/** CMS / JSON sometimes sends open/closed as strings; normalize for badge styling. */
+function coerceOpenNow(raw: unknown): boolean | null {
+  if (raw === true || raw === 1) return true;
+  if (raw === false || raw === 0) return false;
+  if (typeof raw === "string") {
+    const s = raw.trim().toLowerCase();
+    if (s === "true" || s === "1" || s === "yes" || s === "open") return true;
+    if (s === "false" || s === "0" || s === "no" || s === "closed") return false;
+  }
+  return null;
+}
+
 function getLetter(value?: string | null) {
   const first = (value || "").trim().charAt(0).toUpperCase();
   return /^[A-Z]$/.test(first) ? first : "#";
@@ -140,6 +152,105 @@ function DirectoryListingRow({
 }
 
 type GroupedSection = { letter: string; rows: LocationRow[] };
+
+function FeaturedPartnersRail({
+  partners,
+  selectedKey,
+  selectedDesktopKey,
+  onSelect,
+}: {
+  partners: LocationRow[];
+  selectedKey: string | null;
+  selectedDesktopKey: string | undefined;
+  onSelect: (key: string) => void;
+}) {
+  const railRef = useRef<HTMLDivElement | null>(null);
+  const [activeIdx, setActiveIdx] = useState(0);
+
+  useEffect(() => {
+    const root = railRef.current;
+    if (!root || partners.length === 0) return;
+
+    const cards = root.querySelectorAll<HTMLElement>("[data-featured-card]");
+    if (!cards.length) return;
+
+    const obs = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio);
+        const best = visible[0]?.target;
+        if (best) {
+          const idx = Number(best.getAttribute("data-index"));
+          if (!Number.isNaN(idx)) setActiveIdx(idx);
+        }
+      },
+      { root, rootMargin: "0px -12% 0px -12%", threshold: [0.2, 0.45, 0.65, 0.85] },
+    );
+
+    cards.forEach((c) => obs.observe(c));
+    return () => obs.disconnect();
+  }, [partners]);
+
+  function scrollToIndex(idx: number) {
+    const root = railRef.current;
+    if (!root) return;
+    const card = root.querySelector<HTMLElement>(`[data-featured-card][data-index="${idx}"]`);
+    card?.scrollIntoView({ behavior: "smooth", inline: "center", block: "nearest" });
+  }
+
+  return (
+    <div className="directoryGroupBlock directoryGroupBlock--featured">
+      <div className="directorySectionHeading">Featured partners</div>
+      <div className="directoryFeaturedRailWrap">
+        <div className="directoryFeaturedRail" ref={railRef} role="list">
+          {partners.map((l, i) => {
+            const active = selectedKey ? selectedKey === l.key : selectedDesktopKey === l.key;
+            const thumb = l.coverImageUrl || null;
+            return (
+              <button
+                key={l.id}
+                type="button"
+                role="listitem"
+                data-featured-card
+                data-index={i}
+                className={`directoryFeaturedCard${active ? " directoryFeaturedCard--active" : ""}`}
+                onClick={() => onSelect(l.key)}
+              >
+                <div className="directoryFeaturedCardThumb">
+                  {thumb ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={thumb} alt="" />
+                  ) : (
+                    <div className="directoryFeaturedCardThumb--placeholder" aria-hidden />
+                  )}
+                </div>
+                <div className="directoryFeaturedCardBody">
+                  <span className="directoryFeaturedCardTitle">{l.name ?? "Untitled"}</span>
+                  {l.category ? <span className="directoryFeaturedCardMeta">{l.category}</span> : null}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+        {partners.length > 1 ? (
+          <div className="directoryFeaturedDots" role="tablist" aria-label="Featured partners">
+            {partners.map((_, i) => (
+              <button
+                key={i}
+                type="button"
+                role="tab"
+                aria-selected={i === activeIdx ? "true" : "false"}
+                className={`directoryFeaturedDot${i === activeIdx ? " directoryFeaturedDot--active" : ""}`}
+                onClick={() => scrollToIndex(i)}
+              />
+            ))}
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 
 
 type PlaceDetailsResponse = {
@@ -654,15 +765,12 @@ export default function LocationsSplitClient({
             ) : (
               <div className="directoryListWrap">
                 {featuredPartners.length > 0 ? (
-                  <div className="directoryGroupBlock">
-                    <div className="directorySectionHeading">Featured partners</div>
-                    {featuredPartners.map((l) => {
-                      const active = selectedKey ? selectedKey === l.key : selectedDesktop?.key === l.key;
-                      return (
-                        <DirectoryListingRow key={l.id} l={l} active={active} onSelect={() => setSelected(l.key)} />
-                      );
-                    })}
-                  </div>
+                  <FeaturedPartnersRail
+                    partners={featuredPartners}
+                    selectedKey={selectedKey}
+                    selectedDesktopKey={selectedDesktop?.key}
+                    onSelect={(key) => setSelected(key)}
+                  />
                 ) : null}
 
                 {groupedStandardListings.length > 0 ? (
@@ -677,11 +785,7 @@ export default function LocationsSplitClient({
                         className="directoryLetterSection"
                         data-letter-section={section.letter}
                       >
-                        <div
-                          className={`directoryLetterHeading${!effectiveIsMobile ? " directoryLetterHeading--sticky" : ""}`}
-                        >
-                          {section.letter}
-                        </div>
+                        <div className="directoryLetterHeading directoryLetterHeading--sticky">{section.letter}</div>
                         {section.rows.map((l) => {
                           const active = selectedKey ? selectedKey === l.key : selectedDesktop?.key === l.key;
                           return (
@@ -755,6 +859,7 @@ function LocationDetail({ location }: { location: LocationRow }) {
   const phone = placeDetails?.nationalPhoneNumber || location.phone || null;
   const rating = typeof placeDetails?.rating === "number" ? placeDetails.rating : location.rating;
   const photoAttributions = placeDetails?.photoAttributions?.length ? placeDetails.photoAttributions : [];
+  const placeOpenNow = coerceOpenNow(placeDetails?.openNow);
 
   return (
     <div key={detailFlashKey} className="detailCard detailFlash">
@@ -793,9 +898,9 @@ function LocationDetail({ location }: { location: LocationRow }) {
         {location.category ? <span className="badge detailMetaCategory">{location.category}</span> : null}
         {location.address ? <span className="muted">{location.address}</span> : null}
         {typeof rating === "number" ? <span className="muted">★ {rating.toFixed(1)}</span> : null}
-        {typeof placeDetails?.openNow === "boolean" ? (
-          <span className={`badge ${placeDetails.openNow ? "badgeOpen" : "badgeClosed"}`}>
-            {placeDetails.openNow ? "Open now" : "Closed now"}
+        {placeOpenNow !== null ? (
+          <span className={`badge ${placeOpenNow ? "badgeOpen" : "badgeClosed"}`}>
+            {placeOpenNow ? "Open now" : "Closed now"}
           </span>
         ) : null}
       </div>
