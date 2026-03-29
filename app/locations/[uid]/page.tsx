@@ -39,7 +39,7 @@ export default async function LocationDetailPage({
   const testPage = getTestPartnerPage(uid);
   if (testPage) {
     return (
-      <main className="locationPageShell">
+      <main className={`locationPageShell${backToEventHref ? " locationPageShell--fromEvent" : ""}`}>
         <div className="locationPageInner">
           <a className="locationPageBack" href={backToEventHref ?? "/locations"}>
             {backToEventHref ? "← Back to event" : "← Back to directory"}
@@ -136,7 +136,7 @@ export default async function LocationDetailPage({
   const photoAttributions = placeDetails?.photoAttributions ?? [];
 
   return (
-    <main className="locationPageShell">
+    <main className={`locationPageShell${backToEventHref ? " locationPageShell--fromEvent" : ""}`}>
       <div className="locationPageInner">
         <a className="locationPageBack" href={backToEventHref ?? "/locations"}>
           {backToEventHref ? "← Back to event" : "← Back to directory"}

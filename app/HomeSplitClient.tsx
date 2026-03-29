@@ -462,8 +462,6 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   /** After attaching the scroll listener, ignore the first in-bounds pass so restored scrollTop does not instantly collapse controls. */
   const mobileScrollCollapsePrimedRef = useRef(false);
   const mobileControlsCollapsedRef = useRef(false);
-  const spotlightRailRef = useRef<HTMLDivElement | null>(null);
-  const [spotlightPagerIndex, setSpotlightPagerIndex] = useState(0);
   const weekCategorySentinelRef = useRef<HTMLDivElement | null>(null);
   const [mobileWeekCategorySticky, setMobileWeekCategorySticky] = useState(false);
   const [mobileWeekCategorySheetOpen, setMobileWeekCategorySheetOpen] = useState(false);
@@ -572,20 +570,6 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     if (!effectiveIsMobile || !mobileSpotlightOpen) return;
     setMobileControlsCollapsed(false);
   }, [effectiveIsMobile, mobileSpotlightOpen]);
-
-  useEffect(() => {
-    if (!effectiveIsMobile || viewMode !== "list") return;
-    const el = spotlightRailRef.current;
-    if (!el) return;
-    const sync = () => {
-      const w = el.getBoundingClientRect().width;
-      if (w <= 1) return;
-      setSpotlightPagerIndex(el.scrollLeft > w * 0.35 ? 1 : 0);
-    };
-    el.addEventListener("scroll", sync, { passive: true });
-    sync();
-    return () => el.removeEventListener("scroll", sync);
-  }, [effectiveIsMobile, viewMode, resolvedSection]);
 
   // Keep the optimistic client key in sync with the URL when navigation completes.
   useEffect(() => {
@@ -1082,13 +1066,28 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     if (!effectiveIsMobile) setFilterOpen(false);
   }, [effectiveIsMobile]);
 
-  // On mobile, ensure route switches (Calendar/Directory/Updates) never carry a stuck detail overlay.
+  const mobilePathPrevRef = useRef<string | null>(null);
+
+  // On mobile, clear the event overlay when switching primary sections — but not when returning
+  // from a venue page (…/locations/[uid]) back to the calendar with ?event= still in the URL.
   useEffect(() => {
     if (!effectiveIsMobile) return;
+    const prev = mobilePathPrevRef.current;
+    const isVenueDetailPath = (p: string) => /^\/locations\/[^/]+$/.test(p);
+
+    if (prev === null) {
+      mobilePathPrevRef.current = pathname;
+      return;
+    }
+
+    mobilePathPrevRef.current = pathname;
+
+    if (pathname === "/" && isVenueDetailPath(prev)) return;
+
     setClientSelectedKey(null);
     if (sp.get("event")) setParam("event", null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pathname]);
+  }, [pathname, effectiveIsMobile]);
 
   // Ensure tagline is visible again when leaving mobile.
   useEffect(() => {
@@ -1097,6 +1096,16 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
 
   const mobileDetailOpen =
     effectiveIsMobile && (!!selectedEvent || mobileSpotlightOpen);
+
+  useEffect(() => {
+    if (!effectiveIsMobile || !mobileDetailOpen) return;
+    try {
+      delete document.documentElement.dataset.routeSwitching;
+      window.sessionStorage.removeItem("wnl-segmented-pending");
+    } catch {
+      /* ignore */
+    }
+  }, [effectiveIsMobile, mobileDetailOpen]);
 
   useEffect(() => {
     if (mobileDetailOpen) setFilterOpen(false);
@@ -1352,7 +1361,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 {effectiveIsMobile && resolvedSection === "calendar" && !mobileDetailOpen ? (
                   <button
                     type="button"
-                    className="mobileControlsToggle"
+                    className="mobileControlsToggle mobileControlsToggle--text"
                     aria-label={mobileControlsCollapsed ? "Show search and filters" : "Hide search and filters"}
                     aria-expanded={mobileControlsCollapsed ? "false" : "true"}
                     onClick={() => {
@@ -1492,45 +1501,35 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 viewMode === "list" &&
                 !isClockView ? (
                   <div className="weeklySpotlightMobile fadeInItem" style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}>
-                    <div ref={spotlightRailRef} className="weeklySpotlightRail">
+                    <div className="weeklySpotlightMobile__row">
                       <button
                         type="button"
-                        className="weeklyOverview weeklyOverview--spotlightCard"
+                        className="weeklyOverview weeklyOverview--spotlightMobileHalf"
                         data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
                         onClick={() => openWeek(WEEKLY_KEY)}
                       >
-                        <div className="weeklyTitle">Weekly Overview</div>
-                        <div className="weeklyCount">
-                          {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left this week
+                        <div className="weeklySpotlightMobile__label">This week</div>
+                        <div className="weeklySpotlightMobile__count">
+                          {(() => {
+                            const n = defaultWeekBucket?.events.length ?? 0;
+                            return `${n} ${n === 1 ? "event" : "events"}`;
+                          })()}
                         </div>
                       </button>
                       <button
                         type="button"
-                        className="weeklyOverview weeklyOverview--spotlightCard"
+                        className="weeklyOverview weeklyOverview--spotlightMobileHalf"
                         data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
                         onClick={() => openWeek(GOING_NOW_KEY)}
                       >
-                        <div className="weeklyTitle">Going on now</div>
-                        <div className="weeklyCount">
-                          {liveEventsNow.length} event{liveEventsNow.length === 1 ? "" : "s"} happening now
+                        <div className="weeklySpotlightMobile__label">Happening now</div>
+                        <div className="weeklySpotlightMobile__count">
+                          {(() => {
+                            const n = liveEventsNow.length;
+                            return `${n} ${n === 1 ? "event" : "events"}`;
+                          })()}
                         </div>
                       </button>
-                    </div>
-                    <div className="weeklySpotlightPager" aria-hidden="true">
-                      <span
-                        className={
-                          spotlightPagerIndex === 0
-                            ? "weeklySpotlightPager__dot weeklySpotlightPager__dot--active"
-                            : "weeklySpotlightPager__dot"
-                        }
-                      />
-                      <span
-                        className={
-                          spotlightPagerIndex === 1
-                            ? "weeklySpotlightPager__dot weeklySpotlightPager__dot--active"
-                            : "weeklySpotlightPager__dot"
-                        }
-                      />
                     </div>
                   </div>
                 ) : null}
@@ -2298,6 +2297,12 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       key: "cal",
                       label: "Cal.",
                       onClick: () => {
+                        try {
+                          delete document.documentElement.dataset.routeSwitching;
+                          window.sessionStorage.removeItem("wnl-segmented-pending");
+                        } catch {
+                          /* ignore */
+                        }
                         setMobileDetailVisualKey("cal");
                         setMobileDetailNavPending(false);
                         clearSelected();
