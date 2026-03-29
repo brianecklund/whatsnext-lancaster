@@ -1315,7 +1315,7 @@ a.eventTimeLink:hover{
 
   .weeklySpotlightMobile__row{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: stretch;
     gap: 8px;
     width: 100%;
@@ -1323,11 +1323,11 @@ a.eventTimeLink:hover{
   }
 
   .weeklyOverview--spotlightMobileHalf{
-    flex: 1 1 0;
+    flex: 0 0 auto;
+    width: 100% !important;
+    max-width: none !important;
     min-width: 0;
     margin: 0 !important;
-    width: auto !important;
-    max-width: none !important;
     padding: 8px 10px 10px !important;
     border-radius: 14px !important;
     text-align: center;
@@ -1336,7 +1336,7 @@ a.eventTimeLink:hover{
     align-items: center;
     justify-content: center;
     gap: 4px;
-    min-height: 0;
+    box-sizing: border-box;
   }
 
   .weeklySpotlightMobile__label{
@@ -5321,7 +5321,7 @@ svg:not(:root) {
     grid-template-columns: 1fr;
     gap: 0;
     min-height: 46px;
-    padding: 0 16px;
+    padding: 0;
   }
 
   .newsBar__intro{
@@ -5333,29 +5333,38 @@ svg:not(:root) {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .nw{
+  .newsBar .nw{
     width: 100%;
     max-width: 100%;
     min-width: 0;
   }
 
-  .nw__inner{
+  .newsBar .nw__inner{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
     width: 100%;
     justify-content: space-between;
+    gap: 10px;
   }
 
-  .nw__wrapper{
+  .newsBar .nw__wrapper{
     flex: 1 1 auto;
+    min-width: 0;
     height: 1.65em;
   }
 
-  .nw__slider{
-    margin-right: 10px;
+  .newsBar .nw__slider{
+    margin-right: 0;
   }
 
-  .nw__slider__item{
+  .newsBar .nw__slider__item{
     max-width: none;
     height: 1.65em;
+  }
+
+  .newsBar .nw__slider__text{
+    text-align: left;
   }
 
   .nw__slider__link{
@@ -11339,9 +11348,46 @@ body[data-layout="content"] .simplePage{
 
 @media (max-width: 980px){
   .newsBar__openBtn{
-    gap: 8px;
-    padding: 0 16px 0;
+    gap: 10px;
+    padding: 4px var(--panePadX) 4px;
     min-height: 38px;
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: stretch;
+  }
+
+  /* Ticker line left-aligned, progress ring right-aligned — match pane horizontal inset */
+  .newsBar .nw{
+    width: 100%;
+    min-width: 0;
+    max-width: none;
+  }
+
+  .newsBar .nw__inner{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .newsBar .nw__wrapper{
+    flex: 1 1 auto;
+    min-width: 0;
+    height: 1.85em;
+  }
+
+  .newsBar .nw__slider{
+    margin-right: 0;
+  }
+
+  .newsBar .nw__slider__item{
+    height: 1.85em;
+    max-width: none;
+  }
+
+  .newsBar .nw__slider__text{
+    text-align: left !important;
   }
 
   .newsBar .nw__progress{
@@ -11349,23 +11395,12 @@ body[data-layout="content"] .simplePage{
     height: 26px;
     min-width: 26px;
     min-height: 26px;
+    flex-shrink: 0;
   }
 
   .newsBar .nw__progress__icon{
     width: 13px;
     height: 13px;
-  }
-
-  .newsBar .nw__wrapper{
-    height: 1.85em;
-  }
-
-  .newsBar .nw__slider__item{
-    height: 1.85em;
-  }
-
-  .newsBar .nw__slider{
-    margin-right: 0.85em;
   }
 }
 

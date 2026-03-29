@@ -569,6 +569,7 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   useEffect(() => {
     if (!effectiveIsMobile || !mobileSpotlightOpen) return;
     setMobileControlsCollapsed(false);
+    setMobileControlsPinnedOpen(false);
   }, [effectiveIsMobile, mobileSpotlightOpen]);
 
   // Keep the optimistic client key in sync with the URL when navigation completes.
@@ -1358,16 +1359,23 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ]}
                 />
 
-                {effectiveIsMobile && resolvedSection === "calendar" && !mobileDetailOpen ? (
+                {effectiveIsMobile &&
+                resolvedSection === "calendar" &&
+                !mobileDetailOpen &&
+                (mobileControlsCollapsed || mobileControlsPinnedOpen) ? (
                   <button
                     type="button"
                     className="mobileControlsToggle mobileControlsToggle--text"
                     aria-label={mobileControlsCollapsed ? "Show search and filters" : "Hide search and filters"}
                     aria-expanded={mobileControlsCollapsed ? "false" : "true"}
                     onClick={() => {
-                      const nextCollapsed = !mobileControlsCollapsed;
-                      setMobileControlsCollapsed(nextCollapsed);
-                      setMobileControlsPinnedOpen(!nextCollapsed);
+                      if (mobileControlsCollapsed) {
+                        setMobileControlsCollapsed(false);
+                        setMobileControlsPinnedOpen(true);
+                      } else {
+                        setMobileControlsCollapsed(true);
+                        setMobileControlsPinnedOpen(false);
+                      }
                     }}
                   >
                     <span className="mobileControlsToggleLabel">{mobileControlsCollapsed ? "Show controls" : "Hide controls"}</span>
