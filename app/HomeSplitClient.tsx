@@ -5,7 +5,9 @@ import ToolbarIcon from "./components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { dayKey, eventHasEnded, nearestDayWithEvents, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
 
+import { createPortal } from "react-dom";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import WeeklyPreviewRail from "@/app/components/WeeklyPreviewRail";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import SegmentedControl from "@/app/components/SegmentedControl";
@@ -262,6 +264,11 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
 
   const listRef = useRef<HTMLDivElement | null>(null);
   const mobileDetailScrollRef = useRef<HTMLDivElement | null>(null);
+  const [mobileTabsPortalReady, setMobileTabsPortalReady] = useState(false);
+
+  useEffect(() => {
+    setMobileTabsPortalReady(true);
+  }, []);
   const daySectionRefs = useRef<Record<string, HTMLElement | null>>({});
   const displayDayGroupsRef = useRef<Array<{ date: Date; items: EventLite[] }>>([]);
   const [scrollDayKey, setScrollDayKey] = useState<string | null>(null);
@@ -1846,66 +1853,69 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
         ) : null}
       </div>
 
-      {/* Mobile bottom tabs */}
-      {effectiveIsMobile ? (
-        mobileDetailOpen ? (
-          <div className="mobileTabs mobileTabsDetail mobileTabDock" aria-label="Event navigation">
-            <SegmentedControl
-              className="segmentedControl--mobile segmentedControl--detail"
-              ariaLabel="Event navigation"
-              currentKey="cal"
-              visualKeyOverride={mobileDetailVisualKey}
-              pendingOverride={mobileDetailNavPending}
-              items={[
-                {
-                  key: "previous",
-                  label: "Prev.",
-                  onClick: () => {
-                    if (!previousEventKey) return;
-                    setMobileDetailVisualKey("previous");
-                    setMobileDetailNavPending(true);
-                    openSelected(previousEventKey);
-                  },
-                  disabled: !previousEventKey,
-                },
-                {
-                  key: "cal",
-                  label: "Cal.",
-                  onClick: () => {
-                    setMobileDetailVisualKey("cal");
-                    setMobileDetailNavPending(false);
-                    clearSelected();
-                  },
-                },
-                {
-                  key: "next",
-                  label: "Next",
-                  onClick: () => {
-                    if (!nextEventKey) return;
-                    setMobileDetailVisualKey("next");
-                    setMobileDetailNavPending(true);
-                    openSelected(nextEventKey);
-                  },
-                  disabled: !nextEventKey,
-                },
-              ]}
-            />
-          </div>
-        ) : (
-          <div className="mobileTabs mobilePrimaryTabs mobileTabDock" aria-label="Primary navigation">
-            <SegmentedControl
-              className="segmentedControl--mobile"
-              ariaLabel="Primary navigation"
-              currentKey={resolvedSection}
-              items={[
-                { key: "calendar", label: "Calendar", href: "/" },
-                { key: "directory", label: "Directory", href: "/locations" },
-                { key: "updates", label: "Updates", href: "/updates" },
-              ]}
-            />
-          </div>
-        )
-      ) : null}
+      {/* Mobile bottom tabs — portaled to body so position:fixed anchors to the viewport (shell transforms otherwise clip/push tabs). */}
+      {effectiveIsMobile && mobileTabsPortalReady
+        ? createPortal(
+            mobileDetailOpen ? (
+              <div className="mobileTabs mobileTabsDetail mobileTabDock" aria-label="Event navigation">
+                <SegmentedControl
+                  className="segmentedControl--mobile segmentedControl--detail"
+                  ariaLabel="Event navigation"
+                  currentKey="cal"
+                  visualKeyOverride={mobileDetailVisualKey}
+                  pendingOverride={mobileDetailNavPending}
+                  items={[
+                    {
+                      key: "previous",
+                      label: "Prev.",
+                      onClick: () => {
+                        if (!previousEventKey) return;
+                        setMobileDetailVisualKey("previous");
+                        setMobileDetailNavPending(true);
+                        openSelected(previousEventKey);
+                      },
+                      disabled: !previousEventKey,
+                    },
+                    {
+                      key: "cal",
+                      label: "Cal.",
+                      onClick: () => {
+                        setMobileDetailVisualKey("cal");
+                        setMobileDetailNavPending(false);
+                        clearSelected();
+                      },
+                    },
+                    {
+                      key: "next",
+                      label: "Next",
+                      onClick: () => {
+                        if (!nextEventKey) return;
+                        setMobileDetailVisualKey("next");
+                        setMobileDetailNavPending(true);
+                        openSelected(nextEventKey);
+                      },
+                      disabled: !nextEventKey,
+                    },
+                  ]}
+                />
+              </div>
+            ) : (
+              <div className="mobileTabs mobilePrimaryTabs mobileTabDock" aria-label="Primary navigation">
+                <SegmentedControl
+                  className="segmentedControl--mobile"
+                  ariaLabel="Primary navigation"
+                  currentKey={resolvedSection}
+                  items={[
+                    { key: "calendar", label: "Calendar", href: "/" },
+                    { key: "directory", label: "Directory", href: "/locations" },
+                    { key: "updates", label: "Updates", href: "/updates" },
+                  ]}
+                />
+              </div>
+            ),
+            document.body,
+          )
+        : null}
 
       {/* Mobile detail overlay */}
       <div
@@ -2042,7 +2052,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
 
               <div className="weeklyLanding fadeInItem" style={{ animationDelay: "260ms" }}>
                 {filteredWeekEvents.length ? (
-                  <div className="weeklyPreviewRail" aria-label="Swipe through upcoming events this week">
+                  <WeeklyPreviewRail itemCount={filteredWeekEvents.length}>
                     {filteredWeekEvents.map((e) => {
                       const title = e.title || "Untitled event";
                       const d = safeDateFromEvent(e);
@@ -2076,7 +2086,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         </button>
                       );
                     })}
-                  </div>
+                  </WeeklyPreviewRail>
                 ) : null}
 
                 <div className="weeklyCards">
