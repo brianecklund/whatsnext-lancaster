@@ -7531,15 +7531,18 @@ html[data-route-switching="true"] .routeFrame{
 }
 
 .weeklyPreviewRail{
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(240px, 84vw);
-  gap: 12px;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 16px;
   overflow-x: auto;
   overscroll-behavior-x: contain;
-  padding: 4px 0 8px 0;
+  padding: 4px 0 12px 0;
   margin: 0;
-  scroll-snap-type: x proximity;
+  scroll-snap-type: x mandatory;
+  scroll-behavior: smooth;
+  scroll-padding-inline: max(12px, 5vw);
   -webkit-overflow-scrolling: touch;
 }
 
@@ -7580,7 +7583,11 @@ html[data-route-switching="true"] .routeFrame{
 }
 
 .weeklyPreviewCard{
-  scroll-snap-align: start;
+  flex: 0 0 min(88vw, 440px);
+  width: min(88vw, 440px);
+  min-width: min(88vw, 440px);
+  max-width: min(88vw, 440px);
+  scroll-snap-align: center;
   text-align: left;
   border: 1px solid var(--border);
   border-radius: 18px;
@@ -9093,7 +9100,7 @@ body > *{
     margin-top: 8px !important;
   }
 
-  .mobileWeekAnnouncements{
+  .mobileWeekAnnouncements:not(.weekAnnouncements--strip){
     margin-top: 14px;
     padding: 14px;
   }
@@ -11715,5 +11722,131 @@ body[data-layout="content"] main.contentPage.clockPage{
   .mobileWeekCategoryStickyBar--visible{
     transform: translateY(0);
     opacity: 1;
+  }
+
+  .weeklyPreviewRail{
+    scroll-behavior: auto;
+    scroll-snap-type: x proximity;
+  }
+}
+
+/* --- 2026-03-27 Weekly overview: category chip rail + pinned strip; calendar search flex --- */
+.weekCategoryScrollRail{
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+  padding: 4px 0 10px;
+  margin: 4px -2px 0;
+  scrollbar-width: thin;
+}
+
+.weekCategoryChip{
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: var(--btnSurface, #fff);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  transition: background-color 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.weekCategoryChip[data-active="true"]{
+  border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  background: var(--accentSoft);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 28%, transparent);
+}
+
+.weekCategoryChip__label{
+  font-size: 0.82rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  max-width: 56vw;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.weekCategoryChip__count{
+  font-size: 0.88rem;
+  font-weight: 700;
+  opacity: 0.82;
+  font-variant-numeric: tabular-nums;
+}
+
+.weekAnnouncements--strip{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  border-top: 1px solid var(--border);
+  padding-top: 14px;
+}
+
+.weekAnnouncements--strip .weekAnnouncementsHeader{
+  margin-bottom: 0;
+}
+
+.weekAnnouncements--strip .weekAnnouncementCard{
+  width: 100%;
+  box-sizing: border-box;
+}
+
+@media (max-width: 980px){
+  .mobileWeeklyOverviewOpen .weekAnnouncements--strip{
+    margin-left: calc(-1 * var(--panePadX));
+    margin-right: calc(-1 * var(--panePadX));
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
+    margin-top: 10px;
+    padding-top: 16px;
+  }
+
+  .mobileWeeklyOverviewOpen .weekAnnouncementCard{
+    border-radius: 16px;
+  }
+
+  .leftSticky .calendarSearchRow.calendarSearchRowMobile,
+  .leftSticky .searchRow.calendarSearchRowMobile{
+    display: flex !important;
+    flex-direction: row !important;
+    flex-wrap: nowrap !important;
+    align-items: center !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+    gap: 6px !important;
+  }
+
+  .leftSticky .calendarSearchRowMobile .searchInput,
+  .leftSticky .searchRow.calendarSearchRowMobile .searchInput{
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  .leftSticky .calendarSearchRowMobile .viewBtn,
+  .leftSticky .calendarSearchRowMobile .filterBtn,
+  .leftSticky .searchRow.calendarSearchRowMobile .viewBtn,
+  .leftSticky .searchRow.calendarSearchRowMobile .filterBtn{
+    flex: 0 0 40px !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
   }
 }

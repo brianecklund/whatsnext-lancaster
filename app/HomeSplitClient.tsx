@@ -1856,67 +1856,64 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
                     </div>
 
-                    <div className="weekSummaryGrid weekSummaryGridSingle" role="list">
+                    <div className="weekCategoryScrollRail" role="tablist" aria-label="Filter events by category">
                       <button
                         type="button"
-                        className="weekSummaryCard weekSummaryCardButton"
-                        role="listitem"
+                        role="tab"
+                        aria-selected={selectedWeekCategory === "All"}
+                        className="weekCategoryChip"
                         data-active={selectedWeekCategory === "All" ? "true" : "false"}
                         onClick={() => setSelectedWeekCategory("All")}
                       >
-                        <div className="weekSummaryKicker">Total events</div>
-                        <div className="weekSummaryValue">{weekEventsCount}</div>
+                        <span className="weekCategoryChip__label">All</span>
+                        <span className="weekCategoryChip__count">{weekEventsCount}</span>
                       </button>
-                      <div className="weekCategoryFilters" role="group" aria-label="Weekly overview category filters">
-                        {weekCategoryOptions.map((category) => {
-                          const isActive = selectedWeekCategory === category;
-                          const count = selectedWeekBucket.insights[category] ?? 0;
-                          return (
-                            <button
-                              key={category}
-                              type="button"
-                              className="weekCategoryFilterBtn"
-                              data-active={isActive ? "true" : "false"}
-                              onClick={() => setSelectedWeekCategory(category)}
-                            >
-                              <div className="weekSummaryKicker">{category}</div>
-                              <div className="weekSummaryValue weekCategoryFilterCount">{count}</div>
-                            </button>
-                          );
-                        })}
-                      </div>
+                      {weekCategoryOptions.map((category) => {
+                        const isActive = selectedWeekCategory === category;
+                        const count = selectedWeekBucket.insights[category] ?? 0;
+                        return (
+                          <button
+                            key={category}
+                            type="button"
+                            role="tab"
+                            aria-selected={isActive}
+                            className="weekCategoryChip"
+                            data-active={isActive ? "true" : "false"}
+                            onClick={() => setSelectedWeekCategory(category)}
+                          >
+                            <span className="weekCategoryChip__label">{category}</span>
+                            <span className="weekCategoryChip__count">{count}</span>
+                          </button>
+                        );
+                      })}
                     </div>
-
-                    <div className="weekAnnouncements" aria-label="Pinned announcements">
-                      <div className="weekAnnouncementsHeader">
-                        <div>
-                          <div className="weekSummaryKicker">Pinned Announcements</div>
-                        </div>
-                      </div>
-
-                      {weekAnnouncements.length ? (
-                        <div className="weekAnnouncementsList">
-                          {weekAnnouncements.map((update) => (
-                            <button
-                              key={update.id}
-                              type="button"
-                              className="weekAnnouncementCard"
-                              onClick={() => router.push(`/updates?u=${encodeURIComponent(update.id)}`)}
-                            >
-                              <div className="weekAnnouncementTop">
-                                <div className="weekAnnouncementTitle">{update.title}</div>
-                                {update.date ? <div className="weekAnnouncementDate">{update.date}</div> : null}
-                              </div>
-                              {update.summary ? <div className="weekAnnouncementText">{update.summary}</div> : null}
-                              {update.link ? <div className="weekAnnouncementLink">{update.linkLabel || "Open link"}</div> : null}
-                            </button>
-                          ))}
-                        </div>
-                      ) : (
-                        <div className="weekAnnouncementEmpty">Add or pin announcements in the Updates CMS collection to feature them here.</div>
-                      )}
-                    </div>
+                    <div ref={weekCategorySentinelRef} className="weekCategoryStickySentinel" aria-hidden />
                   </div>
+
+                  <section className="weekAnnouncements weekAnnouncements--strip" aria-label="Pinned announcements">
+                    <div className="weekAnnouncementsHeader">
+                      <div className="weekSummaryKicker">Pinned announcements</div>
+                    </div>
+                    {weekAnnouncements.length ? (
+                      weekAnnouncements.map((update) => (
+                        <button
+                          key={update.id}
+                          type="button"
+                          className="weekAnnouncementCard"
+                          onClick={() => router.push(`/updates?u=${encodeURIComponent(update.id)}`)}
+                        >
+                          <div className="weekAnnouncementTop">
+                            <div className="weekAnnouncementTitle">{update.title}</div>
+                            {update.date ? <div className="weekAnnouncementDate">{update.date}</div> : null}
+                          </div>
+                          {update.summary ? <div className="weekAnnouncementText">{update.summary}</div> : null}
+                          {update.link ? <div className="weekAnnouncementLink">{update.linkLabel || "Open link"}</div> : null}
+                        </button>
+                      ))
+                    ) : (
+                      <div className="weekAnnouncementEmpty">Add or pin announcements in the Updates CMS collection to feature them here.</div>
+                    )}
+                  </section>
 
                   {filteredWeekEvents.length === 0 ? (
                     <div className="emptyRight">No events match this weekly overview filter right now.</div>
@@ -2404,66 +2401,66 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
                 </div>
 
-                <div className="weekSummaryGrid weekSummaryGridSingle" role="list">
+                <div className="weekCategoryScrollRail" role="tablist" aria-label="Filter events by category">
                   <button
                     type="button"
-                    className="weekSummaryCard weekSummaryCardButton"
-                    role="listitem"
+                    role="tab"
+                    aria-selected={selectedWeekCategory === "All"}
+                    className="weekCategoryChip"
                     data-active={selectedWeekCategory === "All" ? "true" : "false"}
                     onClick={() => setSelectedWeekCategory("All")}
                   >
-                    <div className="weekSummaryKicker">Total events</div>
-                    <div className="weekSummaryValue">{selectedWeekBucket.events.length}</div>
+                    <span className="weekCategoryChip__label">All</span>
+                    <span className="weekCategoryChip__count">{selectedWeekBucket.events.length}</span>
                   </button>
-                  <div className="weekCategoryFilters weekCategoryFilters--mobileCompact" role="group" aria-label="Weekly overview category filters">
-                    {weekCategoryOptions.map((category) => {
-                      const isActive = selectedWeekCategory === category;
-                      const count = selectedWeekBucket.insights[category] ?? 0;
-                      return (
-                        <button
-                          key={category}
-                          type="button"
-                          className="weekCategoryFilterBtn"
-                          data-active={isActive ? "true" : "false"}
-                          onClick={() => setSelectedWeekCategory(category)}
-                        >
-                          <div className="weekSummaryKicker">{category}</div>
-                          <div className="weekSummaryValue weekCategoryFilterCount">{count}</div>
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <div ref={weekCategorySentinelRef} className="weekCategoryStickySentinel" aria-hidden />
+                  {weekCategoryOptions.map((category) => {
+                    const isActive = selectedWeekCategory === category;
+                    const count = selectedWeekBucket.insights[category] ?? 0;
+                    return (
+                      <button
+                        key={category}
+                        type="button"
+                        role="tab"
+                        aria-selected={isActive}
+                        className="weekCategoryChip"
+                        data-active={isActive ? "true" : "false"}
+                        onClick={() => setSelectedWeekCategory(category)}
+                      >
+                        <span className="weekCategoryChip__label">{category}</span>
+                        <span className="weekCategoryChip__count">{count}</span>
+                      </button>
+                    );
+                  })}
                 </div>
-
-                <div className="weekAnnouncements mobileWeekAnnouncements" aria-label="Pinned announcements">
-                  <div className="weekAnnouncementsHeader">
-                    <div>
-                      <div className="weekSummaryKicker">Pinned Announcements</div>
-                    </div>
-                  </div>
-                  {weekAnnouncements.length ? (
-                    <div className="weekAnnouncementsList">
-                      {weekAnnouncements.map((update) => (
-                        <button
-                          key={update.id}
-                          type="button"
-                          className="weekAnnouncementCard"
-                          onClick={() => router.push(`/updates?u=${encodeURIComponent(update.id)}`)}
-                        >
-                          <div className="weekAnnouncementTop">
-                            <div className="weekAnnouncementTitle">{update.title}</div>
-                            {update.date ? <div className="weekAnnouncementDate">{update.date}</div> : null}
-                          </div>
-                          {update.summary ? <div className="weekAnnouncementText">{update.summary}</div> : null}
-                        </button>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="weekAnnouncementEmpty">Add or pin updates in the CMS to feature them here.</div>
-                  )}
-                </div>
+                <div ref={weekCategorySentinelRef} className="weekCategoryStickySentinel" aria-hidden />
               </div>
+
+              <section
+                className="weekAnnouncements weekAnnouncements--strip mobileWeekAnnouncements"
+                aria-label="Pinned announcements"
+              >
+                <div className="weekAnnouncementsHeader">
+                  <div className="weekSummaryKicker">Pinned announcements</div>
+                </div>
+                {weekAnnouncements.length ? (
+                  weekAnnouncements.map((update) => (
+                    <button
+                      key={update.id}
+                      type="button"
+                      className="weekAnnouncementCard"
+                      onClick={() => router.push(`/updates?u=${encodeURIComponent(update.id)}`)}
+                    >
+                      <div className="weekAnnouncementTop">
+                        <div className="weekAnnouncementTitle">{update.title}</div>
+                        {update.date ? <div className="weekAnnouncementDate">{update.date}</div> : null}
+                      </div>
+                      {update.summary ? <div className="weekAnnouncementText">{update.summary}</div> : null}
+                    </button>
+                  ))
+                ) : (
+                  <div className="weekAnnouncementEmpty">Add or pin updates in the CMS to feature them here.</div>
+                )}
+              </section>
 
               <div className="weeklyLanding fadeInItem" style={{ animationDelay: "260ms" }}>
                 {filteredWeekEvents.length ? (
