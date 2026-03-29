@@ -2068,6 +2068,64 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 </div>
               ) : null}
             </div>
+          ) : selectedDisplayKey === GOING_NOW_KEY ? (
+            <div className="weeklyOverviewLanding mobileWeeklyOverviewOpen mobileGoingNowOpen">
+              <div className="weekSummary fadeInItem" style={{ animationDelay: "140ms" }}>
+                <div className="weekSummaryTopline">
+                  <div>
+                    <div className="rightDayLabel">Going on now</div>
+                    <h3 className="weekSummaryTitle">Live now</h3>
+                  </div>
+                  <div className="weekSummaryRangePill">{liveEventsNow.length} live</div>
+                </div>
+              </div>
+              <div className="weeklyLanding fadeInItem" style={{ animationDelay: "200ms" }}>
+                {liveEventsNow.length === 0 ? (
+                  <div className="emptyRight">Nothing scheduled as happening right now.</div>
+                ) : (
+                  <div className="weeklyCards">
+                    {liveEventsNow.map((e) => {
+                      const title = e.title || "Untitled event";
+                      const d = safeDateFromEvent(e);
+                      const timeLabel = d ? formatTimeShort(d) : "Time TBD";
+                      const desc = (pickDescriptionText(e) || e.summary || "").trim();
+                      const img = pickImageUrl(e);
+                      return (
+                        <button
+                          key={e.id}
+                          type="button"
+                          className="weeklyCard weeklyCardSelectable"
+                          data-past={eventHasEnded(e) ? "true" : "false"}
+                          onClick={() => openSelected(e.uid ?? e.id)}
+                        >
+                          <div className="weeklyCardMedia">
+                            {img ? (
+                              <div className="media16x9">
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img className="weeklyThumb" src={img} alt="" />
+                              </div>
+                            ) : (
+                              <div className="media16x9 weeklyThumbPlaceholder" aria-hidden />
+                            )}
+                          </div>
+                          <div className="weeklyCardContent weeklyCardContentExpanded">
+                            {e.event_type ? <div className="weeklyCardTag">{e.event_type}</div> : null}
+                            <div className="weeklyCardTop">
+                              <div className="weeklyCardTitleWrap">
+                                <div className="weeklyCardTitle">{title}</div>
+                                <div className="weeklyCardTime">{timeLabel}</div>
+                              </div>
+                            </div>
+                            <div className="weeklyCardMetaRow">{[e.locationName].filter(Boolean).join(" • ")}</div>
+                            {desc ? <div className="weeklyCardDesc">{desc.length > 180 ? `${desc.slice(0, 180).trim()}…` : desc}</div> : null}
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            </div>
           ) : selectedWeekBucket ? (
             <div className="weeklyOverviewLanding mobileWeeklyOverviewOpen">
               <div className="weekSelectorRail weekSelectorRailMobile fadeInItem" style={{ animationDelay: "140ms" }}>
