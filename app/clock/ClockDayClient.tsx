@@ -6,7 +6,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import type { EventLite } from "@/lib/types";
 import { dayKey, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
 import MediaBlocks from "@/app/components/MediaBlocks";
-import EventClockLink from "@/app/components/EventClockLink";
 
 type Props = {
   events: EventLite[];
@@ -401,9 +400,7 @@ export default function ClockDayClient({ events, navigationMode = "standalone" }
                     onFocus={() => setHoveredKey(key)}
                     onBlur={() => setHoveredKey((prev) => (prev === key ? null : prev))}
                   >
-                    <EventClockLink event={e} className="clockEventTime">
-                      {timeLabel}
-                    </EventClockLink>
+                    <div className="clockEventTime">{timeLabel}</div>
                     <div className="clockEventTitle">{title}</div>
                     {metaBits ? <div className="clockEventMeta">{metaBits}</div> : null}
 

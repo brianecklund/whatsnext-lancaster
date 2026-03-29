@@ -352,6 +352,9 @@ a.eventTimeLink:hover{
   height: 22px;
   display: block;
 }
+.settingsBtnIcon svg path{
+  fill: currentColor;
+}
 
 .settingsSheetScroll{
   max-height: min(72vh, 640px);
@@ -3717,7 +3720,30 @@ a:hover{
 }
 
 @media (min-width: 981px){
-  .mobileSheetOverlay{ display:none; }
+  /* Hamburger / full-screen mobile sheets only — settings uses its own dialog layout */
+  .mobileSheetOverlay:not(.settingsSheetOverlay){
+    display: none;
+  }
+
+  .settingsSheetOverlay{
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: max(12px, env(safe-area-inset-top)) 20px 24px;
+    background: rgba(0, 0, 0, 0.42);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .settingsSheetOverlay .mobileSheet.settingsSheet{
+    min-height: 0;
+    max-height: min(88dvh, 720px);
+    width: 100%;
+    max-width: 440px;
+    margin-top: 8px;
+    border-radius: 22px;
+    box-shadow: 0 24px 56px rgba(0, 0, 0, 0.22);
+  }
 }
 
 @media (hover: hover) and (pointer: fine){
@@ -9386,6 +9412,15 @@ body[data-layout="content"] .simplePage{
 }
 
 /* --- Clock view page (analog clock + hover-synced event list) --- */
+.paneLeftClockEmbed{
+  width: 100%;
+  min-height: 0;
+}
+
+.paneLeftClockEmbed .clockPage--embed{
+  padding-bottom: 32px;
+}
+
 .clockPage{
   padding-top: 22px;
   padding-bottom: 88px;

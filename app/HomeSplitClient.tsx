@@ -11,7 +11,6 @@ import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperti
 import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
 import WeeklyPreviewRail from "@/app/components/WeeklyPreviewRail";
 import ClockDayClient from "@/app/clock/ClockDayClient";
-import EventClockLink from "@/app/components/EventClockLink";
 import type { EventLite as LibEventLite } from "@/lib/types";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
@@ -270,6 +269,8 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   const dayParam = sp.get("day");
   const viewMode: "list" | "month" | "clock" = view === "month" ? "month" : view === "clock" ? "clock" : "list";
   const isClockView = viewMode === "clock";
+  /** Clock view reuses list-style right pane (detail / weekly / day list). */
+  const showListStyleRightPane = viewMode === "list" || isClockView;
 
   const listRef = useRef<HTMLDivElement | null>(null);
   const paneRightScrollRef = useRef<HTMLDivElement | null>(null);
@@ -329,7 +330,8 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
 
   const effectiveIsMobile = mounted ? isMobile : false;
 
-  const selectedDisplayKey = selectedKey ?? (!effectiveIsMobile && viewMode === "list" ? WEEKLY_KEY : null);
+  const selectedDisplayKey =
+    selectedKey ?? (!effectiveIsMobile && (viewMode === "list" || isClockView) ? WEEKLY_KEY : null);
 
   const mobileSpotlightOpen =
     effectiveIsMobile &&
@@ -1328,18 +1330,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           });
                         }}
                       >
-                        <span className="clockViewToolbarBtn__icon" aria-hidden>
-                          <svg viewBox="0 0 24 24" fill="none" width={20} height={20}>
-                            <circle cx="12" cy="12" r="8.5" stroke="currentColor" strokeWidth="1.8" />
-                            <path
-                              d="M12 7.8v4.7l3.2 1.8"
-                              stroke="currentColor"
-                              strokeWidth="1.8"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </span>
+                        <ToolbarIcon src="/icons/clock-view.svg" alt="" />
                         {effectiveIsMobile ? <span>Clock</span> : null}
                       </button>
                       {effectiveIsMobile ? (
@@ -1462,7 +1453,11 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 }
                 key={resolvedSection === "calendar" ? viewMode : "static"}
               >
-              {!isClockView && viewMode === "list" ? (
+              {isClockView && resolvedSection === "calendar" ? (
+                <div className="paneLeftClockEmbed">
+                  <ClockDayClient events={filteredEvents as unknown as LibEventLite[]} navigationMode="embedded" />
+                </div>
+              ) : viewMode === "list" ? (
                 <>
                   {/* Weekly overview + Going on now */}
                   {effectiveIsMobile ? (
@@ -1578,9 +1573,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       >
                         <div className="eventRowTitle">{title}</div>
                         <div className="eventRowMeta">
-                          <EventClockLink event={e as unknown as LibEventLite} className="eventRowTime">
-                            {timeLabel}
-                          </EventClockLink>
+                          <span>{timeLabel}</span>
                           {e.event_type ? (
                             effectiveIsMobile ? (
                               <span className="eventRowTypePill">{e.event_type}</span>
@@ -1610,7 +1603,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 </section>
               ))}
                 </>
-              ) : !isClockView && viewMode === "month" ? (
+              ) : viewMode === "month" ? (
                 <>
                   <div className="monthWrap">
                     <div className="monthHeader">
@@ -1708,9 +1701,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                               >
                                 <div className="eventCardTitle">{title}</div>
                                 <div className="eventMeta">
-                                  <EventClockLink event={e as unknown as LibEventLite} className="eventMetaTime">
-                                    {timeLabel}
-                                  </EventClockLink>
+                                  {timeLabel}
                                   {venueBits ? ` • ${venueBits}` : ""}
                                 </div>
                               </button>
@@ -1721,13 +1712,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     </div>
                   ) : null}
                 </>
-              ) : (
-                <div className="clockViewLeftHint muted" style={{ padding: "20px 16px" }}>
-                  <p style={{ margin: 0, fontSize: "0.95rem", lineHeight: 1.5 }}>
-                    <strong>Clock view</strong> is active. Use <strong>List</strong> or <strong>Calendar</strong> in the toolbar to return to the full schedule.
-                  </p>
-                </div>
-              )}
+              ) : null}
               </div>
 
             </div>
@@ -1738,10 +1723,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
         {showRight ? (
           <main className="pane paneRight">
             <div className="scroll" ref={paneRightScrollRef}>
-
-              {isClockView && resolvedSection === "calendar" ? (
-                <ClockDayClient events={filteredEvents as unknown as LibEventLite[]} navigationMode="embedded" />
-              ) : null}
 
               {!isClockView && viewMode === "month" ? (
                 <div className="dayRight">
@@ -1781,9 +1762,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           >
                             <div className="dayRightTop">
                               <div className="dayRightTitle">{title}</div>
-                              <EventClockLink event={e as unknown as LibEventLite} className="dayRightTime">
-                                {timeLabel}
-                              </EventClockLink>
+                              <div className="dayRightTime">{timeLabel}</div>
                             </div>
                             {venueBits ? <div className="dayRightMeta">{venueBits}</div> : null}
                           </button>
@@ -1795,7 +1774,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               ) : null}
 
 
-              {!isClockView && viewMode === "list" && selectedDisplayKey === GOING_NOW_KEY ? (
+              {showListStyleRightPane && selectedDisplayKey === GOING_NOW_KEY ? (
                 <div className="rightHeader weeklyOverviewLanding goingNowRight weeklyOverviewRevealGroup">
                   <div className="goingNowRight__top">
                     <div className="rightDayLabel">Going on now</div>
@@ -1822,9 +1801,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           >
                             <div className="dayRightTop">
                               <div className="dayRightTitle">{title}</div>
-                              <EventClockLink event={e as unknown as LibEventLite} className="dayRightTime">
-                                {timeLabel}
-                              </EventClockLink>
+                              <div className="dayRightTime">{timeLabel}</div>
                             </div>
                             {venueBits ? <div className="dayRightMeta">{venueBits}</div> : null}
                           </button>
@@ -1833,7 +1810,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     </div>
                   )}
                 </div>
-              ) : !isClockView && viewMode === "list" && selectedWeekBucket ? (
+              ) : showListStyleRightPane && selectedWeekBucket ? (
                 <div className="rightHeader weeklyOverviewLanding weeklyOverviewRevealGroup">
                   <div className="rightDayLabel">Weekly Overview</div>
 
@@ -1963,9 +1940,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                     <div className="weeklyCardTop">
                                       <div className="weeklyCardTitleWrap">
                                         <div className="weeklyCardTitle">{title}</div>
-                                        <EventClockLink event={e as unknown as LibEventLite} className="weeklyCardTime">
-                                          {timeLabel}
-                                        </EventClockLink>
+                                        <div className="weeklyCardTime">{timeLabel}</div>
                                       </div>
 
                                       {e.tickets_url || e.website_url ? (
@@ -2010,7 +1985,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     </div>
                   )}
                 </div>
-              ) : !isClockView && !selectedEvent ? (
+              ) : !selectedEvent ? (
                 <div className="dayRight">
                   <div className="dayRightHeader">
                     <div className="rightDayLabel">{formatDayHeading(selectedDay)}</div>
@@ -2041,9 +2016,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           >
                             <div className="dayRightTop">
                               <div className="dayRightTitle">{title}</div>
-                              <EventClockLink event={e as unknown as LibEventLite} className="dayRightTime">
-                                {timeLabel}
-                              </EventClockLink>
+                              <div className="dayRightTime">{timeLabel}</div>
                             </div>
                             {venueBits ? <div className="dayRightMeta">{venueBits}</div> : null}
                           </button>
@@ -2059,7 +2032,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   <h1 className="detailTitle">{selectedEvent.title || "Untitled event"}</h1>
 
                   <div className="detailMeta">
-                    <EventClockLink event={selectedEvent as unknown as LibEventLite}>{selectedTime}</EventClockLink>
+                    <span>{selectedTime}</span>
                     {selectedEvent.locationName ? (
                       <>
                         <span className="dot">•</span>
@@ -2367,9 +2340,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             <div className="weeklyCardTop">
                               <div className="weeklyCardTitleWrap">
                                 <div className="weeklyCardTitle">{title}</div>
-                                <EventClockLink event={e as unknown as LibEventLite} className="weeklyCardTime">
-                                  {timeLabel}
-                                </EventClockLink>
+                                <div className="weeklyCardTime">{timeLabel}</div>
                               </div>
                             </div>
                             <div className="weeklyCardMetaRow">{[e.locationName].filter(Boolean).join(" • ")}</div>
@@ -2501,14 +2472,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           </div>
                           <div className="weeklyPreviewContent">
                             <div className="weeklyPreviewTime">
-                              {d ? (
-                                <>
-                                  <span>{formatDayHeading(d)} • </span>
-                                  <EventClockLink event={e as unknown as LibEventLite}>{formatTimeShort(d)}</EventClockLink>
-                                </>
-                              ) : (
-                                "Time TBD"
-                              )}
+                              {d ? `${formatDayHeading(d)} • ${formatTimeShort(d)}` : "Time TBD"}
                             </div>
                             <div className="weeklyPreviewTitle">{title}</div>
                             {meta ? <div className="weeklyPreviewMeta">{meta}</div> : null}
@@ -2552,9 +2516,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                               <div className="weeklyCardTop">
                                 <div className="weeklyCardTitleWrap">
                                   <div className="weeklyCardTitle">{title}</div>
-                                  <EventClockLink event={e as unknown as LibEventLite} className="weeklyCardTime">
-                                    {timeLabel}
-                                  </EventClockLink>
+                                  <div className="weeklyCardTime">{timeLabel}</div>
                                 </div>
                                 {e.tickets_url || e.website_url ? (
                                   <div className="weeklyCardActions">
