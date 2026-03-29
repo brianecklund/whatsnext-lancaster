@@ -1317,13 +1317,13 @@ a.eventTimeLink:hover{
     scroll-snap-type: x mandatory;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
-    margin-left: calc(var(--mobileListPadX, 12px) * -1);
-    margin-right: calc(var(--mobileListPadX, 12px) * -1);
-    padding-left: var(--mobileListPadX, 12px);
-    padding-right: var(--mobileListPadX, 12px);
+    margin-left: calc(var(--panePadX) * -1);
+    margin-right: calc(var(--panePadX) * -1);
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
     padding-bottom: 10px;
-    width: calc(100% + (var(--mobileListPadX, 12px) * 2));
-    max-width: calc(100% + (var(--mobileListPadX, 12px) * 2));
+    width: calc(100% + (var(--panePadX) * 2));
+    max-width: calc(100% + (var(--panePadX) * 2));
     box-sizing: border-box;
   }
 
@@ -3353,6 +3353,14 @@ a:hover{
 @media (prefers-reduced-motion: reduce){
   .weeklyOverviewRevealGroup{
     animation: none !important;
+  }
+}
+
+@media (max-width: 980px){
+  .mobileWeeklyOverviewOpen.weeklyOverviewRevealGroup{
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
   }
 }
 
@@ -7452,6 +7460,7 @@ html[data-route-switching="true"] .routeFrame{
 
   .leftSticky > .tabs,
   .leftSticky > .leftControls,
+  .leftSticky > .weeklySpotlightMobile,
   .leftSticky > .directoryAlphabetNav,
   .leftSticky > .weekdayRow{
     padding-left: var(--panePadX);
@@ -11447,6 +11456,20 @@ body[data-layout="content"] .simplePage{
   gap: 6px;
   text-align: left;
   padding-right: 52px;
+}
+
+@media (max-width: 980px){
+  .updateListRow{
+    padding-right: 0;
+  }
+
+  .updateListRow__kind{
+    display: none !important;
+  }
+
+  .updateDetailTitleRow .updateKindOrb{
+    display: none !important;
+  }
 }
 
 .updateListRow__kind{

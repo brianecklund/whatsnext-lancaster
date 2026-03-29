@@ -11,6 +11,14 @@ type NewsTickerItem = {
   href?: string;
 };
 
+function tickerItemLine(item: NewsTickerItem): string {
+  const text = (item.text ?? "").replace(/\s+/g, " ").trim();
+  if (text) return text;
+  const label = (item.label ?? "").trim();
+  if (label) return `${label}: see Updates for details.`;
+  return "Community update.";
+}
+
 const HUB_CLOSE_MS = 340;
 
 const DEFAULT_HUB_LEAD =
@@ -71,10 +79,10 @@ export default function NewsTickerBar({
   }, [clearCloseTimer]);
 
   const renderedItems = useMemo(() => {
-    if (!items.length) {
-      return [{ label: "NEWS", text: "Upcoming Lancaster events and pop-ups.", href: "#" }];
-    }
-    const base = items.slice(0, 6);
+    const raw = !items.length
+      ? [{ label: "NEWS", text: "Upcoming Lancaster events and pop-ups.", href: "#" as const }]
+      : items.slice(0, 6);
+    const base = raw.map((item) => ({ ...item, text: tickerItemLine(item) }));
     return [...base, base[0]];
   }, [items]);
 

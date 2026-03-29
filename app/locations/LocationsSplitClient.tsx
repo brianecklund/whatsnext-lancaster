@@ -514,11 +514,15 @@ export default function LocationsSplitClient({
 
 
   const newsTickerItems = useMemo(() => {
-    const upcoming = orderedLocations.slice(0, 6).map((location) => ({
-      label: "NEWS",
-      text: `${location.name ?? "Featured listing"} • ${location.category ?? "Directory"}`,
-      href: "#",
-    }));
+    const upcoming = orderedLocations.slice(0, 6).map((location) => {
+      const name = (location.name ?? "").trim() || "Featured listing";
+      const cat = (location.category ?? "").trim() || "Directory";
+      return {
+        label: "NEWS",
+        text: `${name} • ${cat}`,
+        href: "#",
+      };
+    });
 
     return upcoming.length
       ? upcoming

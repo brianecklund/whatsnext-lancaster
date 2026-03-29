@@ -1220,11 +1220,18 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
       .filter(({ date }) => date.getTime() >= startOfToday().getTime())
       .sort((a, b) => a.date.getTime() - b.date.getTime())
       .slice(0, 6)
-      .map(({ event, date }) => ({
-        label: event.event_type ? event.event_type.toUpperCase() : "NEWS",
-        text: `${event.title ?? event.summary ?? "Upcoming event"} • ${event.locationName ?? "Lancaster"} • ${formatTimeLabel(date)}`,
-        href: "#",
-      }));
+      .map(({ event, date }) => {
+        const title =
+          (event.title ?? "").trim() ||
+          (event.summary ?? "").trim() ||
+          "Upcoming event";
+        const where = (event.locationName ?? "").trim() || "Lancaster";
+        return {
+          label: event.event_type ? event.event_type.toUpperCase() : "NEWS",
+          text: `${title} • ${where} • ${formatTimeLabel(date)}`,
+          href: "#",
+        };
+      });
 
     return upcoming.length
       ? upcoming
@@ -1479,6 +1486,55 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   </div>
                 </div>
 
+                {effectiveIsMobile &&
+                resolvedSection === "calendar" &&
+                !mobileDetailOpen &&
+                viewMode === "list" &&
+                !isClockView ? (
+                  <div className="weeklySpotlightMobile fadeInItem" style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}>
+                    <div ref={spotlightRailRef} className="weeklySpotlightRail">
+                      <button
+                        type="button"
+                        className="weeklyOverview weeklyOverview--spotlightCard"
+                        data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
+                        onClick={() => openWeek(WEEKLY_KEY)}
+                      >
+                        <div className="weeklyTitle">Weekly Overview</div>
+                        <div className="weeklyCount">
+                          {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left this week
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        className="weeklyOverview weeklyOverview--spotlightCard"
+                        data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
+                        onClick={() => openWeek(GOING_NOW_KEY)}
+                      >
+                        <div className="weeklyTitle">Going on now</div>
+                        <div className="weeklyCount">
+                          {liveEventsNow.length} event{liveEventsNow.length === 1 ? "" : "s"} happening now
+                        </div>
+                      </button>
+                    </div>
+                    <div className="weeklySpotlightPager" aria-hidden="true">
+                      <span
+                        className={
+                          spotlightPagerIndex === 0
+                            ? "weeklySpotlightPager__dot weeklySpotlightPager__dot--active"
+                            : "weeklySpotlightPager__dot"
+                        }
+                      />
+                      <span
+                        className={
+                          spotlightPagerIndex === 1
+                            ? "weeklySpotlightPager__dot weeklySpotlightPager__dot--active"
+                            : "weeklySpotlightPager__dot"
+                        }
+                      />
+                    </div>
+                  </div>
+                ) : null}
+
               </div>
 
               {filterOpen ? (
@@ -1564,51 +1620,8 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 </div>
               ) : viewMode === "list" ? (
                 <>
-                  {/* Weekly overview + Going on now */}
-                  {effectiveIsMobile ? (
-                    <div className="weeklySpotlightMobile fadeInItem" style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}>
-                      <div ref={spotlightRailRef} className="weeklySpotlightRail">
-                        <button
-                          type="button"
-                          className="weeklyOverview weeklyOverview--spotlightCard"
-                          data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
-                          onClick={() => openWeek(WEEKLY_KEY)}
-                        >
-                          <div className="weeklyTitle">Weekly Overview</div>
-                          <div className="weeklyCount">
-                            {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left this week
-                          </div>
-                        </button>
-                        <button
-                          type="button"
-                          className="weeklyOverview weeklyOverview--spotlightCard"
-                          data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
-                          onClick={() => openWeek(GOING_NOW_KEY)}
-                        >
-                          <div className="weeklyTitle">Going on now</div>
-                          <div className="weeklyCount">
-                            {liveEventsNow.length} event{liveEventsNow.length === 1 ? "" : "s"} happening now
-                          </div>
-                        </button>
-                      </div>
-                      <div className="weeklySpotlightPager" aria-hidden="true">
-                        <span
-                          className={
-                            spotlightPagerIndex === 0
-                              ? "weeklySpotlightPager__dot weeklySpotlightPager__dot--active"
-                              : "weeklySpotlightPager__dot"
-                          }
-                        />
-                        <span
-                          className={
-                            spotlightPagerIndex === 1
-                              ? "weeklySpotlightPager__dot weeklySpotlightPager__dot--active"
-                              : "weeklySpotlightPager__dot"
-                          }
-                        />
-                      </div>
-                    </div>
-                  ) : (
+                  {/* Weekly overview + Going on now (desktop — mobile lives in leftSticky under filters) */}
+                  {!effectiveIsMobile ? (
                     <div className="weeklySpotlightPair fadeInItem" style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}>
                       <button
                         type="button"
@@ -1633,7 +1646,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         </div>
                       </button>
                     </div>
-                  )}
+                  ) : null}
 
 {displayDayGroups.length === 0 ? (
                 <div className="emptyList">No events match your search.</div>

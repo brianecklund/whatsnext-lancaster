@@ -178,11 +178,17 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
   }, [safeUpdates, q, tag]);
 
   const newsTickerItems = useMemo(() => {
-    const upcoming = filtered.slice(0, 6).map((update) => ({
-      label: update.pinned ? "NEWS" : "UPDATE",
-      text: `${update.title}${update.summary ? ` • ${update.summary}` : update.tags?.[0] ? ` • ${update.tags[0]}` : ""}`,
-      href: "#",
-    }));
+    const upcoming = filtered.slice(0, 6).map((update) => {
+      const title = (update.title ?? "").trim() || "Update";
+      const sum = (update.summary ?? "").trim();
+      const tag0 = update.tags?.map((t) => (t ?? "").trim()).find(Boolean);
+      const tail = sum ? sum : tag0 ? tag0 : "";
+      return {
+        label: update.pinned ? "NEWS" : "UPDATE",
+        text: tail ? `${title} • ${tail}` : title,
+        href: "#",
+      };
+    });
 
     return upcoming.length
       ? upcoming
