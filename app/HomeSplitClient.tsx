@@ -1630,7 +1630,43 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               ) : null}
 
 
-              {viewMode === "list" && selectedWeekBucket ? (
+              {viewMode === "list" && selectedDisplayKey === GOING_NOW_KEY ? (
+                <div className="rightHeader weeklyOverviewLanding goingNowRight">
+                  <div className="goingNowRight__top">
+                    <div className="rightDayLabel">Going on now</div>
+                    <div className="weekSummaryRangePill">{liveEventsNow.length} live</div>
+                  </div>
+                  {liveEventsNow.length === 0 ? (
+                    <div className="emptyRight">Nothing scheduled as happening right now.</div>
+                  ) : (
+                    <div className="goingNowRightList" role="list">
+                      {liveEventsNow.map((e) => {
+                        const key = e.uid ?? e.id;
+                        const title = e.title || "Untitled event";
+                        const d = safeDateFromEvent(e);
+                        const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
+                        const venueBits = [e.locationName, e.event_type].filter(Boolean).join(" • ");
+                        return (
+                          <button
+                            key={key}
+                            type="button"
+                            className="dayRightRow"
+                            data-past={eventHasEnded(e) ? "true" : "false"}
+                            onClick={() => openSelected(String(key))}
+                            role="listitem"
+                          >
+                            <div className="dayRightTop">
+                              <div className="dayRightTitle">{title}</div>
+                              <div className="dayRightTime">{timeLabel}</div>
+                            </div>
+                            {venueBits ? <div className="dayRightMeta">{venueBits}</div> : null}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              ) : viewMode === "list" && selectedWeekBucket ? (
                 <div className="rightHeader weeklyOverviewLanding">
                   <div className="rightDayLabel">Weekly Overview</div>
 
