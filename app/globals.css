@@ -3691,15 +3691,47 @@ textarea,
   background: #16a34a;
 }
 
-@media (max-width: 520px){
+/* Mobile directory rows: name/category left, actions top-right */
+@media (max-width: 980px){
   .eventRow.directoryListingRow{
-    grid-template-columns: 1fr;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
   }
 
-  .directoryListingRow__actions{
-    justify-content: flex-end;
-    width: 100%;
+  .eventRow.directoryListingRow .directoryListingRow__main{
+    flex: 1 1 auto;
+    min-width: 0;
   }
+
+  .eventRow.directoryListingRow .directoryListingRow__actions{
+    align-self: flex-start;
+    flex-shrink: 0;
+    justify-content: flex-end;
+  }
+}
+
+.directoryListingRow__actions--onImage .directoryListingIconBtn{
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(255, 255, 255, 0.65);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.22);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.directoryListingRow__actions--onImage .directoryOpenBadge{
+  background: rgba(255, 255, 255, 0.94);
+  border-color: rgba(255, 255, 255, 0.55);
+  box-shadow: 0 2px 14px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.directoryListingRow__actions--onImage .directoryOpenBadge--open{
+  background: color-mix(in srgb, #ffffff 88%, #16a34a 12%);
+  border-color: color-mix(in srgb, #16a34a 35%, #ffffff 65%);
 }
 
 .directoryGroupBlock + .directoryGroupBlock{
@@ -5251,6 +5283,40 @@ svg:not(:root) {
   box-shadow: var(--shadowCard, 0 10px 24px rgba(0,0,0,0.08));
   margin: 0 0 18px;
   aspect-ratio: 16 / 10;
+}
+
+.locationCover--detail{
+  position: relative;
+}
+
+.locationCover__overlayActions{
+  display: none;
+}
+
+@media (max-width: 980px){
+  .mobileDetail .locationCover__overlayActions{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 5px;
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    left: 8px;
+    z-index: 3;
+    pointer-events: none;
+  }
+
+  .mobileDetail .locationCover__overlayActions .directoryListingRow__actions{
+    margin-left: auto;
+    pointer-events: auto;
+  }
+
+  .mobileDetail .locationCover__overlayActions a,
+  .mobileDetail .locationCover__overlayActions span.directoryOpenBadge{
+    pointer-events: auto;
+  }
 }
 
 .locationCover img{
@@ -10221,17 +10287,117 @@ body[data-layout="content"] .simplePage{
     display: flex;
   }
 
+  .mobileDetail .locationDetailMobileTop--cover{
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .mobileDetail .locationDetailMobileTop--noCover{
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+  }
+
+  .mobileDetail .locationDetailMobileTop--noCover .locationDetailMobileHeadText{
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .mobileDetail .locationDetailMobileTop--noCover .directoryListingRow__actions{
+    flex-shrink: 0;
+    align-self: flex-start;
+  }
+
   .mobileDetail .detailMeta .detailMetaCategory{
     display: none;
   }
+}
 
-  .locationDetailMobileTop .directoryListingRow__actions{
-    flex-direction: row;
-    flex-wrap: nowrap;
-    justify-content: flex-start;
-    width: auto;
-    flex-shrink: 0;
-  }
+.visuallyHidden{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Updates list + detail: primary type icon */
+.updateListRow{
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
+  text-align: left;
+}
+
+.updateListRow__kind{
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.updateListRow__main{
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: stretch;
+}
+
+.updateKindOrb{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+  box-sizing: border-box;
+}
+
+.updateKindOrb--list{
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+.updateKindOrb__glyph{
+  font-size: 1.12rem;
+  line-height: 1;
+  opacity: 0.9;
+}
+
+.updateDetailTitleRow{
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.updateDetailTitleRow__title.detailTitle{
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+.updateKindPill{
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  background: var(--panelStrong);
+  border: 1px solid var(--border);
+  color: var(--muted);
 }
 
 /* Clock page: full-bleed scroll root, inset content (scrollbar on window right) */

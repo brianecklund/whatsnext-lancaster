@@ -285,6 +285,7 @@ export async function getSiteData() {
       id: doc.id,
       title: doc.data?.title ?? 'Untitled update',
       summary: doc.data?.summary ?? null,
+      kind: doc.data?.update_kind ?? doc.data?.kind ?? null,
       date: formatUpdateDate(rawDate),
       sortDate: rawDate,
       tags,
@@ -310,6 +311,7 @@ export async function getSiteData() {
   const fallbackUpdates: UpdateLite[] = [
     {
       id: 'u-1',
+      kind: 'menu',
       title: 'New seasonal menu at West Art',
       date: 'This week',
       tags: ['new seasonal menu', 'opening'],
@@ -319,6 +321,7 @@ export async function getSiteData() {
     },
     {
       id: 'u-2',
+      kind: 'psa',
       title: 'Parking PSA for First Friday',
       date: 'Feb 2026',
       tags: ['PSA', 'downtown'],
@@ -327,6 +330,7 @@ export async function getSiteData() {
     },
     {
       id: 'u-3',
+      kind: 'community',
       title: 'Pop-up weekend: local makers market',
       date: 'Upcoming',
       tags: ['pop-up', 'market'],
