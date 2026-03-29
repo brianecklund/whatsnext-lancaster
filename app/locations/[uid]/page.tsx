@@ -32,9 +32,29 @@ export default async function LocationDetailPage({ params }: { params: Promise<{
               <span>{testPage.address}</span>
               <span>{TEST_DATA_TAG}</span>
             </div>
-            <div style={{ marginTop: 14, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-              <a className="link" href={testPage.website} target="_blank" rel="noreferrer">Visit website</a>
-              <a className="link" href={testPage.mapsUrl} target="_blank" rel="noreferrer">Open in Maps</a>
+            <div className="locationDetailLinkRow">
+              <a className="locationOutlineLinkBtn" href={testPage.website} target="_blank" rel="noreferrer">
+                <span className="locationOutlineLinkBtn__icon" aria-hidden>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img className="btnIconImg" src="/icons/globe.svg" alt="" width={18} height={18} />
+                </span>
+                <span className="locationOutlineLinkBtn__label">Website</span>
+                <span className="locationOutlineLinkBtn__arrow" aria-hidden>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </span>
+              </a>
+              <a className="locationOutlineLinkBtn" href={testPage.mapsUrl} target="_blank" rel="noreferrer">
+                <span className="locationOutlineLinkBtn__icon" aria-hidden>
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                    <circle cx="12" cy="10" r="3" />
+                  </svg>
+                </span>
+                <span className="locationOutlineLinkBtn__label">Maps</span>
+                <span className="locationOutlineLinkBtn__arrow" aria-hidden>
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                </span>
+              </a>
             </div>
           </div>
 
@@ -109,9 +129,33 @@ export default async function LocationDetailPage({ params }: { params: Promise<{
             {typeof placeDetails?.openNow === 'boolean' ? <span>{placeDetails.openNow ? 'Open now' : 'Closed now'}</span> : null}
           </div>
           {(website || mapsUrl) ? (
-            <div style={{ marginTop: 14, display: 'flex', gap: 14, flexWrap: 'wrap' }}>
-              {website ? <a className="link" href={website} target="_blank" rel="noreferrer">Visit website</a> : null}
-              {mapsUrl ? <a className="link" href={mapsUrl} target="_blank" rel="noreferrer">Open in Maps</a> : null}
+            <div className="locationDetailLinkRow">
+              {website ? (
+                <a className="locationOutlineLinkBtn" href={website} target="_blank" rel="noreferrer">
+                  <span className="locationOutlineLinkBtn__icon" aria-hidden>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img className="btnIconImg" src="/icons/globe.svg" alt="" width={18} height={18} />
+                  </span>
+                  <span className="locationOutlineLinkBtn__label">Website</span>
+                  <span className="locationOutlineLinkBtn__arrow" aria-hidden>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                  </span>
+                </a>
+              ) : null}
+              {mapsUrl ? (
+                <a className="locationOutlineLinkBtn" href={mapsUrl} target="_blank" rel="noreferrer">
+                  <span className="locationOutlineLinkBtn__icon" aria-hidden>
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                  </span>
+                  <span className="locationOutlineLinkBtn__label">Maps</span>
+                  <span className="locationOutlineLinkBtn__arrow" aria-hidden>
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+                  </span>
+                </a>
+              ) : null}
             </div>
           ) : null}
         </div>

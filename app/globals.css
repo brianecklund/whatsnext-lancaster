@@ -363,6 +363,13 @@ a.eventTimeLink:hover{
   display: block;
 }
 
+.settingsBtnIconImg{
+  width: 22px;
+  height: 22px;
+  display: block;
+  object-fit: contain;
+}
+
 .settingsSheetScroll{
   max-height: min(72vh, 640px);
   overflow-y: auto;
@@ -1480,6 +1487,66 @@ a.eventTimeLink:hover{
   color: var(--muted);
   font-weight: var(--fw-medium);
 }
+
+.locationDetailLinkRow{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.locationOutlineLinkBtn{
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 8px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text);
+  font-size: 0.92rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+@media (hover: hover) and (pointer: fine){
+  .locationOutlineLinkBtn:hover{
+    background: color-mix(in srgb, var(--panel) 88%, var(--muted) 12%);
+    border-color: color-mix(in srgb, var(--text) 35%, var(--border) 65%);
+  }
+}
+
+.locationOutlineLinkBtn__icon{
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.locationOutlineLinkBtn__icon .btnIconImg{
+  width: 18px;
+  height: 18px;
+}
+
+.locationOutlineLinkBtn__arrow{
+  display: inline-flex;
+  margin-left: 2px;
+  transition: transform 0.22s ease;
+}
+
+@media (hover: hover) and (pointer: fine){
+  .locationOutlineLinkBtn:hover .locationOutlineLinkBtn__arrow{
+    transform: translateX(5px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .locationOutlineLinkBtn__arrow{
+    transition: none;
+  }
+}
+
 .venue{ }
 
 .detailChips{
@@ -3639,14 +3706,27 @@ a:hover{
 
 .locationPageShell {
   min-height: 100vh;
+  min-height: 100dvh;
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   background: #fbf8ef;
   color: #0f0f0f;
   padding: 120px 24px 80px;
 }
 
+.wnlPageRevealRoot > main.locationPageShell{
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
 .locationPageInner {
   max-width: 1080px;
   margin: 0 auto;
+  padding-bottom: 48px;
 }
 
 .locationPageBack {
@@ -3734,7 +3814,7 @@ a:hover{
   padding: 8px 0 4px;
   margin-left: calc(var(--mobileListPadX, 12px) * -1);
   margin-right: calc(var(--mobileListPadX, 12px) * -1);
-  padding-left: var(--mobileListPadX, 12px);
+  padding-left: calc(var(--mobileListPadX, 12px) + 12px);
   padding-right: var(--mobileListPadX, 12px);
   border-radius: 14px;
   transition: background-color 0.22s ease;
@@ -3823,6 +3903,39 @@ a:hover{
   font-weight: 500;
 }
 
+.directoryFeaturedCardSubhead{
+  display: none;
+}
+
+.directoryFeaturedCardThumbActions{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 2;
+  display: flex;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.directoryFeaturedCardIconBtn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.directoryFeaturedCardIconBtn .btnIconImg{
+  width: 16px;
+  height: 16px;
+}
+
 .directoryFeaturedDots{
   display: flex;
   justify-content: center;
@@ -3850,12 +3963,25 @@ a:hover{
   .directoryFeaturedRailWrap{
     margin-left: calc(var(--panePadX) * -1);
     margin-right: calc(var(--panePadX) * -1);
-    padding-left: var(--panePadX);
+    padding-left: calc(var(--panePadX) + 10px);
     padding-right: var(--panePadX);
   }
 
   .directoryFeaturedCard{
-    flex-basis: 260px;
+    flex: 0 0 min(320px, 42vw);
+    max-width: 360px;
+  }
+
+  .directoryFeaturedCardSubhead{
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
+    margin: 6px 0 0;
+    font-size: 0.84rem;
+    line-height: 1.45;
+    color: var(--muted);
+    font-weight: 500;
   }
 }
 
@@ -6289,6 +6415,24 @@ body {
   width: 100%;
   flex-direction: column;
   align-items: stretch;
+  gap: 8px;
+}
+
+@media (max-width: 980px){
+  .leftControls.directoryLeftControls{
+    padding-bottom: 0 !important;
+    gap: 8px !important;
+  }
+
+  .leftSticky.splitPageStickySurface:has(.directoryLeftControls){
+    padding-bottom: 6px !important;
+  }
+}
+
+@media (min-width: 981px){
+  .leftSticky.splitPageStickySurface:has(.directoryLeftControls){
+    padding-bottom: 8px !important;
+  }
 }
 
 .directorySearchRowDesktop{
@@ -10901,14 +11045,21 @@ body[data-layout="content"] .simplePage{
   text-decoration: none;
   color: inherit;
   cursor: pointer;
-  transition: background 180ms ease, border-color 180ms ease;
+  transition: transform 0.22s ease, background 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
 }
 
 @media (hover: hover) and (pointer: fine){
   .newsTickerHubCard--link:hover{
-    background: var(--hover);
+    background: color-mix(in srgb, var(--panel) 88%, var(--muted) 12%);
     border-color: color-mix(in srgb, var(--accent) 22%, var(--border) 78%);
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(0, 0, 0, 0.07);
   }
+}
+
+.newsTickerHubCard--link,
+.newsTickerHubCard--link *{
+  text-decoration: none !important;
 }
 
 .newsTickerHubCardTop{
@@ -10964,15 +11115,25 @@ body[data-layout="content"] .simplePage{
 
 .newsTickerHubExternal,
 .newsTickerHubReadMore{
+  display: inline-flex;
+  align-items: center;
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--accent);
   text-decoration: none;
+  transition: transform 0.2s ease, background-color 0.2s ease;
+  border-radius: 8px;
+  padding: 2px 4px;
+  margin: -2px -4px;
 }
 
-.newsTickerHubExternal:hover,
-.newsTickerHubReadMore:hover{
-  text-decoration: underline;
+@media (hover: hover) and (pointer: fine){
+  .newsTickerHubExternal:hover,
+  .newsTickerHubReadMore:hover{
+    text-decoration: none;
+    transform: translateX(3px);
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
 }
 
 @keyframes newsTickerHubFade{

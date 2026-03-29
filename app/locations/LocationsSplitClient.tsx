@@ -18,18 +18,6 @@ function normalize(v?: string | null) {
   return (v || "").toLowerCase().trim();
 }
 
-/** CMS / JSON sometimes sends open/closed as strings; normalize for badge styling. */
-function coerceOpenNow(raw: unknown): boolean | null {
-  if (raw === true || raw === 1) return true;
-  if (raw === false || raw === 0) return false;
-  if (typeof raw === "string") {
-    const s = raw.trim().toLowerCase();
-    if (s === "true" || s === "1" || s === "yes" || s === "open") return true;
-    if (s === "false" || s === "0" || s === "no" || s === "closed") return false;
-  }
-  return null;
-}
-
 function getLetter(value?: string | null) {
   const first = (value || "").trim().charAt(0).toUpperCase();
   return /^[A-Z]$/.test(first) ? first : "#";
@@ -66,7 +54,6 @@ function DirectoryListingActions({
 }) {
   const phoneHref = normalizePhoneHref(l.phone);
   const webHref = normalizeWebsiteHref(l.website);
-  const openNow = l.openNow;
 
   return (
     <div
@@ -102,19 +89,6 @@ function DirectoryListingActions({
           <ToolbarIcon src="/icons/globe.svg" alt="" />
         </a>
       ) : null}
-      <span
-        className={`directoryOpenBadge${
-          openNow === true ? " directoryOpenBadge--open" : openNow === false ? " directoryOpenBadge--closed" : ""
-        }`}
-        aria-label={openNow === true ? "Open now" : openNow === false ? "Closed" : "Hours unknown"}
-      >
-        <span className="directoryOpenBadge__dot" aria-hidden />
-        {openNow === true ? (
-          <span className="directoryOpenBadge__label">OPEN</span>
-        ) : openNow === false ? (
-          <span className="directoryOpenBadge__label">CLOSED</span>
-        ) : null}
-      </span>
     </div>
   );
 }
@@ -152,6 +126,12 @@ function DirectoryListingRow({
 }
 
 type GroupedSection = { letter: string; rows: LocationRow[] };
+
+function featuredPartnerSubhead(l: LocationRow): string | null {
+  const raw = (l.description || "").replace(/\s+/g, " ").trim();
+  if (raw) return raw;
+  return (l.address || "").trim() || null;
+}
 
 function FeaturedPartnersRail({
   partners,
@@ -222,6 +202,9 @@ function FeaturedPartnersRail({
           {partners.map((l, i) => {
             const active = selectedKey ? selectedKey === l.key : selectedDesktopKey === l.key;
             const thumb = l.coverImageUrl || null;
+            const phoneHref = normalizePhoneHref(l.phone);
+            const webHref = normalizeWebsiteHref(l.website);
+            const sub = featuredPartnerSubhead(l);
             return (
               <button
                 key={l.id}
@@ -239,10 +222,35 @@ function FeaturedPartnersRail({
                   ) : (
                     <div className="directoryFeaturedCardThumb--placeholder" aria-hidden />
                   )}
+                  {(phoneHref || webHref) ? (
+                    <div
+                      className="directoryFeaturedCardThumbActions"
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
+                      {phoneHref ? (
+                        <a className="directoryFeaturedCardIconBtn" href={phoneHref} aria-label={`Call ${l.name ?? "partner"}`}>
+                          <ToolbarIcon src="/icons/phone.svg" alt="" />
+                        </a>
+                      ) : null}
+                      {webHref ? (
+                        <a
+                          className="directoryFeaturedCardIconBtn"
+                          href={webHref}
+                          target="_blank"
+                          rel="noreferrer"
+                          aria-label={`Website for ${l.name ?? "partner"}`}
+                        >
+                          <ToolbarIcon src="/icons/globe.svg" alt="" />
+                        </a>
+                      ) : null}
+                    </div>
+                  ) : null}
                 </div>
                 <div className="directoryFeaturedCardBody">
                   <span className="directoryFeaturedCardTitle">{l.name ?? "Untitled"}</span>
                   {l.category ? <span className="directoryFeaturedCardMeta">{l.category}</span> : null}
+                  {sub ? <p className="directoryFeaturedCardSubhead">{sub}</p> : null}
                 </div>
               </button>
             );
@@ -910,8 +918,6 @@ function LocationDetail({ location }: { location: LocationRow }) {
   const phone = placeDetails?.nationalPhoneNumber || location.phone || null;
   const rating = typeof placeDetails?.rating === "number" ? placeDetails.rating : location.rating;
   const photoAttributions = placeDetails?.photoAttributions?.length ? placeDetails.photoAttributions : [];
-  const placeOpenNow = coerceOpenNow(placeDetails?.openNow);
-
   return (
     <div key={detailFlashKey} className="detailCard detailFlash">
       {coverImageUrl ? (
@@ -949,31 +955,56 @@ function LocationDetail({ location }: { location: LocationRow }) {
         {location.category ? <span className="badge detailMetaCategory">{location.category}</span> : null}
         {location.address ? <span className="muted">{location.address}</span> : null}
         {typeof rating === "number" ? <span className="muted">★ {rating.toFixed(1)}</span> : null}
-        {placeOpenNow !== null ? (
-          <span className={`badge ${placeOpenNow ? "badgeOpen" : "badgeClosed"}`}>
-            {placeOpenNow ? "Open now" : "Closed now"}
-          </span>
-        ) : null}
       </div>
 
       {(location.customPageUrl || websiteHref || mapsHref) ? (
-        <p className="locationDetailLinks" style={{ marginTop: 10, display: "flex", gap: 14, flexWrap: "wrap" }}>
+        <div className="locationDetailLinkRow fadeInItem" style={{ animationDelay: "340ms" }}>
           {location.customPageUrl ? (
-            <a className="link" href={location.customPageUrl}>
-              Full page
+            <a className="locationOutlineLinkBtn" href={location.customPageUrl}>
+              <span className="locationOutlineLinkBtn__icon" aria-hidden>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                  <path d="M14 2v6h6M16 13H8M16 17H8M10 9H8" />
+                </svg>
+              </span>
+              <span className="locationOutlineLinkBtn__label">Full page</span>
+              <span className="locationOutlineLinkBtn__arrow" aria-hidden>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </span>
             </a>
           ) : null}
           {websiteHref ? (
-            <a className="link" href={websiteHref} target="_blank" rel="noreferrer">
-              Website
+            <a className="locationOutlineLinkBtn" href={websiteHref} target="_blank" rel="noreferrer">
+              <span className="locationOutlineLinkBtn__icon" aria-hidden>
+                <ToolbarIcon src="/icons/globe.svg" alt="" />
+              </span>
+              <span className="locationOutlineLinkBtn__label">Website</span>
+              <span className="locationOutlineLinkBtn__arrow" aria-hidden>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </span>
             </a>
           ) : null}
           {mapsHref ? (
-            <a className="link" href={mapsHref} target="_blank" rel="noreferrer">
-              Maps
+            <a className="locationOutlineLinkBtn" href={mapsHref} target="_blank" rel="noreferrer">
+              <span className="locationOutlineLinkBtn__icon" aria-hidden>
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                  <circle cx="12" cy="10" r="3" />
+                </svg>
+              </span>
+              <span className="locationOutlineLinkBtn__label">Maps</span>
+              <span className="locationOutlineLinkBtn__arrow" aria-hidden>
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+              </span>
             </a>
           ) : null}
-        </p>
+        </div>
       ) : null}
 
       {location.description ? (

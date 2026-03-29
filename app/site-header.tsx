@@ -490,22 +490,8 @@ export default function SiteHeader() {
             }}
           >
             <span className="settingsBtnIcon" aria-hidden>
-              <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path
-                  d="M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"
-                  stroke="currentColor"
-                  strokeWidth="1.75"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-                <path
-                  d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.53-.43 1.65 1.65 0 0 0-1.08 1.52V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1.08-1.52 1.65 1.65 0 0 0-1.53.43l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .43-1.53 1.65 1.65 0 0 0-1.52-1.08H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.52-1.08 1.65 1.65 0 0 0-.43-1.53l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.53.43H12a1.65 1.65 0 0 0 1.08-1.52V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1.08 1.52 1.65 1.65 0 0 0 1.53-.43l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.43 1.53V12c0 .53-.21 1.04-.59 1.41l.01.01Z"
-                  stroke="currentColor"
-                  strokeWidth="1.35"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                />
-              </svg>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img className="settingsBtnIconImg" src="/icons/gear-setting.svg" alt="" width={22} height={22} />
             </span>
           </button>
 
