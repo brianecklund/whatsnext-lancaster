@@ -9,12 +9,20 @@ import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
 import MobileContentBackButton from "@/app/components/MobileContentBackButton";
+import {
+  resolveUpdateKind,
+  updateKindIcon,
+  updateKindLabel,
+  type UpdateKind,
+} from "@/lib/updateDisplay";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export type UpdateLite = {
   id: string;
   title: string;
   tags: string[];
+  /** Primary type for icon + filter inference (menu, community, notice, opening, event, general, urgent, psa). */
+  kind?: UpdateKind | string | null;
   date?: string | null;
   sortDate?: string | null;
   summary?: string | null;
@@ -41,26 +49,33 @@ function norm(v: string) {
 
 function tagIconFor(tag: string): string {
   const t = norm(tag);
-  if (t.includes("opening") || t.includes("launch")) return "✦";
-  if (t.includes("food") || t.includes("drink") || t.includes("menu")) return "◔";
-  if (t.includes("music") || t.includes("show") || t.includes("concert")) return "♪";
+  if (t.includes("urgent") || t.includes("time-sensitive") || t.includes("asap")) return "⏱";
+  if (t.includes("opening") || t.includes("launch") || t.includes("now open")) return "✦";
+  if (t.includes("food") || t.includes("drink") || t.includes("menu") || t.includes("dining")) return "◔";
+  if (t.includes("music") || t.includes("show") || t.includes("concert") || t.includes("festival")) return "♪";
   if (t.includes("art") || t.includes("gallery")) return "✳";
-  if (t.includes("community") || t.includes("market")) return "◎";
-  if (t.includes("alert") || t.includes("psa") || t.includes("notice")) return "!";
+  if (t.includes("community") || t.includes("neighborhood") || t.includes("civic")) return "◎";
+  if (t.includes("notable") || t.includes("headline event")) return "★";
+  if (t.includes("alert") || t.includes("psa") || t.includes("notice") || t.includes("advisory")) return "!";
   return "•";
 }
 
 function UpdateDetail({ update }: { update: UpdateLite }) {
   const detailFlashKey = update?.id ?? update?.title ?? update?.date ?? "detail";
+  const primaryKind = resolveUpdateKind(update);
 
   return (
     <div key={detailFlashKey} className="detailCard detailFlash">
       <div className="detailHeader">
         <div>
-          <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
-            {update.title}
+          <div className="updateDetailTitleRow fadeInItem" style={{ animationDelay: "260ms" }}>
+            <span className="updateKindOrb" title={updateKindLabel(primaryKind)} aria-hidden>
+              <span className="updateKindOrb__glyph">{updateKindIcon(primaryKind)}</span>
+            </span>
+            <div className="detailTitle updateDetailTitleRow__title">{update.title}</div>
           </div>
           <div className="detailMeta fadeInItem" style={{ animationDelay: "320ms" }}>
+            <span className="updateKindPill">{updateKindLabel(primaryKind)}</span>
             {update.pinned ? <span className="pinnedBadge">Pinned</span> : null}
             {update.date ? <span>{update.date}</span> : null}
           </div>
@@ -296,29 +311,40 @@ export default function UpdatesSplitClient({ updates, currentSection, onNavigate
   ) : (
     filtered.map((u) => {
       const active = selected?.id === u.id;
+      const primaryKind = resolveUpdateKind(u);
       return (
         <button
           key={u.id}
-          className="eventRow"
+          className="eventRow updateListRow"
           data-active={active ? "true" : "false"}
+          data-update-kind={primaryKind}
           onClick={() => setSelected(u.id)}
           type="button"
         >
-          <span className="eventRowTitle">{u.title}</span>
-          <span className="eventRowMeta updateRowMeta">
-            {u.pinned ? <span className="updateDateBadge">Pinned</span> : null}{u.date ? <span className="updateDateBadge">{u.date}</span> : null}
-          </span>
-          {u.summary ? <span className="eventRowMeta">{u.summary}</span> : null}
-          {u.tags?.length ? (
-            <span className="tagRow" aria-label="Update tags">
-              {u.tags.slice(0, 3).map((t) => (
-                <span key={t} className="tagChip updateTagChip">
-                  <span className="tagGlyph" aria-hidden>{tagIconFor(t)}</span>
-                  <span>{t}</span>
-                </span>
-              ))}
+          <span className="updateListRow__kind" title={updateKindLabel(primaryKind)}>
+            <span className="updateKindOrb updateKindOrb--list" aria-hidden>
+              <span className="updateKindOrb__glyph">{updateKindIcon(primaryKind)}</span>
             </span>
-          ) : null}
+            <span className="visuallyHidden">{updateKindLabel(primaryKind)}</span>
+          </span>
+          <span className="updateListRow__main">
+            <span className="eventRowTitle">{u.title}</span>
+            <span className="eventRowMeta updateRowMeta">
+              {u.pinned ? <span className="updateDateBadge">Pinned</span> : null}
+              {u.date ? <span className="updateDateBadge">{u.date}</span> : null}
+            </span>
+            {u.summary ? <span className="eventRowMeta">{u.summary}</span> : null}
+            {u.tags?.length ? (
+              <span className="tagRow" aria-label="Update tags">
+                {u.tags.slice(0, 3).map((t) => (
+                  <span key={t} className="tagChip updateTagChip">
+                    <span className="tagGlyph" aria-hidden>{tagIconFor(t)}</span>
+                    <span>{t}</span>
+                  </span>
+                ))}
+              </span>
+            ) : null}
+          </span>
         </button>
       );
     })

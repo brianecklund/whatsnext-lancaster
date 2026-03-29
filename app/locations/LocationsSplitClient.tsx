@@ -43,10 +43,13 @@ function DirectoryListingActions({
   l,
   stopPropagation,
   className,
+  variant,
 }: {
   l: LocationRow;
   stopPropagation?: boolean;
   className?: string;
+  /** Lighter controls over a photo (mobile listing cover). */
+  variant?: "onImage";
 }) {
   const phoneHref = normalizePhoneHref(l.phone);
   const webHref = normalizeWebsiteHref(l.website);
@@ -54,7 +57,13 @@ function DirectoryListingActions({
 
   return (
     <div
-      className={["directoryListingRow__actions", className].filter(Boolean).join(" ")}
+      className={[
+        "directoryListingRow__actions",
+        variant === "onImage" ? "directoryListingRow__actions--onImage" : "",
+        className,
+      ]
+        .filter(Boolean)
+        .join(" ")}
       onClick={stopPropagation ? (e) => e.stopPropagation() : undefined}
       onKeyDown={stopPropagation ? (e) => e.stopPropagation() : undefined}
     >
@@ -735,9 +744,12 @@ function LocationDetail({ location }: { location: LocationRow }) {
   return (
     <div key={detailFlashKey} className="detailCard detailFlash">
       {coverImageUrl ? (
-        <div className="locationCover fadeInItem" style={{ animationDelay: "160ms" }}>
+        <div className="locationCover locationCover--detail fadeInItem" style={{ animationDelay: "160ms" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img src={coverImageUrl} alt={location.name ?? "Listing cover"} />
+          <div className="locationCover__overlayActions">
+            <DirectoryListingActions l={location} stopPropagation variant="onImage" />
+          </div>
         </div>
       ) : null}
 
@@ -745,8 +757,17 @@ function LocationDetail({ location }: { location: LocationRow }) {
         {location.name ?? "Untitled listing"}
       </div>
 
-      <div className="locationDetailMobileTop fadeInItem" style={{ animationDelay: "260ms" }}>
-        <DirectoryListingActions l={location} className="locationDetailMobileActions" />
+      <div
+        className={[
+          "locationDetailMobileTop",
+          "fadeInItem",
+          coverImageUrl ? "locationDetailMobileTop--cover" : "locationDetailMobileTop--noCover",
+        ]
+          .filter(Boolean)
+          .join(" ")}
+        style={{ animationDelay: "260ms" }}
+      >
+        {!coverImageUrl ? <DirectoryListingActions l={location} className="locationDetailMobileActions" /> : null}
         <div className="locationDetailMobileHeadText">
           <div className="detailTitle locationDetailMobileTitle">{location.name ?? "Untitled listing"}</div>
           {location.category ? <span className="badge">{location.category}</span> : null}
