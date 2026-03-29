@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
-import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 type Item = {
@@ -36,7 +35,6 @@ export default function SegmentedControl({
   pendingOverride = null,
 }: Props) {
   const router = useRouter();
-  const pathname = usePathname();
   const [visualKey, setVisualKey] = useState(currentKey);
   const [isPending, setIsPending] = useState(false);
   const timeoutRef = useRef<number | null>(null);
@@ -56,29 +54,20 @@ export default function SegmentedControl({
     if (visualKeyOverride !== null) return;
     try {
       const pending = window.sessionStorage.getItem("wnl-segmented-pending");
-      if (pending && items.some((item) => item.key === pending)) {
-        setVisualKey(pending);
-        setIsPending(pending !== currentKey);
-      } else if (!isPending) {
-        setVisualKey(currentKey);
+      if (pending && pending !== currentKey) {
+        window.sessionStorage.removeItem("wnl-segmented-pending");
       }
     } catch {
-      if (!isPending) setVisualKey(currentKey);
+      /* ignore */
     }
-  }, [currentKey, isPending, items, visualKeyOverride]);
-
-  useEffect(() => {
-    if (visualKeyOverride !== null) return;
+    setVisualKey(currentKey);
+    setIsPending(false);
     try {
-      const pending = window.sessionStorage.getItem("wnl-segmented-pending");
-      if (pending && pending === currentKey) {
-        window.sessionStorage.removeItem("wnl-segmented-pending");
-        setVisualKey(currentKey);
-        setIsPending(false);
-        if (typeof document !== "undefined") delete document.documentElement.dataset.routeSwitching;
-      }
-    } catch {}
-  }, [currentKey, pathname, visualKeyOverride]);
+      if (typeof document !== "undefined") delete document.documentElement.dataset.routeSwitching;
+    } catch {
+      /* ignore */
+    }
+  }, [currentKey, visualKeyOverride]);
 
   useEffect(() => {
     return () => {

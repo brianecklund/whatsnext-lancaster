@@ -17,6 +17,21 @@ export function eventHasEnded<T extends CalendarEventLite>(e: T, now = Date.now(
   return !Number.isNaN(d.getTime()) && d.getTime() < now;
 }
 
+/** True when local time is between start and end (or within a short window after start if no end). */
+export function eventHappeningNow<T extends CalendarEventLite>(e: T, nowMs = Date.now()): boolean {
+  const start = safeDateFromEvent(e);
+  if (!start) return false;
+  const startMs = start.getTime();
+  if (startMs > nowMs) return false;
+  if (e.end_datetime) {
+    const end = new Date(e.end_datetime);
+    if (Number.isNaN(end.getTime())) return false;
+    return nowMs <= end.getTime();
+  }
+  const assumedEndMs = startMs + 4 * 60 * 60 * 1000;
+  return nowMs <= assumedEndMs;
+}
+
 export function startOfToday(): Date {
   const d = new Date();
   d.setHours(0, 0, 0, 0);

@@ -3,7 +3,7 @@
 import NewsTickerBar from "./components/NewsTickerBar";
 import ToolbarIcon from "./components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
-import { dayKey, eventHasEnded, nearestDayWithEvents, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
+import { dayKey, eventHasEnded, eventHappeningNow, nearestDayWithEvents, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
 
 import { createPortal } from "react-dom";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -58,6 +58,7 @@ type Props = {
 };
 
 const WEEKLY_KEY = "__weekly__";
+const GOING_NOW_KEY = "__going_now__";
 
 function norm(v: string) {
   return (v || "").toLowerCase().trim();
@@ -321,10 +322,12 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const viewMode: "list" | "month" = view === "month" ? "month" : "list";
   const selectedDisplayKey = selectedKey ?? (!effectiveIsMobile && viewMode === "list" ? WEEKLY_KEY : null);
 
-  const mobileWeeklyOpen =
+  const mobileSpotlightOpen =
     effectiveIsMobile &&
     !!selectedDisplayKey &&
-    (selectedDisplayKey === WEEKLY_KEY || selectedDisplayKey.startsWith("__week__:"));
+    (selectedDisplayKey === WEEKLY_KEY ||
+      selectedDisplayKey === GOING_NOW_KEY ||
+      selectedDisplayKey.startsWith("__week__:"));
 
   const selectedDay = useMemo(() => {
     const parsed = dayParam ? parseDayKey(dayParam) : null;
@@ -365,6 +368,8 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const mobileControlsInitRef = useRef(false);
   const lastScrollTopRef = useRef(0);
   const mobileControlsCollapsedRef = useRef(false);
+  const spotlightRailRef = useRef<HTMLDivElement | null>(null);
+  const [spotlightPagerIndex, setSpotlightPagerIndex] = useState(0);
 
   useEffect(() => {
     mobileControlsCollapsedRef.current = mobileControlsCollapsed;
@@ -442,7 +447,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
       const delta = st - lastScrollTopRef.current;
       lastScrollTopRef.current = st;
 
-      if (mobileControlsPinnedOpen || mobileWeeklyOpen) return;
+      if (mobileControlsPinnedOpen || mobileSpotlightOpen) return;
 
       if (st <= 12 && !mobileControlsCollapsedRef.current) {
         setMobileControlsCollapsed(false);
@@ -455,12 +460,26 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
     syncFromScroll();
     listEl.addEventListener('scroll', syncFromScroll, { passive: true });
     return () => listEl.removeEventListener('scroll', syncFromScroll);
-  }, [effectiveIsMobile, mobileControlsPinnedOpen, mobileWeeklyOpen]);
+  }, [effectiveIsMobile, mobileControlsPinnedOpen, mobileSpotlightOpen]);
 
   useEffect(() => {
-    if (!effectiveIsMobile || !mobileWeeklyOpen) return;
+    if (!effectiveIsMobile || !mobileSpotlightOpen) return;
     setMobileControlsCollapsed(false);
-  }, [effectiveIsMobile, mobileWeeklyOpen]);
+  }, [effectiveIsMobile, mobileSpotlightOpen]);
+
+  useEffect(() => {
+    if (!effectiveIsMobile || viewMode !== "list") return;
+    const el = spotlightRailRef.current;
+    if (!el) return;
+    const sync = () => {
+      const w = el.getBoundingClientRect().width;
+      if (w <= 1) return;
+      setSpotlightPagerIndex(el.scrollLeft > w * 0.35 ? 1 : 0);
+    };
+    el.addEventListener("scroll", sync, { passive: true });
+    sync();
+    return () => el.removeEventListener("scroll", sync);
+  }, [effectiveIsMobile, viewMode, resolvedSection]);
 
   // Keep the optimistic client key in sync with the URL when navigation completes.
   useEffect(() => {
@@ -522,6 +541,10 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
       return matchesSearch && matchesType;
     });
   }, [events, q, type]);
+
+  const liveEventsNow = useMemo(() => {
+    return filteredEvents.filter((e) => eventHappeningNow(e));
+  }, [filteredEvents]);
 
   const dayEvents = useMemo(() => {
     const key = selectedDayStr;
@@ -859,6 +882,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const selectedEvent = useMemo(() => {
     if (!filteredEvents.length) return null;
     if (selectedDisplayKey === WEEKLY_KEY) return null;
+    if (selectedDisplayKey === GOING_NOW_KEY) return null;
 
     const byUid =
       selectedDisplayKey && filteredEvents.find((e) => e.uid && e.uid === selectedDisplayKey);
@@ -897,7 +921,7 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   }, [effectiveIsMobile]);
 
   const mobileDetailOpen =
-    effectiveIsMobile && (!!selectedEvent || mobileWeeklyOpen);
+    effectiveIsMobile && (!!selectedEvent || mobileSpotlightOpen);
 
   useEffect(() => {
     if (mobileDetailOpen) setFilterOpen(false);
@@ -1101,12 +1125,12 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 className="leftSticky"
                 ref={leftStickyRef}
                 data-mobile-collapsed={
-                  effectiveIsMobile && mobileControlsCollapsed && !mobileWeeklyOpen && !mobileDetailOpen
+                  effectiveIsMobile && mobileControlsCollapsed && !mobileSpotlightOpen && !mobileDetailOpen
                     ? "true"
                     : "false"
                 }
                 data-mobile-pinned={effectiveIsMobile && mobileControlsPinnedOpen ? "true" : "false"}
-                data-mobile-weekly-surface={effectiveIsMobile && resolvedSection === "calendar" && mobileWeeklyOpen ? "true" : "false"}
+                data-mobile-weekly-surface={effectiveIsMobile && resolvedSection === "calendar" && mobileSpotlightOpen ? "true" : "false"}
               >
                 <SegmentedControl
                   className="tabs segmentedControl--primary"
@@ -1305,19 +1329,64 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               >
               {viewMode === "list" ? (
                 <>
-                  {/* Weekly Overview (left) */}
-                  <button
-                    type="button"
-                    className="weeklyOverview fadeInItem"
-                    style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}
-                    data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
-                    onClick={() => openWeek(WEEKLY_KEY)}
-                  >
-                    <div className="weeklyTitle">Weekly Overview</div>
-                    <div className="weeklyCount">
-                      {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left this week
+                  {/* Weekly overview + Going on now */}
+                  {effectiveIsMobile ? (
+                    <div className="weeklySpotlightMobile fadeInItem" style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}>
+                      <div ref={spotlightRailRef} className="weeklySpotlightRail">
+                        <button
+                          type="button"
+                          className="weeklyOverview weeklyOverview--spotlightCard"
+                          data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
+                          onClick={() => openWeek(WEEKLY_KEY)}
+                        >
+                          <div className="weeklyTitle">Weekly Overview</div>
+                          <div className="weeklyCount">
+                            {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left this week
+                          </div>
+                        </button>
+                        <button
+                          type="button"
+                          className="weeklyOverview weeklyOverview--spotlightCard"
+                          data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
+                          onClick={() => openWeek(GOING_NOW_KEY)}
+                        >
+                          <div className="weeklyTitle">Going on now</div>
+                          <div className="weeklyCount">
+                            {liveEventsNow.length} event{liveEventsNow.length === 1 ? "" : "s"} happening now
+                          </div>
+                        </button>
+                      </div>
+                      <div className="weeklySpotlightPager" aria-hidden="true">
+                        <span className={spotlightPagerIndex === 0 ? "weeklySpotlightPager__dot weeklySpotlightPager__dot--active" : "weeklySpotlightPager__dot"} />
+                        <span className={spotlightPagerIndex === 1 ? "weeklySpotlightPager__dot weeklySpotlightPager__dot--active" : "weeklySpotlightPager__dot"} />
+                      </div>
                     </div>
-                  </button>
+                  ) : (
+                    <div className="weeklySpotlightPair fadeInItem" style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}>
+                      <button
+                        type="button"
+                        className="weeklyOverview weeklyOverview--spotlightHalf"
+                        data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
+                        onClick={() => openWeek(WEEKLY_KEY)}
+                      >
+                        <div className="weeklyTitle">Weekly Overview</div>
+                        <div className="weeklyCount">
+                          {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left this week
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        className="weeklyOverview weeklyOverview--spotlightHalf"
+                        data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
+                        onClick={() => openWeek(GOING_NOW_KEY)}
+                      >
+                        <div className="weeklyTitle">Going on now</div>
+                        <div className="weeklyCount">
+                          {liveEventsNow.length} event{liveEventsNow.length === 1 ? "" : "s"} happening now
+                        </div>
+                      </button>
+                    </div>
+                  )}
 
 {displayDayGroups.length === 0 ? (
                 <div className="emptyList">No events match your search.</div>
