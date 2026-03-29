@@ -677,7 +677,11 @@ export default function LocationsSplitClient({
                         className="directoryLetterSection"
                         data-letter-section={section.letter}
                       >
-                        <div className="directoryLetterHeading">{section.letter}</div>
+                        <div
+                          className={`directoryLetterHeading${!effectiveIsMobile ? " directoryLetterHeading--sticky" : ""}`}
+                        >
+                          {section.letter}
+                        </div>
                         {section.rows.map((l) => {
                           const active = selectedKey ? selectedKey === l.key : selectedDesktop?.key === l.key;
                           return (

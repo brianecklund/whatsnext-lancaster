@@ -363,13 +363,13 @@ a.eventTimeLink:hover{
 }
 
 .settingsSection{
-  padding: 16px 0 10px;
+  padding: 10px 0 8px;
   border-top: 1px solid var(--border);
 }
 
 .settingsSection:first-of-type{
   border-top: 0;
-  padding-top: 4px;
+  padding-top: 2px;
 }
 
 .settingsSectionTitle{
@@ -438,6 +438,179 @@ a.eventTimeLink:hover{
 .settingsToggle input{
   margin-top: 4px;
   flex: 0 0 auto;
+}
+
+.settingsToggle > span{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex: 1 1 auto;
+}
+
+.settingsToggleStatus{
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  background: var(--panel);
+}
+
+.settingsToggleStatus--on{
+  color: var(--text);
+  border-color: var(--accent);
+  background: var(--accentSoft);
+}
+
+.settingsA11yHint{
+  margin: 0 0 8px;
+  font-size: 0.8rem;
+}
+
+.settingsA11yBody{
+  padding-top: 4px;
+}
+
+.settingsDropdownWrap{
+  position: relative;
+  flex: 0 0 auto;
+}
+
+.settingsDropdown{
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  width: min(100vw - 32px, 380px);
+  max-height: min(72vh, 640px);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  z-index: 5000;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18);
+}
+
+.settingsDropdown .settingsSheetScroll{
+  max-height: min(72vh, 640px);
+  padding: 12px 14px 16px;
+}
+
+.settingsSection--compact{
+  padding-top: 8px;
+  padding-bottom: 6px;
+}
+
+.settingsSectionToggle{
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.settingsSectionToggleLabel{
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 0.75rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.settingsSectionToggleMeta{
+  flex: 0 1 auto;
+  font-size: 0.78rem;
+  max-width: 46%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--muted);
+  text-align: right;
+}
+
+.settingsSectionToggleChevron{
+  flex: 0 0 auto;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.settingsA11yBadge{
+  flex: 0 0 auto;
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+}
+
+.settingsA11yBadge--on{
+  color: var(--text);
+  border-color: var(--accent);
+  background: var(--accentSoft);
+}
+
+.settingsPaletteGrid{
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  margin-top: 2px;
+}
+
+.settingsPaletteOption{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: var(--btnSurface, var(--panel));
+  color: var(--text);
+  font-size: 0.86rem;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: left;
+}
+
+.settingsPaletteOption[data-active="true"]{
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+  background: var(--hover);
+}
+
+.settingsPaletteOptionName{
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.settingsPaletteSwatches{
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: 0 0 auto;
+}
+
+.settingsPaletteSwatch{
+  width: 13px;
+  height: 13px;
+  border-radius: 999px;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  flex-shrink: 0;
 }
 
 .menuOverlay{
@@ -3324,10 +3497,10 @@ a:hover{
 }
 .filterDropdownClear:hover{ background: var(--btnBgHover); }
 
-/* Mobile calendar controls */
+/* Mobile calendar controls — search + calendar + clock + filter */
 .calendarSearchRowMobile{
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto;
+  grid-template-columns: minmax(0, 1fr) auto auto auto auto;
   align-items: center;
 }
 
@@ -3377,7 +3550,7 @@ a:hover{
 
 @media (max-width: 520px){
   .calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-columns: minmax(0, 1fr) auto auto auto auto;
   }
 
   .dayJumpRail{
@@ -4100,6 +4273,24 @@ textarea,
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+@media (min-width: 981px){
+  .directoryListWrap .directoryLetterHeading--sticky{
+    position: sticky;
+    top: var(--calendarListStickyTop, 104px);
+    z-index: 6;
+    margin-left: calc(var(--panePadX) * -1);
+    margin-right: calc(var(--panePadX) * -1);
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
+    padding-top: 10px;
+    padding-bottom: 10px;
+    margin-top: -4px;
+    margin-bottom: 10px;
+    background: var(--bg);
+    box-shadow: 0 1px 0 var(--border);
+  }
 }
 
 @media (max-width: 980px){
@@ -5342,17 +5533,24 @@ svg:not(:root) {
 
   .nw__inner{
     width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
 
   .nw__wrapper{
     flex: 1 1 auto;
     min-width: 0;
+    display: flex;
+    align-items: center;
   }
 
   .nw__slider__item,
   .nw__slider__link{
     max-width: none !important;
     width: 100% !important;
+    display: flex !important;
+    align-items: center !important;
   }
 
   .nw__slider__link{
@@ -5771,8 +5969,8 @@ body {
   .calendarSearchRowMobile,
   .searchRow.calendarSearchRowMobile {
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) auto auto;
-    gap: 8px !important;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px;
+    gap: 4px !important;
     align-items: center;
     width: 100%;
   }
@@ -5809,13 +6007,14 @@ body {
 @media (max-width: 980px){
   .calendarSearchRowMobile,
   .searchRow.calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) 44px 44px !important;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px !important;
   }
 
   .calendarSearchRowMobile .viewBtn,
   .calendarSearchRowMobile .filterBtn{
-    width: 44px;
-    min-width: 44px;
+    width: 40px;
+    min-width: 40px;
+    max-width: 40px;
     padding: 0 !important;
     justify-content: center;
   }
@@ -8109,7 +8308,7 @@ body{
 
   .leftSticky .calendarSearchRowMobile,
   .leftSticky .searchRow.calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) 40px 40px !important;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px !important;
   }
 
   .leftSticky .calendarSearchRowMobile .searchInput,
@@ -8289,7 +8488,7 @@ body > *{
   }
 
   .searchRow.calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) 40px 40px !important;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px !important;
   }
 
   .paneLeft > .scroll{
@@ -9614,6 +9813,75 @@ body[data-layout="content"] .simplePage{
   z-index: 0;
 }
 
+.clockLayout--embed{
+  align-items: stretch;
+  width: 100%;
+}
+
+.clockListWrap--embed{
+  width: 100%;
+  align-self: stretch;
+}
+
+.clockEventList--embed{
+  width: 100%;
+}
+
+.clockEventRowEmbed{
+  display: flex;
+  width: 100%;
+  max-width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+  padding: 10px 4px;
+  gap: 12px;
+  align-items: flex-start;
+  cursor: pointer;
+  border-radius: 14px;
+  color: inherit;
+  font: inherit;
+  box-sizing: border-box;
+}
+
+.clockEventRowEmbed:hover{
+  background: var(--hover);
+}
+
+.clockEventRowEmbed[data-active="true"]{
+  background: var(--accentSoft);
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.28) inset;
+}
+
+.clockEventRowEmbedThumb{
+  flex: 0 0 72px;
+  width: 72px;
+}
+
+.clockEventRowEmbedImg{
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+
+.clockEventRowEmbedPlaceholder{
+  width: 72px;
+  height: 72px;
+  border-radius: 12px;
+  background: var(--panel);
+  border: 1px solid var(--border);
+}
+
+.clockEventRowEmbedMain{
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
 .clockFaceWrap{
   display:flex;
   justify-content:center;
@@ -10145,10 +10413,13 @@ body[data-layout="content"] .simplePage{
   }
 }
 
-/* Full-screen news hub (ticker tap) */
+/* Full-screen news hub (ticker tap) — below site header so nav stays visible */
 .newsTickerHubOverlay{
   position: fixed;
-  inset: 0;
+  left: 0;
+  right: 0;
+  top: var(--headerH);
+  bottom: 0;
   z-index: 100800;
   display: flex;
   flex-direction: column;

@@ -59,6 +59,23 @@ function clamp(n: number, min: number, max: number) {
   return Math.max(min, Math.min(max, n));
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function pickImageUrl(e: any): string | null {
+  if (!e) return null;
+  if (typeof e.imageUrl === "string" && e.imageUrl) return e.imageUrl;
+  if (typeof e.image_url === "string" && e.image_url) return e.image_url;
+  const img = e.image;
+  if (img) {
+    if (typeof img.url === "string" && img.url) return img.url;
+    const square = img.Square || img.square;
+    if (square?.url) return square.url;
+    const thumbs = img.thumbnails || img.variants;
+    if (thumbs?.Square?.url) return thumbs.Square.url;
+    if (thumbs?.square?.url) return thumbs.square.url;
+  }
+  return null;
+}
+
 export default function ClockDayClient({ events, navigationMode = "standalone" }: Props) {
   const router = useRouter();
   const sp = useSearchParams();
@@ -79,6 +96,7 @@ export default function ClockDayClient({ events, navigationMode = "standalone" }
     },
     [embedded, router, sp],
   );
+
   const dayParam = sp.get("day") ?? "";
   const eventParam = sp.get("event") ?? "";
 
@@ -108,6 +126,18 @@ export default function ClockDayClient({ events, navigationMode = "standalone" }
   }, [dayParam, eventParam, events]);
 
   const selectedDayStr = dayKey(selectedDayDate);
+
+  const selectEmbeddedEvent = useCallback(
+    (eventId: string) => {
+      if (!embedded) return;
+      const p = new URLSearchParams();
+      p.set("view", "clock");
+      p.set("day", dayParam || selectedDayStr);
+      p.set("event", eventId);
+      router.push(`/?${p.toString()}`);
+    },
+    [embedded, router, dayParam, selectedDayStr],
+  );
 
   const selectedDayStart = useMemo(() => startOfDay(selectedDayDate), [selectedDayDate]);
   const selectedDayEnd = useMemo(() => {
@@ -280,7 +310,7 @@ export default function ClockDayClient({ events, navigationMode = "standalone" }
           )
         : null}
 
-      <section className="clockLayout" aria-label="Analog clock with event markers">
+      <section className={embedded ? "clockLayout clockLayout--embed" : "clockLayout"} aria-label="Analog clock with event markers">
         <div className="clockFaceWrap">
           <div ref={faceRef} className="clockFace">
             {/* Tick marks */}
@@ -335,7 +365,9 @@ export default function ClockDayClient({ events, navigationMode = "standalone" }
             {/* Event markers */}
             {dayEvents.map(({ e, d }, idx) => {
               const key = e.uid ?? e.id;
-              const active = hoveredKey === key;
+              const keyStr = String(key);
+              const active =
+                hoveredKey === key || (embedded && eventParam && eventParam === keyStr);
 
               const { angleDeg } = dialAngleForEvent(d);
               // Reduce overlaps when multiple events fall near the same time.
@@ -368,25 +400,58 @@ export default function ClockDayClient({ events, navigationMode = "standalone" }
                   onMouseLeave={() => setHoveredKey((prev) => (prev === key ? null : prev))}
                   onFocus={() => setHoveredKey(key)}
                   onBlur={() => setHoveredKey((prev) => (prev === key ? null : prev))}
+                  onClick={() => embedded && selectEmbeddedEvent(keyStr)}
                 />
               );
             })}
           </div>
         </div>
 
-        <div className="clockListWrap">
+        <div className={embedded ? "clockListWrap clockListWrap--embed" : "clockListWrap"}>
           <div className="clockListHeader">
             {dayEvents.length ? `${dayEvents.length} event${dayEvents.length === 1 ? "" : "s"}` : "No events"}
           </div>
 
-          <div className="clockEventList" role="list">
+          <div className={embedded ? "clockEventList clockEventList--embed" : "clockEventList"} role="list">
             {dayEvents.length ? (
               dayEvents.map(({ e, d }) => {
                 const key = e.uid ?? e.id;
-                const active = hoveredKey === key;
+                const keyStr = String(key);
+                const selectedFromUrl = embedded && eventParam && String(eventParam) === keyStr;
+                const active = embedded ? selectedFromUrl || hoveredKey === key : hoveredKey === key;
                 const timeLabel = formatTimeShort(d);
                 const title = e.title ?? "Untitled event";
                 const metaBits = [e.event_type, e.locationName].filter(Boolean).join(" • ");
+                const thumb = pickImageUrl(e);
+
+                if (embedded) {
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      className="clockEventRowEmbed"
+                      data-active={selectedFromUrl ? "true" : "false"}
+                      role="listitem"
+                      onClick={() => selectEmbeddedEvent(keyStr)}
+                      onMouseEnter={() => setHoveredKey(key)}
+                      onMouseLeave={() => setHoveredKey((prev) => (prev === key ? null : prev))}
+                    >
+                      <div className="clockEventRowEmbedThumb" aria-hidden>
+                        {thumb ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={thumb} alt="" className="clockEventRowEmbedImg" />
+                        ) : (
+                          <div className="clockEventRowEmbedPlaceholder" />
+                        )}
+                      </div>
+                      <div className="clockEventRowEmbedMain">
+                        <div className="clockEventTime">{timeLabel}</div>
+                        <div className="clockEventTitle">{title}</div>
+                        {metaBits ? <div className="clockEventMeta">{metaBits}</div> : null}
+                      </div>
+                    </button>
+                  );
+                }
 
                 return (
                   <div
