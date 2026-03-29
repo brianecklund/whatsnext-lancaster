@@ -168,6 +168,21 @@ function FeaturedPartnersRail({
   const [activeIdx, setActiveIdx] = useState(0);
 
   useEffect(() => {
+    const rail = railRef.current;
+    if (!rail) return;
+
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      if (rail.scrollWidth <= rail.clientWidth) return;
+      rail.scrollLeft += e.deltaY;
+      e.preventDefault();
+    };
+
+    rail.addEventListener("wheel", onWheel, { passive: false });
+    return () => rail.removeEventListener("wheel", onWheel);
+  }, [partners]);
+
+  useEffect(() => {
     const root = railRef.current;
     if (!root || partners.length === 0) return;
 
@@ -302,6 +317,7 @@ export default function LocationsSplitClient({
   const [mounted, setMounted] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [filterOpen, setFilterOpen] = useState(false);
+  const [alphabetOpen, setAlphabetOpen] = useState(false);
   const [mobileOverlayOffset, setMobileOverlayOffset] = useState(0);
   const [activeLetter, setActiveLetter] = useState("#");
   const [taglineHidden, setTaglineHidden] = useState(false);
@@ -338,6 +354,25 @@ export default function LocationsSplitClient({
     }
   }, [effectiveIsMobile]);
 
+  useEffect(() => {
+    const sticky = leftStickyRef.current;
+    const scroll = leftScrollRef.current;
+    if (!sticky || !scroll) return;
+
+    const apply = () => {
+      scroll.style.setProperty("--directoryStickyTop", `${sticky.offsetHeight}px`);
+    };
+
+    apply();
+    const ro = typeof ResizeObserver !== "undefined" ? new ResizeObserver(apply) : null;
+    ro?.observe(sticky);
+    window.addEventListener("resize", apply);
+    return () => {
+      ro?.disconnect();
+      window.removeEventListener("resize", apply);
+    };
+  }, [effectiveIsMobile, q, cat, filterOpen, alphabetOpen]);
+
     useBodyScrollLock(filterOpen || (effectiveIsMobile && Boolean(selectedKey)));
 
   useEffect(() => {
@@ -363,7 +398,7 @@ export default function LocationsSplitClient({
       window.removeEventListener("resize", updateOffset);
       ro?.disconnect();
     };
-  }, [effectiveIsMobile, q, cat, filterOpen]);
+  }, [effectiveIsMobile, q, cat, filterOpen, alphabetOpen]);
 
   function navigate(params: URLSearchParams) {
     const qs = params.toString();
@@ -621,7 +656,9 @@ export default function LocationsSplitClient({
               />
 
               <div className="leftControls directoryLeftControls">
-                <div className={`searchRow${!effectiveIsMobile ? " directorySearchRowDesktop" : ""}`}>
+                <div
+                  className={`searchRow${!effectiveIsMobile ? " directorySearchRowDesktop" : " directorySearchRowMobile"}`}
+                >
                   <input
                     className="searchInput"
                     value={q}
@@ -630,21 +667,32 @@ export default function LocationsSplitClient({
                     aria-label="Search locations"
                   />
 
+                  <button
+                    type="button"
+                    className="directoryAzToggleBtn"
+                    data-active={alphabetOpen ? "true" : "false"}
+                    aria-label={alphabetOpen ? "Hide A–Z index" : "Show A–Z index"}
+                    aria-expanded={alphabetOpen ? "true" : "false"}
+                    onClick={() => setAlphabetOpen((v) => !v)}
+                  >
+                    A–Z
+                  </button>
+
                   {effectiveIsMobile ? (
                     <button
                       type="button"
-                      className="filterBtn"
+                      className="filterBtn directoryFilterBtnMobile"
                       data-active={filterOpen || !!cat ? "true" : "false"}
                       aria-label={filterOpen ? "Close filters" : "Open filters"}
                       aria-expanded={filterOpen ? "true" : "false"}
                       onClick={() => setFilterOpen((v) => !v)}
                     >
                       <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
-                      <span>{activeFilterLabel}</span>
+                      <span className="directoryFilterBtnMobile__label">{activeFilterLabel}</span>
                     </button>
                   ) : (
                     <>
-<button
+                      <button
                         type="button"
                         className="filterBtn filterBtnSquare squareIconBtn"
                         data-active={filterOpen || !!cat ? "true" : "false"}
@@ -662,7 +710,6 @@ export default function LocationsSplitClient({
                           onClick={() => {
                             setQuery("");
                             setCategory(null);
-                            
                           }}
                         >
                           Clear
@@ -672,7 +719,11 @@ export default function LocationsSplitClient({
                   )}
                 </div>
 
-                <div className={`directoryToolbar${effectiveIsMobile ? " directoryToolbarMobile" : ""}`}>
+                <div
+                  className={`directoryToolbar${effectiveIsMobile ? " directoryToolbarMobile" : ""}${
+                    alphabetOpen ? " directoryToolbar--alphabetOpen" : ""
+                  }`}
+                >
                   <div className={`directoryAlphabetNav${effectiveIsMobile ? " directoryAlphabetNavMobile" : ""}`} aria-label="Directory alphabet navigation">
                     {ALPHABET.map((letter) => {
                       const enabled = visibleLetters.includes(letter);
