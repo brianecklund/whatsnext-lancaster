@@ -1711,7 +1711,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
 
 
               {viewMode === "list" && selectedDisplayKey === GOING_NOW_KEY ? (
-                <div className="rightHeader weeklyOverviewLanding goingNowRight">
+                <div className="rightHeader weeklyOverviewLanding goingNowRight weeklyOverviewRevealGroup">
                   <div className="goingNowRight__top">
                     <div className="rightDayLabel">Going on now</div>
                     <div className="weekSummaryRangePill">{liveEventsNow.length} live</div>
@@ -1747,7 +1747,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   )}
                 </div>
               ) : viewMode === "list" && selectedWeekBucket ? (
-                <div className="rightHeader weeklyOverviewLanding">
+                <div className="rightHeader weeklyOverviewLanding weeklyOverviewRevealGroup">
                   <div className="rightDayLabel">Weekly Overview</div>
 
                   <div className="weekSelectorRail">
@@ -2229,7 +2229,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
             </div>
             </>
           ) : selectedDisplayKey === GOING_NOW_KEY ? (
-            <div className="weeklyOverviewLanding mobileWeeklyOverviewOpen mobileGoingNowOpen">
+            <div className="weeklyOverviewLanding mobileWeeklyOverviewOpen mobileGoingNowOpen weeklyOverviewRevealGroup">
               <div className="mobileListingContentBackWrap">
                 <MobileContentBackButton onBack={handleMobileDetailBack} />
               </div>
@@ -2290,7 +2290,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               </div>
             </div>
           ) : selectedWeekBucket ? (
-            <div className="weeklyOverviewLanding mobileWeeklyOverviewOpen">
+            <div className="weeklyOverviewLanding mobileWeeklyOverviewOpen weeklyOverviewRevealGroup">
               <div className="mobileListingContentBackWrap">
                 <MobileContentBackButton onBack={handleMobileDetailBack} />
               </div>

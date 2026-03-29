@@ -321,12 +321,6 @@ export default function UpdatesSplitClient({ updates, currentSection, onNavigate
           onClick={() => setSelected(u.id)}
           type="button"
         >
-          <span className="updateListRow__kind" title={updateKindLabel(primaryKind)}>
-            <span className="updateKindOrb updateKindOrb--list" aria-hidden>
-              <span className="updateKindOrb__glyph">{updateKindIcon(primaryKind)}</span>
-            </span>
-            <span className="visuallyHidden">{updateKindLabel(primaryKind)}</span>
-          </span>
           <span className="updateListRow__main">
             <span className="eventRowTitle">{u.title}</span>
             <span className="eventRowMeta updateRowMeta">
@@ -344,6 +338,12 @@ export default function UpdatesSplitClient({ updates, currentSection, onNavigate
                 ))}
               </span>
             ) : null}
+          </span>
+          <span className="updateListRow__kind" title={updateKindLabel(primaryKind)}>
+            <span className="updateKindOrb updateKindOrb--list" aria-hidden>
+              <span className="updateKindOrb__glyph">{updateKindIcon(primaryKind)}</span>
+            </span>
+            <span className="visuallyHidden">{updateKindLabel(primaryKind)}</span>
           </span>
         </button>
       );

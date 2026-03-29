@@ -2860,6 +2860,29 @@ a:hover{
   padding-bottom: 40px;
 }
 
+@keyframes weeklyOverviewRevealIn{
+  from{
+    opacity: 0;
+    transform: translate3d(0, 20px, 0);
+  }
+  to{
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference){
+  .weeklyOverviewRevealGroup{
+    animation: weeklyOverviewRevealIn 1.35s cubic-bezier(0.22, 1, 0.36, 1) 420ms both;
+  }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .weeklyOverviewRevealGroup{
+    animation: none !important;
+  }
+}
+
 .weekSummaryTopline{
   display:flex;
   align-items:flex-start;
@@ -10327,18 +10350,24 @@ body[data-layout="content"] .simplePage{
   border: 0;
 }
 
-/* Updates list + detail: primary type icon */
+/* Updates list + detail: primary type icon (top-right of row) */
 .updateListRow{
+  position: relative;
   display: flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 12px;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
   text-align: left;
+  padding-right: 52px;
 }
 
 .updateListRow__kind{
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
   flex-shrink: 0;
-  padding-top: 2px;
+  line-height: 0;
 }
 
 .updateListRow__main{
@@ -10348,6 +10377,7 @@ body[data-layout="content"] .simplePage{
   flex-direction: column;
   gap: 6px;
   align-items: stretch;
+  padding-right: 0;
 }
 
 .updateKindOrb{
