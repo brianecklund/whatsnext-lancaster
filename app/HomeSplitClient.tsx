@@ -1,6 +1,7 @@
 "use client";
 
 import NewsTickerBar from "./components/NewsTickerBar";
+import MobileContentBackButton from "./components/MobileContentBackButton";
 import ToolbarIcon from "./components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { dayKey, eventHasEnded, eventHappeningNow, nearestDayWithEvents, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
@@ -370,6 +371,9 @@ export default function HomeSplitClient({ events, updates = [], currentSection, 
   const mobileControlsCollapsedRef = useRef(false);
   const spotlightRailRef = useRef<HTMLDivElement | null>(null);
   const [spotlightPagerIndex, setSpotlightPagerIndex] = useState(0);
+  const weekCategorySentinelRef = useRef<HTMLDivElement | null>(null);
+  const [mobileWeekCategorySticky, setMobileWeekCategorySticky] = useState(false);
+  const [mobileWeekCategorySheetOpen, setMobileWeekCategorySheetOpen] = useState(false);
 
   useEffect(() => {
     mobileControlsCollapsedRef.current = mobileControlsCollapsed;
@@ -1073,6 +1077,14 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
   function clearSelected() {
     setClientSelectedKey(null);
     setParam("event", null);
+  }
+
+  function handleMobileDetailBack() {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      clearSelected();
+    }
   }
 
   function openSelected(key: string) {

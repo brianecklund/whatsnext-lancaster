@@ -8,6 +8,7 @@ import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
+import MobileContentBackButton from "@/app/components/MobileContentBackButton";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 
 export type UpdateLite = {
@@ -210,6 +211,14 @@ export default function UpdatesSplitClient({ updates, currentSection, onNavigate
     setParam("u", null);
   }
 
+  function handleMobileUpdateBack() {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      clearSelected();
+    }
+  }
+
   const leftSticky = (
     <div className="leftSticky splitPageStickySurface">
       <SegmentedControl
@@ -335,14 +344,15 @@ export default function UpdatesSplitClient({ updates, currentSection, onNavigate
       ) : undefined}
       mobileOverlay={
         <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
-          <div className="mobileDetailHeader">
-            <button className="backBtn" type="button" onClick={clearSelected}>
-              Back
-            </button>
-            <div className="mobileDetailTitle">Update</div>
-          </div>
-          <div className="scroll" style={{ padding: "0 16px 96px 16px" }}>
-            {selectedMobile ? <UpdateDetail update={selectedMobile} /> : null}
+          <div className="scroll mobileListingContentScroll" style={{ paddingBottom: 96 }}>
+            {selectedMobile ? (
+              <>
+                <div className="mobileListingContentBackWrap">
+                  <MobileContentBackButton onBack={handleMobileUpdateBack} />
+                </div>
+                <UpdateDetail update={selectedMobile} />
+              </>
+            ) : null}
           </div>
         </div>
       }

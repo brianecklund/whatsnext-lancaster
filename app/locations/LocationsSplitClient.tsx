@@ -8,6 +8,7 @@ import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
+import MobileContentBackButton from "@/app/components/MobileContentBackButton";
 import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
 import type { LocationLite } from "@/lib/types";
 import { mergeDirectoryCategories } from "@/lib/directoryCategories";
@@ -38,6 +39,58 @@ function normalizeWebsiteHref(url?: string | null): string | null {
   return `https://${t}`;
 }
 
+function DirectoryListingActions({
+  l,
+  stopPropagation,
+  className,
+}: {
+  l: LocationRow;
+  stopPropagation?: boolean;
+  className?: string;
+}) {
+  const phoneHref = normalizePhoneHref(l.phone);
+  const webHref = normalizeWebsiteHref(l.website);
+  const openNow = l.openNow;
+
+  return (
+    <div
+      className={["directoryListingRow__actions", className].filter(Boolean).join(" ")}
+      onClick={stopPropagation ? (e) => e.stopPropagation() : undefined}
+      onKeyDown={stopPropagation ? (e) => e.stopPropagation() : undefined}
+    >
+      {phoneHref ? (
+        <a
+          className="directoryListingIconBtn"
+          href={phoneHref}
+          aria-label={`Call ${l.name ?? "this listing"}`}
+          onClick={stopPropagation ? (e) => e.stopPropagation() : undefined}
+        >
+          <ToolbarIcon src="/icons/phone.svg" alt="" />
+        </a>
+      ) : null}
+      {webHref ? (
+        <a
+          className="directoryListingIconBtn"
+          href={webHref}
+          target="_blank"
+          rel="noreferrer"
+          aria-label={`Website for ${l.name ?? "this listing"}`}
+          onClick={stopPropagation ? (e) => e.stopPropagation() : undefined}
+        >
+          <ToolbarIcon src="/icons/globe.svg" alt="" />
+        </a>
+      ) : null}
+      <span
+        className={`directoryOpenBadge${openNow === true ? " directoryOpenBadge--open" : ""}`}
+        aria-label={openNow === true ? "Open now" : openNow === false ? "Closed" : "Hours unknown"}
+      >
+        <span className="directoryOpenBadge__dot" aria-hidden />
+        {openNow === true ? <span className="directoryOpenBadge__label">OPEN</span> : null}
+      </span>
+    </div>
+  );
+}
+
 function DirectoryListingRow({
   l,
   active,
@@ -47,10 +100,6 @@ function DirectoryListingRow({
   active: boolean;
   onSelect: () => void;
 }) {
-  const phoneHref = normalizePhoneHref(l.phone);
-  const webHref = normalizeWebsiteHref(l.website);
-  const openNow = l.openNow;
-
   return (
     <div
       className="eventRow directoryListingRow"
@@ -69,43 +118,7 @@ function DirectoryListingRow({
         <span className="eventRowTitle">{l.name ?? "Untitled listing"}</span>
         {l.category ? <span className="directoryListingRow__category">{l.category}</span> : null}
       </div>
-      <div
-        className="directoryListingRow__actions"
-        onClick={(e) => {
-          e.stopPropagation();
-        }}
-        onKeyDown={(e) => e.stopPropagation()}
-      >
-        {phoneHref ? (
-          <a
-            className="directoryListingIconBtn"
-            href={phoneHref}
-            aria-label={`Call ${l.name ?? "this listing"}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <ToolbarIcon src="/icons/phone.svg" alt="" />
-          </a>
-        ) : null}
-        {webHref ? (
-          <a
-            className="directoryListingIconBtn"
-            href={webHref}
-            target="_blank"
-            rel="noreferrer"
-            aria-label={`Website for ${l.name ?? "this listing"}`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <ToolbarIcon src="/icons/globe.svg" alt="" />
-          </a>
-        ) : null}
-        <span
-          className={`directoryOpenBadge${openNow === true ? " directoryOpenBadge--open" : ""}`}
-          aria-label={openNow === true ? "Open now" : openNow === false ? "Closed" : "Hours unknown"}
-        >
-          <span className="directoryOpenBadge__dot" aria-hidden />
-          {openNow === true ? <span className="directoryOpenBadge__label">OPEN</span> : null}
-        </span>
-      </div>
+      <DirectoryListingActions l={l} stopPropagation />
     </div>
   );
 }
@@ -238,6 +251,14 @@ export default function LocationsSplitClient({
     const params = new URLSearchParams(searchParams.toString());
     params.delete("location");
     navigate(params);
+  }
+
+  function handleMobileListingBack() {
+    if (typeof window !== "undefined" && window.history.length > 1) {
+      router.back();
+    } else {
+      clearSelected();
+    }
   }
 
   function setQuery(next: string) {
@@ -440,14 +461,15 @@ export default function LocationsSplitClient({
       }
       mobileOverlay={
         <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
-          <div className="mobileDetailHeader">
-            <button className="backBtn" type="button" onClick={clearSelected}>
-              Back
-            </button>
-            <div className="mobileDetailTitle">Listing</div>
-          </div>
-          <div className="scroll" style={{ padding: "0 16px 84px 16px" }}>
-            {selectedMobile ? <LocationDetail location={selectedMobile} /> : null}
+          <div className="scroll mobileListingContentScroll" style={{ paddingBottom: 84 }}>
+            {selectedMobile ? (
+              <>
+                <div className="mobileListingContentBackWrap">
+                  <MobileContentBackButton onBack={handleMobileListingBack} />
+                </div>
+                <LocationDetail location={selectedMobile} />
+              </>
+            ) : null}
           </div>
         </div>
       }
@@ -719,12 +741,20 @@ function LocationDetail({ location }: { location: LocationRow }) {
         </div>
       ) : null}
 
-      <div className="detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
+      <div className="locationDetailDesktopTitle detailTitle fadeInItem" style={{ animationDelay: "260ms" }}>
         {location.name ?? "Untitled listing"}
       </div>
 
+      <div className="locationDetailMobileTop fadeInItem" style={{ animationDelay: "260ms" }}>
+        <DirectoryListingActions l={location} className="locationDetailMobileActions" />
+        <div className="locationDetailMobileHeadText">
+          <div className="detailTitle locationDetailMobileTitle">{location.name ?? "Untitled listing"}</div>
+          {location.category ? <span className="badge">{location.category}</span> : null}
+        </div>
+      </div>
+
       <div className="detailMeta fadeInItem" style={{ animationDelay: "320ms" }}>
-        {location.category ? <span className="badge">{location.category}</span> : null}
+        {location.category ? <span className="badge detailMetaCategory">{location.category}</span> : null}
         {location.address ? <span className="muted">{location.address}</span> : null}
         {typeof rating === "number" ? <span className="muted">★ {rating.toFixed(1)}</span> : null}
         {typeof placeDetails?.openNow === "boolean" ? (
