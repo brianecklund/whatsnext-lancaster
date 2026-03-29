@@ -51,6 +51,12 @@ export function dayKey(d: Date): string {
   return `${y}-${m}-${dd}`;
 }
 
+/** Ended event whose scheduled day is “today” — for same-day ENDED badges (not past days). */
+export function eventEndedEarlierToday<T extends CalendarEventLite>(e: T, eventDay: Date, now = Date.now()): boolean {
+  if (!eventHasEnded(e, now)) return false;
+  return dayKey(eventDay) === dayKey(new Date(now));
+}
+
 export function nearestDayWithEvents<T extends CalendarEventLite>(events: T[]): Date {
   const today = startOfToday();
   const dated = events

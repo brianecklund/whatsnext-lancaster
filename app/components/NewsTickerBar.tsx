@@ -83,13 +83,9 @@ export default function NewsTickerBar({
     const slider = sliderRef.current;
     if (!newsWidget || !slider) return;
 
-    const allItems = Array.from(slider.querySelectorAll<HTMLElement>(".nw__slider__item"));
-    if (!allItems.length) return;
-
     const path = newsWidget.querySelector<SVGPathElement>(".js-news-widget__progress");
     if (!path) return;
 
-    const itemHeight = allItems[0].getBoundingClientRect().height;
     const length = path.getTotalLength();
     const duration = 2200;
 
@@ -97,6 +93,13 @@ export default function NewsTickerBar({
     let strokeTimer: number | undefined;
     let resetTimer: number | undefined;
     let destroyed = false;
+
+    const measureHeight = () => {
+      const allItems = Array.from(slider.querySelectorAll<HTMLElement>(".nw__slider__item"));
+      if (!allItems.length) return 24;
+      const h = allItems[0].getBoundingClientRect().height;
+      return Math.max(8, Math.round(h * 1000) / 1000);
+    };
 
     const animateStroke = () => {
       if (destroyed) return;
@@ -114,8 +117,13 @@ export default function NewsTickerBar({
 
     const slideItem = () => {
       if (destroyed) return;
+      const allItems = Array.from(slider.querySelectorAll<HTMLElement>(".nw__slider__item"));
+      if (!allItems.length) return;
+
+      const itemHeightPx = measureHeight();
+      const y = Math.round(itemHeightPx * counter * 1000) / 1000;
       slider.style.transition = `transform ${duration / 1000 / 4}s ease-in-out`;
-      slider.style.transform = `translate3d(0, -${itemHeight * counter}px, 0)`;
+      slider.style.transform = `translate3d(0, -${y}px, 0)`;
 
       if (counter === allItems.length - 1) {
         resetTimer = window.setTimeout(() => {

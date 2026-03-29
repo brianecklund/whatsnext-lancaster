@@ -1393,11 +1393,12 @@ a.eventTimeLink:hover{
 }
 
 .eventRow{
+  position: relative;
   width: 100%;
   text-align: left;
   border: 0;
   background: transparent;
-  padding: 10px 12px;
+  padding: 10px 52px 10px 12px;
   border-radius: 12px;
   cursor: pointer;
   display:flex;
@@ -2879,11 +2880,54 @@ html{ scroll-behavior: auto; }
   padding-bottom: 8px;
 }
 .dayRightRow{
+  position: relative;
   text-align:left;
-  padding: 12px 12px;
+  padding: 12px 48px 12px 12px;
   border-radius: 14px;
   border: 1px solid rgba(0,0,0,0.10);
   background: rgba(255,255,255,0.8);
+}
+
+.eventCard{
+  position: relative;
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 12px 44px 12px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(0,0,0,0.10);
+  background: rgba(255,255,255,0.8);
+  cursor: pointer;
+  color: var(--text);
+}
+
+.eventCardTitle{
+  font-weight: 600;
+  font-size: clamp(1.08rem, 1rem + 0.2vw, 1.24rem);
+  line-height: 1.15;
+}
+
+.eventCard .eventMeta{
+  margin-top: 4px;
+  font-size: clamp(0.92rem, 0.9rem + 0.08vw, 0.98rem);
+  opacity: 0.78;
+}
+
+.eventEndedTag{
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 1;
+  font-size: 0.58rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  padding: 3px 6px;
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--muted) 22%, var(--panel) 78%);
+  color: var(--muted);
+  pointer-events: none;
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
 }
 .dayRightRow[data-active="true"]{
   outline: 2px solid rgba(0,0,0,0.65);
@@ -4075,6 +4119,16 @@ a:hover{
 .mobileMenuList{ gap: 14px; }
 .mobileMenuActionText{ display:block; }
 
+.mobileMenuSheet .mobileSheetHeader{
+  justify-content: flex-start;
+  border-bottom: none;
+  padding-bottom: 10px;
+}
+
+.mobileMenuSheet .mobileSheetClose{
+  display: none;
+}
+
 /* Mobile: hamburger + palette sheets drop from below the site header */
 @media (max-width: 980px){
   .mobileSheetOverlay.mobileSheetOverlay--fromNav{
@@ -5113,6 +5167,7 @@ svg:not(:root) {
   list-style: none;
   display: flex;
   flex-direction: column;
+  flex-wrap: nowrap;
   margin-right: 1.5em;
   transform: translate3d(0, 0, 0);
   transition: transform 0.5s ease-in-out;
@@ -5121,6 +5176,8 @@ svg:not(:root) {
 .nw__slider__item {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
+  box-sizing: border-box;
   max-width: 30em;
   height: 2.4em;
 }
@@ -5251,6 +5308,11 @@ svg:not(:root) {
 
   .newsBar__intro{
     display: none;
+  }
+
+  /* One column so the ticker uses full width when intro is hidden (was leaving an empty grid track). */
+  .newsBar__openBtn{
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .nw{
@@ -6415,23 +6477,45 @@ body {
   width: 100%;
   flex-direction: column;
   align-items: stretch;
-  gap: 8px;
+  gap: 0;
 }
 
 @media (max-width: 980px){
   .leftControls.directoryLeftControls{
     padding-bottom: 0 !important;
-    gap: 8px !important;
+    gap: 0 !important;
   }
 
   .leftSticky.splitPageStickySurface:has(.directoryLeftControls){
     padding-bottom: 6px !important;
   }
+
+  .leftSticky .directoryLeftControls{
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    align-self: stretch !important;
+  }
+
+  .leftSticky .directoryLeftControls .searchRow.directorySearchRowMobile{
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto auto !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
+  }
+
+  .leftSticky .directoryLeftControls .searchRow.directorySearchRowMobile .searchInput{
+    width: 100% !important;
+    min-width: 0 !important;
+  }
 }
 
 @media (min-width: 981px){
   .leftSticky.splitPageStickySurface:has(.directoryLeftControls){
-    padding-bottom: 8px !important;
+    padding-bottom: 10px !important;
   }
 }
 

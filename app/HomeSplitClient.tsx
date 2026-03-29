@@ -4,7 +4,16 @@ import NewsTickerBar from "./components/NewsTickerBar";
 import MobileContentBackButton from "./components/MobileContentBackButton";
 import ToolbarIcon from "./components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
-import { dayKey, eventHasEnded, eventHappeningNow, nearestDayWithEvents, safeDateFromEvent, startOfDay, startOfToday } from "@/lib/calendar";
+import {
+  dayKey,
+  eventEndedEarlierToday,
+  eventHasEnded,
+  eventHappeningNow,
+  nearestDayWithEvents,
+  safeDateFromEvent,
+  startOfDay,
+  startOfToday,
+} from "@/lib/calendar";
 
 import { createPortal } from "react-dom";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
@@ -1571,6 +1580,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         }}
                         type="button"
                       >
+                        {eventEndedEarlierToday(e, g.date) ? (
+                          <span className="eventEndedTag">ENDED</span>
+                        ) : null}
                         <div className="eventRowTitle">{title}</div>
                         <div className="eventRowMeta">
                           <span>{timeLabel}</span>
@@ -1699,6 +1711,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                   setParam("event", key);
                                 }}
                               >
+                                {eventEndedEarlierToday(e, selectedDay) ? (
+                                  <span className="eventEndedTag">ENDED</span>
+                                ) : null}
                                 <div className="eventCardTitle">{title}</div>
                                 <div className="eventMeta">
                                   {timeLabel}
@@ -1760,6 +1775,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             }}
                             role="listitem"
                           >
+                            {eventEndedEarlierToday(e, selectedDay) ? (
+                              <span className="eventEndedTag">ENDED</span>
+                            ) : null}
                             <div className="dayRightTop">
                               <div className="dayRightTitle">{title}</div>
                               <div className="dayRightTime">{timeLabel}</div>
@@ -2014,6 +2032,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             onClick={() => openSelected(key)}
                             role="listitem"
                           >
+                            {eventEndedEarlierToday(e, selectedDay) ? (
+                              <span className="eventEndedTag">ENDED</span>
+                            ) : null}
                             <div className="dayRightTop">
                               <div className="dayRightTitle">{title}</div>
                               <div className="dayRightTime">{timeLabel}</div>
