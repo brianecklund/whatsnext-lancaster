@@ -459,6 +459,8 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   const pullRefreshingRef = useRef(false);
   const mobileControlsInitRef = useRef(false);
   const lastScrollTopRef = useRef(0);
+  /** After attaching the scroll listener, ignore the first in-bounds pass so restored scrollTop does not instantly collapse controls. */
+  const mobileScrollCollapsePrimedRef = useRef(false);
   const mobileControlsCollapsedRef = useRef(false);
   const spotlightRailRef = useRef<HTMLDivElement | null>(null);
   const [spotlightPagerIndex, setSpotlightPagerIndex] = useState(0);
@@ -525,6 +527,7 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
       setMobileControlsPinnedOpen(false);
       mobileControlsInitRef.current = false;
       lastScrollTopRef.current = 0;
+      mobileScrollCollapsePrimedRef.current = false;
       return;
     }
 
@@ -537,19 +540,27 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     const listEl = listRef.current;
     if (!listEl) return;
 
+    mobileScrollCollapsePrimedRef.current = false;
+
     const syncFromScroll = () => {
       const st = Math.max(0, listEl.scrollTop || 0);
-      const delta = st - lastScrollTopRef.current;
+      const prevTop = lastScrollTopRef.current;
       lastScrollTopRef.current = st;
 
       if (mobileControlsPinnedOpen || mobileSpotlightOpen) return;
 
       if (st <= 12) {
         setMobileControlsCollapsed(false);
+        mobileScrollCollapsePrimedRef.current = true;
         return;
       }
 
-      if (delta > 10) setMobileControlsCollapsed(true);
+      if (!mobileScrollCollapsePrimedRef.current) {
+        mobileScrollCollapsePrimedRef.current = true;
+        return;
+      }
+
+      if (st - prevTop > 10) setMobileControlsCollapsed(true);
     };
 
     syncFromScroll();
