@@ -1,0 +1,87 @@
+{
+  "id": "news_hub_settings",
+  "label": "News hub settings",
+  "repeatable": false,
+  "status": true,
+  "format": "custom",
+  "json": {
+    "Main": {
+      "season_eyebrow": {
+        "type": "Text",
+        "config": {
+          "label": "Season section label",
+          "placeholder": "This season"
+        }
+      },
+      "season_rows": {
+        "type": "Group",
+        "config": {
+          "label": "Season promo rows",
+          "repeat": true,
+          "fields": {
+            "row_layout": {
+              "type": "Select",
+              "config": {
+                "label": "Row layout",
+                "options": ["one_up", "two_up"],
+                "default_value": "two_up"
+              }
+            },
+            "tile_1_title": {
+              "type": "Text",
+              "config": {
+                "label": "Tile 1 title",
+                "placeholder": "Short label"
+              }
+            },
+            "tile_1_image": {
+              "type": "Image",
+              "config": {
+                "label": "Tile 1 image",
+                "constraint": {},
+                "thumbnails": []
+              }
+            },
+            "tile_1_link": {
+              "type": "Link",
+              "config": {
+                "label": "Tile 1 link",
+                "placeholder": "",
+                "select": null,
+                "allowTargetBlank": true,
+                "allowText": false,
+                "repeat": false
+              }
+            },
+            "tile_2_title": {
+              "type": "Text",
+              "config": {
+                "label": "Tile 2 title (two-up rows only)",
+                "placeholder": ""
+              }
+            },
+            "tile_2_image": {
+              "type": "Image",
+              "config": {
+                "label": "Tile 2 image",
+                "constraint": {},
+                "thumbnails": []
+              }
+            },
+            "tile_2_link": {
+              "type": "Link",
+              "config": {
+                "label": "Tile 2 link",
+                "placeholder": "",
+                "select": null,
+                "allowTargetBlank": true,
+                "allowText": false,
+                "repeat": false
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
