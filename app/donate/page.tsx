@@ -3,9 +3,9 @@ export default function DonatePage() {
     <main className="contentPage donatePage">
       <section className="contentHero">
         <p className="contentEyebrow">Support local discovery</p>
-        <h1 className="contentHeroTitle">Help keep What’s Next Lancaster free, current, and community-driven.</h1>
+        <h1 className="contentHeroTitle">Support Our Mission</h1>
         <p className="contentHeroLead">
-          Contributions help cover site upkeep, event curation, venue research, and the tools needed to keep the calendar, directory, and updates fresh.
+          Help keep What’s Next Lancaster free, current, and community-driven. Contributions help cover site upkeep, event curation, venue research, and the tools needed to keep the calendar, directory, and updates fresh.
         </p>
       </section>
 

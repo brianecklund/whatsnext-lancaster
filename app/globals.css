@@ -10420,6 +10420,38 @@ body[data-layout="content"] main.contentPage.clockPage{
   box-sizing: border-box;
 }
 
+/* Donate + About (desktop): scroll track on viewport right; content stays inset */
+@media (min-width: 981px){
+  body[data-layout="content"] main.contentPage.donatePage,
+  body[data-layout="content"] main.contentPage.aboutPage{
+    max-width: none;
+    width: 100%;
+    margin: 0;
+    padding-right: 0;
+    padding-left: var(--gutter);
+    box-sizing: border-box;
+  }
+
+  body[data-layout="content"] main.contentPage.donatePage{
+    padding-top: 28px;
+    padding-bottom: 72px;
+  }
+
+  body[data-layout="content"] main.contentPage.aboutPage{
+    padding-top: 18px;
+    padding-bottom: 54px;
+  }
+
+  body[data-layout="content"] main.contentPage.donatePage > section,
+  body[data-layout="content"] main.contentPage.aboutPage > section{
+    max-width: 1160px;
+    margin-left: auto;
+    margin-right: auto;
+    padding-right: var(--gutter);
+    box-sizing: border-box;
+  }
+}
+
 /* Weekly overview mobile: compact category pills (not “Total events”) */
 @media (max-width: 980px){
   .mobileWeeklyOverviewOpen .weekCategoryFilters--mobileCompact{
