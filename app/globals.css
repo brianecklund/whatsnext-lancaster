@@ -1279,6 +1279,14 @@ a.eventTimeLink:hover{
   max-width: none !important;
 }
 
+@media (min-width: 981px){
+  .weeklySpotlightPair .weeklyOverview--spotlightHalf{
+    align-items: flex-start !important;
+    justify-content: flex-start !important;
+    text-align: left !important;
+  }
+}
+
 .goingNowRight{
   display: flex;
   flex-direction: column;
@@ -1311,7 +1319,7 @@ a.eventTimeLink:hover{
   }
 
   .weeklySpotlightMobile{
-    margin: 2px 0 0 0;
+    margin: 0;
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -1364,7 +1372,7 @@ a.eventTimeLink:hover{
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    margin-top: 4px;
+    margin-top: 0;
     margin-left: 0;
     margin-right: 0;
     padding: 0;
@@ -1382,9 +1390,6 @@ a.eventTimeLink:hover{
     max-width: none !important;
   }
 
-  .leftSticky[data-mobile-collapsed="true"] .weeklySpotlightMobile--stickyRow{
-    margin-top: 0;
-  }
 }
 
 .dayTitle{
@@ -8061,7 +8066,7 @@ body,
     height: auto;
     min-height: 0;
     margin: 2px var(--panePadX) 0;
-    padding: 2px 4px 4px;
+    padding: 0 4px 2px;
     border: 0;
     border-radius: 0;
     background: transparent;
@@ -8303,7 +8308,7 @@ body{
 
   .leftSticky > .leftControls{
     padding-top: 6px !important;
-    padding-bottom: 4px !important;
+    padding-bottom: 2px !important;
   }
 
   .mobileControlsToggle{
@@ -8311,19 +8316,39 @@ body{
     margin-bottom: 6px !important;
   }
 
+  .leftSticky > .mobileControlsToggle.mobileControlsToggle--text{
+    margin-top: 4px !important;
+    margin-bottom: 2px !important;
+  }
+
   .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle{
     margin-bottom: 2px !important;
   }
 
   .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle.mobileControlsToggle--text{
-    margin-top: 6px !important;
-    margin-bottom: 6px !important;
+    margin-top: 4px !important;
+    margin-bottom: 2px !important;
   }
 
   .leftSticky > .weeklySpotlightMobile{
     padding-left: var(--panePadX) !important;
     padding-right: var(--panePadX) !important;
     box-sizing: border-box;
+  }
+
+  /* Match siteHeader horizontal padding (6px 12px rule) so spotlight + tabs align with logo / header actions */
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .tabs,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .leftControls,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky .calendarToolbar,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky .searchRow,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .weeklySpotlightMobile{
+    padding-left: 12px !important;
+    padding-right: 12px !important;
+  }
+
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .mobileControlsToggle.mobileControlsToggle--text{
+    margin-left: 12px !important;
+    margin-right: 12px !important;
   }
 
   .splitPageListBody,
