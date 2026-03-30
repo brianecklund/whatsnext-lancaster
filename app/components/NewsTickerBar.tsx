@@ -120,6 +120,16 @@ export default function NewsTickerBar({
       return Math.max(8, Math.round(maxH * 1000) / 1000);
     };
 
+    const syncFixedHeights = () => {
+      const wrapper = newsWidget.querySelector<HTMLElement>(".nw__wrapper");
+      if (!wrapper) return;
+      const allItems = Array.from(slider.querySelectorAll<HTMLElement>(".nw__slider__item"));
+      if (!allItems.length) return;
+      const itemHeightPx = measureHeight();
+      wrapper.style.height = `${itemHeightPx}px`;
+      for (const el of allItems) el.style.height = `${itemHeightPx}px`;
+    };
+
     const animateStroke = () => {
       if (destroyed) return;
       path.style.transition = "none";
@@ -139,6 +149,7 @@ export default function NewsTickerBar({
       const allItems = Array.from(slider.querySelectorAll<HTMLElement>(".nw__slider__item"));
       if (!allItems.length) return;
 
+      syncFixedHeights();
       const itemHeightPx = measureHeight();
       const y = Math.round(itemHeightPx * counter * 1000) / 1000;
       slider.style.transition = `transform ${duration / 1000 / 4}s ease-in-out`;
@@ -157,7 +168,31 @@ export default function NewsTickerBar({
       animateStroke();
     };
 
-    animateStroke();
+    // If fonts/layout are still settling (common on mobile), measured heights can be 0-ish
+    // which makes the slider land between items (blank frames). Wait for fonts + 2 frames,
+    // then lock the wrapper/item heights and start the loop.
+    const start = async () => {
+      try {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const fontsReady = (document as any)?.fonts?.ready as Promise<void> | undefined;
+        if (fontsReady) await fontsReady;
+      } catch {
+        /* ignore */
+      }
+      if (destroyed) return;
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      if (destroyed) return;
+      await new Promise<void>((r) => requestAnimationFrame(() => r()));
+      if (destroyed) return;
+
+      slider.style.transition = "none";
+      slider.style.transform = "translate3d(0,0,0)";
+      counter = 1;
+      syncFixedHeights();
+      animateStroke();
+    };
+
+    void start();
 
     return () => {
       destroyed = true;
