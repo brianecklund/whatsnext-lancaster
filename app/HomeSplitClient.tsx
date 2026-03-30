@@ -109,11 +109,34 @@ function weekCategoryForEvent(eventType?: string | null): WeekCategory {
   return "Other";
 }
 
-function EventListingLocation({ e, className }: { e: EventLite; className?: string }) {
+function EventListingLocation({
+  e,
+  className,
+  onWeeklyDesktopVenuePeek,
+}: {
+  e: EventLite;
+  className?: string;
+  /** Desktop weekly overview: open inline venue panel instead of navigating immediately. */
+  onWeeklyDesktopVenuePeek?: (event: EventLite) => void;
+}) {
   const name = (e.locationName || "").trim();
   if (!name) return null;
-  const dir = directoryHrefForEvent(e);
   const cn = ["eventListingLocation", className].filter(Boolean).join(" ");
+  if (onWeeklyDesktopVenuePeek) {
+    return (
+      <button
+        type="button"
+        className={`${cn} eventListingLocation--directory weeklyVenueNamePeekBtn`}
+        onClick={(ev) => {
+          ev.stopPropagation();
+          onWeeklyDesktopVenuePeek(e);
+        }}
+      >
+        {name}
+      </button>
+    );
+  }
+  const dir = directoryHrefForEvent(e);
   if (dir) {
     return (
       <Link href={dir} className={`${cn} eventListingLocation--directory`} onClick={(ev) => ev.stopPropagation()}>
@@ -326,6 +349,52 @@ function VenueHoverPreviewAside({
   );
 }
 
+function WeeklyDesktopVenuePeekPanel({ e }: { e: EventLite }) {
+  const descRaw = (pickDescriptionText(e) || e.summary || "").trim();
+  const desc = descRaw.length > 260 ? `${descRaw.slice(0, 257).trim()}…` : descRaw;
+  const dirHref = directoryHrefForEvent(e);
+  const main = (
+    <>
+      <div className="venueHoverPreview__kicker">Venue</div>
+      {e.locationName?.trim() ? <div className="venueHoverPreview__title">{e.locationName.trim()}</div> : null}
+      {e.address?.trim() ? <div className="venueHoverPreview__address muted">{e.address.trim()}</div> : null}
+      {desc ? <div className="venueHoverPreview__desc">{desc}</div> : null}
+      {dirHref ? <span className="weeklyVenuePeekPanel__hint">View venue page →</span> : null}
+      {!dirHref && e.locationUrl ? <span className="weeklyVenuePeekPanel__hint">Open location link →</span> : null}
+    </>
+  );
+
+  return (
+    <div className="weeklyVenuePeekPanel">
+      {dirHref ? (
+        <Link href={dirHref} className="weeklyVenuePeekPanel__main">
+          {main}
+        </Link>
+      ) : e.locationUrl ? (
+        <a href={e.locationUrl} className="weeklyVenuePeekPanel__main" target="_blank" rel="noreferrer">
+          {main}
+        </a>
+      ) : (
+        <div className="weeklyVenuePeekPanel__main weeklyVenuePeekPanel__main--static">{main}</div>
+      )}
+      {e.website_url || e.tickets_url ? (
+        <div className="venueHoverPreview__contact weeklyVenuePeekPanel__links">
+          {e.website_url ? (
+            <a className="venueHoverPreview__link" href={e.website_url} target="_blank" rel="noreferrer">
+              Website
+            </a>
+          ) : null}
+          {e.tickets_url ? (
+            <a className="venueHoverPreview__link" href={e.tickets_url} target="_blank" rel="noreferrer">
+              Tickets
+            </a>
+          ) : null}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
 type WeekBucket = {
   key: string;
   label: string;
@@ -501,6 +570,7 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
 
   const desktopHoverLeaveTimerRef = useRef<number | null>(null);
   const [desktopListHoverEvent, setDesktopListHoverEvent] = useState<EventLite | null>(null);
+  const [weeklyDesktopVenuePeekId, setWeeklyDesktopVenuePeekId] = useState<string | null>(null);
 
   useEffect(() => {
     mobileControlsCollapsedRef.current = mobileControlsCollapsed;
@@ -1087,9 +1157,19 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     return byUid || byId || null;
   }, [filteredEvents, selectedDisplayKey]);
 
+  const weekCategorySelectionKey = useMemo(
+    () => [...weekCategorySelection].sort().join("\0"),
+    [weekCategorySelection],
+  );
+
   useEffect(() => {
     setDesktopListHoverEvent(null);
+    setWeeklyDesktopVenuePeekId(null);
   }, [selectedEvent, selectedDisplayKey, viewMode, selectedDayStr]);
+
+  useEffect(() => {
+    setWeeklyDesktopVenuePeekId(null);
+  }, [selectedWeekBucket?.key, weekCategorySelectionKey, effectiveIsMobile]);
 
   function desktopListingHoverable(e: EventLite) {
     return Boolean(e.locationName?.trim() || (e.address ?? "").trim());
@@ -1374,6 +1454,11 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
     setParam("event", key);
   }
 
+  function toggleWeeklyDesktopVenuePeek(event: EventLite) {
+    if (!(event.locationName || "").trim()) return;
+    setWeeklyDesktopVenuePeekId((prev) => (prev === event.id ? null : event.id));
+  }
+
   function desktopListingHoverHandlers(e: EventLite) {
     if (effectiveIsMobile || !desktopListingHoverable(e)) return {};
     return {
@@ -1605,46 +1690,46 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       ) : null}
                     </div>
                   </div>
-                </div>
 
-                {effectiveIsMobile &&
-                resolvedSection === "calendar" &&
-                !mobileDetailOpen &&
-                viewMode === "list" &&
-                !isClockView ? (
-                  <div className="weeklySpotlightMobile fadeInItem" style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}>
-                    <div className="weeklySpotlightMobile__row">
-                      <button
-                        type="button"
-                        className="weeklyOverview weeklyOverview--spotlightMobileHalf"
-                        data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
-                        onClick={() => openWeek(WEEKLY_KEY)}
-                      >
-                        <div className="weeklySpotlightMobile__label">This week</div>
-                        <div className="weeklySpotlightMobile__count">
-                          {(() => {
-                            const n = defaultWeekBucket?.events.length ?? 0;
-                            return `${n} ${n === 1 ? "event" : "events"}`;
-                          })()}
-                        </div>
-                      </button>
-                      <button
-                        type="button"
-                        className="weeklyOverview weeklyOverview--spotlightMobileHalf"
-                        data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
-                        onClick={() => openWeek(GOING_NOW_KEY)}
-                      >
-                        <div className="weeklySpotlightMobile__label">Happening now</div>
-                        <div className="weeklySpotlightMobile__count">
-                          {(() => {
-                            const n = liveEventsNow.length;
-                            return `${n} ${n === 1 ? "event" : "events"}`;
-                          })()}
-                        </div>
-                      </button>
+                  {effectiveIsMobile &&
+                  resolvedSection === "calendar" &&
+                  !mobileDetailOpen &&
+                  viewMode === "list" &&
+                  !isClockView ? (
+                    <div className="weeklySpotlightMobile fadeInItem" style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}>
+                      <div className="weeklySpotlightMobile__row">
+                        <button
+                          type="button"
+                          className="weeklyOverview weeklyOverview--spotlightMobileHalf"
+                          data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
+                          onClick={() => openWeek(WEEKLY_KEY)}
+                        >
+                          <div className="weeklySpotlightMobile__label">This week</div>
+                          <div className="weeklySpotlightMobile__count">
+                            {(() => {
+                              const n = defaultWeekBucket?.events.length ?? 0;
+                              return `${n} ${n === 1 ? "event" : "events"}`;
+                            })()}
+                          </div>
+                        </button>
+                        <button
+                          type="button"
+                          className="weeklyOverview weeklyOverview--spotlightMobileHalf"
+                          data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
+                          onClick={() => openWeek(GOING_NOW_KEY)}
+                        >
+                          <div className="weeklySpotlightMobile__label">Happening now</div>
+                          <div className="weeklySpotlightMobile__count">
+                            {(() => {
+                              const n = liveEventsNow.length;
+                              return `${n} ${n === 1 ? "event" : "events"}`;
+                            })()}
+                          </div>
+                        </button>
+                      </div>
                     </div>
-                  </div>
-                ) : null}
+                  ) : null}
+                </div>
 
               </div>
 
@@ -2185,8 +2270,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   {filteredWeekEvents.length === 0 ? (
                     <div className="emptyRight">No events match this weekly overview filter right now.</div>
                   ) : (
-                    desktopHoverSplit(
-                      <div className="weeklyLanding">
+                    <div className="weeklyLanding weeklyLanding--desktopFull">
                       <div className="weeklyCards">
                         {weekGroups.map((g) => (
                           <div key={dayKey(g.date)} className="weeklyDayGroup">
@@ -2198,15 +2282,15 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                               const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
                               const img = pickImageUrl(e);
                               const desc = (pickDescriptionText(e) || e.summary || "").trim();
+                              const peekOpen = weeklyDesktopVenuePeekId === e.id;
 
-                              return (
+                              const card = (
                                 <button
-                                  key={e.id}
                                   type="button"
                                   className="weeklyCard weeklyCardSelectable"
                                   data-past={eventHasEnded(e) ? "true" : "false"}
+                                  data-venue-peek-open={peekOpen ? "true" : "false"}
                                   onClick={() => openSelected(e.uid ?? e.id)}
-                                  {...desktopListingHoverHandlers(e)}
                                 >
                                   <div className="weeklyCardMedia">
                                     {img ? (
@@ -2220,15 +2304,17 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                   </div>
 
                                   <div className="weeklyCardContent weeklyCardContentExpanded">
-                                    {e.event_type ? <div className="weeklyCardTag">{e.event_type}</div> : null}
                                     <div className="weeklyCardTop">
-                                      <div className="weeklyCardTitleWrap">
-                                        <div className="weeklyCardTitle">{title}</div>
-                                        <div className="weeklyCardTime eventListingTime">{timeLabel}</div>
+                                      <div className="weeklyCardTitleCol">
+                                        {e.event_type ? <div className="weeklyCardTag">{e.event_type}</div> : null}
+                                        <div className="weeklyCardTitleWrap">
+                                          <div className="weeklyCardTitle">{title}</div>
+                                          <div className="weeklyCardTime eventListingTime">{timeLabel}</div>
+                                        </div>
                                       </div>
 
                                       {e.tickets_url || e.website_url ? (
-                                        <div className="weeklyCardActions">
+                                        <div className="weeklyCardActions weeklyCardActions--listingCorner">
                                           {e.tickets_url ? (
                                             <a
                                               className="weeklyMiniBtn"
@@ -2256,18 +2342,44 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                     </div>
 
                                     <div className="weeklyCardMetaRow">
-                                      {e.locationName?.trim() ? <EventListingLocation e={e} /> : null}
+                                      {e.locationName?.trim() ? (
+                                        <EventListingLocation e={e} onWeeklyDesktopVenuePeek={toggleWeeklyDesktopVenuePeek} />
+                                      ) : null}
                                     </div>
                                     {desc ? <div className="weeklyCardDesc">{desc.length > 200 ? `${desc.slice(0, 200).trim()}…` : desc}</div> : null}
                                   </div>
                                 </button>
+                              );
+
+                              return (
+                                <div key={e.id} className="weeklyCardShell" data-peek-open={peekOpen ? "true" : "false"}>
+                                  <div className="weeklyCardShell__main">
+                                    {peekOpen ? (
+                                      <button
+                                        type="button"
+                                        className="weeklyCardPeekRestore"
+                                        aria-label="Expand listing to full width"
+                                        onClick={() => setWeeklyDesktopVenuePeekId(null)}
+                                      >
+                                        <span className="weeklyCardPeekRestore__chev" aria-hidden>
+                                          ◀
+                                        </span>
+                                      </button>
+                                    ) : null}
+                                    {card}
+                                  </div>
+                                  {peekOpen ? (
+                                    <div className="weeklyVenuePeekPanelWrap">
+                                      <WeeklyDesktopVenuePeekPanel e={e} />
+                                    </div>
+                                  ) : null}
+                                </div>
                               );
                             })}
                           </div>
                         ))}
                       </div>
                     </div>
-                    )
                   )}
                 </div>
               ) : !selectedEvent ? (
@@ -2643,12 +2755,40 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             )}
                           </div>
                           <div className="weeklyCardContent weeklyCardContentExpanded">
-                            {e.event_type ? <div className="weeklyCardTag">{e.event_type}</div> : null}
                             <div className="weeklyCardTop">
-                              <div className="weeklyCardTitleWrap">
-                                <div className="weeklyCardTitle">{title}</div>
-                                <div className="weeklyCardTime eventListingTime">{timeLabel}</div>
+                              <div className="weeklyCardTitleCol">
+                                {e.event_type ? <div className="weeklyCardTag">{e.event_type}</div> : null}
+                                <div className="weeklyCardTitleWrap">
+                                  <div className="weeklyCardTitle">{title}</div>
+                                  <div className="weeklyCardTime eventListingTime">{timeLabel}</div>
+                                </div>
                               </div>
+                              {e.tickets_url || e.website_url ? (
+                                <div className="weeklyCardActions weeklyCardActions--listingCorner">
+                                  {e.tickets_url ? (
+                                    <a
+                                      className="weeklyMiniBtn"
+                                      href={e.tickets_url}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      onClick={(ev) => ev.stopPropagation()}
+                                    >
+                                      Tickets
+                                    </a>
+                                  ) : null}
+                                  {e.website_url ? (
+                                    <a
+                                      className="weeklyMiniBtn"
+                                      href={e.website_url}
+                                      target="_blank"
+                                      rel="noreferrer"
+                                      onClick={(ev) => ev.stopPropagation()}
+                                    >
+                                      Website
+                                    </a>
+                                  ) : null}
+                                </div>
+                              ) : null}
                             </div>
                             <div className="weeklyCardMetaRow">
                               {e.locationName?.trim() ? <EventListingLocation e={e} /> : null}
@@ -2840,14 +2980,16 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                               )}
                             </div>
                             <div className="weeklyCardContent weeklyCardContentExpanded">
-                              {e.event_type ? <div className="weeklyCardTag">{e.event_type}</div> : null}
                               <div className="weeklyCardTop">
-                                <div className="weeklyCardTitleWrap">
-                                  <div className="weeklyCardTitle">{title}</div>
-                                  <div className="weeklyCardTime eventListingTime">{timeLabel}</div>
+                                <div className="weeklyCardTitleCol">
+                                  {e.event_type ? <div className="weeklyCardTag">{e.event_type}</div> : null}
+                                  <div className="weeklyCardTitleWrap">
+                                    <div className="weeklyCardTitle">{title}</div>
+                                    <div className="weeklyCardTime eventListingTime">{timeLabel}</div>
+                                  </div>
                                 </div>
                                 {e.tickets_url || e.website_url ? (
-                                  <div className="weeklyCardActions">
+                                  <div className="weeklyCardActions weeklyCardActions--listingCorner">
                                     {e.tickets_url ? (
                                       <a
                                         className="weeklyMiniBtn"
