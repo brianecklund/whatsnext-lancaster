@@ -108,6 +108,14 @@ html{ font-size: var(--baseSize); }
   font-display: swap;
 }
 
+@font-face {
+  font-family: "ABC Arizona Flare Variable";
+  src: url("/fonts/ABCArizonaFlareVariable-Trial.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 *{ box-sizing:border-box; }
 html,body{ height:100%; }
 body{
@@ -130,6 +138,10 @@ html[data-font="source-serif"]{
 html[data-font="jetbrains-mono"]{
   --font-sans: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --font-serif: "JetBrains Mono", ui-monospace, monospace;
+}
+html[data-font="abc-arizona-flare"]{
+  --font-sans: "ABC Arizona Flare Variable", "Inter", "Gabarito", system-ui, sans-serif;
+  --font-serif: "ABC Arizona Flare Variable", Georgia, "Times New Roman", serif;
 }
 
 html[data-text-scale="smaller"]{
@@ -8308,7 +8320,7 @@ body{
 
   .leftSticky > .leftControls{
     padding-top: 6px !important;
-    padding-bottom: 2px !important;
+    padding-bottom: 0 !important;
   }
 
   .mobileControlsToggle{
@@ -8317,8 +8329,8 @@ body{
   }
 
   .leftSticky > .mobileControlsToggle.mobileControlsToggle--text{
-    margin-top: 4px !important;
-    margin-bottom: 2px !important;
+    margin-top: 2px !important;
+    margin-bottom: 0 !important;
   }
 
   .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle{
@@ -8326,8 +8338,8 @@ body{
   }
 
   .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle.mobileControlsToggle--text{
-    margin-top: 4px !important;
-    margin-bottom: 2px !important;
+    margin-top: 2px !important;
+    margin-bottom: 0 !important;
   }
 
   .leftSticky > .weeklySpotlightMobile{
@@ -8336,19 +8348,22 @@ body{
     box-sizing: border-box;
   }
 
-  /* Match siteHeader horizontal padding (6px 12px rule) so spotlight + tabs align with logo / header actions */
+  /* Shell mobile: line up with day headers on the left (--panePadX), header action cluster on the right (12px). */
   body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .tabs,
   body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .leftControls,
   body[data-layout="shell"] .paneLeft > .scroll > .leftSticky .calendarToolbar,
   body[data-layout="shell"] .paneLeft > .scroll > .leftSticky .searchRow,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky .directoryToolbar,
   body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .weeklySpotlightMobile{
-    padding-left: 12px !important;
+    padding-left: var(--panePadX) !important;
     padding-right: 12px !important;
   }
 
   body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .mobileControlsToggle.mobileControlsToggle--text{
-    margin-left: 12px !important;
-    margin-right: 12px !important;
+    display: flex !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    max-width: calc(100% - var(--panePadX) - 12px);
   }
 
   .splitPageListBody,
@@ -11044,7 +11059,8 @@ body[data-layout="content"] .simplePage{
 
 @media (max-width: 980px){
   .newsBar .nw__slider__text{
-    font-size: 0.79rem;
+    font-size: max(12px, 0.79rem);
+    min-height: 1.2em;
   }
 }
 

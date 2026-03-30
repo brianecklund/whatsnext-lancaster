@@ -1352,6 +1352,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
           "Upcoming event";
         const where = (event.locationName ?? "").trim() || "Lancaster";
         return {
+          id: `ev-${event.id}`,
           label: event.event_type ? event.event_type.toUpperCase() : "NEWS",
           text: `${title} • ${where} • ${formatTimeLabel(date)}`,
           href: "#",
@@ -1361,7 +1362,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
     return upcoming.length
       ? upcoming
       : [
-          { label: "NEWS", text: "Upcoming Lancaster events, specials, and pop-ups.", href: "#" },
+          { id: "ticker-fallback", label: "NEWS", text: "Upcoming Lancaster events, specials, and pop-ups.", href: "#" },
         ];
   }, [events]);
 

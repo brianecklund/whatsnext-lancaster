@@ -183,20 +183,37 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
 
   const newsTickerItems = useMemo(() => {
     const upcoming = filtered.slice(0, 6).map((update) => {
-      const title = (update.title ?? "").trim() || "Update";
-      const sum = (update.summary ?? "").trim();
+      const rawTitle = (update.title ?? "").trim();
+      const rawSum = (update.summary ?? "").trim();
+      const fromBody =
+        !rawTitle && !rawSum && update.body
+          ? update.body
+              .replace(/<[^>]+>/g, " ")
+              .replace(/\s+/g, " ")
+              .trim()
+              .slice(0, 140)
+          : "";
+      const title = rawTitle || rawSum || fromBody || "Update";
       const tag0 = update.tags?.map((t) => (t ?? "").trim()).find(Boolean);
-      const tail = sum ? sum : tag0 ? tag0 : "";
+      let tail = "";
+      if (rawTitle) {
+        if (rawSum) tail = rawSum;
+        else if (tag0) tail = tag0;
+      } else if (tag0) {
+        tail = tag0;
+      }
+      const text = tail ? `${title} • ${tail}` : title;
       return {
+        id: update.id,
         label: update.pinned ? "NEWS" : "UPDATE",
-        text: tail ? `${title} • ${tail}` : title,
+        text,
         href: "#",
       };
     });
 
     return upcoming.length
       ? upcoming
-      : [{ label: "NEWS", text: "Upcoming Lancaster events, specials, and pop-ups.", href: "#" }];
+      : [{ id: "ticker-fallback", label: "NEWS", text: "Upcoming Lancaster events, specials, and pop-ups.", href: "#" }];
   }, [filtered]);
 
   const selectedDesktop = useMemo(() => {

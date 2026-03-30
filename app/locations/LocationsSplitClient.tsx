@@ -518,6 +518,7 @@ export default function LocationsSplitClient({
       const name = (location.name ?? "").trim() || "Featured listing";
       const cat = (location.category ?? "").trim() || "Directory";
       return {
+        id: `loc-${location.key}`,
         label: "NEWS",
         text: `${name} • ${cat}`,
         href: "#",
@@ -526,7 +527,7 @@ export default function LocationsSplitClient({
 
     return upcoming.length
       ? upcoming
-      : [{ label: "NEWS", text: "Local Lancaster venues, shops, and places to explore.", href: "#" }];
+      : [{ id: "ticker-fallback", label: "NEWS", text: "Local Lancaster venues, shops, and places to explore.", href: "#" }];
   }, [orderedLocations]);
 
   const selectedDesktop = useMemo(() => {

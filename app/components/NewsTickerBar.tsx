@@ -6,15 +6,22 @@ import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
 import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
 
 type NewsTickerItem = {
+  id?: string;
   label?: string;
   text: string;
   href?: string;
 };
 
+function stripInvisible(s: string) {
+  return (s ?? "").replace(/\u200B/g, "").replace(/\uFEFF/g, "").replace(/\u00AD/g, "");
+}
+
 function tickerItemLine(item: NewsTickerItem): string {
-  const text = (item.text ?? "").replace(/\s+/g, " ").trim();
-  if (text) return text;
-  const label = (item.label ?? "").trim();
+  const text = stripInvisible(item.text ?? "")
+    .replace(/\s+/g, " ")
+    .trim();
+  if (text.length > 0) return text;
+  const label = stripInvisible(item.label ?? "").trim();
   if (label) return `${label}: see Updates for details.`;
   return "Community update.";
 }
@@ -80,7 +87,7 @@ export default function NewsTickerBar({
 
   const renderedItems = useMemo(() => {
     const raw = !items.length
-      ? [{ label: "NEWS", text: "Upcoming Lancaster events and pop-ups.", href: "#" as const }]
+      ? [{ id: "ticker-empty", label: "NEWS", text: "Upcoming Lancaster events and pop-ups.", href: "#" as const }]
       : items.slice(0, 6);
     const base = raw.map((item) => ({ ...item, text: tickerItemLine(item) }));
     return [...base, base[0]];
@@ -105,8 +112,12 @@ export default function NewsTickerBar({
     const measureHeight = () => {
       const allItems = Array.from(slider.querySelectorAll<HTMLElement>(".nw__slider__item"));
       if (!allItems.length) return 24;
-      const h = allItems[0].getBoundingClientRect().height;
-      return Math.max(8, Math.round(h * 1000) / 1000);
+      let maxH = 8;
+      for (const el of allItems) {
+        const h = el.getBoundingClientRect().height;
+        if (h > maxH) maxH = h;
+      }
+      return Math.max(8, Math.round(maxH * 1000) / 1000);
     };
 
     const animateStroke = () => {
@@ -166,7 +177,7 @@ export default function NewsTickerBar({
               <div className="nw__wrapper">
                 <ul className="nw__slider" ref={sliderRef}>
                   {renderedItems.map((item, index) => (
-                    <li key={`${item.text}-${index}`} className="nw__slider__item">
+                    <li key={item.id ? `nw-${item.id}-${index}` : `nw-${index}`} className="nw__slider__item">
                       <span className="nw__slider__text">
                         {item.label ? <strong>{item.label}:</strong> : null} {item.text}
                       </span>

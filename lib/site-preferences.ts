@@ -1,6 +1,6 @@
 import type { ThemeKey } from "@/app/theme-palettes";
 
-export type FontFamilyKey = "default" | "dm-sans" | "source-serif" | "jetbrains-mono";
+export type FontFamilyKey = "default" | "dm-sans" | "source-serif" | "jetbrains-mono" | "abc-arizona-flare";
 export type TextScaleKey = "default" | "smaller" | "larger";
 
 export const FONT_OPTIONS: { key: FontFamilyKey; label: string }[] = [
@@ -8,6 +8,7 @@ export const FONT_OPTIONS: { key: FontFamilyKey; label: string }[] = [
   { key: "dm-sans", label: "DM Sans" },
   { key: "source-serif", label: "Source Serif" },
   { key: "jetbrains-mono", label: "JetBrains Mono" },
+  { key: "abc-arizona-flare", label: "ABC Arizona Flare" },
 ];
 
 export const TEXT_SCALE_OPTIONS: { key: TextScaleKey; label: string }[] = [
