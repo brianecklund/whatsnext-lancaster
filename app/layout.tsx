@@ -6,6 +6,7 @@ import PageRevealRoot from "./components/PageRevealRoot";
 import SiteHeader from "./site-header";
 import ThemeBoot from "./ThemeBoot";
 import SitePreferencesBoot from "./components/SitePreferencesBoot";
+import SiteFooterBar from "./components/SiteFooterBar";
 
 export const metadata: Metadata = {
   title: "What's Next Lancaster",
@@ -41,6 +42,7 @@ export default function RootLayout({
             <SiteHeader />
           </Suspense>
           {children}
+          <SiteFooterBar />
         </PageRevealRoot>
       </body>
     </html>

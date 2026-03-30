@@ -278,7 +278,7 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
 
       <div className="leftControls">
         {isMobile ? (
-          <div className="searchRow">
+          <div className="searchRow updatesSearchRowMobile">
             <input
               className="searchInput"
               placeholder="Search updates…"
