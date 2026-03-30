@@ -20,6 +20,7 @@ import {
 } from "@/lib/site-preferences";
 
 const DESKTOP_LINKS = [
+  { href: "/blog", label: "Blog" },
   { href: "/donate", label: "Donate" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
@@ -29,6 +30,7 @@ const MOBILE_LINKS = [
   { href: "/", label: "Calendar" },
   { href: "/locations", label: "Directory" },
   { href: "/updates", label: "Updates" },
+  { href: "/blog", label: "Blog" },
   { href: "/donate", label: "Donate" },
   { href: "/about", label: "About" },
   { href: "/contact", label: "Contact" },
