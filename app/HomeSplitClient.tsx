@@ -16,7 +16,7 @@ import {
 } from "@/lib/calendar";
 
 import { createPortal } from "react-dom";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
 import WeeklyPreviewRail from "@/app/components/WeeklyPreviewRail";
 import ClockDayClient from "@/app/clock/ClockDayClient";
@@ -293,6 +293,39 @@ function pickDescriptionText(e: EventLite): string | null {
   return null;
 }
 
+function VenueHoverPreviewAside({
+  event: e,
+  onMouseEnter,
+  onMouseLeave,
+}: {
+  event: EventLite;
+  onMouseEnter: () => void;
+  onMouseLeave: () => void;
+}) {
+  const descRaw = (pickDescriptionText(e) || e.summary || "").trim();
+  const desc = descRaw.length > 240 ? `${descRaw.slice(0, 237).trim()}…` : descRaw;
+  return (
+    <aside className="venueHoverPreview" onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave} aria-label="Venue preview">
+      <div className="venueHoverPreview__kicker">Venue</div>
+      {e.locationName?.trim() ? <div className="venueHoverPreview__title">{e.locationName.trim()}</div> : null}
+      {e.address?.trim() ? <div className="venueHoverPreview__address muted">{e.address.trim()}</div> : null}
+      {desc ? <p className="venueHoverPreview__desc">{desc}</p> : null}
+      <div className="venueHoverPreview__contact">
+        {e.website_url ? (
+          <a className="venueHoverPreview__link" href={e.website_url} target="_blank" rel="noreferrer">
+            Website
+          </a>
+        ) : null}
+        {e.tickets_url ? (
+          <a className="venueHoverPreview__link" href={e.tickets_url} target="_blank" rel="noreferrer">
+            Tickets
+          </a>
+        ) : null}
+      </div>
+    </aside>
+  );
+}
+
 type WeekBucket = {
   key: string;
   label: string;
@@ -465,6 +498,9 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   const weekCategorySentinelRef = useRef<HTMLDivElement | null>(null);
   const [mobileWeekCategorySticky, setMobileWeekCategorySticky] = useState(false);
   const [mobileWeekCategorySheetOpen, setMobileWeekCategorySheetOpen] = useState(false);
+
+  const desktopHoverLeaveTimerRef = useRef<number | null>(null);
+  const [desktopListHoverEvent, setDesktopListHoverEvent] = useState<EventLite | null>(null);
 
   useEffect(() => {
     mobileControlsCollapsedRef.current = mobileControlsCollapsed;
@@ -1051,6 +1087,45 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     return byUid || byId || null;
   }, [filteredEvents, selectedDisplayKey]);
 
+  useEffect(() => {
+    setDesktopListHoverEvent(null);
+  }, [selectedEvent, selectedDisplayKey, viewMode, selectedDayStr]);
+
+  function desktopListingHoverable(e: EventLite) {
+    return Boolean(e.locationName?.trim() || (e.address ?? "").trim());
+  }
+
+  function onDesktopListingHoverEnter(e: EventLite) {
+    if (effectiveIsMobile || !desktopListingHoverable(e)) return;
+    if (desktopHoverLeaveTimerRef.current != null) {
+      window.clearTimeout(desktopHoverLeaveTimerRef.current);
+      desktopHoverLeaveTimerRef.current = null;
+    }
+    setDesktopListHoverEvent(e);
+  }
+
+  function onDesktopListingHoverLeave() {
+    if (effectiveIsMobile) return;
+    if (desktopHoverLeaveTimerRef.current != null) window.clearTimeout(desktopHoverLeaveTimerRef.current);
+    desktopHoverLeaveTimerRef.current = window.setTimeout(() => {
+      setDesktopListHoverEvent(null);
+      desktopHoverLeaveTimerRef.current = null;
+    }, 140);
+  }
+
+  function onDesktopVenuePreviewEnter() {
+    if (desktopHoverLeaveTimerRef.current != null) {
+      window.clearTimeout(desktopHoverLeaveTimerRef.current);
+      desktopHoverLeaveTimerRef.current = null;
+    }
+  }
+
+  useEffect(() => {
+    return () => {
+      if (desktopHoverLeaveTimerRef.current != null) window.clearTimeout(desktopHoverLeaveTimerRef.current);
+    };
+  }, []);
+
   /** Day jump rail follows list scroll position (not the selected event’s date). */
   const dayRailActiveKey = scrollDayKey ?? selectedDayStr;
 
@@ -1297,6 +1372,35 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
   function openWeek(key: string) {
     setClientSelectedKey(key);
     setParam("event", key);
+  }
+
+  function desktopListingHoverHandlers(e: EventLite) {
+    if (effectiveIsMobile || !desktopListingHoverable(e)) return {};
+    return {
+      onMouseEnter: () => onDesktopListingHoverEnter(e),
+      onMouseLeave: onDesktopListingHoverLeave,
+    };
+  }
+
+  function desktopHoverSplit(children: ReactNode) {
+    if (effectiveIsMobile) return children;
+    return (
+      <div className="desktopEventHoverSplit">
+        <div className="desktopEventHoverSplit__main">{children}</div>
+        <div className="desktopEventHoverSplit__aside">
+          {desktopListHoverEvent && desktopListingHoverable(desktopListHoverEvent) ? (
+            <VenueHoverPreviewAside
+              key={String(desktopListHoverEvent.uid ?? desktopListHoverEvent.id)}
+              event={desktopListHoverEvent}
+              onMouseEnter={onDesktopVenuePreviewEnter}
+              onMouseLeave={onDesktopListingHoverLeave}
+            />
+          ) : (
+            <div className="venueHoverPreview venueHoverPreview--empty" aria-hidden />
+          )}
+        </div>
+      </div>
+    );
   }
 
   return (<>
@@ -1883,7 +1987,8 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   {dayEvents.length === 0 ? (
                     <div className="emptyList">No events on this day.</div>
                   ) : (
-                    <div className="dayRightList" role="list">
+                    desktopHoverSplit(
+                      <div className="dayRightList" role="list">
                       {dayEvents.map((e) => {
                         const key = e.uid ?? e.id;
                         const active =
@@ -1905,6 +2010,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                               setParam("event", key);
                             }}
                             role="listitem"
+                            {...desktopListingHoverHandlers(e)}
                           >
                             {eventEndedEarlierToday(e, selectedDay) ? (
                               <span className="eventEndedTag">ENDED</span>
@@ -1923,6 +2029,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         );
                       })}
                     </div>
+                    )
                   )}
                 </div>
               ) : null}
@@ -1937,7 +2044,8 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   {liveEventsNow.length === 0 ? (
                     <div className="emptyRight">Nothing scheduled as happening right now.</div>
                   ) : (
-                    <div className="goingNowRightList" role="list">
+                    desktopHoverSplit(
+                      <div className="goingNowRightList" role="list">
                       {liveEventsNow.map((e) => {
                         const key = e.uid ?? e.id;
                         const title = e.title || "Untitled event";
@@ -1951,6 +2059,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             data-past={eventHasEnded(e) ? "true" : "false"}
                             onClick={() => openSelected(String(key))}
                             role="listitem"
+                            {...desktopListingHoverHandlers(e)}
                           >
                             <div className="dayRightTop">
                               <div className="dayRightTitle">{title}</div>
@@ -1966,6 +2075,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         );
                       })}
                     </div>
+                    )
                   )}
                 </div>
               ) : showListStyleRightPane && selectedWeekBucket ? (
@@ -2038,14 +2148,15 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       type="button"
                       className="weekAnnouncementsCollapseToggle"
                       aria-expanded={pinnedAnnouncementsExpanded}
+                      aria-controls="pinned-week-announcements-panel"
                       onClick={() => setPinnedAnnouncementsExpanded((v) => !v)}
                     >
                       <span className="weekSummaryKicker">Pinned announcements</span>
-                      <span className="weekAnnouncementsCollapseChev" aria-hidden>
-                        {pinnedAnnouncementsExpanded ? "▴" : "▾"}
+                      <span className="weekAnnouncementsCollapseAction">
+                        {pinnedAnnouncementsExpanded ? "Show less" : "See all"}
                       </span>
                     </button>
-                    <div className="weekAnnouncementsCollapseBody">
+                    <div id="pinned-week-announcements-panel" className="weekAnnouncementsCollapseBody">
                       {weekAnnouncements.length ? (
                         weekAnnouncements.map((update) => (
                           <button
@@ -2074,7 +2185,8 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   {filteredWeekEvents.length === 0 ? (
                     <div className="emptyRight">No events match this weekly overview filter right now.</div>
                   ) : (
-                    <div className="weeklyLanding">
+                    desktopHoverSplit(
+                      <div className="weeklyLanding">
                       <div className="weeklyCards">
                         {weekGroups.map((g) => (
                           <div key={dayKey(g.date)} className="weeklyDayGroup">
@@ -2094,6 +2206,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                   className="weeklyCard weeklyCardSelectable"
                                   data-past={eventHasEnded(e) ? "true" : "false"}
                                   onClick={() => openSelected(e.uid ?? e.id)}
+                                  {...desktopListingHoverHandlers(e)}
                                 >
                                   <div className="weeklyCardMedia">
                                     {img ? (
@@ -2154,6 +2267,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         ))}
                       </div>
                     </div>
+                    )
                   )}
                 </div>
               ) : !selectedEvent ? (
@@ -2168,7 +2282,8 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   {dayEvents.length === 0 ? (
                     <div className="emptyList">No events on this day.</div>
                   ) : (
-                    <div className="dayRightList" role="list">
+                    desktopHoverSplit(
+                      <div className="dayRightList" role="list">
                       {dayEvents.map((e) => {
                         const key = e.uid ?? e.id;
                         const title = e.title || "Untitled event";
@@ -2183,6 +2298,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             data-past={eventHasEnded(e) ? "true" : "false"}
                             onClick={() => openSelected(key)}
                             role="listitem"
+                            {...desktopListingHoverHandlers(e)}
                           >
                             {eventEndedEarlierToday(e, selectedDay) ? (
                               <span className="eventEndedTag">ENDED</span>
@@ -2201,6 +2317,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         );
                       })}
                     </div>
+                    )
                   )}
                 </div>
               ) : (
@@ -2617,14 +2734,15 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   type="button"
                   className="weekAnnouncementsCollapseToggle"
                   aria-expanded={pinnedAnnouncementsExpanded}
+                  aria-controls="pinned-week-announcements-panel-mobile"
                   onClick={() => setPinnedAnnouncementsExpanded((v) => !v)}
                 >
                   <span className="weekSummaryKicker">Pinned announcements</span>
-                  <span className="weekAnnouncementsCollapseChev" aria-hidden>
-                    {pinnedAnnouncementsExpanded ? "▴" : "▾"}
+                  <span className="weekAnnouncementsCollapseAction">
+                    {pinnedAnnouncementsExpanded ? "Show less" : "See all"}
                   </span>
                 </button>
-                <div className="weekAnnouncementsCollapseBody">
+                <div id="pinned-week-announcements-panel-mobile" className="weekAnnouncementsCollapseBody">
                   {weekAnnouncements.length ? (
                     weekAnnouncements.map((update) => (
                       <button

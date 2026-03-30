@@ -1315,7 +1315,7 @@ a.eventTimeLink:hover{
 
   .weeklySpotlightMobile__row{
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: stretch;
     gap: 8px;
     width: 100%;
@@ -1323,17 +1323,17 @@ a.eventTimeLink:hover{
   }
 
   .weeklyOverview--spotlightMobileHalf{
-    flex: 0 0 auto;
-    width: 100% !important;
+    flex: 1 1 0;
+    width: auto !important;
     max-width: none !important;
     min-width: 0;
     margin: 0 !important;
     padding: 8px 10px 10px !important;
     border-radius: 14px !important;
-    text-align: center;
+    text-align: left;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
     gap: 4px;
     box-sizing: border-box;
@@ -2054,8 +2054,20 @@ a.eventTimeLink:hover{
 .pillBtnSecondary{
   background: var(--btnBg);
 }
+
+.pillBtn--menuSample{
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+  background: color-mix(in srgb, var(--accentSoft) 55%, #fff);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
 @media (hover: hover) and (pointer: fine){
   .pillBtn:hover{ background: var(--hover); }
+  .pillBtn--menuSample:hover{
+    background: color-mix(in srgb, var(--accentSoft) 85%, #fff);
+    border-color: color-mix(in srgb, var(--accent) 50%, var(--border));
+  }
 }
 
 @media (max-width: 980px){
@@ -3526,6 +3538,30 @@ a:hover{
     display:flex;
     flex-direction:column;
     align-items:flex-start;
+  }
+
+  .mobileWeeklyOverviewOpen .weekSummary .weekSummaryTopline,
+  .mobileGoingNowOpen .weekSummary .weekSummaryTopline{
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+  }
+
+  .mobileWeeklyOverviewOpen .weekSummary .weekSummaryTopline > div:first-child,
+  .mobileGoingNowOpen .weekSummary .weekSummaryTopline > div:first-child{
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .mobileWeeklyOverviewOpen .weekSummary .weekSummaryRangePill,
+  .mobileGoingNowOpen .weekSummary .weekSummaryRangePill{
+    flex-shrink: 0;
+    align-self: flex-start;
+    text-align: right;
+    white-space: nowrap;
+    max-width: 48%;
   }
 }
 
@@ -11543,10 +11579,6 @@ body[data-layout="content"] .simplePage{
   .updateListRow__kind{
     display: none !important;
   }
-
-  .updateDetailTitleRow .updateKindOrb{
-    display: none !important;
-  }
 }
 
 .updateListRow__kind{
@@ -11962,8 +11994,8 @@ body[data-layout="content"] main.contentPage.clockPage{
   display: flex;
   flex-wrap: wrap;
   gap: 8px 10px;
-  padding: 4px 0 10px;
-  margin: 4px 0 0;
+  padding: 2px 0 4px;
+  margin: 2px 0 0;
   align-items: center;
 }
 
@@ -12002,10 +12034,19 @@ body[data-layout="content"] main.contentPage.clockPage{
   color: inherit;
 }
 
-.weekAnnouncementsCollapseChev{
-  opacity: 0.55;
-  font-size: 0.75rem;
+.weekAnnouncementsCollapseAction{
   flex-shrink: 0;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+@media (hover: hover) and (pointer: fine){
+  .weekAnnouncementsCollapseToggle:hover .weekAnnouncementsCollapseAction{
+    color: var(--text);
+  }
 }
 
 .weekAnnouncements--collapsed .weekAnnouncementsCollapseBody{
@@ -12121,4 +12162,107 @@ span.eventListingLocation{
   align-items: baseline;
   gap: 4px 6px;
   font-size: 0.78rem;
+}
+
+/* Desktop calendar right pane: venue preview column on listing hover */
+.desktopEventHoverSplit{
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(200px, 32%);
+  gap: 16px;
+  align-items: start;
+}
+
+.desktopEventHoverSplit__main{
+  min-width: 0;
+}
+
+.desktopEventHoverSplit__aside{
+  position: sticky;
+  top: 12px;
+  align-self: start;
+}
+
+.venueHoverPreview{
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px 14px 12px;
+  background: var(--panel);
+  font-size: 0.88rem;
+  line-height: 1.45;
+  box-sizing: border-box;
+}
+
+.venueHoverPreview__kicker{
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+
+.venueHoverPreview__title{
+  font-weight: 650;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  margin-bottom: 6px;
+}
+
+.venueHoverPreview__address{
+  font-size: 0.82rem;
+  margin-bottom: 10px;
+}
+
+.venueHoverPreview__desc{
+  margin: 0 0 12px;
+  color: var(--text);
+}
+
+.venueHoverPreview__contact{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+}
+
+.venueHoverPreview__link{
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  color: color-mix(in srgb, var(--accent) 88%, var(--muted) 12%);
+}
+
+.venueHoverPreview--empty{
+  min-height: 140px;
+  border-style: dashed;
+  opacity: 0.35;
+  pointer-events: none;
+}
+
+@media (max-width: 980px){
+  .desktopEventHoverSplit{
+    display: block;
+  }
+
+  .desktopEventHoverSplit__aside{
+    display: none;
+  }
+}
+
+/* Updates detail panel typography */
+.detailCard.detailFlash .updateDetailTitleRow{
+  margin-bottom: 14px;
+}
+
+.detailCard.detailFlash .detailMeta{
+  margin-top: 0;
+}
+
+.detailCard.detailFlash .tagRow{
+  margin-top: 14px !important;
+  margin-bottom: 18px;
+}
+
+.detailCard.detailFlash .detailDesc{
+  margin-top: 4px;
 }

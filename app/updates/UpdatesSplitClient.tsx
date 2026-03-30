@@ -65,15 +65,14 @@ function tagIconFor(tag: string): string {
 function UpdateDetail({ update }: { update: UpdateLite }) {
   const detailFlashKey = update?.id ?? update?.title ?? update?.date ?? "detail";
   const primaryKind = resolveUpdateKind(update);
+  const linkLabel = update.linkLabel || "Learn more";
+  const menuSampleCta = /sample menu/i.test(linkLabel);
 
   return (
     <div key={detailFlashKey} className="detailCard detailFlash">
       <div className="detailHeader">
         <div>
           <div className="updateDetailTitleRow fadeInItem" style={{ animationDelay: "260ms" }}>
-            <span className="updateKindOrb" title={updateKindLabel(primaryKind)} aria-hidden>
-              <span className="updateKindOrb__glyph">{updateKindIcon(primaryKind)}</span>
-            </span>
             <div className="detailTitle updateDetailTitleRow__title">{update.title}</div>
           </div>
           <div className="detailMeta fadeInItem" style={{ animationDelay: "320ms" }}>
@@ -114,8 +113,13 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
 
       {update.link ? (
         <div className="detailLinks">
-          <a className="pillBtn" href={update.link} target="_blank" rel="noreferrer">
-            {update.linkLabel || "Learn more"}
+          <a
+            className={`pillBtn${menuSampleCta ? " pillBtn--menuSample" : ""}`}
+            href={update.link}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {linkLabel}
           </a>
         </div>
       ) : null}
