@@ -1317,10 +1317,6 @@ a.eventTimeLink:hover{
     gap: 0;
   }
 
-  .leftSticky[data-mobile-collapsed="true"] .weeklySpotlightMobile{
-    margin-top: 0;
-  }
-
   .weeklySpotlightMobile__row{
     display: flex;
     flex-direction: row;
@@ -1384,6 +1380,10 @@ a.eventTimeLink:hover{
     width: 0 !important;
     min-width: 0 !important;
     max-width: none !important;
+  }
+
+  .leftSticky[data-mobile-collapsed="true"] .weeklySpotlightMobile--stickyRow{
+    margin-top: 0;
   }
 }
 
@@ -8060,7 +8060,7 @@ body,
     max-width: 100%;
     height: auto;
     min-height: 0;
-    margin: 2px auto 0;
+    margin: 2px var(--panePadX) 0;
     padding: 2px 4px 4px;
     border: 0;
     border-radius: 0;
@@ -8086,8 +8086,6 @@ body,
   }
 
   .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle--text{
-    margin-top: 0;
-    margin-bottom: 0;
     padding-top: 0;
     padding-bottom: 1px;
   }
@@ -8251,7 +8249,7 @@ body{
   .paneLeft .weeklyLanding,
   .paneLeft .monthWrap,
   .paneLeft .emptyList,
-  .weeklyOverview,
+  .weeklyOverview:not(.weeklyOverview--spotlightMobileHalf),
   .dayBlock{
     width: 100% !important;
     max-width: 100% !important;
@@ -8317,6 +8315,17 @@ body{
     margin-bottom: 2px !important;
   }
 
+  .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle.mobileControlsToggle--text{
+    margin-top: 6px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .leftSticky > .weeklySpotlightMobile{
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+    box-sizing: border-box;
+  }
+
   .splitPageListBody,
   .directoryHeroList,
   .directoryLetterSection,
@@ -8324,7 +8333,7 @@ body{
   .paneLeft .weeklyLanding,
   .paneLeft .monthWrap,
   .paneLeft .emptyList,
-  .weeklyOverview,
+  .weeklyOverview:not(.weeklyOverview--spotlightMobileHalf),
   .dayBlock{
     width: 100% !important;
     max-width: 100% !important;
@@ -10944,7 +10953,7 @@ body[data-layout="content"] .simplePage{
   }
 
   .leftSticky[data-mobile-collapsed="true"]:not([data-mobile-weekly-surface="true"]){
-    padding-bottom: 0 !important;
+    padding-bottom: 8px !important;
   }
 
   body[data-layout="shell"] .mobileTabDock{
