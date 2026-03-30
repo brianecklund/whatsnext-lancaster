@@ -141,7 +141,14 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
   }, [introActive, renderedSection]);
 
   function switchSection(next: SectionKey) {
-    if (next === sectionFromUrl) return;
+    const p = pathname ?? "";
+    const onCalendar = p === "/" || p === "";
+    const onDirectory = p.startsWith("/locations");
+    const onUpdates = p.startsWith("/updates");
+    if (next === "calendar" && onCalendar) return;
+    if (next === "directory" && onDirectory) return;
+    if (next === "updates" && onUpdates) return;
+
     setIsTransitioning(true);
     setContentSwitching(true);
     const target = SECTION_PATHS[next];

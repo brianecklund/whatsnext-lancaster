@@ -1,4 +1,4 @@
-
+import Link from "next/link";
 import { notFound } from 'next/navigation';
 import type { RichTextField } from '@prismicio/client';
 import MediaBlocks from '@/app/components/MediaBlocks';
@@ -41,9 +41,15 @@ export default async function LocationDetailPage({
     return (
       <main className={`locationPageShell${backToEventHref ? " locationPageShell--fromEvent" : ""}`}>
         <div className="locationPageInner">
-          <a className="locationPageBack" href={backToEventHref ?? "/locations"}>
-            {backToEventHref ? "← Back to event" : "← Back to directory"}
-          </a>
+          {backToEventHref ? (
+            <Link className="locationPageBack" href={backToEventHref} replace>
+              ← Back to event
+            </Link>
+          ) : (
+            <a className="locationPageBack" href="/locations">
+              ← Back to directory
+            </a>
+          )}
           <div className="locationPageHeader">
             <div className="locationPageEyebrow">Directory</div>
             <h1 className="locationPageTitle">{testPage.name}</h1>
@@ -138,9 +144,15 @@ export default async function LocationDetailPage({
   return (
     <main className={`locationPageShell${backToEventHref ? " locationPageShell--fromEvent" : ""}`}>
       <div className="locationPageInner">
-        <a className="locationPageBack" href={backToEventHref ?? "/locations"}>
-          {backToEventHref ? "← Back to event" : "← Back to directory"}
-        </a>
+        {backToEventHref ? (
+          <Link className="locationPageBack" href={backToEventHref} replace>
+            ← Back to event
+          </Link>
+        ) : (
+          <a className="locationPageBack" href="/locations">
+            ← Back to directory
+          </a>
+        )}
         <div className="locationPageHeader">
           <div className="locationPageEyebrow">Directory</div>
           <h1 className="locationPageTitle">{doc.data?.name || venue?.name || doc.data?.venue_name || 'Location'}</h1>

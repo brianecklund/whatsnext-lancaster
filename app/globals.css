@@ -1302,15 +1302,23 @@ a.eventTimeLink:hover{
 }
 
 @media (max-width: 980px){
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky{
+    position: sticky;
+    top: 0;
+    z-index: 15;
+    background: var(--bg);
+    box-shadow: 0 1px 0 color-mix(in srgb, var(--border) 85%, transparent);
+  }
+
   .weeklySpotlightMobile{
-    margin: 4px 0 0 0;
+    margin: 2px 0 0 0;
     display: flex;
     flex-direction: column;
     gap: 0;
   }
 
   .leftSticky[data-mobile-collapsed="true"] .weeklySpotlightMobile{
-    margin-top: 2px;
+    margin-top: 0;
   }
 
   .weeklySpotlightMobile__row{
@@ -1356,22 +1364,22 @@ a.eventTimeLink:hover{
     line-height: 1.2;
   }
 
-  .leftControls .weeklySpotlightMobile{
+  .weeklySpotlightMobile--stickyRow{
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
-    margin-top: 10px;
+    margin-top: 4px;
     margin-left: 0;
     margin-right: 0;
     padding: 0;
   }
 
-  .leftControls .weeklySpotlightMobile__row{
+  .weeklySpotlightMobile--stickyRow .weeklySpotlightMobile__row{
     width: 100%;
     box-sizing: border-box;
   }
 
-  .leftControls .weeklyOverview--spotlightMobileHalf{
+  .weeklySpotlightMobile--stickyRow .weeklyOverview--spotlightMobileHalf{
     flex: 1 1 0 !important;
     width: 0 !important;
     min-width: 0 !important;
@@ -3824,11 +3832,12 @@ a:hover{
 }
 
 .locationPageShell--fromEvent{
-  padding-top: 88px;
+  padding-top: calc(var(--headerH) + 8px);
 }
 
 .locationPageShell--fromEvent .locationPageBack{
-  margin-bottom: 12px;
+  margin-top: 0;
+  margin-bottom: 8px;
 }
 
 .wnlPageRevealRoot > main.locationPageShell{
@@ -3904,7 +3913,7 @@ a:hover{
   }
 
   .locationPageShell--fromEvent{
-    padding-top: 72px;
+    padding-top: calc(var(--headerH) + 4px);
   }
 
   .locationPageVenueGrid {
@@ -4778,6 +4787,22 @@ body.overlay-open{
 
   .mobilePrimaryTabs{
     display: flex;
+  }
+}
+
+.splitPageListBody.splitPageListBody--updatesLead{
+  padding-top: 22px;
+}
+
+@media (min-width: 981px){
+  .splitPageListBody.splitPageListBody--updatesLead{
+    padding-top: 30px;
+  }
+}
+
+@media (max-width: 980px){
+  .splitPageListBody.splitPageListBody--updatesLead{
+    padding-top: 18px;
   }
 }
 

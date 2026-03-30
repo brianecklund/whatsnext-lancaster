@@ -109,33 +109,10 @@ function weekCategoryForEvent(eventType?: string | null): WeekCategory {
   return "Other";
 }
 
-function EventListingLocation({
-  e,
-  className,
-  onWeeklyDesktopVenuePeek,
-}: {
-  e: EventLite;
-  className?: string;
-  /** Desktop weekly overview: open inline venue panel instead of navigating immediately. */
-  onWeeklyDesktopVenuePeek?: (event: EventLite) => void;
-}) {
+function EventListingLocation({ e, className }: { e: EventLite; className?: string }) {
   const name = (e.locationName || "").trim();
   if (!name) return null;
   const cn = ["eventListingLocation", className].filter(Boolean).join(" ");
-  if (onWeeklyDesktopVenuePeek) {
-    return (
-      <button
-        type="button"
-        className={`${cn} eventListingLocation--directory weeklyVenueNamePeekBtn`}
-        onClick={(ev) => {
-          ev.stopPropagation();
-          onWeeklyDesktopVenuePeek(e);
-        }}
-      >
-        {name}
-      </button>
-    );
-  }
   const dir = directoryHrefForEvent(e);
   if (dir) {
     return (
@@ -158,6 +135,46 @@ function EventListingLocation({
     );
   }
   return <span className={cn}>{name}</span>;
+}
+
+/** Desktop weekly overview: directory venue page when linked, else open this event’s detail. */
+function WeeklyOverviewVenueLink({ e, openSelected }: { e: EventLite; openSelected: (key: string) => void }) {
+  const name = (e.locationName || "").trim();
+  if (!name) return null;
+  const dir = directoryHrefForEvent(e);
+  const cn = "eventListingLocation eventListingLocation--directory";
+  if (dir) {
+    return (
+      <Link href={dir} className={cn} onClick={(ev) => ev.stopPropagation()}>
+        {name}
+      </Link>
+    );
+  }
+  if (e.locationUrl) {
+    return (
+      <a
+        href={e.locationUrl}
+        className={`${cn} eventListingLocation--external`}
+        target="_blank"
+        rel="noreferrer"
+        onClick={(ev) => ev.stopPropagation()}
+      >
+        {name}
+      </a>
+    );
+  }
+  return (
+    <button
+      type="button"
+      className={`${cn} weeklyVenueNamePeekBtn`}
+      onClick={(ev) => {
+        ev.stopPropagation();
+        openSelected(String(e.uid ?? e.id));
+      }}
+    >
+      {name}
+    </button>
+  );
 }
 
 function EventDetailLocation({ e }: { e: EventLite }) {
@@ -349,52 +366,6 @@ function VenueHoverPreviewAside({
   );
 }
 
-function WeeklyDesktopVenuePeekPanel({ e }: { e: EventLite }) {
-  const descRaw = (pickDescriptionText(e) || e.summary || "").trim();
-  const desc = descRaw.length > 260 ? `${descRaw.slice(0, 257).trim()}…` : descRaw;
-  const dirHref = directoryHrefForEvent(e);
-  const main = (
-    <>
-      <div className="venueHoverPreview__kicker">Venue</div>
-      {e.locationName?.trim() ? <div className="venueHoverPreview__title">{e.locationName.trim()}</div> : null}
-      {e.address?.trim() ? <div className="venueHoverPreview__address muted">{e.address.trim()}</div> : null}
-      {desc ? <div className="venueHoverPreview__desc">{desc}</div> : null}
-      {dirHref ? <span className="weeklyVenuePeekPanel__hint">View venue page →</span> : null}
-      {!dirHref && e.locationUrl ? <span className="weeklyVenuePeekPanel__hint">Open location link →</span> : null}
-    </>
-  );
-
-  return (
-    <div className="weeklyVenuePeekPanel">
-      {dirHref ? (
-        <Link href={dirHref} className="weeklyVenuePeekPanel__main">
-          {main}
-        </Link>
-      ) : e.locationUrl ? (
-        <a href={e.locationUrl} className="weeklyVenuePeekPanel__main" target="_blank" rel="noreferrer">
-          {main}
-        </a>
-      ) : (
-        <div className="weeklyVenuePeekPanel__main weeklyVenuePeekPanel__main--static">{main}</div>
-      )}
-      {e.website_url || e.tickets_url ? (
-        <div className="venueHoverPreview__contact weeklyVenuePeekPanel__links">
-          {e.website_url ? (
-            <a className="venueHoverPreview__link" href={e.website_url} target="_blank" rel="noreferrer">
-              Website
-            </a>
-          ) : null}
-          {e.tickets_url ? (
-            <a className="venueHoverPreview__link" href={e.tickets_url} target="_blank" rel="noreferrer">
-              Tickets
-            </a>
-          ) : null}
-        </div>
-      ) : null}
-    </div>
-  );
-}
-
 type WeekBucket = {
   key: string;
   label: string;
@@ -570,7 +541,6 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
 
   const desktopHoverLeaveTimerRef = useRef<number | null>(null);
   const [desktopListHoverEvent, setDesktopListHoverEvent] = useState<EventLite | null>(null);
-  const [weeklyDesktopVenuePeekId, setWeeklyDesktopVenuePeekId] = useState<string | null>(null);
 
   useEffect(() => {
     mobileControlsCollapsedRef.current = mobileControlsCollapsed;
@@ -1157,19 +1127,9 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     return byUid || byId || null;
   }, [filteredEvents, selectedDisplayKey]);
 
-  const weekCategorySelectionKey = useMemo(
-    () => [...weekCategorySelection].sort().join("\0"),
-    [weekCategorySelection],
-  );
-
   useEffect(() => {
     setDesktopListHoverEvent(null);
-    setWeeklyDesktopVenuePeekId(null);
   }, [selectedEvent, selectedDisplayKey, viewMode, selectedDayStr]);
-
-  useEffect(() => {
-    setWeeklyDesktopVenuePeekId(null);
-  }, [selectedWeekBucket?.key, weekCategorySelectionKey, effectiveIsMobile]);
 
   function desktopListingHoverable(e: EventLite) {
     return Boolean(e.locationName?.trim() || (e.address ?? "").trim());
@@ -1454,9 +1414,21 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
     setParam("event", key);
   }
 
-  function toggleWeeklyDesktopVenuePeek(event: EventLite) {
-    if (!(event.locationName || "").trim()) return;
-    setWeeklyDesktopVenuePeekId((prev) => (prev === event.id ? null : event.id));
+  /** Mobile bottom “Cal.” — `replace` avoids a history loop after venue page → back to event → back. */
+  function exitMobileEventDetailToCalendarList() {
+    setClientSelectedKey(null);
+    try {
+      delete document.documentElement.dataset.routeSwitching;
+      window.sessionStorage.removeItem("wnl-segmented-pending");
+    } catch {
+      /* ignore */
+    }
+    setMobileDetailVisualKey("cal");
+    setMobileDetailNavPending(false);
+    const params = new URLSearchParams(sp.toString());
+    params.delete("event");
+    const qs = params.toString();
+    router.replace(qs ? `/?${qs}` : "/");
   }
 
   function desktopListingHoverHandlers(e: EventLite) {
@@ -1690,46 +1662,46 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       ) : null}
                     </div>
                   </div>
-
-                  {effectiveIsMobile &&
-                  resolvedSection === "calendar" &&
-                  !mobileDetailOpen &&
-                  viewMode === "list" &&
-                  !isClockView ? (
-                    <div className="weeklySpotlightMobile fadeInItem" style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}>
-                      <div className="weeklySpotlightMobile__row">
-                        <button
-                          type="button"
-                          className="weeklyOverview weeklyOverview--spotlightMobileHalf"
-                          data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
-                          onClick={() => openWeek(WEEKLY_KEY)}
-                        >
-                          <div className="weeklySpotlightMobile__label">This week</div>
-                          <div className="weeklySpotlightMobile__count">
-                            {(() => {
-                              const n = defaultWeekBucket?.events.length ?? 0;
-                              return `${n} ${n === 1 ? "event" : "events"}`;
-                            })()}
-                          </div>
-                        </button>
-                        <button
-                          type="button"
-                          className="weeklyOverview weeklyOverview--spotlightMobileHalf"
-                          data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
-                          onClick={() => openWeek(GOING_NOW_KEY)}
-                        >
-                          <div className="weeklySpotlightMobile__label">Happening now</div>
-                          <div className="weeklySpotlightMobile__count">
-                            {(() => {
-                              const n = liveEventsNow.length;
-                              return `${n} ${n === 1 ? "event" : "events"}`;
-                            })()}
-                          </div>
-                        </button>
-                      </div>
-                    </div>
-                  ) : null}
                 </div>
+
+                {effectiveIsMobile &&
+                resolvedSection === "calendar" &&
+                !mobileDetailOpen &&
+                viewMode === "list" &&
+                !isClockView ? (
+                  <div className="weeklySpotlightMobile weeklySpotlightMobile--stickyRow fadeInItem" style={{ animationDelay: `${listAnimIndex++ * 35}ms` }}>
+                    <div className="weeklySpotlightMobile__row">
+                      <button
+                        type="button"
+                        className="weeklyOverview weeklyOverview--spotlightMobileHalf"
+                        data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
+                        onClick={() => openWeek(WEEKLY_KEY)}
+                      >
+                        <div className="weeklySpotlightMobile__label">This week</div>
+                        <div className="weeklySpotlightMobile__count">
+                          {(() => {
+                            const n = defaultWeekBucket?.events.length ?? 0;
+                            return `${n} ${n === 1 ? "event" : "events"}`;
+                          })()}
+                        </div>
+                      </button>
+                      <button
+                        type="button"
+                        className="weeklyOverview weeklyOverview--spotlightMobileHalf"
+                        data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
+                        onClick={() => openWeek(GOING_NOW_KEY)}
+                      >
+                        <div className="weeklySpotlightMobile__label">Happening now</div>
+                        <div className="weeklySpotlightMobile__count">
+                          {(() => {
+                            const n = liveEventsNow.length;
+                            return `${n} ${n === 1 ? "event" : "events"}`;
+                          })()}
+                        </div>
+                      </button>
+                    </div>
+                  </div>
+                ) : null}
 
               </div>
 
@@ -2072,8 +2044,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   {dayEvents.length === 0 ? (
                     <div className="emptyList">No events on this day.</div>
                   ) : (
-                    desktopHoverSplit(
-                      <div className="dayRightList" role="list">
+                    <div className="dayRightList" role="list">
                       {dayEvents.map((e) => {
                         const key = e.uid ?? e.id;
                         const active =
@@ -2095,7 +2066,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                               setParam("event", key);
                             }}
                             role="listitem"
-                            {...desktopListingHoverHandlers(e)}
                           >
                             {eventEndedEarlierToday(e, selectedDay) ? (
                               <span className="eventEndedTag">ENDED</span>
@@ -2114,7 +2084,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         );
                       })}
                     </div>
-                    )
                   )}
                 </div>
               ) : null}
@@ -2282,14 +2251,13 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                               const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
                               const img = pickImageUrl(e);
                               const desc = (pickDescriptionText(e) || e.summary || "").trim();
-                              const peekOpen = weeklyDesktopVenuePeekId === e.id;
 
-                              const card = (
+                              return (
                                 <button
+                                  key={e.id}
                                   type="button"
                                   className="weeklyCard weeklyCardSelectable"
                                   data-past={eventHasEnded(e) ? "true" : "false"}
-                                  data-venue-peek-open={peekOpen ? "true" : "false"}
                                   onClick={() => openSelected(e.uid ?? e.id)}
                                 >
                                   <div className="weeklyCardMedia">
@@ -2343,37 +2311,12 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
 
                                     <div className="weeklyCardMetaRow">
                                       {e.locationName?.trim() ? (
-                                        <EventListingLocation e={e} onWeeklyDesktopVenuePeek={toggleWeeklyDesktopVenuePeek} />
+                                        <WeeklyOverviewVenueLink e={e} openSelected={openSelected} />
                                       ) : null}
                                     </div>
                                     {desc ? <div className="weeklyCardDesc">{desc.length > 200 ? `${desc.slice(0, 200).trim()}…` : desc}</div> : null}
                                   </div>
                                 </button>
-                              );
-
-                              return (
-                                <div key={e.id} className="weeklyCardShell" data-peek-open={peekOpen ? "true" : "false"}>
-                                  <div className="weeklyCardShell__main">
-                                    {peekOpen ? (
-                                      <button
-                                        type="button"
-                                        className="weeklyCardPeekRestore"
-                                        aria-label="Expand listing to full width"
-                                        onClick={() => setWeeklyDesktopVenuePeekId(null)}
-                                      >
-                                        <span className="weeklyCardPeekRestore__chev" aria-hidden>
-                                          ◀
-                                        </span>
-                                      </button>
-                                    ) : null}
-                                    {card}
-                                  </div>
-                                  {peekOpen ? (
-                                    <div className="weeklyVenuePeekPanelWrap">
-                                      <WeeklyDesktopVenuePeekPanel e={e} />
-                                    </div>
-                                  ) : null}
-                                </div>
                               );
                             })}
                           </div>
@@ -2394,8 +2337,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   {dayEvents.length === 0 ? (
                     <div className="emptyList">No events on this day.</div>
                   ) : (
-                    desktopHoverSplit(
-                      <div className="dayRightList" role="list">
+                    <div className="dayRightList" role="list">
                       {dayEvents.map((e) => {
                         const key = e.uid ?? e.id;
                         const title = e.title || "Untitled event";
@@ -2410,7 +2352,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             data-past={eventHasEnded(e) ? "true" : "false"}
                             onClick={() => openSelected(key)}
                             role="listitem"
-                            {...desktopListingHoverHandlers(e)}
                           >
                             {eventEndedEarlierToday(e, selectedDay) ? (
                               <span className="eventEndedTag">ENDED</span>
@@ -2429,7 +2370,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         );
                       })}
                     </div>
-                    )
                   )}
                 </div>
               ) : (
@@ -2534,15 +2474,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       key: "cal",
                       label: "Cal.",
                       onClick: () => {
-                        try {
-                          delete document.documentElement.dataset.routeSwitching;
-                          window.sessionStorage.removeItem("wnl-segmented-pending");
-                        } catch {
-                          /* ignore */
-                        }
-                        setMobileDetailVisualKey("cal");
-                        setMobileDetailNavPending(false);
-                        clearSelected();
+                        exitMobileEventDetailToCalendarList();
                       },
                     },
                     {

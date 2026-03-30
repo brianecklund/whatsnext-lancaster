@@ -476,7 +476,7 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
               </div>
             ) : null}
 
-            <div className="splitPageListBody">{list}</div>
+            <div className="splitPageListBody splitPageListBody--updatesLead">{list}</div>
           </div>
         </aside>
 
