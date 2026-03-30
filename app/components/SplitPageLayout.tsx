@@ -1,7 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import SegmentedControl from "@/app/components/SegmentedControl";
 
@@ -43,6 +43,7 @@ export default function SplitPageLayout({
     t0: number;
     target: EventTarget | null;
   } | null>(null);
+  const [swipeHint, setSwipeHint] = useState<"left" | "right" | "">("");
 
   const items = useMemo(
     () => [
@@ -82,6 +83,7 @@ export default function SplitPageLayout({
       if (e.touches.length !== 1) return;
       const t = e.touches[0];
       touchRef.current = { x0: t.clientX, y0: t.clientY, x1: t.clientX, y1: t.clientY, t0: Date.now(), target: e.target };
+      setSwipeHint("");
     };
 
     const onMove = (e: TouchEvent) => {
@@ -91,11 +93,24 @@ export default function SplitPageLayout({
       if (!t) return;
       state.x1 = t.clientX;
       state.y1 = t.clientY;
+
+      // Visual cue while swiping: only when gesture is clearly horizontal
+      if (isInHorizontalScrollArea(state.target)) {
+        if (swipeHint) setSwipeHint("");
+        return;
+      }
+      const dx = state.x1 - state.x0;
+      const dy = state.y1 - state.y0;
+      const ax = Math.abs(dx);
+      const ay = Math.abs(dy);
+      if (ax >= 18 && ax >= ay * 1.15) setSwipeHint(dx < 0 ? "left" : "right");
+      else if (swipeHint) setSwipeHint("");
     };
 
     const onEnd = (e: TouchEvent) => {
       const state = touchRef.current;
       touchRef.current = null;
+      setSwipeHint("");
       if (!state) return;
 
       // Ignore swipes that began inside horizontal scroll containers.
@@ -108,10 +123,10 @@ export default function SplitPageLayout({
       const dt = Date.now() - state.t0;
 
       // Horizontal swipe: strong x intent, limited vertical drift, not too slow.
-      if (ax < 64) return;
-      if (ax < ay * 1.6) return;
-      if (ay > 46) return;
-      if (dt > 800) return;
+      if (ax < 44) return;
+      if (ax < ay * 1.15) return;
+      if (ay > 120) return;
+      if (dt > 1200) return;
 
       const order: PageKey[] = ["calendar", "directory", "updates"];
       const idx = Math.max(0, order.indexOf(current));
@@ -139,6 +154,7 @@ export default function SplitPageLayout({
       className="pageShell"
       style={style}
       data-mobile-detail-open={isMobile && mobileDetailOpen ? "true" : "false"}
+      data-swipe-hint={swipeHint}
     >
       {topBar ?? (!hideDefaultIntro ? (
         <section className={`newsBar pageIntroBar ${taglineHidden ? "pageIntroBarHidden" : ""}`} aria-label="Page introduction">
