@@ -1341,7 +1341,7 @@ a.eventTimeLink:hover{
     display: flex;
     flex-direction: row;
     align-items: stretch;
-    gap: 8px;
+    gap: 0;
     width: 100%;
     box-sizing: border-box;
   }
@@ -1400,6 +1400,18 @@ a.eventTimeLink:hover{
     width: 0 !important;
     min-width: 0 !important;
     max-width: none !important;
+    box-sizing: border-box;
+  }
+
+  .weeklySpotlightMobile--stickyRow .weeklyOverview--spotlightMobileHalf:first-of-type{
+    border-top-right-radius: 0 !important;
+    border-bottom-right-radius: 0 !important;
+    border-right: 0 !important;
+  }
+
+  .weeklySpotlightMobile--stickyRow .weeklyOverview--spotlightMobileHalf:last-of-type{
+    border-top-left-radius: 0 !important;
+    border-bottom-left-radius: 0 !important;
   }
 
 }
@@ -3707,7 +3719,8 @@ a:hover{
 /* Mobile calendar controls — search + calendar + clock + filter */
 .calendarSearchRowMobile{
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+  /* Search + 3 toolbar buttons (list/calendar, clock, filter) on mobile — not 5 columns */
+  grid-template-columns: minmax(0, 1fr) auto auto auto;
   align-items: center;
 }
 
@@ -3757,7 +3770,7 @@ a:hover{
 
 @media (max-width: 520px){
   .calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+    grid-template-columns: minmax(0, 1fr) auto auto auto;
   }
 
   .dayJumpRail{
@@ -3829,7 +3842,7 @@ a:hover{
   }
 
   .calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px;
   }
 
   .calendarSearchRowMobile .filterBtn{
@@ -6438,7 +6451,7 @@ body {
   .calendarSearchRowMobile,
   .searchRow.calendarSearchRowMobile {
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px;
     gap: 4px !important;
     align-items: center;
     width: 100%;
@@ -6476,7 +6489,7 @@ body {
 @media (max-width: 980px){
   .calendarSearchRowMobile,
   .searchRow.calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px !important;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px !important;
   }
 
   .calendarSearchRowMobile .viewBtn,
@@ -8329,8 +8342,8 @@ body{
   }
 
   .leftSticky > .mobileControlsToggle.mobileControlsToggle--text{
-    margin-top: 2px !important;
-    margin-bottom: 0 !important;
+    margin-top: 10px !important;
+    margin-bottom: -6px !important;
   }
 
   .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle{
@@ -8338,8 +8351,8 @@ body{
   }
 
   .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle.mobileControlsToggle--text{
-    margin-top: 2px !important;
-    margin-bottom: 0 !important;
+    margin-top: 10px !important;
+    margin-bottom: -6px !important;
   }
 
   .leftSticky > .weeklySpotlightMobile{
@@ -8742,7 +8755,7 @@ body{
 
   .calendarSearchRowMobile,
   .searchRow.calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px !important;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px !important;
     gap: 6px !important;
     width: 100% !important;
   }
@@ -8835,7 +8848,7 @@ body{
   .calendarSearchRowMobile,
   .searchRow.calendarSearchRowMobile{
     display: grid !important;
-    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px !important;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px !important;
     align-items: center !important;
     width: 100% !important;
     max-width: 100% !important;
@@ -8958,7 +8971,7 @@ body{
 
   .leftSticky .calendarSearchRowMobile,
   .leftSticky .searchRow.calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px !important;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px !important;
   }
 
   .leftSticky .calendarSearchRowMobile .searchInput,
@@ -9138,7 +9151,7 @@ body > *{
   }
 
   .searchRow.calendarSearchRowMobile{
-    grid-template-columns: minmax(0, 1fr) 40px 40px 40px 40px !important;
+    grid-template-columns: minmax(0, 1fr) 40px 40px 40px !important;
   }
 
   .paneLeft > .scroll{
@@ -10743,6 +10756,92 @@ body[data-layout="content"] .simplePage{
   .clockEventRow{
     border-radius: 16px;
     padding: 11px 11px;
+  }
+
+  /* Embedded clock in calendar shell: list uses full scroll width; header stays inset */
+  .paneLeftClockEmbed .clockPage.clockPage--embed{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
+  }
+
+  .paneLeftClockEmbed .clockPage.clockPage--embed .clockHeader,
+  .paneLeftClockEmbed .clockPage.clockPage--embed .clockLayout,
+  .paneLeftClockEmbed .clockPage.clockPage--embed .clockListWrap{
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  .paneLeftClockEmbed .clockPage.clockPage--embed .clockHeader{
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
+    box-sizing: border-box;
+  }
+
+  .paneLeftClockEmbed .clockListHeader{
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
+    box-sizing: border-box;
+  }
+
+  .paneLeftClockEmbed .clockEventList--embed{
+    padding-right: 0;
+    width: 100%;
+  }
+
+  .paneLeftClockEmbed .clockEventRowEmbed{
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
+    border-radius: 0;
+    width: 100%;
+    max-width: none;
+  }
+
+  /* Standalone /clock on mobile: full-width list band */
+  body[data-layout="content"] main.contentPage.clockPage{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  body[data-layout="content"] main.contentPage.clockPage .clockHeader{
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
+    box-sizing: border-box;
+  }
+
+  body[data-layout="content"] main.contentPage.clockPage .clockLayout,
+  body[data-layout="content"] main.contentPage.clockPage .clockListWrap{
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  body[data-layout="content"] main.contentPage.clockPage .clockListHeader{
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
+    box-sizing: border-box;
+  }
+
+  body[data-layout="content"] main.contentPage.clockPage .clockEventList{
+    padding-right: 0;
+    width: 100%;
+  }
+
+  body[data-layout="content"] main.contentPage.clockPage .clockEventRow{
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
+    border-radius: 0;
+    width: 100%;
+    max-width: none;
+    box-sizing: border-box;
   }
 }
 
