@@ -1341,7 +1341,7 @@ a.eventTimeLink:hover{
     display: flex;
     flex-direction: row;
     align-items: stretch;
-    gap: 0;
+    gap: 8px;
     width: 100%;
     box-sizing: border-box;
   }
@@ -1403,17 +1403,6 @@ a.eventTimeLink:hover{
     box-sizing: border-box;
   }
 
-  .weeklySpotlightMobile--stickyRow .weeklyOverview--spotlightMobileHalf:first-of-type{
-    border-top-right-radius: 0 !important;
-    border-bottom-right-radius: 0 !important;
-    border-right: 0 !important;
-  }
-
-  .weeklySpotlightMobile--stickyRow .weeklyOverview--spotlightMobileHalf:last-of-type{
-    border-top-left-radius: 0 !important;
-    border-bottom-left-radius: 0 !important;
-  }
-
 }
 
 .dayTitle{
@@ -1443,6 +1432,12 @@ a.eventTimeLink:hover{
   margin-bottom: 10px;
   background: var(--bg);
   box-shadow: 0 1px 0 var(--border);
+}
+
+@media (max-width: 980px){
+  .paneLeft .dayBlock .dayTitle.dayTitle--sticky{
+    padding-top: 14px;
+  }
 }
 
 .eventRow{
@@ -3673,6 +3668,20 @@ a:hover{
   }
 
   .leftControls .searchRow:not(.directorySearchRowDesktop) .filterBtn[data-active="true"] .btnIconImg{
+    filter: brightness(0) invert(1) !important;
+    opacity: 0.95 !important;
+  }
+
+  .leftControls .calendarSearchRowMobile .viewBtn[data-active="true"],
+  .leftControls .searchRow.calendarSearchRowMobile .viewBtn[data-active="true"]{
+    background: color-mix(in srgb, var(--text) 72%, var(--panel) 28%) !important;
+    color: #fff !important;
+    border-color: color-mix(in srgb, var(--text) 55%, var(--border) 45%) !important;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  }
+
+  .leftControls .calendarSearchRowMobile .viewBtn[data-active="true"] .btnIconImg,
+  .leftControls .searchRow.calendarSearchRowMobile .viewBtn[data-active="true"] .btnIconImg{
     filter: brightness(0) invert(1) !important;
     opacity: 0.95 !important;
   }
@@ -8342,8 +8351,9 @@ body{
   }
 
   .leftSticky > .mobileControlsToggle.mobileControlsToggle--text{
-    margin-top: 10px !important;
-    margin-bottom: -6px !important;
+    margin-top: 18px !important;
+    padding-top: 4px !important;
+    margin-bottom: -4px !important;
   }
 
   .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle{
@@ -8351,8 +8361,9 @@ body{
   }
 
   .leftSticky[data-mobile-collapsed="true"] .mobileControlsToggle.mobileControlsToggle--text{
-    margin-top: 10px !important;
-    margin-bottom: -6px !important;
+    margin-top: 18px !important;
+    padding-top: 4px !important;
+    margin-bottom: -4px !important;
   }
 
   .leftSticky > .weeklySpotlightMobile{
@@ -8361,13 +8372,45 @@ body{
     box-sizing: border-box;
   }
 
-  /* Shell mobile: line up with day headers on the left (--panePadX), header action cluster on the right (12px). */
+  /* Shell mobile: tabs + directory toolbar inset; calendar controls + spotlight break out to full scroll width */
   body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .tabs,
-  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .leftControls,
-  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky .calendarToolbar,
-  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky .searchRow,
-  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky .directoryToolbar,
-  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .weeklySpotlightMobile{
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .directoryToolbar,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .directoryAlphabetNav,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .directoryAlphabetNavMobile{
+    padding-left: var(--panePadX) !important;
+    padding-right: 12px !important;
+  }
+
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .leftControls:has(.calendarToolbar){
+    margin-left: calc(-1 * var(--panePadX)) !important;
+    margin-right: -12px !important;
+    width: calc(100% + var(--panePadX) + 12px) !important;
+    max-width: none !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 6px !important;
+    padding-bottom: 0 !important;
+    box-sizing: border-box;
+  }
+
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .leftControls:has(.calendarToolbar) .calendarToolbar,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .leftControls:has(.calendarToolbar) .searchRow{
+    padding-left: var(--panePadX) !important;
+    padding-right: 12px !important;
+    box-sizing: border-box;
+  }
+
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .weeklySpotlightMobile.weeklySpotlightMobile--stickyRow{
+    margin-left: calc(-1 * var(--panePadX)) !important;
+    margin-right: -12px !important;
+    width: calc(100% + var(--panePadX) + 12px) !important;
+    max-width: none !important;
+    padding-left: var(--panePadX) !important;
+    padding-right: 12px !important;
+    box-sizing: border-box;
+  }
+
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .leftControls:not(:has(.calendarToolbar)){
     padding-left: var(--panePadX) !important;
     padding-right: 12px !important;
   }

@@ -1608,10 +1608,14 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       <button
                         type="button"
                         className={`viewBtn iconBtn clockViewToolbarBtn${!effectiveIsMobile ? " squareIconBtn" : ""}`}
-                        aria-label="Clock view"
+                        aria-label={isClockView ? "Switch to list view" : "Clock view"}
                         aria-pressed={isClockView ? "true" : "false"}
                         data-active={isClockView ? "true" : "false"}
                         onClick={() => {
+                          if (isClockView) {
+                            setParams({ view: "list", event: null });
+                            return;
+                          }
                           clearSelected();
                           setFilterOpen(false);
                           setParams({
