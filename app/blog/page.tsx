@@ -1,6 +1,7 @@
 import { createClient } from "@/prismicio";
 import BlogClient from "@/app/blog/BlogClient";
-import { blogPostLiteFromPrismicDoc, type BlogPostLite } from "@/lib/blog";
+import { blogPostLiteFromPrismicDoc, mergeBlogPostsForList, type BlogPostLite } from "@/lib/blog";
+import { listDemoBlogLites } from "@/lib/blog-demos";
 
 export const revalidate = 60;
 
@@ -16,6 +17,8 @@ export default async function BlogPage() {
   } catch {
     posts = [];
   }
+
+  posts = mergeBlogPostsForList(posts, listDemoBlogLites());
 
   return <BlogClient posts={posts} />;
 }

@@ -415,7 +415,21 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   const resolvedSection = currentSection ?? (pathname?.startsWith("/updates") ? "updates" : pathname?.startsWith("/locations") ? "directory" : "calendar");
 
   const q = sp.get("q") || "";
-  const type = sp.get("type") || "";
+  const searchParamsKey = sp.toString();
+  const selectedEventTypes = useMemo(() => {
+    const raw = new URLSearchParams(searchParamsKey).getAll("type");
+    const out: string[] = [];
+    const seen = new Set<string>();
+    for (const t of raw) {
+      const n = norm(t);
+      if (!n || seen.has(n)) continue;
+      seen.add(n);
+      out.push(t.trim());
+    }
+    return out;
+  }, [searchParamsKey]);
+  const selectedEventTypeNormSet = useMemo(() => new Set(selectedEventTypes.map((t) => norm(t))), [selectedEventTypes]);
+  const hasActiveEventTypeFilters = selectedEventTypes.length > 0;
   const view = sp.get("view") || "list";
   const dayParam = sp.get("day");
   const viewMode: "list" | "month" | "clock" = view === "month" ? "month" : view === "clock" ? "clock" : "list";
@@ -503,12 +517,14 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
           .join(" ")
       );
       const matchesSearch = !norm(q) || hay.includes(norm(q));
-      const matchesType = !norm(type) || norm(e.event_type ?? "") === norm(type);
+      const et = norm(e.event_type ?? "");
+      const matchesType =
+        selectedEventTypeNormSet.size === 0 || (et && selectedEventTypeNormSet.has(et));
       return matchesSearch && matchesType;
     });
 
     return nearestDayWithEvents(source);
-  }, [dayParam, events, q, type]);
+  }, [dayParam, events, q, selectedEventTypeNormSet]);
 
   const selectedDayStr = dayKey(selectedDay);
   const monthAnchor = useMemo(() => {
@@ -593,7 +609,7 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
       window.removeEventListener("resize", updateOffset);
       ro?.disconnect();
     };
-  }, [effectiveIsMobile, q, type, viewMode, filterOpen]);
+  }, [effectiveIsMobile, q, searchParamsKey, viewMode, filterOpen]);
 
   useEffect(() => {
     if (!effectiveIsMobile) {
@@ -680,6 +696,29 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     pushParams(params);
   }
 
+  function clearEventTypeFilters() {
+    const params = new URLSearchParams(sp.toString());
+    params.delete("type");
+    pushParams(params);
+  }
+
+  function toggleEventTypeFilter(t: string) {
+    const params = new URLSearchParams(sp.toString());
+    const current = params.getAll("type");
+    const n = norm(t);
+    const exists = current.some((c) => norm(c) === n);
+    params.delete("type");
+    if (exists) {
+      for (const c of current) {
+        if (norm(c) !== n) params.append("type", c);
+      }
+    } else {
+      for (const c of current) params.append("type", c);
+      params.append("type", t);
+    }
+    pushParams(params);
+  }
+
   const eventTypes = useMemo(() => {
     const set = new Set<string>();
     for (const e of events) if (e.event_type) set.add(e.event_type);
@@ -688,7 +727,6 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
 
   const filteredEvents = useMemo(() => {
     const nq = norm(q);
-    const nt = norm(type);
 
     return events.filter((e) => {
       const hay = norm(
@@ -704,10 +742,12 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
       );
 
       const matchesSearch = !nq || hay.includes(nq);
-      const matchesType = !nt || norm(e.event_type ?? "") === nt;
+      const et = norm(e.event_type ?? "");
+      const matchesType =
+        selectedEventTypeNormSet.size === 0 || (et && selectedEventTypeNormSet.has(et));
       return matchesSearch && matchesType;
     });
-  }, [events, q, type]);
+  }, [events, q, selectedEventTypeNormSet]);
 
   const liveEventsNow = useMemo(() => {
     return filteredEvents.filter((e) => eventHappeningNow(e));
@@ -1171,8 +1211,8 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
 
   const detailFlashKey = useMemo(() => {
     if (!selectedEvent) return "none";
-    return `${selectedEvent.uid ?? selectedEvent.id ?? "event"}|${selectedDisplayKey}|${viewMode}|${q}|${type}`;
-  }, [selectedEvent, selectedDisplayKey, viewMode, q, type]);
+    return `${selectedEvent.uid ?? selectedEvent.id ?? "event"}|${selectedDisplayKey}|${viewMode}|${q}|${selectedEventTypes.join(",")}`;
+  }, [selectedEvent, selectedDisplayKey, viewMode, q, selectedEventTypes]);
 
 // stagger counter for left list
   let listAnimIndex = 0;
@@ -1634,11 +1674,17 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           className="filterBtn"
                           aria-label={filterOpen ? "Close filters" : "Open filters"}
                           aria-expanded={filterOpen ? "true" : "false"}
-                          data-active={filterOpen || !!type ? "true" : "false"}
+                          data-active={filterOpen || hasActiveEventTypeFilters ? "true" : "false"}
                           onClick={() => setFilterOpen((v) => !v)}
                         >
                           <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
-                          <span>{type ? `Filter: ${type}` : "Filter"}</span>
+                          <span>
+                            {hasActiveEventTypeFilters
+                              ? selectedEventTypes.length === 1
+                                ? `Filter: ${selectedEventTypes[0]}`
+                                : `Filters (${selectedEventTypes.length})`
+                              : "Filter"}
+                          </span>
                         </button>
                       ) : (
                         <button
@@ -1646,19 +1692,21 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           className="filterBtn filterBtnSquare squareIconBtn"
                           aria-label={filterOpen ? "Close filters" : "Open filters"}
                           aria-expanded={filterOpen ? "true" : "false"}
-                          data-active={filterOpen || !!type ? "true" : "false"}
+                          data-active={filterOpen || hasActiveEventTypeFilters ? "true" : "false"}
                           onClick={() => setFilterOpen((v) => !v)}
                         >
                           <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
-                          {!effectiveIsMobile ? null : <span>{type ? "Filtered" : "Filter"}</span>}
+                          {!effectiveIsMobile ? null : (
+                            <span>{hasActiveEventTypeFilters ? "Filtered" : "Filter"}</span>
+                          )}
                         </button>
                       )}
-                      {!effectiveIsMobile && (q || type) ? (
+                      {!effectiveIsMobile && (q || hasActiveEventTypeFilters) ? (
                         <button
                           className="clearBtn"
                           onClick={() => {
                             setParam("q", null);
-                            setParam("type", null);
+                            clearEventTypeFilters();
                           }}
                           type="button"
                         >
@@ -1731,13 +1779,13 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       </button>
                     </div>
 
-                    {(q || type) ? (
+                    {(q || hasActiveEventTypeFilters) ? (
                       <button
                         type="button"
                         className="filterOverlayClear"
                         onClick={() => {
                           setParam("q", null);
-                          setParam("type", null);
+                          clearEventTypeFilters();
                           setFilterOpen(false);
                         }}
                       >
@@ -1745,30 +1793,28 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       </button>
                     ) : null}
 
-                    <div className="typePills" role="group" aria-label="Event type filters">
+                    <div className="typePills" role="group" aria-label="Event type filters (choose one or more)">
                       <button
                         type="button"
                         className="typePill"
-                        data-active={!type ? "true" : "false"}
+                        data-active={!hasActiveEventTypeFilters ? "true" : "false"}
                         onClick={() => {
-                          setParam("type", null);
-                          setFilterOpen(false);
+                          clearEventTypeFilters();
+                          /* Mobile: leave overlay open so several types can be toggled without reopening. */
+                          if (!effectiveIsMobile) setFilterOpen(false);
                         }}
                       >
                         All
                       </button>
                       {eventTypes.map((t) => {
-                        const on = norm(type) === norm(t);
+                        const on = selectedEventTypeNormSet.has(norm(t));
                         return (
                           <button
                             key={t}
                             type="button"
                             className="typePill"
                             data-active={on ? "true" : "false"}
-                            onClick={() => {
-                              setParam("type", on ? null : t);
-                              setFilterOpen(false);
-                            }}
+                            onClick={() => toggleEventTypeFilter(t)}
                           >
                             {t}
                           </button>

@@ -317,6 +317,371 @@ body{
   font-size: 0.74rem;
 }
 
+.blogListRowDate{
+  font-family: var(--font-tags);
+  font-size: 0.78rem;
+}
+
+.blogFeatured{
+  margin: 20px var(--gutter) 8px;
+  max-width: 1100px;
+}
+
+.blogFeatured__label{
+  font-family: var(--font-tags);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+
+.blogFeatured__grid{
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.blogFeaturedCard{
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  border-radius: 18px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+  color: inherit;
+  text-decoration: none;
+  background: var(--bg);
+}
+
+.blogFeaturedCard:hover{
+  background: var(--hover);
+}
+
+.blogFeaturedCard__thumb{
+  aspect-ratio: 16 / 10;
+  background: var(--panel);
+}
+
+.blogFeaturedCard__img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.blogFeaturedCard__placeholder{
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, var(--panel), var(--panelStrong));
+}
+
+.blogFeaturedCard__body{
+  padding: 12px 14px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.blogFeaturedCard__cat{
+  font-family: var(--font-tags);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.blogFeaturedCard__title{
+  font-weight: 650;
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.blogFeaturedCard__excerpt{
+  font-size: 0.88rem;
+  color: var(--muted);
+  line-height: 1.35;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  overflow: hidden;
+}
+
+.blogPostPage{
+  padding-bottom: calc(24px + var(--footerH));
+}
+
+.blogPostArticle{
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 24px var(--gutter) 48px;
+}
+
+.blogPostHeader{
+  margin-bottom: 18px;
+}
+
+.blogPostKicker{
+  font-family: var(--font-tags);
+  font-size: 0.74rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 650;
+}
+
+.blogPostTitle{
+  margin: 10px 0 6px;
+  font-size: clamp(1.6rem, 1.2rem + 2vw, 2.3rem);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+  font-weight: 700;
+}
+
+.blogPostDate{
+  display: block;
+  margin-bottom: 12px;
+  font-size: 0.92rem;
+}
+
+.blogPostDeck{
+  font-size: 1.08rem;
+  line-height: 1.45;
+  color: var(--muted);
+  margin: 0;
+  max-width: 65ch;
+}
+
+.blogPostHero{
+  margin: 0 0 24px;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.blogPostHeroImg{
+  width: 100%;
+  display: block;
+  max-height: 420px;
+  object-fit: cover;
+}
+
+.blogPostGrid{
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 28px;
+  align-items: start;
+}
+
+.blogPostGrid--single{
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.blogPostAside{
+  position: sticky;
+  top: calc(var(--headerH) + 12px);
+  align-self: start;
+}
+
+.blogSectionTracker{
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 12px 12px 10px;
+  background: var(--panel);
+}
+
+.blogSectionTracker__label{
+  font-family: var(--font-tags);
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.blogSectionTracker__list{
+  margin: 0;
+  padding: 0 0 0 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  list-style: decimal;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.blogSectionTracker__link{
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+}
+
+.blogSectionTracker__link[data-active="true"]{
+  color: var(--text);
+  font-weight: 650;
+  border-bottom-color: color-mix(in srgb, var(--accent) 35%, transparent);
+}
+
+.blogPostBody{
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.blogPostH2{
+  margin: 18px 0 0;
+  scroll-margin-top: calc(var(--headerH) + 28px);
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+}
+
+.blogPostH3{
+  margin: 12px 0 0;
+  scroll-margin-top: calc(var(--headerH) + 24px);
+  font-size: 1.12rem;
+}
+
+.blogPostP{
+  margin: 0;
+  line-height: 1.55;
+  font-size: 1.02rem;
+}
+
+.blogPostPullquote{
+  margin: 16px 0;
+  padding: 16px 18px;
+  border-left: 4px solid var(--accent);
+  background: var(--panel);
+  border-radius: 0 14px 14px 0;
+  font-size: 1.12rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.blogReviewMeta{
+  padding: 14px 16px;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: var(--bg);
+}
+
+.blogReviewMeta__venue{
+  font-weight: 700;
+  font-size: 1.02rem;
+  margin-bottom: 8px;
+}
+
+.blogReviewMeta__row{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.94rem;
+  color: var(--muted);
+}
+
+.blogReviewMeta__verdict{
+  color: var(--text);
+}
+
+.blogProfileFacts{
+  margin: 8px 0;
+  padding: 14px 16px;
+  border-radius: 16px;
+  border: 1px dashed var(--border);
+  display: grid;
+  gap: 12px;
+}
+
+.blogProfileFacts__row{
+  display: grid;
+  gap: 4px;
+}
+
+.blogProfileFacts__row dt{
+  font-family: var(--font-tags);
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.blogProfileFacts__row dd{
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.4;
+}
+
+.blogPostUl{
+  margin: 4px 0 8px;
+  padding-left: 1.2rem;
+  line-height: 1.5;
+}
+
+.blogPostPage--layout-review .blogPostPullquote{
+  border-left-color: color-mix(in srgb, var(--accent) 80%, #7c2d12);
+}
+
+.blogPostPage--layout-profile .blogPostHeader{
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 16px;
+}
+
+@media (max-width: 980px){
+  .blogFeatured__grid{
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .blogFeatured{
+    margin-left: var(--gutter);
+    margin-right: var(--gutter);
+  }
+
+  .blogPostGrid{
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .blogPostAside{
+    position: static;
+  }
+
+  .blogSectionTracker{
+    position: sticky;
+    top: calc(var(--headerH) + 6px);
+    z-index: 4;
+  }
+
+  .blogSectionTracker__list{
+    flex-direction: row;
+    flex-wrap: wrap;
+    list-style: none;
+    padding-left: 0;
+    gap: 8px 12px;
+  }
+
+  .blogSectionTracker__list li{
+    margin: 0;
+  }
+
+  .blogSectionTracker__link{
+    display: inline-block;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--bg);
+    font-size: 0.78rem;
+    font-family: var(--font-tags);
+  }
+
+  .blogSectionTracker__link[data-active="true"]{
+    background: var(--text);
+    color: var(--bg);
+    border-color: var(--text);
+  }
+}
+
 .blogListRowTitle{
   font-size: 1.05rem;
   font-weight: 650;
@@ -1555,9 +1920,17 @@ a.eventTimeLink:hover{
 
 @media (min-width: 981px){
   .weeklySpotlightPair .weeklyOverview--spotlightHalf{
+    display: flex !important;
+    flex-direction: column !important;
     align-items: flex-start !important;
     justify-content: flex-start !important;
     text-align: left !important;
+  }
+
+  .weeklySpotlightPair .weeklyOverview--spotlightHalf .weeklyTitle,
+  .weeklySpotlightPair .weeklyOverview--spotlightHalf .weeklyCount{
+    text-align: left !important;
+    width: 100%;
   }
 }
 
@@ -4503,6 +4876,14 @@ a:hover{
 }
 
 .mobileMenuOverlay{ z-index: 9999; }
+
+/* Above portaled mobile tab dock (calendar) so hamburger / settings cover bottom nav */
+@media (max-width: 980px){
+  .mobileSheetOverlay.mobileMenuOverlay,
+  .mobileSheetOverlay.settingsSheetOverlay{
+    z-index: 600000;
+  }
+}
 .mobileMenuSheet{ min-height: 100dvh; padding-top: max(16px, env(safe-area-inset-top)); }
 .mobileMenuList{ gap: 14px; }
 .mobileMenuActionText{ display:block; }
@@ -7051,8 +7432,9 @@ body {
 
 @media (max-width: 980px){
   :root{
-    --panePadX: 20px;
+    --panePadX: 18px;
     --panePadY: 18px;
+    --gutter: 18px;
   }
 
   .pageIntroBar{
@@ -7610,6 +7992,8 @@ html[data-route-switching="true"] .routeFrame{
   :root{
     --panePadX: 18px;
     --panePadY: 18px;
+    --gutter: 18px;
+    --footerH: 36px;
   }
 
   .paneLeft > .scroll{

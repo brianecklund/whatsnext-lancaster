@@ -336,7 +336,21 @@ export default function LocationsSplitClient({
 
   const selectedKey = searchParams.get("location");
   const q = searchParams.get("q") ?? "";
-  const cat = searchParams.get("cat") ?? "";
+  const searchKey = searchParams.toString();
+  const selectedCats = useMemo(() => {
+    const raw = new URLSearchParams(searchKey).getAll("cat");
+    const out: string[] = [];
+    const seen = new Set<string>();
+    for (const c of raw) {
+      const n = normalize(c);
+      if (!n || seen.has(n)) continue;
+      seen.add(n);
+      out.push(c.trim());
+    }
+    return out;
+  }, [searchKey]);
+  const selectedCatNormSet = useMemo(() => new Set(selectedCats.map((c) => normalize(c))), [selectedCats]);
+  const hasActiveCatFilters = selectedCats.length > 0;
 
   useEffect(() => {
     setMounted(true);
@@ -379,7 +393,7 @@ export default function LocationsSplitClient({
       ro?.disconnect();
       window.removeEventListener("resize", apply);
     };
-  }, [effectiveIsMobile, q, cat, filterOpen, alphabetOpen]);
+  }, [effectiveIsMobile, q, searchKey, filterOpen, alphabetOpen]);
 
     useBodyScrollLock(filterOpen || (effectiveIsMobile && Boolean(selectedKey)));
 
@@ -406,7 +420,7 @@ export default function LocationsSplitClient({
       window.removeEventListener("resize", updateOffset);
       ro?.disconnect();
     };
-  }, [effectiveIsMobile, q, cat, filterOpen, alphabetOpen]);
+  }, [effectiveIsMobile, q, searchKey, filterOpen, alphabetOpen]);
 
   function navigate(params: URLSearchParams) {
     const qs = params.toString();
@@ -441,10 +455,27 @@ export default function LocationsSplitClient({
     navigate(params);
   }
 
-  function setCategory(next: string | null) {
+  function clearCategoryFilters() {
     const params = new URLSearchParams(searchParams.toString());
-    if (!next) params.delete("cat");
-    else params.set("cat", next);
+    params.delete("cat");
+    params.delete("location");
+    navigate(params);
+  }
+
+  function toggleCategoryFilter(label: string) {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.getAll("cat");
+    const n = normalize(label);
+    const exists = current.some((c) => normalize(c) === n);
+    params.delete("cat");
+    if (exists) {
+      for (const c of current) {
+        if (normalize(c) !== n) params.append("cat", c);
+      }
+    } else {
+      for (const c of current) params.append("cat", c);
+      params.append("cat", label);
+    }
     params.delete("location");
     navigate(params);
   }
@@ -456,7 +487,6 @@ export default function LocationsSplitClient({
 
   const filtered = useMemo(() => {
     const nq = normalize(q);
-    const nc = normalize(cat);
 
     return safeLocations.filter((l) => {
       const hay = normalize(
@@ -465,10 +495,12 @@ export default function LocationsSplitClient({
           .join(" "),
       );
       const matchesSearch = !nq || hay.includes(nq);
-      const matchesCat = !nc || normalize(l.category) === nc;
+      const lc = normalize(l.category);
+      const matchesCat =
+        selectedCatNormSet.size === 0 || (lc && selectedCatNormSet.has(lc));
       return matchesSearch && matchesCat;
     });
-  }, [safeLocations, q, cat]);
+  }, [safeLocations, q, selectedCatNormSet]);
 
   const featuredPartners = useMemo(
     () =>
@@ -597,7 +629,7 @@ export default function LocationsSplitClient({
       container.removeEventListener("scroll", syncActiveLetter);
       window.removeEventListener("resize", syncActiveLetter);
     };
-  }, [visibleLetters, q, cat, featuredPartners.length, activeLetter]);
+  }, [visibleLetters, q, searchKey, featuredPartners.length, activeLetter]);
 
   function jumpToLetter(letter: string) {
     const section = sectionRefs.current[letter];
@@ -611,7 +643,11 @@ export default function LocationsSplitClient({
   }
 
   const mobileDetailOpen = effectiveIsMobile && Boolean(selectedMobile);
-  const activeFilterLabel = cat ? `Filter: ${cat}` : "Filter";
+  const activeFilterLabel = hasActiveCatFilters
+    ? selectedCats.length === 1
+      ? `Filter: ${selectedCats[0]}`
+      : `Filters (${selectedCats.length})`
+    : "Filter";
 
   return (
     <SplitPageLayout
@@ -695,7 +731,7 @@ export default function LocationsSplitClient({
                     <button
                       type="button"
                       className="filterBtn directoryFilterBtnMobile"
-                      data-active={filterOpen || !!cat ? "true" : "false"}
+                      data-active={filterOpen || hasActiveCatFilters ? "true" : "false"}
                       aria-label={filterOpen ? "Close filters" : "Open filters"}
                       aria-expanded={filterOpen ? "true" : "false"}
                       onClick={() => setFilterOpen((v) => !v)}
@@ -708,7 +744,7 @@ export default function LocationsSplitClient({
                       <button
                         type="button"
                         className="filterBtn filterBtnSquare squareIconBtn"
-                        data-active={filterOpen || !!cat ? "true" : "false"}
+                        data-active={filterOpen || hasActiveCatFilters ? "true" : "false"}
                         aria-label={filterOpen ? "Close filters" : activeFilterLabel}
                         aria-expanded={filterOpen ? "true" : "false"}
                         onClick={() => setFilterOpen((value) => !value)}
@@ -716,13 +752,13 @@ export default function LocationsSplitClient({
                         <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
                       </button>
 
-                      {q || cat ? (
+                      {q || hasActiveCatFilters ? (
                         <button
                           className="clearBtn"
                           type="button"
                           onClick={() => {
                             setQuery("");
-                            setCategory(null);
+                            clearCategoryFilters();
                           }}
                         >
                           Clear
@@ -775,30 +811,27 @@ export default function LocationsSplitClient({
                     </button>
                   </div>
 
-                  <div className="typePills" role="group" aria-label="Directory filters">
+                  <div className="typePills" role="group" aria-label="Directory filters (choose one or more)">
                     <button
                       type="button"
                       className="typePill"
-                      data-active={!cat ? "true" : "false"}
+                      data-active={!hasActiveCatFilters ? "true" : "false"}
                       onClick={() => {
-                        setCategory(null);
-                        setFilterOpen(false);
+                        clearCategoryFilters();
+                        if (!effectiveIsMobile) setFilterOpen(false);
                       }}
                     >
                       All
                     </button>
                     {categories.map((t) => {
-                      const on = normalize(cat) === normalize(t);
+                      const on = selectedCatNormSet.has(normalize(t));
                       return (
                         <button
                           key={t}
                           type="button"
                           className="typePill"
                           data-active={on ? "true" : "false"}
-                          onClick={() => {
-                            setCategory(on ? null : t);
-                            setFilterOpen(false);
-                          }}
+                          onClick={() => toggleCategoryFilter(t)}
                         >
                           {t}
                         </button>
@@ -806,13 +839,13 @@ export default function LocationsSplitClient({
                     })}
                   </div>
 
-                  {q || cat ? (
+                  {q || hasActiveCatFilters ? (
                     <button
                       type="button"
                       className="filterOverlayClear"
                       onClick={() => {
                         setQuery("");
-                        setCategory(null);
+                        clearCategoryFilters();
                         setFilterOpen(false);
                       }}
                     >

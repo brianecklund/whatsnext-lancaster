@@ -135,7 +135,21 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
   const resolvedSection = currentSection ?? (pathname?.startsWith("/updates") ? "updates" : pathname?.startsWith("/locations") ? "directory" : "calendar");
 
   const q = sp.get("q") || "";
-  const tag = sp.get("tag") || "";
+  const searchKey = sp.toString();
+  const selectedTags = useMemo(() => {
+    const raw = new URLSearchParams(searchKey).getAll("tag");
+    const out: string[] = [];
+    const seen = new Set<string>();
+    for (const t of raw) {
+      const n = norm(t);
+      if (!n || seen.has(n)) continue;
+      seen.add(n);
+      out.push(t.trim());
+    }
+    return out;
+  }, [searchKey]);
+  const selectedTagNormSet = useMemo(() => new Set(selectedTags.map((t) => norm(t))), [selectedTags]);
+  const hasActiveTagFilters = selectedTags.length > 0;
   const selectedKey = sp.get("u") || "";
 
   const [isMobile, setIsMobile] = useState(false);
@@ -169,17 +183,17 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
 
   const filtered = useMemo(() => {
     const nq = norm(q);
-    const nt = norm(tag);
     return safeUpdates.filter((u) => {
-      if (nt) {
-        const utags = (u.tags || []).map((t) => norm(t));
-        if (!utags.includes(nt)) return false;
+      if (selectedTagNormSet.size > 0) {
+        const utags = new Set((u.tags || []).map((t) => norm(t)));
+        const any = [...selectedTagNormSet].some((t) => utags.has(t));
+        if (!any) return false;
       }
       if (!nq) return true;
       const hay = norm([u.title, ...(u.tags || []), u.body || ""].join(" "));
       return hay.includes(nq);
     });
-  }, [safeUpdates, q, tag]);
+  }, [safeUpdates, q, selectedTagNormSet]);
 
   const newsTickerItems = useMemo(() => {
     const upcoming = filtered.slice(0, 6).map((update) => {
@@ -247,6 +261,31 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
     router.push(query ? `${basePath}?${query}` : basePath);
   }
 
+  function clearTagFilters() {
+    const params = new URLSearchParams(sp.toString());
+    params.delete("tag");
+    const query = params.toString();
+    router.push(query ? `${basePath}?${query}` : basePath);
+  }
+
+  function toggleTagFilter(tagLabel: string) {
+    const params = new URLSearchParams(sp.toString());
+    const current = params.getAll("tag");
+    const n = norm(tagLabel);
+    const exists = current.some((c) => norm(c) === n);
+    params.delete("tag");
+    if (exists) {
+      for (const c of current) {
+        if (norm(c) !== n) params.append("tag", c);
+      }
+    } else {
+      for (const c of current) params.append("tag", c);
+      params.append("tag", tagLabel);
+    }
+    const query = params.toString();
+    router.push(query ? `${basePath}?${query}` : basePath);
+  }
+
   function setSelected(id: string) {
     setParam("u", id);
   }
@@ -289,13 +328,19 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
             <button
               type="button"
               className="filterBtn"
-              data-active={filterOpen || !!tag ? "true" : "false"}
+              data-active={filterOpen || hasActiveTagFilters ? "true" : "false"}
               aria-label={filterOpen ? "Close filters" : "Open filters"}
               aria-expanded={filterOpen ? "true" : "false"}
               onClick={() => setFilterOpen((v) => !v)}
             >
               <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
-              <span>{tag ? `Filter: ${tag}` : "Filter"}</span>
+              <span>
+                {hasActiveTagFilters
+                  ? selectedTags.length === 1
+                    ? `Filter: ${selectedTags[0]}`
+                    : `Filters (${selectedTags.length})`
+                  : "Filter"}
+              </span>
             </button>
           </div>
         ) : (
@@ -312,18 +357,18 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
               className="filterBtn filterBtnSquare squareIconBtn"
               aria-label={filterOpen ? "Close filters" : "Open filters"}
               aria-expanded={filterOpen ? "true" : "false"}
-              data-active={filterOpen || !!tag ? "true" : "false"}
+              data-active={filterOpen || hasActiveTagFilters ? "true" : "false"}
               onClick={() => setFilterOpen((v) => !v)}
             >
               <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
             </button>
-            {q || tag ? (
+            {q || hasActiveTagFilters ? (
               <button
                 className="clearBtn"
                 type="button"
                 onClick={() => {
                   setParam("q", null);
-                  setParam("tag", null);
+                  clearTagFilters();
                 }}
               >
                 Clear
@@ -445,13 +490,13 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
                     </button>
                   </div>
 
-                  {q || tag ? (
+                  {q || hasActiveTagFilters ? (
                     <button
                       type="button"
                       className="filterOverlayClear"
                       onClick={() => {
                         setParam("q", null);
-                        setParam("tag", null);
+                        clearTagFilters();
                         setFilterOpen(false);
                       }}
                     >
@@ -459,30 +504,27 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
                     </button>
                   ) : null}
 
-                  <div className="typePills" role="group" aria-label="Update filters">
+                  <div className="typePills" role="group" aria-label="Update filters (choose one or more)">
                     <button
                       type="button"
                       className="typePill"
-                      data-active={!tag ? "true" : "false"}
+                      data-active={!hasActiveTagFilters ? "true" : "false"}
                       onClick={() => {
-                        setParam("tag", null);
-                        setFilterOpen(false);
+                        clearTagFilters();
+                        if (!isMobile) setFilterOpen(false);
                       }}
                     >
                       All
                     </button>
                     {tags.map((t) => {
-                      const on = norm(tag) === norm(t);
+                      const on = selectedTagNormSet.has(norm(t));
                       return (
                         <button
                           key={t}
                           type="button"
                           className="typePill"
                           data-active={on ? "true" : "false"}
-                          onClick={() => {
-                            setParam("tag", on ? null : t);
-                            setFilterOpen(false);
-                          }}
+                          onClick={() => toggleTagFilter(t)}
                         >
                           {t}
                         </button>

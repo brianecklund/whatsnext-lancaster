@@ -39,12 +39,48 @@ export default function BlogClient({ posts }: { posts: BlogPostLite[] }) {
     });
   }, [posts, q, cat]);
 
+  const featuredPosts = useMemo(() => filtered.filter((p) => p.featured).slice(0, 3), [filtered]);
+
+  const listPosts = useMemo(() => {
+    const fav = new Set(featuredPosts.map((p) => (p.uid ?? p.id).trim()).filter(Boolean));
+    return filtered.filter((p) => !fav.has((p.uid ?? p.id).trim()));
+  }, [filtered, featuredPosts]);
+
   return (
     <main className="contentPage blogPage">
       <header className="blogHeader">
         <h1 className="blogTitle">Blog</h1>
         <p className="blogLead muted">Reviews, profiles, and articles from around Lancaster.</p>
       </header>
+
+      {featuredPosts.length ? (
+        <section className="blogFeatured" aria-label="Featured posts">
+          <div className="blogFeatured__label">Featured</div>
+          <div className="blogFeatured__grid">
+            {featuredPosts.map((p) => (
+              <Link
+                key={p.id}
+                href={p.uid ? `/blog/${encodeURIComponent(p.uid)}` : "/blog"}
+                className="blogFeaturedCard"
+              >
+                <div className="blogFeaturedCard__thumb" aria-hidden>
+                  {p.imageUrl ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img src={p.imageUrl} alt="" className="blogFeaturedCard__img" />
+                  ) : (
+                    <div className="blogFeaturedCard__placeholder" />
+                  )}
+                </div>
+                <div className="blogFeaturedCard__body">
+                  {p.category ? <span className="blogFeaturedCard__cat">{p.category}</span> : null}
+                  <div className="blogFeaturedCard__title">{p.title}</div>
+                  {p.excerpt ? <div className="blogFeaturedCard__excerpt">{p.excerpt}</div> : null}
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="blogLayout" aria-label="Blog list with filters">
         <aside className="blogSidebar" aria-label="Blog filters">
@@ -78,7 +114,7 @@ export default function BlogClient({ posts }: { posts: BlogPostLite[] }) {
 
         <div className="blogList" role="list">
           {filtered.length === 0 ? <div className="emptyList">No posts found.</div> : null}
-          {filtered.map((p) => (
+          {listPosts.map((p) => (
             <Link
               key={p.id}
               href={p.uid ? `/blog/${encodeURIComponent(p.uid)}` : "/blog"}
