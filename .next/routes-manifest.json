@@ -22,6 +22,14 @@
   },
   "dynamicRoutes": [
     {
+      "page": "/blog/[uid]",
+      "regex": "^/blog/([^/]+?)(?:/)?$",
+      "routeKeys": {
+        "nxtPuid": "nxtPuid"
+      },
+      "namedRegex": "^/blog/(?<nxtPuid>[^/]+?)(?:/)?$"
+    },
+    {
       "page": "/locations/[uid]",
       "regex": "^/locations/([^/]+?)(?:/)?$",
       "routeKeys": {

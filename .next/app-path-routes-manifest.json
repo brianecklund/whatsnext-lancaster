@@ -11,6 +11,7 @@
   "/api/venues/route": "/api/venues",
   "/api/venues/search/route": "/api/venues/search",
   "/api/venues/status/route": "/api/venues/status",
+  "/blog/[uid]/page": "/blog/[uid]",
   "/blog/page": "/blog",
   "/clock/page": "/clock",
   "/contact/page": "/contact",

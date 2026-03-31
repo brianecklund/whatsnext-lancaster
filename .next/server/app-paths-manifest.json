@@ -11,6 +11,7 @@
   "/api/venues/route": "app/api/venues/route.js",
   "/api/venues/search/route": "app/api/venues/search/route.js",
   "/api/venues/status/route": "app/api/venues/status/route.js",
+  "/blog/[uid]/page": "app/blog/[uid]/page.js",
   "/blog/page": "app/blog/page.js",
   "/clock/page": "app/clock/page.js",
   "/contact/page": "app/contact/page.js",
