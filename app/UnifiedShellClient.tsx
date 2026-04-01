@@ -39,29 +39,67 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
   const [activeSection, setActiveSection] = useState<SectionKey>(() => sectionFromUrl ?? initialSection);
   const [renderedSection, setRenderedSection] = useState<SectionKey>(() => sectionFromUrl ?? initialSection);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [contentSwitching, setContentSwitching] = useState(false);
   const [introActive, setIntroActive] = useState(false);
+  /** Listing / right-pane only: exit old → swap panel → enter new (chrome stays mounted until swap, no ticker/tabs animation). */
+  const [shellSwitchPhase, setShellSwitchPhase] = useState<"idle" | "exiting" | "entering">("idle");
   const shellRef = useRef<HTMLDivElement | null>(null);
   const prevShellSectionRef = useRef<SectionKey | null>(null);
+  const renderedSectionRef = useRef(renderedSection);
+  const shellTransitionTimersRef = useRef<{ exit?: number; enter?: number }>({});
 
-  /** Keep shell in sync with real URL (Next navigation, back/forward, deep links). */
   useEffect(() => {
-    const next = sectionFromPathname(pathname);
-    const prev = prevShellSectionRef.current;
+    renderedSectionRef.current = renderedSection;
+  }, [renderedSection]);
 
-    setActiveSection(next);
-    setRenderedSection(next);
+  /** Keep shell in sync with URL; defer panel swap until listing fade-out finishes. */
+  useEffect(() => {
+    const urlSection = sectionFromPathname(pathname);
+    setActiveSection(urlSection);
     setIsTransitioning(false);
 
-    if (prev !== null && prev !== next) {
-      setContentSwitching(true);
-      const t = window.setTimeout(() => setContentSwitching(false), 560);
-      prevShellSectionRef.current = next;
-      return () => window.clearTimeout(t);
+    if (prevShellSectionRef.current === null) {
+      prevShellSectionRef.current = urlSection;
+      setRenderedSection(urlSection);
+      setShellSwitchPhase("idle");
+      return;
     }
 
-    prevShellSectionRef.current = next;
-    setContentSwitching(false);
+    const currentRendered = renderedSectionRef.current;
+    if (urlSection === currentRendered) {
+      prevShellSectionRef.current = urlSection;
+      if (shellTransitionTimersRef.current.exit) window.clearTimeout(shellTransitionTimersRef.current.exit);
+      if (shellTransitionTimersRef.current.enter) window.clearTimeout(shellTransitionTimersRef.current.enter);
+      shellTransitionTimersRef.current = {};
+      setShellSwitchPhase("idle");
+      return;
+    }
+
+    const reduceMotion =
+      typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+    const exitBeforeSwapMs = reduceMotion ? 0 : 780;
+    const enterHoldMs = reduceMotion ? 0 : 1200;
+
+    if (shellTransitionTimersRef.current.exit) window.clearTimeout(shellTransitionTimersRef.current.exit);
+    if (shellTransitionTimersRef.current.enter) window.clearTimeout(shellTransitionTimersRef.current.enter);
+    shellTransitionTimersRef.current = {};
+
+    setShellSwitchPhase("exiting");
+
+    shellTransitionTimersRef.current.exit = window.setTimeout(() => {
+      shellTransitionTimersRef.current.exit = undefined;
+      setRenderedSection(urlSection);
+      prevShellSectionRef.current = urlSection;
+      setShellSwitchPhase("entering");
+      shellTransitionTimersRef.current.enter = window.setTimeout(() => {
+        shellTransitionTimersRef.current.enter = undefined;
+        setShellSwitchPhase("idle");
+      }, enterHoldMs);
+    }, exitBeforeSwapMs);
+
+    return () => {
+      if (shellTransitionTimersRef.current.exit) window.clearTimeout(shellTransitionTimersRef.current.exit);
+      if (shellTransitionTimersRef.current.enter) window.clearTimeout(shellTransitionTimersRef.current.enter);
+    };
   }, [pathname]);
 
   useEffect(() => {
@@ -102,15 +140,20 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
       return el.offsetParent !== null;
     });
 
+    const tag = shellSwitchPhase === "exiting" || shellSwitchPhase === "entering";
     nodes.forEach((el, index) => {
-      el.dataset.switchItem = contentSwitching ? "true" : "false";
-      el.style.setProperty("--switch-index", String(index));
+      if (tag) {
+        el.dataset.switchItem = "true";
+        el.style.setProperty("--switch-index", String(index));
+      } else {
+        delete el.dataset.switchItem;
+      }
     });
 
     return () => {
       nodes.forEach((el) => delete el.dataset.switchItem);
     };
-  }, [renderedSection, contentSwitching]);
+  }, [renderedSection, shellSwitchPhase]);
 
   useEffect(() => {
     if (!introActive) return;
@@ -181,7 +224,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
       ref={shellRef}
       className={`shellSwap homeShell${introActive ? " shellIntro--active" : ""}`}
       data-transitioning={isTransitioning ? "true" : "false"}
-      data-content-switching={contentSwitching ? "true" : "false"}
+      data-shell-switch={shellSwitchPhase}
     >
       <div key={renderedSection} className="shellSwap__panel">
         {renderedSection === "calendar" ? (
