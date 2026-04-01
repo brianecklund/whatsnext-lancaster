@@ -554,6 +554,7 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   const weekCategorySentinelRef = useRef<HTMLDivElement | null>(null);
   const [mobileWeekCategorySticky, setMobileWeekCategorySticky] = useState(false);
   const [mobileWeekCategorySheetOpen, setMobileWeekCategorySheetOpen] = useState(false);
+  const [mobileWeekPickerSheetOpen, setMobileWeekPickerSheetOpen] = useState(false);
 
   const desktopHoverLeaveTimerRef = useRef<number | null>(null);
   const [desktopListHoverEvent, setDesktopListHoverEvent] = useState<EventLite | null>(null);
@@ -1143,17 +1144,25 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   }, [mobileWeekCategoryStickyEnabled, selectedWeekBucket?.key]);
 
   useEffect(() => {
-    if (!mobileWeekCategorySticky) setMobileWeekCategorySheetOpen(false);
+    if (!mobileWeekCategorySticky) {
+      setMobileWeekCategorySheetOpen(false);
+      setMobileWeekPickerSheetOpen(false);
+    }
   }, [mobileWeekCategorySticky]);
 
   useEffect(() => {
-    if (!mobileWeekCategorySheetOpen) return;
+    if (!mobileWeekCategorySheetOpen && !mobileWeekPickerSheetOpen) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setMobileWeekCategorySheetOpen(false);
+      if (e.key === "Escape") {
+        setMobileWeekCategorySheetOpen(false);
+        setMobileWeekPickerSheetOpen(false);
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [mobileWeekCategorySheetOpen]);
+  }, [mobileWeekCategorySheetOpen, mobileWeekPickerSheetOpen]);
+
+  const mobileWeeklyStickySheetsOpen = mobileWeekCategorySheetOpen || mobileWeekPickerSheetOpen;
 
   const selectedEvent = useMemo(() => {
     if (!filteredEvents.length) return null;
@@ -2565,27 +2574,50 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
             <>
               <button
                 type="button"
-                className={`mobileWeekCategorySheetBackdrop${mobileWeekCategorySheetOpen ? " mobileWeekCategorySheetBackdrop--open" : ""}`}
-                aria-label="Close category menu"
-                tabIndex={mobileWeekCategorySheetOpen ? 0 : -1}
-                onClick={() => setMobileWeekCategorySheetOpen(false)}
+                className={`mobileWeekCategorySheetBackdrop${mobileWeeklyStickySheetsOpen ? " mobileWeekCategorySheetBackdrop--open" : ""}`}
+                aria-label="Close menu"
+                tabIndex={mobileWeeklyStickySheetsOpen ? 0 : -1}
+                onClick={() => {
+                  setMobileWeekCategorySheetOpen(false);
+                  setMobileWeekPickerSheetOpen(false);
+                }}
               />
               <div
                 className={["mobileWeekCategoryStickyBar", mobileWeekCategorySticky ? "mobileWeekCategoryStickyBar--visible" : ""]
                   .filter(Boolean)
                   .join(" ")}
               >
-                <button
-                  type="button"
-                  className="mobileWeekCategoryStickyBar__btn"
-                  aria-expanded={mobileWeekCategorySheetOpen}
-                  onClick={() => setMobileWeekCategorySheetOpen((o) => !o)}
-                >
-                  Category
-                  <span className="mobileWeekCategoryStickyBar__chev" aria-hidden>
-                    {mobileWeekCategorySheetOpen ? "▾" : "▸"}
-                  </span>
-                </button>
+                <div className="mobileWeekCategoryStickyBar__row">
+                  <button
+                    type="button"
+                    className="mobileWeekCategoryStickyBar__btn"
+                    aria-expanded={mobileWeekCategorySheetOpen}
+                    onClick={() => {
+                      setMobileWeekPickerSheetOpen(false);
+                      setMobileWeekCategorySheetOpen((o) => !o);
+                    }}
+                  >
+                    Category
+                    <span className="mobileWeekCategoryStickyBar__chev" aria-hidden>
+                      {mobileWeekCategorySheetOpen ? "▾" : "▸"}
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    className="mobileWeekCategoryStickyBar__btn mobileWeekCategoryStickyBar__btn--week"
+                    aria-expanded={mobileWeekPickerSheetOpen}
+                    onClick={() => {
+                      setMobileWeekCategorySheetOpen(false);
+                      setMobileWeekPickerSheetOpen((o) => !o);
+                    }}
+                  >
+                    <span className="mobileWeekCategoryStickyBar__weekLabel">Week</span>
+                    <span className="mobileWeekCategoryStickyBar__weekRange">{selectedWeekBucket.rangeLabel}</span>
+                    <span className="mobileWeekCategoryStickyBar__chev" aria-hidden>
+                      {mobileWeekPickerSheetOpen ? "▾" : "▸"}
+                    </span>
+                  </button>
+                </div>
               </div>
               <div
                 className={["mobileWeekCategorySheet", mobileWeekCategorySheetOpen ? "mobileWeekCategorySheet--open" : ""]
@@ -2626,6 +2658,35 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       );
                     })}
                   </div>
+                </div>
+              </div>
+              <div
+                className={["mobileWeekPickerSheet", mobileWeekPickerSheetOpen ? "mobileWeekPickerSheet--open" : ""]
+                  .filter(Boolean)
+                  .join(" ")}
+                role="dialog"
+                aria-label="Choose week"
+              >
+                <div className="mobileWeekPickerSheet__inner">
+                  {weekBuckets.map((bucket) => {
+                    const active = selectedWeekBucket?.key === bucket.key;
+                    return (
+                      <button
+                        key={bucket.key}
+                        type="button"
+                        className="mobileWeekPickerSheet__option"
+                        data-active={active ? "true" : "false"}
+                        onClick={() => {
+                          openWeek(bucket.key);
+                          setMobileWeekPickerSheetOpen(false);
+                        }}
+                      >
+                        <span className="mobileWeekPickerSheet__optionTitle">{bucket.label}</span>
+                        <span className="mobileWeekPickerSheet__optionRange muted">{bucket.rangeLabel}</span>
+                        <span className="mobileWeekPickerSheet__optionCount">{bucket.events.length} events</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </>,

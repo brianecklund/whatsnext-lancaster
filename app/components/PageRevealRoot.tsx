@@ -14,17 +14,24 @@ export default function PageRevealRoot({ children }: { children: ReactNode }) {
 
   useLayoutEffect(() => {
     setContentReady(false);
-    let r1 = 0;
-    let r2 = 0;
-    r1 = window.requestAnimationFrame(() => {
-      r2 = window.requestAnimationFrame(() => {
+    let raf2 = 0;
+    let revealTimer: number | undefined;
+
+    const raf1 = window.requestAnimationFrame(() => {
+      raf2 = window.requestAnimationFrame(() => {
         setHeaderReady(true);
-        setContentReady(true);
+        // Let one frame paint with --contentReady off so route transitions visibly fade
+        // (double rAF alone often batches with the next ready state).
+        revealTimer = window.setTimeout(() => {
+          setContentReady(true);
+        }, 140);
       });
     });
+
     return () => {
-      window.cancelAnimationFrame(r1);
-      window.cancelAnimationFrame(r2);
+      window.cancelAnimationFrame(raf1);
+      window.cancelAnimationFrame(raf2);
+      if (revealTimer != null) window.clearTimeout(revealTimer);
     };
   }, [pathname]);
 

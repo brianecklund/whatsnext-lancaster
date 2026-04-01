@@ -81,6 +81,12 @@ export default function NewsTickerBar({
     }, HUB_CLOSE_MS);
   }, [hubOpen, hubClosing, clearCloseTimer]);
 
+  const toggleHubFromBar = useCallback(() => {
+    if (hubClosing) return;
+    if (hubOpen) requestCloseHub();
+    else openHub();
+  }, [hubOpen, hubClosing, openHub, requestCloseHub]);
+
   useEffect(() => {
     return () => clearCloseTimer();
   }, [clearCloseTimer]);
@@ -204,7 +210,14 @@ export default function NewsTickerBar({
   return (
     <>
       <section className={["newsBar", className].filter(Boolean).join(" ")} aria-label="Latest updates — open full list">
-        <button type="button" className="newsBar__openBtn" onClick={openHub} aria-haspopup="dialog" aria-expanded={hubOpen}>
+        <button
+          type="button"
+          className="newsBar__openBtn"
+          onClick={toggleHubFromBar}
+          aria-haspopup="dialog"
+          aria-expanded={hubOpen}
+          aria-label={hubOpen ? "Close latest updates panel" : undefined}
+        >
           <span className="newsBar__intro">{introText}</span>
 
           <div className="nw js-news-widget" ref={rootRef}>
