@@ -46,6 +46,8 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
   const prevShellSectionRef = useRef<SectionKey | null>(null);
   const renderedSectionRef = useRef(renderedSection);
   const shellTransitionTimersRef = useRef<{ exit?: number; enter?: number }>({});
+  /** Stops initial listing cascade when a real section transition starts (avoids clearing `entering` early). */
+  const cancelListingBootRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     renderedSectionRef.current = renderedSection;
@@ -67,6 +69,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
     const currentRendered = renderedSectionRef.current;
     if (urlSection === currentRendered) {
       prevShellSectionRef.current = urlSection;
+      cancelListingBootRef.current?.();
       if (shellTransitionTimersRef.current.exit) window.clearTimeout(shellTransitionTimersRef.current.exit);
       if (shellTransitionTimersRef.current.enter) window.clearTimeout(shellTransitionTimersRef.current.enter);
       shellTransitionTimersRef.current = {};
@@ -78,6 +81,8 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
       typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
     const exitBeforeSwapMs = reduceMotion ? 0 : 780;
     const enterHoldMs = reduceMotion ? 0 : 1200;
+
+    cancelListingBootRef.current?.();
 
     if (shellTransitionTimersRef.current.exit) window.clearTimeout(shellTransitionTimersRef.current.exit);
     if (shellTransitionTimersRef.current.enter) window.clearTimeout(shellTransitionTimersRef.current.enter);
@@ -101,6 +106,45 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
       if (shellTransitionTimersRef.current.enter) window.clearTimeout(shellTransitionTimersRef.current.enter);
     };
   }, [pathname]);
+
+  /** First paint on full load: cascade listings in (chrome intro only touches newsBar / leftSticky). */
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    let cancelled = false;
+    let raf1 = 0;
+    let raf2 = 0;
+    let settle: number | undefined;
+
+    const cancel = () => {
+      cancelled = true;
+      cancelAnimationFrame(raf1);
+      cancelAnimationFrame(raf2);
+      if (settle !== undefined) {
+        window.clearTimeout(settle);
+        settle = undefined;
+      }
+    };
+
+    cancelListingBootRef.current = cancel;
+
+    raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        if (cancelled) return;
+        setShellSwitchPhase((p) => (p === "idle" ? "entering" : p));
+        settle = window.setTimeout(() => {
+          settle = undefined;
+          if (!cancelled) setShellSwitchPhase((p) => (p === "entering" ? "idle" : p));
+        }, 1200);
+      });
+    });
+
+    return () => {
+      cancel();
+      cancelListingBootRef.current = null;
+    };
+  }, []);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -162,21 +206,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
       const root = shellRef.current;
       if (!root) return;
 
-      const selector = [
-        ".newsBar",
-        ".pageIntroBar",
-        ".leftSticky",
-        ".paneLeft .weeklyOverview",
-        ".paneLeft .daySection",
-        ".paneLeft .weeklyCondensed > *",
-        ".paneLeft .splitPageListBody > *",
-        ".paneLeft .directoryHeroList > *",
-        ".paneLeft .directoryLetterSection",
-        ".paneLeft .eventRow",
-        ".paneRight > .scroll > *",
-        ".mobileDetail[data-open='true'] > *",
-        ".mobileDetail[data-open='true'] .scroll > *",
-      ].join(", ");
+      const selector = [".newsBar", ".pageIntroBar", ".leftSticky"].join(", ");
 
       const seen = new Set<HTMLElement>();
       const nodes = Array.from(root.querySelectorAll<HTMLElement>(selector)).filter((el) => {

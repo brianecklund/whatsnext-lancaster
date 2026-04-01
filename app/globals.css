@@ -2075,10 +2075,10 @@ a.eventTimeLink:hover{
   }
 
   body[data-layout="shell"] .paneLeft .dayBlock .dayTitle.dayTitle--sticky{
-    margin-left: calc(var(--gutter) * -1);
-    margin-right: calc(var(--gutter) * -1);
-    padding-left: var(--gutter);
-    padding-right: var(--gutter);
+    margin-left: calc(var(--panePadX) * -1);
+    margin-right: calc(var(--panePadX) * -1);
+    padding-left: var(--panePadX);
+    padding-right: var(--panePadX);
   }
 }
 
@@ -9187,37 +9187,56 @@ body{
     padding-right: 0 !important;
   }
 
-  /* Shell mobile: listing text uses same horizontal inset as site header (--gutter). */
+  /*
+   * Shell mobile: one horizontal inset on the outer list layer only (matches calendar dayBlock model).
+   * Directory/updates previously stacked padding on splitPageListBody + directoryLetterSection — wider than calendar.
+   */
   body[data-layout="shell"] .paneLeft > .scroll .calendarListMonthSwap .dayBlock,
   body[data-layout="shell"] .paneLeft > .scroll .calendarListMonthSwap .emptyList{
-    padding-left: var(--gutter) !important;
-    padding-right: var(--gutter) !important;
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
   }
 
   body[data-layout="shell"] .paneLeft > .scroll .calendarListMonthSwap .weeklyOverview{
-    padding-left: var(--gutter) !important;
-    padding-right: var(--gutter) !important;
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
   }
 
   body[data-layout="shell"] .paneLeft > .scroll .calendarListMonthSwap .monthWrap,
   body[data-layout="shell"] .paneLeft > .scroll .calendarListMonthSwap .dayEventsMobile{
-    padding-left: var(--gutter) !important;
-    padding-right: var(--gutter) !important;
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
   }
 
   body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody,
+  body[data-layout="shell"] .paneLeft > .scroll .directoryHeroList{
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+  }
+
   body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody .directoryLetterSection,
   body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody .directoryGroupBlock,
   body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody .directoryListWrap,
-  body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody .emptyList,
-  body[data-layout="shell"] .paneLeft > .scroll .directoryHeroList{
-    padding-left: var(--gutter) !important;
-    padding-right: var(--gutter) !important;
+  body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody .emptyList{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
   }
 
   body[data-layout="shell"] .paneLeft .calendarListMonthSwap .eventRow,
   body[data-layout="shell"] .paneLeft .calendarListMonthSwap .updateRow{
     padding-left: 0 !important;
+  }
+
+  body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody > .eventRow,
+  body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody .eventRow.directoryListingRow{
+    padding-left: 0 !important;
+  }
+
+  body[data-layout="shell"] .directoryListWrap .directoryLetterHeading--sticky{
+    margin-left: calc(var(--panePadX) * -1) !important;
+    margin-right: calc(var(--panePadX) * -1) !important;
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
   }
 }
 
