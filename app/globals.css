@@ -9072,7 +9072,23 @@ body{
     display: flex !important;
     margin-left: auto !important;
     margin-right: auto !important;
-    max-width: calc(100% - (var(--panePadX) * 2));
+    max-width: calc(100% - (var(--gutter) * 2));
+  }
+
+  /* Shell mobile: single horizontal inset matching site header (--gutter), not scroll + row padding. */
+  body[data-layout="shell"] .paneLeft > .scroll{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .tabs,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .directoryToolbar,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .directoryAlphabetNav,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .directoryAlphabetNavMobile,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .leftControls,
+  body[data-layout="shell"] .paneLeft > .scroll > .leftSticky > .weeklySpotlightMobile{
+    padding-left: var(--gutter) !important;
+    padding-right: var(--gutter) !important;
   }
 
   .splitPageListBody,

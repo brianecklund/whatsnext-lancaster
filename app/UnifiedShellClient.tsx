@@ -42,13 +42,25 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
   const [contentSwitching, setContentSwitching] = useState(false);
   const [introActive, setIntroActive] = useState(false);
   const shellRef = useRef<HTMLDivElement | null>(null);
+  const prevShellSectionRef = useRef<SectionKey | null>(null);
 
   /** Keep shell in sync with real URL (Next navigation, back/forward, deep links). */
   useEffect(() => {
     const next = sectionFromPathname(pathname);
+    const prev = prevShellSectionRef.current;
+
     setActiveSection(next);
     setRenderedSection(next);
     setIsTransitioning(false);
+
+    if (prev !== null && prev !== next) {
+      setContentSwitching(true);
+      const t = window.setTimeout(() => setContentSwitching(false), 560);
+      prevShellSectionRef.current = next;
+      return () => window.clearTimeout(t);
+    }
+
+    prevShellSectionRef.current = next;
     setContentSwitching(false);
   }, [pathname]);
 
@@ -72,16 +84,15 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
     if (!root) return;
 
     const selector = [
-      ".paneLeft .weeklyOverview",
-      ".paneLeft .daySection",
-      ".paneLeft .weeklyCondensed > *",
+      ".paneLeft .calendarListMonthSwap .dayBlock",
+      ".paneLeft .calendarListMonthSwap .emptyList",
+      ".paneLeft .calendarListMonthSwap .monthWrap",
+      ".paneLeft .paneLeftClockEmbed",
       ".paneLeft .splitPageListBody > *",
       ".paneLeft .directoryHeroList > *",
       ".paneLeft .directoryLetterSection",
-      ".paneLeft .eventRow",
       ".paneRight > .scroll > *",
-      ".mobileDetail[data-open='true'] > *",
-      ".mobileDetail[data-open='true'] .scroll > *",
+      ".mobileDetail[data-open='true'] > .scroll > *",
     ].join(", ");
 
     const seen = new Set<HTMLElement>();
@@ -150,15 +161,11 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
     if (next === "updates" && onUpdates) return;
 
     setIsTransitioning(true);
-    setContentSwitching(true);
     const target = SECTION_PATHS[next];
     router.push(target);
     window.setTimeout(() => {
       setIsTransitioning(false);
     }, 120);
-    window.setTimeout(() => {
-      setContentSwitching(false);
-    }, 560);
   }
 
   const sharedProps = useMemo(
