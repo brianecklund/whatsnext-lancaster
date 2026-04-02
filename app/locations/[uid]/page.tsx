@@ -7,6 +7,8 @@ import { getCachedVenueImport } from '@/lib/venue-import';
 import { matchVenueFromDocData } from '@/lib/prismic-venue';
 import { fetchPlaceDetails } from '@/lib/google-places';
 import { getTestPartnerPage, TEST_DATA_TAG } from '@/lib/test-fixtures';
+import { getSiteData } from '@/lib/site-data';
+import { filterUpcomingEventsForLocation } from '@/lib/location-upcoming-events';
 
 export const dynamic = 'force-dynamic';
 
@@ -253,7 +255,73 @@ export default async function LocationDetailPage({
         ) : null}
 
         <MediaBlocks slices={(doc.data?.content_blocks ?? null) as any} />
+
+        <LocationUpcomingEventsSection
+          uid={uid}
+          venueExternalId={venue?.externalId ?? null}
+          locationName={(doc.data?.name || venue?.name || doc.data?.venue_name || null) as string | null}
+        />
       </div>
     </main>
+  );
+}
+
+function formatEventListDate(iso: string | null | undefined) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  return d.toLocaleString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+}
+
+async function LocationUpcomingEventsSection({
+  uid,
+  venueExternalId,
+  locationName,
+}: {
+  uid: string;
+  venueExternalId: string | null;
+  locationName: string | null;
+}) {
+  const { events } = await getSiteData();
+  const upcoming = filterUpcomingEventsForLocation(events, {
+    locationUid: uid,
+    venueExternalId,
+    locationName,
+  });
+
+  if (upcoming.length === 0) {
+    return (
+      <section className="locationPageVenueCard locationPageUpcoming">
+        <div className="locationPageSectionLabel">Upcoming on the calendar</div>
+        <p className="muted locationPageUpcomingEmpty">No upcoming listings are linked to this place yet.</p>
+      </section>
+    );
+  }
+
+  return (
+    <section className="locationPageVenueCard locationPageUpcoming">
+      <div className="locationPageSectionLabel">Upcoming on the calendar</div>
+      <ul className="locationPageUpcomingList">
+        {upcoming.map((e) => {
+          const href = `/?event=${encodeURIComponent(e.uid ?? e.id)}`;
+          const time = formatEventListDate(e.start_datetime);
+          return (
+            <li key={e.id}>
+              <Link className="locationPageUpcomingLink" href={href}>
+                <span className="locationPageUpcomingTitle">{e.title || "Event"}</span>
+                {time ? <span className="locationPageUpcomingMeta muted">{time}</span> : null}
+                {e.event_type ? <span className="locationPageUpcomingType">{e.event_type}</span> : null}
+              </Link>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
   );
 }

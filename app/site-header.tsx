@@ -5,17 +5,14 @@ import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { DEFAULT_THEME, THEME_PALETTES, THEME_PREVIEW_COLORS, type ThemeKey } from "./theme-palettes";
+import { DEFAULT_THEME, THEME_PALETTES, THEME_PREVIEW_COLORS, normalizeThemeKey, type ThemeKey } from "./theme-palettes";
 import {
-  FONT_OPTIONS,
   TEXT_SCALE_OPTIONS,
   applyA11yEnhancedFocus,
   applyA11yLinkUnderline,
   applyA11yReducedMotion,
-  applyFontFamily,
   applyTextScale,
   applyTheme,
-  type FontFamilyKey,
   type TextScaleKey,
 } from "@/lib/site-preferences";
 
@@ -42,8 +39,6 @@ function SettingsPanel({
   currentTheme,
   currentThemeLabel,
   onPickTheme,
-  fontFamily,
-  setFontFamily,
   textScale,
   setTextScale,
   a11yMotion,
@@ -63,8 +58,6 @@ function SettingsPanel({
   currentTheme: ThemeKey;
   currentThemeLabel: string;
   onPickTheme: (theme: ThemeKey) => void;
-  fontFamily: FontFamilyKey;
-  setFontFamily: (k: FontFamilyKey) => void;
   textScale: TextScaleKey;
   setTextScale: (k: TextScaleKey) => void;
   a11yMotion: boolean;
@@ -139,25 +132,6 @@ function SettingsPanel({
         </button>
         {typeOpen ? (
           <>
-            <div className="settingsFieldGroup">
-              <span className="settingsFieldLabel">Typeface</span>
-              <div className="settingsChipRow">
-                {FONT_OPTIONS.map((opt) => (
-                  <button
-                    key={opt.key}
-                    type="button"
-                    className="settingsChip"
-                    data-active={fontFamily === opt.key ? "true" : "false"}
-                    onClick={() => {
-                      setFontFamily(opt.key);
-                      applyFontFamily(opt.key);
-                    }}
-                  >
-                    {opt.label.replace("Default (Inter / Gabarito)", "Default")}
-                  </button>
-                ))}
-              </div>
-            </div>
             <div className="settingsFieldGroup">
               <span className="settingsFieldLabel">Text size</span>
               <div className="settingsChipRow">
@@ -276,7 +250,6 @@ export default function SiteHeader() {
   const [a11ySectionOpen, setA11ySectionOpen] = useState(true);
 
   const [currentTheme, setCurrentTheme] = useState<ThemeKey>(DEFAULT_THEME);
-  const [fontFamily, setFontFamily] = useState<FontFamilyKey>("default");
   const [textScale, setTextScale] = useState<TextScaleKey>("default");
   const [a11yMotion, setA11yMotion] = useState(false);
   const [a11yFocus, setA11yFocus] = useState(false);
@@ -369,8 +342,8 @@ export default function SiteHeader() {
 
   useEffect(() => {
     try {
-      const stored = window.localStorage.getItem("wnl-theme") as ThemeKey | null;
-      const initial = THEME_PALETTES.some((theme) => theme.key === stored) ? stored! : DEFAULT_THEME;
+      const stored = window.localStorage.getItem("wnl-theme");
+      const initial = normalizeThemeKey(stored);
       setCurrentTheme(initial);
       document.documentElement.setAttribute("data-theme", initial);
     } catch {
@@ -380,12 +353,6 @@ export default function SiteHeader() {
   }, []);
 
   useEffect(() => {
-    try {
-      const f = window.localStorage.getItem("wnl-font") as FontFamilyKey | null;
-      if (f && FONT_OPTIONS.some((o) => o.key === f)) setFontFamily(f);
-    } catch {
-      /* ignore */
-    }
     try {
       const s = window.localStorage.getItem("wnl-text-scale") as TextScaleKey | null;
       if (s && TEXT_SCALE_OPTIONS.some((o) => o.key === s)) setTextScale(s);
@@ -416,8 +383,6 @@ export default function SiteHeader() {
     currentTheme,
     currentThemeLabel,
     onPickTheme,
-    fontFamily,
-    setFontFamily,
     textScale,
     setTextScale,
     a11yMotion,

@@ -667,6 +667,8 @@ export default function LocationsSplitClient({
           updatesHref="/updates"
           seasonLandingHref="/spring"
           seasonContent={newsHubSeason}
+          mobileExploreOnly={effectiveIsMobile}
+          desktopIntroExplore
         />
       ) : undefined}
       style={

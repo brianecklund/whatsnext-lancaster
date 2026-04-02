@@ -86,8 +86,8 @@ export function bootSitePreferencesFromStorage() {
   if (typeof document === "undefined") return;
 
   try {
-    const f = window.localStorage.getItem(STORAGE_FONT) as FontFamilyKey | null;
-    if (f && FONT_OPTIONS.some((o) => o.key === f) && f !== "default") applyFontFamily(f);
+    applyFontFamily("default");
+    window.localStorage.removeItem(STORAGE_FONT);
   } catch {
     /* ignore */
   }

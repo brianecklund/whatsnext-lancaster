@@ -1520,6 +1520,8 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
         updatesHref="/updates"
         seasonLandingHref="/spring"
         seasonContent={newsHubSeason}
+        mobileExploreOnly={effectiveIsMobile && resolvedSection === "calendar"}
+        desktopIntroExplore
       />
     ) : null}
 
@@ -2514,7 +2516,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
       {/* Mobile bottom tabs — portaled to body so position:fixed anchors to the viewport (shell transforms otherwise clip/push tabs). */}
       {effectiveIsMobile && mobileTabsPortalReady
         ? createPortal(
-            mobileDetailOpen ? (
+            selectedEvent ? (
               <div className="mobileTabs mobileTabsDetail mobileTabDock" aria-label="Event navigation">
                 <SegmentedControl
                   className="segmentedControl--mobile segmentedControl--detail"
@@ -2555,7 +2557,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ]}
                 />
               </div>
-            ) : (
+            ) : mobileSpotlightOpen ? null : (
               <div className="mobileTabs mobilePrimaryTabs mobileTabDock" aria-label="Primary navigation">
                 <SegmentedControl
                   className="segmentedControl--mobile"

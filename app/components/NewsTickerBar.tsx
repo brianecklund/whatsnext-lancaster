@@ -40,6 +40,10 @@ export default function NewsTickerBar({
   updatesHref = "/updates",
   seasonContent,
   className = "",
+  /** Mobile shell: hide ticker strip; show centered Explore control that opens the hub. */
+  mobileExploreOnly = false,
+  /** Desktop: show “Explore ▾” after intro copy in the bar (bar hover still opens hub). */
+  desktopIntroExplore = false,
 }: {
   introText: string;
   items: NewsTickerItem[];
@@ -49,6 +53,8 @@ export default function NewsTickerBar({
   updatesHref?: string;
   seasonContent: NewsHubSeasonContent;
   className?: string;
+  mobileExploreOnly?: boolean;
+  desktopIntroExplore?: boolean;
 }) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const sliderRef = useRef<HTMLUListElement | null>(null);
@@ -100,6 +106,7 @@ export default function NewsTickerBar({
   }, [items]);
 
   useEffect(() => {
+    if (mobileExploreOnly) return;
     const newsWidget = rootRef.current;
     const slider = sliderRef.current;
     if (!newsWidget || !slider) return;
@@ -205,11 +212,47 @@ export default function NewsTickerBar({
       if (strokeTimer) window.clearTimeout(strokeTimer);
       if (resetTimer) window.clearTimeout(resetTimer);
     };
-  }, [renderedItems]);
+  }, [renderedItems, mobileExploreOnly]);
+
+  if (mobileExploreOnly) {
+    return (
+      <>
+        <section className={["newsBar", "newsBar--exploreOnly", className].filter(Boolean).join(" ")} aria-label="Explore What’s Next">
+          <button
+            type="button"
+            className="newsBar__exploreOnlyBtn"
+            onClick={toggleHubFromBar}
+            aria-haspopup="dialog"
+            aria-expanded={hubOpen}
+            aria-label={hubOpen ? "Close explore panel" : "Explore What’s Next"}
+          >
+            <span className="newsBar__exploreOnlyLabel">Explore</span>
+            <span className="newsBar__exploreOnlyChev" aria-hidden>
+              ▾
+            </span>
+          </button>
+        </section>
+
+        <NewsTickerHub
+          open={hubOpen}
+          closing={hubClosing}
+          onRequestClose={requestCloseHub}
+          introBarText={introText}
+          hubLead={hubLead}
+          updates={updates}
+          seasonContent={seasonContent}
+          updatesHref={updatesHref}
+        />
+      </>
+    );
+  }
 
   return (
     <>
-      <section className={["newsBar", className].filter(Boolean).join(" ")} aria-label="Latest updates — open full list">
+      <section
+        className={["newsBar", desktopIntroExplore ? "newsBar--desktopExplore" : "", className].filter(Boolean).join(" ")}
+        aria-label="Latest updates — open full list"
+      >
         <button
           type="button"
           className="newsBar__openBtn"
@@ -218,7 +261,15 @@ export default function NewsTickerBar({
           aria-expanded={hubOpen}
           aria-label={hubOpen ? "Close latest updates panel" : undefined}
         >
-          <span className="newsBar__intro">{introText}</span>
+          <span className="newsBar__introRow">
+            <span className="newsBar__intro">{introText}</span>
+            {desktopIntroExplore ? (
+              <span className="newsBar__exploreInline" aria-hidden>
+                <span className="newsBar__exploreInlineLabel">Explore</span>
+                <span className="newsBar__exploreInlineChev">▾</span>
+              </span>
+            ) : null}
+          </span>
 
           <div className="nw js-news-widget" ref={rootRef}>
             <div className="nw__inner">

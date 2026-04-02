@@ -444,6 +444,7 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
           updatesHref={basePath}
           seasonLandingHref="/spring"
           seasonContent={newsHubSeason}
+          desktopIntroExplore
         />
       ) : undefined}
       mobileOverlay={
