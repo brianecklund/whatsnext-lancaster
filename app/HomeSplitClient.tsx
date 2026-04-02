@@ -550,8 +550,6 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   const pullRefreshingRef = useRef(false);
   const mobileControlsCollapsedRef = useRef(false);
   const weekCategorySentinelRef = useRef<HTMLDivElement | null>(null);
-  const weekOverviewGateSentinelRef = useRef<HTMLDivElement | null>(null);
-  const [mobileWeekOverviewFiltersRevealed, setMobileWeekOverviewFiltersRevealed] = useState(false);
   const [mobileWeekCategorySticky, setMobileWeekCategorySticky] = useState(false);
   const [mobileWeekCategorySheetOpen, setMobileWeekCategorySheetOpen] = useState(false);
   const [mobileWeekPickerSheetOpen, setMobileWeekPickerSheetOpen] = useState(false);
@@ -1003,8 +1001,7 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     effectiveIsMobile &&
     mobileSpotlightOpen &&
     !!selectedWeekBucket &&
-    selectedDisplayKey !== GOING_NOW_KEY &&
-    mobileWeekOverviewFiltersRevealed;
+    selectedDisplayKey !== GOING_NOW_KEY;
 
   const filteredWeekEvents = useMemo(() => {
     if (weekCategorySelection.size === 0) return weekEvents;
@@ -1055,7 +1052,6 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   useEffect(() => {
     setWeekCategorySelection(new Set());
     setPinnedAnnouncementsExpanded(false);
-    setMobileWeekOverviewFiltersRevealed(false);
   }, [selectedWeekBucket?.key]);
 
   const selectAllWeekCategories = () => setWeekCategorySelection(new Set());
@@ -1238,51 +1234,6 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     effectiveIsMobile && (!!selectedEvent || mobileSpotlightOpen);
 
   useEffect(() => {
-    if (!effectiveIsMobile || !selectedWeekBucket || selectedDisplayKey === GOING_NOW_KEY) return;
-    let io: IntersectionObserver | null = null;
-    let raf = 0;
-    let cancelled = false;
-    let attempts = 0;
-
-    const arm = () => {
-      if (cancelled) return;
-      const root = mobileDetailScrollRef.current;
-      const target = weekOverviewGateSentinelRef.current;
-      if (!root || !target) {
-        if (attempts++ < 120) raf = window.requestAnimationFrame(arm);
-        return;
-      }
-      io = new IntersectionObserver(
-        ([e]) => {
-          if (!e.isIntersecting) setMobileWeekOverviewFiltersRevealed(true);
-        },
-        { root, threshold: 0 },
-      );
-      io.observe(target);
-    };
-
-    raf = window.requestAnimationFrame(arm);
-    return () => {
-      cancelled = true;
-      window.cancelAnimationFrame(raf);
-      io?.disconnect();
-    };
-  }, [effectiveIsMobile, selectedWeekBucket?.key, selectedDisplayKey, mobileDetailOpen, mobileSpotlightOpen]);
-
-  useEffect(() => {
-    if (!mobileDetailOpen || !selectedWeekBucket || mobileWeekOverviewFiltersRevealed) return;
-    const root = mobileDetailScrollRef.current;
-    if (!root) return;
-    const check = () => {
-      if (root.scrollHeight <= root.clientHeight + 12) {
-        setMobileWeekOverviewFiltersRevealed(true);
-      }
-    };
-    const id = window.requestAnimationFrame(check);
-    return () => window.cancelAnimationFrame(id);
-  }, [mobileDetailOpen, selectedWeekBucket?.key, mobileWeekOverviewFiltersRevealed]);
-
-  useEffect(() => {
     if (!effectiveIsMobile || !mobileDetailOpen) return;
     try {
       delete document.documentElement.dataset.routeSwitching;
@@ -1460,6 +1411,11 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
   }
 
   function handleMobileDetailBack() {
+    if (effectiveIsMobile && sp.get("fromShell") === "updates" && mobileSpotlightOpen) {
+      setClientSelectedKey(null);
+      router.push("/updates");
+      return;
+    }
     clearSelected();
   }
 
@@ -2826,10 +2782,12 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           : "";
                       return (
                         <li key={e.id}>
-                          <Link className="locationPageUpcomingLink" href={href}>
+                          <Link className="locationPageUpcomingLink locationPageUpcomingLink--stacked" href={href}>
                             <span className="locationPageUpcomingTitle">{e.title || "Event"}</span>
-                            {time ? <span className="locationPageUpcomingMeta muted">{time}</span> : null}
-                            {e.event_type ? <span className="locationPageUpcomingType">{e.event_type}</span> : null}
+                            <span className="locationPageUpcomingLink__metaRow">
+                              {time ? <span className="locationPageUpcomingMeta muted">{time}</span> : null}
+                              {e.event_type ? <span className="locationPageUpcomingType">{e.event_type}</span> : null}
+                            </span>
                           </Link>
                         </li>
                       );
@@ -2936,6 +2894,22 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 <MobileContentBackButton onBack={handleMobileDetailBack} />
               </div>
 
+              <div className="weekSelectorRail weekSelectorRailMobile fadeInItem" style={{ animationDelay: "40ms" }}>
+                {weekBuckets.map((bucket) => (
+                  <button
+                    key={bucket.key}
+                    type="button"
+                    className="weekSelectorCard"
+                    data-active={selectedWeekBucket.key === bucket.key ? "true" : "false"}
+                    onClick={() => openWeek(bucket.key)}
+                  >
+                    <div className="weekSelectorEyebrow">{bucket.label}</div>
+                    <div className="weekSelectorRange">{bucket.rangeLabel}</div>
+                    <div className="weekSelectorMeta">{bucket.events.length} event{bucket.events.length === 1 ? "" : "s"}</div>
+                  </button>
+                ))}
+              </div>
+
               <div className="mobileWeeklyOverviewIntro fadeInItem" style={{ animationDelay: "120ms" }}>
                 <div className="weekSummary">
                   <div className="weekSummaryTopline">
@@ -2948,60 +2922,38 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 </div>
               </div>
 
-              <div ref={weekOverviewGateSentinelRef} className="mobileWeeklyOverviewGateSentinel" aria-hidden />
-
-              {mobileWeekOverviewFiltersRevealed ? (
-                <>
-                  <div className="weekSelectorRail weekSelectorRailMobile fadeInItem" style={{ animationDelay: "40ms" }}>
-                    {weekBuckets.map((bucket) => (
+              <div className="weekSummary fadeInItem" style={{ animationDelay: "80ms" }}>
+                <div className="weekCategoryChipGrid weekCategoryChipGrid--mobile" role="group" aria-label="Filter events by category (choose one or more)">
+                  <button
+                    type="button"
+                    aria-pressed={weekCategorySelection.size === 0}
+                    className="weekCategoryChip"
+                    data-active={weekCategorySelection.size === 0 ? "true" : "false"}
+                    onClick={selectAllWeekCategories}
+                  >
+                    <span className="weekCategoryChip__label">All</span>
+                    <span className="weekCategoryChip__count">{selectedWeekBucket.events.length}</span>
+                  </button>
+                  {weekCategoryOptions.map((category) => {
+                    const isActive = weekCategorySelection.has(category);
+                    const count = selectedWeekBucket.insights[category] ?? 0;
+                    return (
                       <button
-                        key={bucket.key}
+                        key={category}
                         type="button"
-                        className="weekSelectorCard"
-                        data-active={selectedWeekBucket.key === bucket.key ? "true" : "false"}
-                        onClick={() => openWeek(bucket.key)}
-                      >
-                        <div className="weekSelectorEyebrow">{bucket.label}</div>
-                        <div className="weekSelectorRange">{bucket.rangeLabel}</div>
-                        <div className="weekSelectorMeta">{bucket.events.length} event{bucket.events.length === 1 ? "" : "s"}</div>
-                      </button>
-                    ))}
-                  </div>
-
-                  <div className="weekSummary fadeInItem" style={{ animationDelay: "80ms" }}>
-                    <div className="weekCategoryChipGrid weekCategoryChipGrid--mobile" role="group" aria-label="Filter events by category (choose one or more)">
-                      <button
-                        type="button"
-                        aria-pressed={weekCategorySelection.size === 0}
+                        aria-pressed={isActive}
                         className="weekCategoryChip"
-                        data-active={weekCategorySelection.size === 0 ? "true" : "false"}
-                        onClick={selectAllWeekCategories}
+                        data-active={isActive ? "true" : "false"}
+                        onClick={() => toggleWeekCategory(category)}
                       >
-                        <span className="weekCategoryChip__label">All</span>
-                        <span className="weekCategoryChip__count">{selectedWeekBucket.events.length}</span>
+                        <span className="weekCategoryChip__label">{category}</span>
+                        <span className="weekCategoryChip__count">{count}</span>
                       </button>
-                      {weekCategoryOptions.map((category) => {
-                        const isActive = weekCategorySelection.has(category);
-                        const count = selectedWeekBucket.insights[category] ?? 0;
-                        return (
-                          <button
-                            key={category}
-                            type="button"
-                            aria-pressed={isActive}
-                            className="weekCategoryChip"
-                            data-active={isActive ? "true" : "false"}
-                            onClick={() => toggleWeekCategory(category)}
-                          >
-                            <span className="weekCategoryChip__label">{category}</span>
-                            <span className="weekCategoryChip__count">{count}</span>
-                          </button>
-                        );
-                      })}
-                    </div>
-                    <div ref={weekCategorySentinelRef} className="weekCategoryStickySentinel" aria-hidden />
-                  </div>
-                </>
-              ) : null}
+                    );
+                  })}
+                </div>
+                <div ref={weekCategorySentinelRef} className="weekCategoryStickySentinel" aria-hidden />
+              </div>
 
               <section
                 className={`weekAnnouncements weekAnnouncements--strip weekAnnouncements--collapsible mobileWeekAnnouncements${

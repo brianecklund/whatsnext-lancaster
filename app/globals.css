@@ -68,7 +68,7 @@ img, svg, video, canvas {
   --gutter: 24px;
   --panePadX: 32px;
   --panePadY: 24px;
-  --radius: 18px;
+  --radius: 12px;
   --pill: 999px;
 
   /* Buttons */
@@ -228,7 +228,7 @@ body{
 
 .blogSidebarBlock{
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 12px;
   background: var(--bg);
   padding: 12px;
 }
@@ -259,7 +259,7 @@ body{
   display: flex;
   gap: 12px;
   padding: 12px;
-  border-radius: 18px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: transparent;
   color: inherit;
@@ -346,7 +346,7 @@ body{
   display: flex;
   flex-direction: column;
   min-width: 0;
-  border-radius: 18px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   overflow: hidden;
   color: inherit;
@@ -456,7 +456,7 @@ body{
 
 .blogPostHero{
   margin: 0 0 24px;
-  border-radius: 20px;
+  border-radius: 13px;
   overflow: hidden;
   border: 1px solid var(--border);
 }
@@ -1110,7 +1110,7 @@ a.eventTimeLink:hover{
   display: flex;
   flex-direction: column;
   z-index: 5000;
-  border-radius: 18px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--bg);
   box-shadow: 0 20px 48px rgba(0, 0, 0, 0.18);
@@ -1294,7 +1294,7 @@ a.eventTimeLink:hover{
   align-items:center;
   min-height: 64px;
   padding: 14px 16px;
-  border-radius: 18px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   font-weight: var(--fw-medium);
   font-size: clamp(1.2rem, 4vw, 1.8rem);
@@ -1585,7 +1585,7 @@ a.eventTimeLink:hover{
   gap: 12px;
   padding: 12px;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 12px;
   background: #fff;
   transition: transform 220ms ease, box-shadow 220ms ease, background-color 220ms ease;
 }
@@ -2629,7 +2629,7 @@ a.weeklyOverview{
   width: min(560px, 100%);
   background: #fff;
   border: 1px solid var(--border);
-  border-radius: 22px;
+  border-radius: 15px;
   box-shadow: 0 12px 40px rgba(0,0,0,0.14);
   padding: 14px;
 }
@@ -2837,7 +2837,7 @@ a.weeklyOverview{
 
 .aboutCard{
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 12px;
   background: #fff;
   padding: 16px;
 }
@@ -2891,7 +2891,7 @@ a.weeklyOverview{
   margin-top: 16px;
   padding: 16px;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 12px;
   background: #fff;
 }
 .weekSummaryTitle{
@@ -2959,7 +2959,7 @@ a.weeklyOverview{
   margin-top: 22px;
   padding: 18px;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 12px;
   background: #fff;
 }
 .formRow{
@@ -3015,7 +3015,7 @@ a.weeklyOverview{
 .calloutCard{
   padding: 16px;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 12px;
   background: #fff;
 }
 .calloutTitle{
@@ -3819,7 +3819,7 @@ a:hover{
 }
 
 .showcaseHero{
-  border-radius: 18px;
+  border-radius: 12px;
   overflow: hidden;
   transform-style: preserve-3d;
   transform: perspective(900px) rotateX(var(--tilt-rx, 0deg)) rotateY(var(--tilt-ry, 0deg));
@@ -4358,7 +4358,7 @@ a:hover{
 .filterDropdownInner{
   overflow: hidden;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 12px;
   background: #fff;
   padding: 0 12px;
 }
@@ -4869,7 +4869,7 @@ a:hover{
   min-height: 58px;
   width: 100%;
   padding: 14px 16px;
-  border-radius: 18px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
   box-shadow: var(--shadowSoft);
@@ -5021,7 +5021,7 @@ a:hover{
     width: 100%;
     max-width: 440px;
     margin-top: 8px;
-    border-radius: 22px;
+    border-radius: 15px;
     box-shadow: 0 24px 56px rgba(0, 0, 0, 0.22);
   }
 }
@@ -6731,6 +6731,13 @@ svg:not(:root) {
     box-shadow: 0 8px 18px rgba(0,0,0,0.06);
   }
 
+  /* Match calendar list horizontal inset: sticky chrome has no horizontal padding, so inset the controls row. */
+  body[data-layout="shell"] .leftSticky.splitPageStickySurface > .leftControls{
+    padding-left: var(--panePadX) !important;
+    padding-right: var(--panePadX) !important;
+    box-sizing: border-box;
+  }
+
   .leftControls{
     display: grid !important;
     grid-template-columns: 1fr !important;
@@ -6822,7 +6829,7 @@ svg:not(:root) {
 /* Google Places detail enrichments */
 .locationCover{
   width: 100%;
-  border-radius: 22px;
+  border-radius: 15px;
   overflow: hidden;
   background: var(--panel);
   border: 1px solid var(--border);
@@ -6876,7 +6883,7 @@ svg:not(:root) {
   margin-top: 18px;
   padding: 16px 18px;
   border: 1px solid var(--border);
-  border-radius: 20px;
+  border-radius: 13px;
   background: var(--panel);
 }
 
@@ -6934,7 +6941,7 @@ svg:not(:root) {
 }
 
 .locationGalleryItem{
-  border-radius: 18px;
+  border-radius: 12px;
   overflow: hidden;
   background: var(--panel);
   border: 1px solid var(--border);
@@ -6961,7 +6968,7 @@ svg:not(:root) {
   .locationDataCard{
     margin-top: 14px;
     padding: 14px;
-    border-radius: 18px;
+    border-radius: 12px;
   }
 
   .locationGallery{
@@ -6970,7 +6977,7 @@ svg:not(:root) {
   }
 
   .locationCover{
-    border-radius: 18px;
+    border-radius: 12px;
     margin-bottom: 14px;
   }
 }
@@ -7435,7 +7442,7 @@ body {
 }
 .infoGridItem{
   border:1px solid rgba(0,0,0,0.1);
-  border-radius:18px;
+  border-radius:12px;
   background:rgba(255,255,255,0.72);
   padding:14px;
 }
@@ -7460,7 +7467,7 @@ body {
   gap:12px;
   align-items:start;
   border:1px solid rgba(0,0,0,0.08);
-  border-radius:18px;
+  border-radius:12px;
   padding:12px 14px;
   background:rgba(255,255,255,0.7);
 }
@@ -7484,7 +7491,7 @@ body {
 .mbQuote{
   margin:0;
   padding:18px 20px;
-  border-radius:20px;
+  border-radius:13px;
   background:rgba(255,255,255,0.78);
   border:1px solid rgba(0,0,0,0.1);
 }
@@ -7521,7 +7528,7 @@ body {
 .updatePdfFrame{
   margin-top:18px;
   border:1px solid rgba(0,0,0,0.12);
-  border-radius:22px;
+  border-radius:15px;
   overflow:hidden;
   background:rgba(255,255,255,0.82);
 }
@@ -7760,7 +7767,7 @@ html[data-route-switching="true"] .routeFrame{
 
 .contentCard{
   border: 1px solid var(--border);
-  border-radius: 22px;
+  border-radius: 15px;
   background: color-mix(in srgb, var(--bg) 92%, white 8%);
   padding: 22px;
   box-shadow: var(--shadowSoft);
@@ -8401,7 +8408,7 @@ html[data-route-switching="true"] .routeFrame{
   scroll-snap-align: center;
   text-align: left;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 12px;
   background: #fff;
   overflow: hidden;
   display: flex;
@@ -9940,7 +9947,7 @@ body > *{
 .weekAnnouncements{
   margin-top: 18px;
   border: 1px solid var(--border);
-  border-radius: 18px;
+  border-radius: 12px;
   background: color-mix(in srgb, var(--panel) 62%, transparent);
   padding: 16px;
 }
@@ -10658,15 +10665,6 @@ html[data-theme="night-shift"] .weeklyTitle{
     scroll-snap-align: start;
   }
 
-  .mobileWeeklyOverviewGateSentinel{
-    width: 100%;
-    height: 1px;
-    margin: 0;
-    padding: 0;
-    flex-shrink: 0;
-    pointer-events: none;
-  }
-
   .mobileWeeklyOverviewOpen{
     display: flex;
     flex-direction: column;
@@ -11173,7 +11171,7 @@ body[data-layout="content"] .simplePage{
   max-height: min(70vh, 560px);
   overflow: auto;
   -webkit-overflow-scrolling: touch;
-  border-radius: 18px;
+  border-radius: 12px;
   border: 1px solid var(--border);
   background: var(--bg);
   box-shadow: var(--shadowCard);
@@ -11481,7 +11479,7 @@ body[data-layout="content"] .simplePage{
   width: 100%;
   border: 1px solid #111;
   background: transparent;
-  border-radius: 18px;
+  border-radius: 12px;
   padding: 12px 12px;
   display:flex;
   flex-direction:column;
@@ -12072,6 +12070,40 @@ body[data-layout="content"] .simplePage{
   color: var(--muted);
 }
 
+@media (max-width: 980px){
+  .eventDetailOtherVenue .locationPageUpcomingLink--stacked{
+    flex-direction: column;
+    align-items: stretch;
+    align-content: flex-start;
+    gap: 6px;
+  }
+
+  .eventDetailOtherVenue .locationPageUpcomingLink--stacked .locationPageUpcomingTitle{
+    flex: 0 0 auto;
+    width: 100%;
+  }
+
+  .eventDetailOtherVenue .locationPageUpcomingLink__metaRow{
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+    width: 100%;
+  }
+
+  .eventDetailOtherVenue .locationPageUpcomingLink__metaRow .locationPageUpcomingType{
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--panel) 70%, var(--bg) 30%);
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text);
+  }
+}
+
 .locationPageUpcomingEmpty{
   margin: 0;
   margin-top: 10px;
@@ -12561,10 +12593,11 @@ body[data-layout="content"] .simplePage{
 }
 
 @media (min-width: 981px){
-  .updatesDesktopHubRow{
+  .updatesDesktopHubRow--inScroll{
     width: 100%;
     box-sizing: border-box;
-    margin: 12px 0 10px;
+    margin: 0 0 12px;
+    padding: 0 var(--panePadX);
   }
 }
 
