@@ -195,6 +195,14 @@ body{
   box-sizing: border-box;
 }
 
+@media (max-width: 980px){
+  .blogPageMobileBack{
+    padding: 0 var(--gutter);
+    box-sizing: border-box;
+    margin-bottom: 4px;
+  }
+}
+
 .blogTitle{
   margin: 0;
   font-size: clamp(1.6rem, 1.3rem + 1vw, 2.1rem);
@@ -2100,14 +2108,6 @@ a.weeklyOverview{
   .dayBlock + .dayBlock{
     padding-top: 12px !important;
   }
-
-  body[data-layout="shell"] .weeklySpotlightMobile--directoryHub,
-  body[data-layout="shell"] .weeklySpotlightMobile--updatesHub{
-    margin-top: 10px !important;
-    width: 100% !important;
-    max-width: 100% !important;
-    box-sizing: border-box !important;
-  }
 }
 
 .eventRow{
@@ -2959,6 +2959,12 @@ a.weeklyOverview{
   max-width: 980px;
   margin: 0 auto;
   padding: 40px var(--gutter);
+}
+
+@media (max-width: 980px){
+  .simplePageMobileBack{
+    margin: 0 0 10px 0;
+  }
 }
 .simpleHeroTitle{
   margin: 0;
@@ -6749,13 +6755,6 @@ svg:not(:root) {
     box-shadow: 0 8px 18px rgba(0,0,0,0.06);
   }
 
-  /* Match calendar list horizontal inset: sticky chrome has no horizontal padding, so inset the controls row. */
-  body[data-layout="shell"] .leftSticky.splitPageStickySurface > .leftControls{
-    padding-left: var(--panePadX) !important;
-    padding-right: var(--panePadX) !important;
-    box-sizing: border-box;
-  }
-
   .leftControls{
     display: grid !important;
     grid-template-columns: 1fr !important;
@@ -9205,10 +9204,10 @@ body{
     padding-right: 0 !important;
   }
 
-  /* Match vertical row padding (~10px) on left/right inside list cards */
+  /* Match vertical row padding on left/right inside list cards (extra left inset on small screens) */
   body[data-layout="shell"] .paneLeft .calendarListMonthSwap .eventRow,
   body[data-layout="shell"] .paneLeft .calendarListMonthSwap .updateRow{
-    padding-left: 10px !important;
+    padding-left: 16px !important;
     padding-right: 52px !important;
   }
 
@@ -9805,6 +9804,52 @@ body{
     content: "";
     display: block;
     height: calc(132px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+}
+
+/* Shell mobile: one horizontal inset on tabs / controls / hub rows; no double padding inside leftControls */
+@media (max-width: 980px){
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky{
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    padding-top: 6px !important;
+    padding-bottom: 8px !important;
+    box-sizing: border-box !important;
+  }
+
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls{
+    margin-top: 0 !important;
+    padding-top: 8px !important;
+    padding-bottom: 0 !important;
+    gap: 10px !important;
+  }
+
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls .calendarToolbar,
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls .directoryToolbar,
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls .searchRow{
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls + .weeklySpotlightMobile.weeklySpotlightMobile--stickyRow{
+    margin-top: 10px !important;
+  }
+
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .weeklyOverview--spotlightMobileHalf{
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    box-sizing: border-box !important;
   }
 }
 

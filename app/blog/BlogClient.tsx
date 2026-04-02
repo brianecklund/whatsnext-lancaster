@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import MobileContentBackButton from "@/app/components/MobileContentBackButton";
 import type { BlogPostLite } from "@/lib/blog";
+import { sanitizeInternalReturnPath } from "@/lib/sanitize-internal-path";
 
 function norm(v: string) {
   return (v || "").trim().toLowerCase();
@@ -17,9 +19,12 @@ function formatDateLabel(isoOrYmd: string | null) {
 }
 
 export default function BlogClient({ posts }: { posts: BlogPostLite[] }) {
+  const router = useRouter();
   const sp = useSearchParams();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string | null>(null);
+  const [narrowViewport, setNarrowViewport] = useState(false);
+  const returnPath = useMemo(() => sanitizeInternalReturnPath(sp.get("from")), [sp]);
 
   const categories = useMemo(() => {
     const set = new Set<string>();
@@ -38,6 +43,16 @@ export default function BlogClient({ posts }: { posts: BlogPostLite[] }) {
     const match = categories.find((c) => norm(c) === n);
     if (match) setCat(match);
   }, [sp, categories]);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 980px)");
+    const sync = () => setNarrowViewport(mq.matches);
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
+  const showDirectoryBack = narrowViewport && Boolean(returnPath);
 
   const filtered = useMemo(() => {
     const nq = norm(q);
@@ -59,6 +74,11 @@ export default function BlogClient({ posts }: { posts: BlogPostLite[] }) {
 
   return (
     <main className="contentPage blogPage">
+      {showDirectoryBack && returnPath ? (
+        <div className="blogPageMobileBack">
+          <MobileContentBackButton onBack={() => router.push(returnPath)} label="Back" />
+        </div>
+      ) : null}
       <header className="blogHeader">
         <h1 className="blogTitle">Blog</h1>
         <p className="blogLead muted">Reviews, profiles, and articles from around Lancaster.</p>
