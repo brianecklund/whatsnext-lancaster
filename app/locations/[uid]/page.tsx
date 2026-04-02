@@ -295,18 +295,20 @@ async function LocationUpcomingEventsSection({
     locationName,
   });
 
+  const headingName = (locationName || "this place").trim() || "this place";
+
   if (upcoming.length === 0) {
     return (
       <section className="locationPageVenueCard locationPageUpcoming">
-        <div className="locationPageSectionLabel">Upcoming on the calendar</div>
-        <p className="muted locationPageUpcomingEmpty">No upcoming listings are linked to this place yet.</p>
+        <div className="locationPageSectionLabel">Other upcoming events at {headingName}</div>
+        <p className="muted locationPageUpcomingEmpty">No other upcoming listings are linked to this place yet.</p>
       </section>
     );
   }
 
   return (
     <section className="locationPageVenueCard locationPageUpcoming">
-      <div className="locationPageSectionLabel">Upcoming on the calendar</div>
+      <div className="locationPageSectionLabel">Other upcoming events at {headingName}</div>
       <ul className="locationPageUpcomingList">
         {upcoming.map((e) => {
           const href = `/?event=${encodeURIComponent(e.uid ?? e.id)}`;

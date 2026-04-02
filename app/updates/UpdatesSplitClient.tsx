@@ -307,11 +307,7 @@ export default function UpdatesSplitClient({
   }
 
   function handleMobileUpdateBack() {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-    } else {
-      clearSelected();
-    }
+    clearSelected();
   }
 
   const leftSticky = (
@@ -359,8 +355,8 @@ export default function UpdatesSplitClient({
             <div className="weeklySpotlightMobile weeklySpotlightMobile--stickyRow weeklySpotlightMobile--updatesHub fadeInItem">
               <div className="weeklySpotlightMobile__row">
                 <Link href="/spring" className="weeklyOverview weeklyOverview--spotlightMobileHalf">
-                  <div className="weeklySpotlightMobile__label">Spring Hub</div>
-                  <div className="weeklySpotlightMobile__count">Season highlights</div>
+                  <div className="weeklySpotlightMobile__label weeklySpotlightMobile__label--seasonCaps">This season</div>
+                  <div className="weeklySpotlightMobile__count">Spring Guide</div>
                 </Link>
                 <Link href="/?event=__weekly__" className="weeklyOverview weeklyOverview--spotlightMobileHalf">
                   <div className="weeklySpotlightMobile__label">This week</div>
@@ -407,6 +403,20 @@ export default function UpdatesSplitClient({
             ) : null}
           </div>
         )}
+        {!isMobile ? (
+          <div className="weeklySpotlightPair fadeInItem updatesDesktopHubRow">
+            <Link href="/spring" className="weeklyOverview weeklyOverview--spotlightHalf">
+              <div className="weeklyTitle weeklyTitle--seasonCaps">This season</div>
+              <div className="weeklyCount">Spring Guide</div>
+            </Link>
+            <Link href="/?event=__weekly__" className="weeklyOverview weeklyOverview--spotlightHalf">
+              <div className="weeklyTitle">Weekly Overview</div>
+              <div className="weeklyCount">
+                {thisWeekEventCount} event{thisWeekEventCount === 1 ? "" : "s"} this week
+              </div>
+            </Link>
+          </div>
+        ) : null}
       </div>
     </div>
   );

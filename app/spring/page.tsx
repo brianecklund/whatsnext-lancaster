@@ -1,4 +1,5 @@
 import Link from "next/link";
+import SpringHubBack from "./SpringHubBack";
 
 export const metadata = {
   title: "Spring hub | What’s Next Lancaster",
@@ -8,6 +9,7 @@ export const metadata = {
 export default function SpringHubPage() {
   return (
     <main className="contentPage springHubPage">
+      <SpringHubBack />
       <header className="springHubHero">
         <p className="contentEyebrow">Seasonal hub</p>
         <h1 className="contentHeroTitle">Spring in Lancaster</h1>
@@ -52,7 +54,7 @@ export default function SpringHubPage() {
       </section>
 
       <p className="springHubBack">
-        <Link href="/">← Back to calendar</Link>
+        <Link href="/">← Calendar home</Link>
       </p>
     </main>
   );

@@ -440,11 +440,7 @@ export default function LocationsSplitClient({
   }
 
   function handleMobileListingBack() {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-    } else {
-      clearSelected();
-    }
+    clearSelected();
   }
 
   function setQuery(next: string) {

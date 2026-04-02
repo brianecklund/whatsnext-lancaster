@@ -97,6 +97,17 @@ export default function NewsTickerBar({
     return () => clearCloseTimer();
   }, [clearCloseTimer]);
 
+  useEffect(() => {
+    if (hubOpen || hubClosing) {
+      document.documentElement.dataset.wnlExploreHub = "open";
+    } else {
+      delete document.documentElement.dataset.wnlExploreHub;
+    }
+    return () => {
+      delete document.documentElement.dataset.wnlExploreHub;
+    };
+  }, [hubOpen, hubClosing]);
+
   const renderedItems = useMemo(() => {
     const raw = !items.length
       ? [{ id: "ticker-empty", label: "NEWS", text: "Upcoming Lancaster events and pop-ups.", href: "#" as const }]

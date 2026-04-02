@@ -14,6 +14,7 @@ import {
   startOfDay,
   startOfToday,
 } from "@/lib/calendar";
+import { filterUpcomingEventsForLocation } from "@/lib/location-upcoming-events";
 
 import { createPortal } from "react-dom";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
@@ -46,6 +47,7 @@ type EventLite = {
   locationUrl?: string | null;
   /** Prismic directory location document UID when linked in CMS */
   location_page_uid?: string | null;
+  venue_external_id?: string | null;
 
   website_url?: string | null;
   tickets_url?: string | null;
@@ -548,6 +550,8 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   const pullRefreshingRef = useRef(false);
   const mobileControlsCollapsedRef = useRef(false);
   const weekCategorySentinelRef = useRef<HTMLDivElement | null>(null);
+  const weekOverviewGateSentinelRef = useRef<HTMLDivElement | null>(null);
+  const [mobileWeekOverviewFiltersRevealed, setMobileWeekOverviewFiltersRevealed] = useState(false);
   const [mobileWeekCategorySticky, setMobileWeekCategorySticky] = useState(false);
   const [mobileWeekCategorySheetOpen, setMobileWeekCategorySheetOpen] = useState(false);
   const [mobileWeekPickerSheetOpen, setMobileWeekPickerSheetOpen] = useState(false);
@@ -999,7 +1003,8 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     effectiveIsMobile &&
     mobileSpotlightOpen &&
     !!selectedWeekBucket &&
-    selectedDisplayKey !== GOING_NOW_KEY;
+    selectedDisplayKey !== GOING_NOW_KEY &&
+    mobileWeekOverviewFiltersRevealed;
 
   const filteredWeekEvents = useMemo(() => {
     if (weekCategorySelection.size === 0) return weekEvents;
@@ -1050,6 +1055,7 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   useEffect(() => {
     setWeekCategorySelection(new Set());
     setPinnedAnnouncementsExpanded(false);
+    setMobileWeekOverviewFiltersRevealed(false);
   }, [selectedWeekBucket?.key]);
 
   const selectAllWeekCategories = () => setWeekCategorySelection(new Set());
@@ -1131,6 +1137,19 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
 
     return byUid || byId || null;
   }, [filteredEvents, selectedDisplayKey]);
+
+  const otherVenueEvents = useMemo(() => {
+    if (!selectedEvent) return [];
+    return filterUpcomingEventsForLocation(filteredEvents, {
+      locationUid: selectedEvent.location_page_uid?.trim() || null,
+      venueExternalId: selectedEvent.venue_external_id?.trim() || null,
+      locationName: selectedEvent.locationName?.trim() || null,
+      excludeEventId: selectedEvent.id,
+      excludeEventUid: selectedEvent.uid ?? null,
+    });
+  }, [filteredEvents, selectedEvent]);
+
+  const otherVenueHeading = (selectedEvent?.locationName ?? "").trim() || "this venue";
 
   useEffect(() => {
     setDesktopListHoverEvent(null);
@@ -1217,6 +1236,51 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
 
   const mobileDetailOpen =
     effectiveIsMobile && (!!selectedEvent || mobileSpotlightOpen);
+
+  useEffect(() => {
+    if (!effectiveIsMobile || !selectedWeekBucket || selectedDisplayKey === GOING_NOW_KEY) return;
+    let io: IntersectionObserver | null = null;
+    let raf = 0;
+    let cancelled = false;
+    let attempts = 0;
+
+    const arm = () => {
+      if (cancelled) return;
+      const root = mobileDetailScrollRef.current;
+      const target = weekOverviewGateSentinelRef.current;
+      if (!root || !target) {
+        if (attempts++ < 120) raf = window.requestAnimationFrame(arm);
+        return;
+      }
+      io = new IntersectionObserver(
+        ([e]) => {
+          if (!e.isIntersecting) setMobileWeekOverviewFiltersRevealed(true);
+        },
+        { root, threshold: 0 },
+      );
+      io.observe(target);
+    };
+
+    raf = window.requestAnimationFrame(arm);
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(raf);
+      io?.disconnect();
+    };
+  }, [effectiveIsMobile, selectedWeekBucket?.key, selectedDisplayKey, mobileDetailOpen, mobileSpotlightOpen]);
+
+  useEffect(() => {
+    if (!mobileDetailOpen || !selectedWeekBucket || mobileWeekOverviewFiltersRevealed) return;
+    const root = mobileDetailScrollRef.current;
+    if (!root) return;
+    const check = () => {
+      if (root.scrollHeight <= root.clientHeight + 12) {
+        setMobileWeekOverviewFiltersRevealed(true);
+      }
+    };
+    const id = window.requestAnimationFrame(check);
+    return () => window.cancelAnimationFrame(id);
+  }, [mobileDetailOpen, selectedWeekBucket?.key, mobileWeekOverviewFiltersRevealed]);
 
   useEffect(() => {
     if (!effectiveIsMobile || !mobileDetailOpen) return;
@@ -1396,11 +1460,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
   }
 
   function handleMobileDetailBack() {
-    if (typeof window !== "undefined" && window.history.length > 1) {
-      router.back();
-    } else {
-      clearSelected();
-    }
+    clearSelected();
   }
 
   function openSelected(key: string) {
@@ -2464,6 +2524,36 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       </a>
                     </div>
                   ) : null}
+                  {otherVenueEvents.length ? (
+                    <section className="eventDetailOtherVenue" aria-label={`Other upcoming events at ${otherVenueHeading}`}>
+                      <div className="eventDetailOtherVenue__label">Other upcoming events at {otherVenueHeading}</div>
+                      <ul className="locationPageUpcomingList eventDetailOtherVenue__list">
+                        {otherVenueEvents.map((e) => {
+                          const href = `/?event=${encodeURIComponent(e.uid ?? e.id)}`;
+                          const d = safeDateFromEvent(e);
+                          const time =
+                            d != null
+                              ? d.toLocaleString(undefined, {
+                                  weekday: "short",
+                                  month: "short",
+                                  day: "numeric",
+                                  hour: "numeric",
+                                  minute: "2-digit",
+                                })
+                              : "";
+                          return (
+                            <li key={e.id}>
+                              <Link className="locationPageUpcomingLink" href={href}>
+                                <span className="locationPageUpcomingTitle">{e.title || "Event"}</span>
+                                {time ? <span className="locationPageUpcomingMeta muted">{time}</span> : null}
+                                {e.event_type ? <span className="locationPageUpcomingType">{e.event_type}</span> : null}
+                              </Link>
+                            </li>
+                          );
+                        })}
+                      </ul>
+                    </section>
+                  ) : null}
                 </div>
               )}
             </div>
@@ -2717,6 +2807,36 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ) : null}
                 </div>
               ) : null}
+              {otherVenueEvents.length ? (
+                <section className="eventDetailOtherVenue" aria-label={`Other upcoming events at ${otherVenueHeading}`}>
+                  <div className="eventDetailOtherVenue__label">Other upcoming events at {otherVenueHeading}</div>
+                  <ul className="locationPageUpcomingList eventDetailOtherVenue__list">
+                    {otherVenueEvents.map((e) => {
+                      const href = `/?event=${encodeURIComponent(e.uid ?? e.id)}`;
+                      const d = safeDateFromEvent(e);
+                      const time =
+                        d != null
+                          ? d.toLocaleString(undefined, {
+                              weekday: "short",
+                              month: "short",
+                              day: "numeric",
+                              hour: "numeric",
+                              minute: "2-digit",
+                            })
+                          : "";
+                      return (
+                        <li key={e.id}>
+                          <Link className="locationPageUpcomingLink" href={href}>
+                            <span className="locationPageUpcomingTitle">{e.title || "Event"}</span>
+                            {time ? <span className="locationPageUpcomingMeta muted">{time}</span> : null}
+                            {e.event_type ? <span className="locationPageUpcomingType">{e.event_type}</span> : null}
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </section>
+              ) : null}
             </div>
             </>
           ) : selectedDisplayKey === GOING_NOW_KEY ? (
@@ -2815,62 +2935,73 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               <div className="mobileListingContentBackWrap">
                 <MobileContentBackButton onBack={handleMobileDetailBack} />
               </div>
-              <div className="weekSelectorRail weekSelectorRailMobile fadeInItem" style={{ animationDelay: "140ms" }}>
-                {weekBuckets.map((bucket) => (
-                  <button
-                    key={bucket.key}
-                    type="button"
-                    className="weekSelectorCard"
-                    data-active={selectedWeekBucket.key === bucket.key ? "true" : "false"}
-                    onClick={() => openWeek(bucket.key)}
-                  >
-                    <div className="weekSelectorEyebrow">{bucket.label}</div>
-                    <div className="weekSelectorRange">{bucket.rangeLabel}</div>
-                    <div className="weekSelectorMeta">{bucket.events.length} event{bucket.events.length === 1 ? "" : "s"}</div>
-                  </button>
-                ))}
-              </div>
 
-              <div className="weekSummary fadeInItem" style={{ animationDelay: "180ms" }}>
-                <div className="weekSummaryTopline">
-                  <div>
-                    <div className="rightDayLabel">Weekly Overview</div>
-                    <h3 className="weekSummaryTitle">{selectedWeekBucket.label}</h3>
+              <div className="mobileWeeklyOverviewIntro fadeInItem" style={{ animationDelay: "120ms" }}>
+                <div className="weekSummary">
+                  <div className="weekSummaryTopline">
+                    <div>
+                      <div className="rightDayLabel">Weekly Overview</div>
+                      <h3 className="weekSummaryTitle">{selectedWeekBucket.label}</h3>
+                    </div>
+                    <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
                   </div>
-                  <div className="weekSummaryRangePill">{selectedWeekBucket.rangeLabel}</div>
                 </div>
-
-                <div className="weekCategoryChipGrid weekCategoryChipGrid--mobile" role="group" aria-label="Filter events by category (choose one or more)">
-                  <button
-                    type="button"
-                    aria-pressed={weekCategorySelection.size === 0}
-                    className="weekCategoryChip"
-                    data-active={weekCategorySelection.size === 0 ? "true" : "false"}
-                    onClick={selectAllWeekCategories}
-                  >
-                    <span className="weekCategoryChip__label">All</span>
-                    <span className="weekCategoryChip__count">{selectedWeekBucket.events.length}</span>
-                  </button>
-                  {weekCategoryOptions.map((category) => {
-                    const isActive = weekCategorySelection.has(category);
-                    const count = selectedWeekBucket.insights[category] ?? 0;
-                    return (
-                      <button
-                        key={category}
-                        type="button"
-                        aria-pressed={isActive}
-                        className="weekCategoryChip"
-                        data-active={isActive ? "true" : "false"}
-                        onClick={() => toggleWeekCategory(category)}
-                      >
-                        <span className="weekCategoryChip__label">{category}</span>
-                        <span className="weekCategoryChip__count">{count}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div ref={weekCategorySentinelRef} className="weekCategoryStickySentinel" aria-hidden />
               </div>
+
+              <div ref={weekOverviewGateSentinelRef} className="mobileWeeklyOverviewGateSentinel" aria-hidden />
+
+              {mobileWeekOverviewFiltersRevealed ? (
+                <>
+                  <div className="weekSelectorRail weekSelectorRailMobile fadeInItem" style={{ animationDelay: "40ms" }}>
+                    {weekBuckets.map((bucket) => (
+                      <button
+                        key={bucket.key}
+                        type="button"
+                        className="weekSelectorCard"
+                        data-active={selectedWeekBucket.key === bucket.key ? "true" : "false"}
+                        onClick={() => openWeek(bucket.key)}
+                      >
+                        <div className="weekSelectorEyebrow">{bucket.label}</div>
+                        <div className="weekSelectorRange">{bucket.rangeLabel}</div>
+                        <div className="weekSelectorMeta">{bucket.events.length} event{bucket.events.length === 1 ? "" : "s"}</div>
+                      </button>
+                    ))}
+                  </div>
+
+                  <div className="weekSummary fadeInItem" style={{ animationDelay: "80ms" }}>
+                    <div className="weekCategoryChipGrid weekCategoryChipGrid--mobile" role="group" aria-label="Filter events by category (choose one or more)">
+                      <button
+                        type="button"
+                        aria-pressed={weekCategorySelection.size === 0}
+                        className="weekCategoryChip"
+                        data-active={weekCategorySelection.size === 0 ? "true" : "false"}
+                        onClick={selectAllWeekCategories}
+                      >
+                        <span className="weekCategoryChip__label">All</span>
+                        <span className="weekCategoryChip__count">{selectedWeekBucket.events.length}</span>
+                      </button>
+                      {weekCategoryOptions.map((category) => {
+                        const isActive = weekCategorySelection.has(category);
+                        const count = selectedWeekBucket.insights[category] ?? 0;
+                        return (
+                          <button
+                            key={category}
+                            type="button"
+                            aria-pressed={isActive}
+                            className="weekCategoryChip"
+                            data-active={isActive ? "true" : "false"}
+                            onClick={() => toggleWeekCategory(category)}
+                          >
+                            <span className="weekCategoryChip__label">{category}</span>
+                            <span className="weekCategoryChip__count">{count}</span>
+                          </button>
+                        );
+                      })}
+                    </div>
+                    <div ref={weekCategorySentinelRef} className="weekCategoryStickySentinel" aria-hidden />
+                  </div>
+                </>
+              ) : null}
 
               <section
                 className={`weekAnnouncements weekAnnouncements--strip weekAnnouncements--collapsible mobileWeekAnnouncements${
