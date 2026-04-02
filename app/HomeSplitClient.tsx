@@ -2150,7 +2150,8 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
 
 
               {showListStyleRightPane && selectedDisplayKey === GOING_NOW_KEY ? (
-                <div className="rightHeader weeklyOverviewLanding goingNowRight weeklyOverviewRevealGroup">
+                <div className="rightHeader weeklyOverviewLanding goingNowRight">
+                  <div className="weeklyOverviewRevealGroup">
                   <div className="goingNowRight__top">
                     <div className="rightDayLabel">Going on now</div>
                     <div className="weekSummaryRangePill">{liveEventsNow.length} live</div>
@@ -2191,9 +2192,11 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     </div>
                     )
                   )}
+                  </div>
                 </div>
               ) : showListStyleRightPane && selectedWeekBucket ? (
-                <div className="rightHeader weeklyOverviewLanding weeklyOverviewRevealGroup">
+                <div className="rightHeader weeklyOverviewLanding">
+                  <div className="weeklyOverviewRevealGroup">
                   <div className="rightDayLabel">Weekly Overview</div>
 
                   <div className="weekSelectorRail">
@@ -2384,6 +2387,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       </div>
                     </div>
                   )}
+                  </div>
                 </div>
               ) : !selectedEvent ? (
                 <div className="dayRight">
