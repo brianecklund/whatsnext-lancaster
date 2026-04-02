@@ -13559,19 +13559,19 @@ button.weeklyVenueNamePeekBtn{
 }
 
 /* Updates detail panel typography */
-.detailCard.detailFlash .updateDetailTitleRow{
+.detailCard .detailFlash .updateDetailTitleRow{
   margin-bottom: 14px;
 }
 
-.detailCard.detailFlash .detailMeta{
+.detailCard .detailFlash .detailMeta{
   margin-top: 0;
 }
 
-.detailCard.detailFlash .tagRow{
+.detailCard .detailFlash .tagRow{
   margin-top: 14px !important;
   margin-bottom: 18px;
 }
 
-.detailCard.detailFlash .detailDesc{
+.detailCard .detailFlash .detailDesc{
   margin-top: 4px;
 }
