@@ -546,10 +546,6 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   const [pullRefreshing, setPullRefreshing] = useState(false);
   const pullDistanceRef = useRef(0);
   const pullRefreshingRef = useRef(false);
-  const mobileControlsInitRef = useRef(false);
-  const lastScrollTopRef = useRef(0);
-  /** After attaching the scroll listener, ignore the first in-bounds pass so restored scrollTop does not instantly collapse controls. */
-  const mobileScrollCollapsePrimedRef = useRef(false);
   const mobileControlsCollapsedRef = useRef(false);
   const weekCategorySentinelRef = useRef<HTMLDivElement | null>(null);
   const [mobileWeekCategorySticky, setMobileWeekCategorySticky] = useState(false);
@@ -616,48 +612,8 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     if (!effectiveIsMobile) {
       setMobileControlsCollapsed(false);
       setMobileControlsPinnedOpen(false);
-      mobileControlsInitRef.current = false;
-      lastScrollTopRef.current = 0;
-      mobileScrollCollapsePrimedRef.current = false;
-      return;
     }
-
-    if (!mobileControlsInitRef.current) {
-      setMobileControlsCollapsed(false);
-      setMobileControlsPinnedOpen(false);
-      mobileControlsInitRef.current = true;
-    }
-
-    const listEl = listRef.current;
-    if (!listEl) return;
-
-    mobileScrollCollapsePrimedRef.current = false;
-
-    const syncFromScroll = () => {
-      const st = Math.max(0, listEl.scrollTop || 0);
-      const prevTop = lastScrollTopRef.current;
-      lastScrollTopRef.current = st;
-
-      if (mobileControlsPinnedOpen || mobileSpotlightOpen) return;
-
-      if (st <= 12) {
-        setMobileControlsCollapsed(false);
-        mobileScrollCollapsePrimedRef.current = true;
-        return;
-      }
-
-      if (!mobileScrollCollapsePrimedRef.current) {
-        mobileScrollCollapsePrimedRef.current = true;
-        return;
-      }
-
-      if (st - prevTop > 10) setMobileControlsCollapsed(true);
-    };
-
-    syncFromScroll();
-    listEl.addEventListener('scroll', syncFromScroll, { passive: true });
-    return () => listEl.removeEventListener('scroll', syncFromScroll);
-  }, [effectiveIsMobile, mobileControlsPinnedOpen, mobileSpotlightOpen]);
+  }, [effectiveIsMobile]);
 
   useEffect(() => {
     if (!effectiveIsMobile || !mobileSpotlightOpen) return;
@@ -1635,7 +1591,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         className={`viewBtn iconBtn${!effectiveIsMobile ? " squareIconBtn" : ""}`}
                         aria-label={
                           viewMode === "clock"
-                            ? "Switch to list view"
+                            ? "Switch to month calendar view"
                             : viewMode === "month"
                               ? "Switch to list view"
                               : "Switch to calendar view"
@@ -1643,7 +1599,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         data-active={viewMode === "month" ? "true" : "false"}
                         onClick={() => {
                           if (viewMode === "clock") {
-                            setParams({ view: "list", event: null });
+                            clearSelected();
+                            setFilterOpen(false);
+                            setParams({ view: "month", event: null });
                             return;
                           }
                           clearSelected();
@@ -1653,7 +1611,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       >
                         <ToolbarIcon src="/icons/calendar-alt.svg" alt="Calendar view" />
                         {effectiveIsMobile ? (
-                          <span>{viewMode === "clock" ? "List" : viewMode === "month" ? "List" : "Calendar"}</span>
+                          <span>{viewMode === "clock" ? "Calendar" : viewMode === "month" ? "List" : "Calendar"}</span>
                         ) : null}
                       </button>
                       <button
@@ -2958,7 +2916,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
               </section>
 
               <div className="weeklyLanding fadeInItem" style={{ animationDelay: "260ms" }}>
-                {filteredWeekEvents.length ? (
+                {filteredWeekEvents.length && !effectiveIsMobile ? (
                   <WeeklyPreviewRail itemCount={filteredWeekEvents.length}>
                     {filteredWeekEvents.map((e) => {
                       const title = e.title || "Untitled event";

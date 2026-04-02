@@ -15,6 +15,7 @@ import {
   updateKindLabel,
   type UpdateKind,
 } from "@/lib/updateDisplay";
+import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
 
@@ -42,6 +43,8 @@ type Props = {
   currentSection?: "calendar" | "directory" | "updates";
   onNavigateSection?: (section: "calendar" | "directory" | "updates") => void;
   basePath?: string;
+  /** Events in the current calendar week (Sun–Sat, local). */
+  thisWeekEventCount?: number;
 };
 
 function norm(v: string) {
@@ -129,7 +132,14 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
   );
 }
 
-export default function UpdatesSplitClient({ updates, newsHubSeason, currentSection, onNavigateSection, basePath = "/updates" }: Props) {
+export default function UpdatesSplitClient({
+  updates,
+  newsHubSeason,
+  currentSection,
+  onNavigateSection,
+  basePath = "/updates",
+  thisWeekEventCount = 0,
+}: Props) {
   useSmoothWheel(".scroll");
   const router = useRouter();
   const sp = useSearchParams();
@@ -319,32 +329,51 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
 
       <div className="leftControls">
         {isMobile ? (
-          <div className="searchRow updatesSearchRowMobile">
-            <input
-              className="searchInput"
-              placeholder="Search updates…"
-              value={q}
-              onChange={(e) => setParam("q", e.target.value)}
-              aria-label="Search updates"
-            />
-            <button
-              type="button"
-              className="filterBtn"
-              data-active={filterOpen || hasActiveTagFilters ? "true" : "false"}
-              aria-label={filterOpen ? "Close filters" : "Open filters"}
-              aria-expanded={filterOpen ? "true" : "false"}
-              onClick={() => setFilterOpen((v) => !v)}
-            >
-              <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
-              <span>
-                {hasActiveTagFilters
-                  ? selectedTags.length === 1
-                    ? `Filter: ${selectedTags[0]}`
-                    : `Filters (${selectedTags.length})`
-                  : "Filter"}
-              </span>
-            </button>
-          </div>
+          <>
+            <div className="searchRow updatesSearchRowMobile">
+              <input
+                className="searchInput"
+                placeholder="Search updates…"
+                value={q}
+                onChange={(e) => setParam("q", e.target.value)}
+                aria-label="Search updates"
+              />
+              <button
+                type="button"
+                className="filterBtn"
+                data-active={filterOpen || hasActiveTagFilters ? "true" : "false"}
+                aria-label={filterOpen ? "Close filters" : "Open filters"}
+                aria-expanded={filterOpen ? "true" : "false"}
+                onClick={() => setFilterOpen((v) => !v)}
+              >
+                <ToolbarIcon src="/icons/filter.svg" alt="Filter" />
+                <span>
+                  {hasActiveTagFilters
+                    ? selectedTags.length === 1
+                      ? `Filter: ${selectedTags[0]}`
+                      : `Filters (${selectedTags.length})`
+                    : "Filter"}
+                </span>
+              </button>
+            </div>
+            <div className="weeklySpotlightMobile weeklySpotlightMobile--stickyRow weeklySpotlightMobile--updatesHub fadeInItem">
+              <div className="weeklySpotlightMobile__row">
+                <Link href="/spring" className="weeklyOverview weeklyOverview--spotlightMobileHalf">
+                  <div className="weeklySpotlightMobile__label">Spring Hub</div>
+                  <div className="weeklySpotlightMobile__count">Season highlights</div>
+                </Link>
+                <Link href="/?event=__weekly__" className="weeklyOverview weeklyOverview--spotlightMobileHalf">
+                  <div className="weeklySpotlightMobile__label">This week</div>
+                  <div className="weeklySpotlightMobile__count">
+                    {(() => {
+                      const n = thisWeekEventCount;
+                      return `${n} ${n === 1 ? "event" : "events"}`;
+                    })()}
+                  </div>
+                </Link>
+              </div>
+            </div>
+          </>
         ) : (
           <div className="searchRow directorySearchRowDesktop">
             <input
@@ -444,6 +473,7 @@ export default function UpdatesSplitClient({ updates, newsHubSeason, currentSect
           updatesHref={basePath}
           seasonLandingHref="/spring"
           seasonContent={newsHubSeason}
+          mobileExploreOnly={isMobile}
           desktopIntroExplore
         />
       ) : undefined}

@@ -57,6 +57,35 @@ export function eventEndedEarlierToday<T extends CalendarEventLite>(e: T, eventD
   return dayKey(eventDay) === dayKey(new Date(now));
 }
 
+export function startOfWeekSundayFromDate(d: Date): Date {
+  const x = startOfDay(d);
+  const offset = x.getDay();
+  x.setDate(x.getDate() - offset);
+  return x;
+}
+
+export function endOfWeekSaturdayFromDate(d: Date): Date {
+  const start = startOfWeekSundayFromDate(d);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  end.setHours(23, 59, 59, 999);
+  return end;
+}
+
+/** Count events whose start falls within the current calendar week (Sun–Sat, local). */
+export function countEventsInCurrentWeek<T extends CalendarEventLite>(events: T[]): number {
+  const now = new Date();
+  const start = startOfWeekSundayFromDate(now);
+  const end = endOfWeekSaturdayFromDate(now);
+  let n = 0;
+  for (const e of events) {
+    const d = safeDateFromEvent(e);
+    if (!d) continue;
+    if (d.getTime() >= start.getTime() && d.getTime() <= end.getTime()) n++;
+  }
+  return n;
+}
+
 export function nearestDayWithEvents<T extends CalendarEventLite>(events: T[]): Date {
   const today = startOfToday();
   const dated = events

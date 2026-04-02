@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import HomeSplitClient from "@/app/HomeSplitClient";
 import LocationsSplitClient from "@/app/locations/LocationsSplitClient";
 import UpdatesSplitClient, { type UpdateLite } from "@/app/updates/UpdatesSplitClient";
+import { countEventsInCurrentWeek } from "@/lib/calendar";
 import type { EventLite, LocationLite } from "@/lib/types";
 import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
 
@@ -241,6 +242,8 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
     }, 120);
   }
 
+  const thisWeekEventCount = useMemo(() => countEventsInCurrentWeek(events), [events]);
+
   const sharedProps = useMemo(
     () => ({
       currentSection: activeSection,
@@ -262,7 +265,13 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
         ) : renderedSection === "directory" ? (
           <LocationsSplitClient locations={locations} updates={updates} basePath="/locations" newsHubSeason={newsHubSeason} {...sharedProps} />
         ) : (
-          <UpdatesSplitClient updates={updates} basePath="/updates" newsHubSeason={newsHubSeason} {...sharedProps} />
+          <UpdatesSplitClient
+            updates={updates}
+            basePath="/updates"
+            newsHubSeason={newsHubSeason}
+            thisWeekEventCount={thisWeekEventCount}
+            {...sharedProps}
+          />
         )}
       </div>
     </div>

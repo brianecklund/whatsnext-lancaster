@@ -1886,6 +1886,12 @@ a.eventTimeLink:hover{
 .weeklyOverview[data-active="true"]{
   box-shadow: 0 0 0 2px var(--accent) inset;
 }
+
+a.weeklyOverview{
+  text-decoration: none;
+  color: inherit;
+  box-sizing: border-box;
+}
 .weeklyTitle{
   font-weight: var(--fw-medium);
   font-size: var(--fs-meta);
@@ -2036,6 +2042,10 @@ a.eventTimeLink:hover{
     min-width: 0 !important;
     max-width: none !important;
     box-sizing: border-box;
+  }
+
+  .weeklySpotlightMobile--updatesHub{
+    margin-top: 8px;
   }
 
 }
@@ -10630,22 +10640,22 @@ html[data-theme="night-shift"] .weeklyTitle{
 
 @media (max-width: 980px){
   .weekSelectorRailMobile{
-    display: flex !important;
-    grid-template-columns: none !important;
-    overflow-x: auto;
-    overflow-y: hidden;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    overflow-x: visible !important;
+    overflow-y: visible !important;
     gap: 10px;
     margin-top: 0;
     margin-bottom: 6px;
-    padding: 0 0 4px 0;
-    scroll-snap-type: x proximity;
-    -webkit-overflow-scrolling: touch;
+    padding: 0;
+    scroll-snap-type: none;
   }
 
   .weekSelectorRailMobile .weekSelectorCard{
-    flex: 0 0 min(240px, calc(100vw - 56px));
+    flex: initial !important;
+    width: auto !important;
     min-width: 0;
-    scroll-snap-align: start;
+    scroll-snap-align: none;
   }
 
   .mobileWeeklyOverviewOpen{
@@ -10667,6 +10677,85 @@ html[data-theme="night-shift"] .weeklyTitle{
   .mobileWeeklyOverviewOpen .weekSummaryCardButton,
   .mobileWeeklyOverviewOpen .weekCategoryFilterBtn{
     min-height: 64px;
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyCards,
+  .mobileGoingNowOpen .weeklyCards{
+    gap: 10px;
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyDayGroup{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyCondensedDayTitle{
+    margin: 0 0 2px;
+    font-size: 0.76rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyCard,
+  .mobileGoingNowOpen .weeklyCard{
+    grid-template-columns: 76px minmax(0, 1fr);
+    gap: 8px;
+    padding: 8px 10px;
+    border-radius: 14px;
+    align-items: start;
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyCardMedia,
+  .mobileGoingNowOpen .weeklyCardMedia{
+    align-self: start;
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyCardMedia .media16x9,
+  .mobileGoingNowOpen .weeklyCardMedia .media16x9{
+    aspect-ratio: 1;
+    max-height: 76px;
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyCardTitle,
+  .mobileGoingNowOpen .weeklyCardTitle{
+    font-size: 0.95rem;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyCardTime,
+  .mobileGoingNowOpen .weeklyCardTime{
+    font-size: 0.8rem;
+    margin-top: 1px;
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyCardDesc,
+  .mobileGoingNowOpen .weeklyCardDesc{
+    font-size: 0.82rem;
+    line-height: 1.35;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyCardMetaRow,
+  .mobileGoingNowOpen .weeklyCardMetaRow{
+    font-size: 0.76rem;
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyCardTop,
+  .mobileGoingNowOpen .weeklyCardTop{
+    gap: 6px;
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyMiniBtn,
+  .mobileGoingNowOpen .weeklyMiniBtn{
+    height: 28px;
+    padding: 0 8px;
+    font-size: 0.72rem;
   }
 }
 
@@ -11895,6 +11984,36 @@ body[data-layout="content"] .simplePage{
 .newsBar__exploreOnlyChev{
   font-size: 1rem;
   line-height: 1;
+}
+
+@media (max-width: 980px){
+  .newsBar--exploreOnly{
+    min-height: 0;
+  }
+
+  .newsBar__exploreOnlyBtn{
+    min-height: 0;
+    padding: 5px var(--panePadX) 7px;
+    gap: 5px;
+    font-size: 11px;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+
+  .newsBar__exploreOnlyLabel{
+    font-size: 11px;
+    line-height: 1.2;
+    font-weight: 650;
+    letter-spacing: 0.04em;
+    color: var(--muted);
+  }
+
+  .newsBar__exploreOnlyChev{
+    font-size: 11px;
+    line-height: 1;
+    opacity: 0.75;
+  }
 }
 
 .locationPageUpcomingList{
