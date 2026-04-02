@@ -957,7 +957,8 @@ function LocationDetail({ location }: { location: LocationRow }) {
   const rating = typeof placeDetails?.rating === "number" ? placeDetails.rating : location.rating;
   const photoAttributions = placeDetails?.photoAttributions?.length ? placeDetails.photoAttributions : [];
   return (
-    <div key={detailFlashKey} className="detailCard detailFlash">
+    <div className="detailCard">
+      <div key={detailFlashKey} className="detailFlash">
       {coverImageUrl ? (
         <div className="locationCover locationCover--detail fadeInItem" style={{ animationDelay: "160ms" }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1089,6 +1090,7 @@ function LocationDetail({ location }: { location: LocationRow }) {
           ) : null}
         </div>
       ) : null}
+      </div>
     </div>
   );
 }

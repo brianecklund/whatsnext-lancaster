@@ -69,7 +69,8 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
   const menuSampleCta = /sample menu/i.test(linkLabel);
 
   return (
-    <div key={detailFlashKey} className="detailCard detailFlash">
+    <div className="detailCard">
+      <div key={detailFlashKey} className="detailFlash">
       <div className="detailHeader">
         <div>
           <div className="updateDetailTitleRow fadeInItem" style={{ animationDelay: "260ms" }}>
@@ -123,6 +124,7 @@ function UpdateDetail({ update }: { update: UpdateLite }) {
           </a>
         </div>
       ) : null}
+      </div>
     </div>
   );
 }
