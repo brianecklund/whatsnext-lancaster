@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import type { BlogPostLite } from "@/lib/blog";
 
 function norm(v: string) {
@@ -16,6 +17,7 @@ function formatDateLabel(isoOrYmd: string | null) {
 }
 
 export default function BlogClient({ posts }: { posts: BlogPostLite[] }) {
+  const sp = useSearchParams();
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string | null>(null);
 
@@ -27,6 +29,15 @@ export default function BlogClient({ posts }: { posts: BlogPostLite[] }) {
     }
     return Array.from(set).sort((a, b) => a.localeCompare(b));
   }, [posts]);
+
+  useEffect(() => {
+    const raw = sp.get("cat") ?? sp.get("category");
+    if (!raw) return;
+    const decoded = decodeURIComponent(raw);
+    const n = norm(decoded);
+    const match = categories.find((c) => norm(c) === n);
+    if (match) setCat(match);
+  }, [sp, categories]);
 
   const filtered = useMemo(() => {
     const nq = norm(q);

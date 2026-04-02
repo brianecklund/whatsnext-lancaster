@@ -7,6 +7,7 @@ import SegmentedControl from "@/app/components/SegmentedControl";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import Link from "next/link";
 import SplitPageLayout from "@/app/components/SplitPageLayout";
 import MobileContentBackButton from "@/app/components/MobileContentBackButton";
 import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
@@ -17,6 +18,8 @@ import { mergeDirectoryCategories } from "@/lib/directoryCategories";
 function normalize(v?: string | null) {
   return (v || "").toLowerCase().trim();
 }
+
+const DIRECTORY_MEMBER_BLOGS_HREF = `/blog?cat=${encodeURIComponent("member blogs")}`;
 
 function getLetter(value?: string | null) {
   const first = (value || "").trim().charAt(0).toUpperCase();
@@ -645,6 +648,19 @@ export default function LocationsSplitClient({
       : `Filters (${selectedCats.length})`
     : "Filter";
 
+  const directoryDesktopHubRow = !effectiveIsMobile ? (
+    <div className="weeklySpotlightPair fadeInItem directoryDesktopHubRow--inScroll">
+      <Link href={DIRECTORY_MEMBER_BLOGS_HREF} className="weeklyOverview weeklyOverview--spotlightHalf">
+        <div className="weeklyTitle">Learn More</div>
+        <div className="weeklyCount">Read Our Blog</div>
+      </Link>
+      <Link href="/contact" className="weeklyOverview weeklyOverview--spotlightHalf">
+        <div className="weeklyTitle">Partnerships</div>
+        <div className="weeklyCount">Learn More</div>
+      </Link>
+    </div>
+  ) : null;
+
   return (
     <SplitPageLayout
       tagline="A directory of places in Lancaster to explore."
@@ -766,6 +782,21 @@ export default function LocationsSplitClient({
                   )}
                 </div>
 
+                {effectiveIsMobile ? (
+                  <div className="weeklySpotlightMobile weeklySpotlightMobile--stickyRow weeklySpotlightMobile--directoryHub fadeInItem">
+                    <div className="weeklySpotlightMobile__row">
+                      <Link href={DIRECTORY_MEMBER_BLOGS_HREF} className="weeklyOverview weeklyOverview--spotlightMobileHalf">
+                        <div className="weeklySpotlightMobile__label">Learn More</div>
+                        <div className="weeklySpotlightMobile__count">Read Our Blog</div>
+                      </Link>
+                      <Link href="/contact" className="weeklyOverview weeklyOverview--spotlightMobileHalf">
+                        <div className="weeklySpotlightMobile__label">Partnerships</div>
+                        <div className="weeklySpotlightMobile__count">Learn More</div>
+                      </Link>
+                    </div>
+                  </div>
+                ) : null}
+
                 <div
                   className={`directoryToolbar${effectiveIsMobile ? " directoryToolbarMobile" : ""}${
                     alphabetOpen ? " directoryToolbar--alphabetOpen" : ""
@@ -793,6 +824,8 @@ export default function LocationsSplitClient({
                 </div>
               </div>
             </div>
+
+            {directoryDesktopHubRow}
 
             {filterOpen ? (
               <div className={`filterOverlay filterOverlay--pane${effectiveIsMobile ? " filterOverlay--mobilePane" : ""}`} role="dialog" aria-modal="true" aria-label="Directory filters" onClick={() => setFilterOpen(false)}>

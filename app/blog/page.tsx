@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { createClient } from "@/prismicio";
 import BlogClient from "@/app/blog/BlogClient";
 import { blogPostLiteFromPrismicDoc, mergeBlogPostsForList, type BlogPostLite } from "@/lib/blog";
@@ -20,6 +21,10 @@ export default async function BlogPage() {
 
   posts = mergeBlogPostsForList(posts, listDemoBlogLites());
 
-  return <BlogClient posts={posts} />;
+  return (
+    <Suspense fallback={<main className="contentPage blogPage" aria-busy="true" />}>
+      <BlogClient posts={posts} />
+    </Suspense>
+  );
 }
 
