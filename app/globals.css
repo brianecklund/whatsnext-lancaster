@@ -9809,6 +9809,14 @@ body{
 
 /* Shell mobile: one horizontal inset on tabs / controls / hub rows; no double padding inside leftControls */
 @media (max-width: 980px){
+  /*
+   * Single vertical rhythm for calendar / directory / updates:
+   * gap under tabs → search, search → two-up hub, hub → next block, and padding under sticky chrome.
+   */
+  body[data-layout="shell"] .pageShell{
+    --shellMobileChromeV: 6px;
+  }
+
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky{
     margin-left: 0 !important;
     margin-right: 0 !important;
@@ -9816,16 +9824,18 @@ body{
     max-width: 100% !important;
     padding-left: 0 !important;
     padding-right: 0 !important;
-    padding-top: 6px !important;
-    padding-bottom: 8px !important;
+    /* Slightly tighter above segmented tabs than prior 6px */
+    padding-top: 4px !important;
+    padding-bottom: var(--shellMobileChromeV) !important;
     box-sizing: border-box !important;
   }
 
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls{
     margin-top: 0 !important;
-    padding-top: 8px !important;
+    /* Same as gap below: space from tabs to first control row (search) */
+    padding-top: var(--shellMobileChromeV) !important;
     padding-bottom: 0 !important;
-    gap: 10px !important;
+    gap: var(--shellMobileChromeV) !important;
   }
 
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls .calendarToolbar,
@@ -9840,8 +9850,16 @@ body{
     box-sizing: border-box !important;
   }
 
+  /* Calendar: hub is a sibling of leftControls — match directory/updates grid gap */
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls + .weeklySpotlightMobile.weeklySpotlightMobile--stickyRow{
-    margin-top: 10px !important;
+    margin-top: var(--shellMobileChromeV) !important;
+    margin-bottom: 0 !important;
+  }
+
+  /* Updates/directory: hub sits in leftControls — rely on gap only (no extra margin-top from --updatesHub). */
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .weeklySpotlightMobile--updatesHub,
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .weeklySpotlightMobile--directoryHub{
+    margin-top: 0 !important;
   }
 
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .weeklyOverview--spotlightMobileHalf{
