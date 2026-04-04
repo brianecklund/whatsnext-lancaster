@@ -1530,6 +1530,33 @@ a.eventTimeLink:hover{
   margin-top: 16px;
 }
 
+button.weeklyDayPastToggle{
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  padding: 0;
+}
+
+button.weeklyDayPastToggle:focus-visible{
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.weeklyDayPastToggle__chev{
+  flex: 0 0 auto;
+  font-size: 0.85rem;
+  opacity: 0.55;
+  line-height: 1;
+}
+
 /* Mobile condensed weekly overview */
 .weeklyCondensed{
   display:flex;
@@ -9812,6 +9839,8 @@ body{
   body[data-layout="shell"] .pageShell{
     /* Inner vertical spacing between tabs, controls, calendar hub row */
     --shellMobileChromeV: 8px;
+    /* Target net gap between search/filter row and two-up hub (see margin rules below) */
+    --shellMobileChromeSearchToHub: 4px;
     /* Horizontal inset matches list column (--panePadX on mobile shell) */
     --shellMobileChromeH: var(--panePadX);
   }
@@ -9898,6 +9927,29 @@ body{
     margin-left: 0 !important;
     margin-right: 0 !important;
     box-sizing: border-box !important;
+  }
+
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls + .weeklySpotlightMobile{
+    margin-top: calc(var(--shellMobileChromeSearchToHub) - var(--shellMobileChromeV)) !important;
+  }
+
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls .searchRow + .weeklySpotlightMobile{
+    margin-top: calc(var(--shellMobileChromeSearchToHub) - var(--shellMobileChromeV)) !important;
+  }
+
+  /* Match calendar sticky strip: flat surface (directory/updates used splitPageStickySurface shadow / panel tint) */
+  body[data-layout="shell"] .pageShell .paneLeft .leftSticky.splitPageStickySurface{
+    box-shadow: none !important;
+    background: var(--bg) !important;
+  }
+
+  /* Directory: collapsed A–Z toolbar still sat in flex gap — remove phantom space below hub */
+  body[data-layout="shell"] .pageShell .paneLeft .directoryLeftControls .directoryToolbar:not(.directoryToolbar--alphabetOpen){
+    margin-top: calc(-1 * var(--shellMobileChromeV)) !important;
+  }
+
+  body[data-layout="shell"] .pageShell .paneLeft .directoryLeftControls .directoryToolbar.directoryToolbar--alphabetOpen{
+    margin-top: 6px !important;
   }
 }
 
@@ -11988,6 +12040,21 @@ body[data-layout="content"] .simplePage{
     scroll-padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px)) !important;
   }
 
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail[data-spotlight-no-tabs="true"]{
+    inset: 0 0 0 0 !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail[data-spotlight-no-tabs="true"] > .scroll.mobileDetailScroll,
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail[data-spotlight-no-tabs="true"] > .scroll{
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+    scroll-padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail[data-spotlight-no-tabs="true"] .mobileWeeklyOverviewOpen,
+  .pageShell[data-mobile-detail-open="true"] .mobileDetail[data-spotlight-no-tabs="true"] .mobileGoingNowOpen{
+    min-height: 0 !important;
+  }
+
   .pageShell[data-mobile-detail-open="true"] .leftSticky .leftControls{
     display: none !important;
   }
@@ -12014,6 +12081,7 @@ body[data-layout="content"] .simplePage{
     pointer-events: none !important;
     opacity: 0 !important;
   }
+
 }
 
 /* News ticker bar: full-width open control */
@@ -12312,7 +12380,16 @@ body[data-layout="content"] .simplePage{
   padding: 10px 20px 10px;
   min-height: 44px;
   box-sizing: border-box;
+  border: 0;
   border-bottom: 1px solid var(--border);
+  border-radius: 0;
+  margin: 0;
+  width: 100%;
+  background: var(--bg);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  color: inherit;
 }
 
 .newsTickerHubHeaderKicker{
@@ -12329,6 +12406,9 @@ body[data-layout="content"] .simplePage{
 
 .newsTickerHubClose{
   flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   width: 40px;
   height: 40px;
   border-radius: 9px;
@@ -12336,8 +12416,8 @@ body[data-layout="content"] .simplePage{
   background: var(--btnSurface);
   font-size: 18px;
   line-height: 1;
-  cursor: pointer;
   color: var(--text);
+  pointer-events: none;
 }
 
 .newsTickerHubScroll{

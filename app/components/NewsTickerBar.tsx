@@ -232,7 +232,7 @@ export default function NewsTickerBar({
           <button
             type="button"
             className="newsBar__exploreOnlyBtn"
-            onClick={toggleHubFromBar}
+            onClick={hubOpen ? requestCloseHub : openHub}
             aria-haspopup="dialog"
             aria-expanded={hubOpen}
             aria-label={hubOpen ? "Close explore panel" : "Explore What’s Next"}

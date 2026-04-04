@@ -1049,9 +1049,12 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
       .slice(0, 4);
   }, [selectedWeekBucket, updates]);
 
+  const [weeklyPastDayExpandedKeys, setWeeklyPastDayExpandedKeys] = useState<Set<string>>(() => new Set());
+
   useEffect(() => {
     setWeekCategorySelection(new Set());
     setPinnedAnnouncementsExpanded(false);
+    setWeeklyPastDayExpandedKeys(new Set());
   }, [selectedWeekBucket?.key]);
 
   const selectAllWeekCategories = () => setWeekCategorySelection(new Set());
@@ -2280,11 +2283,37 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ) : (
                     <div className="weeklyLanding weeklyLanding--desktopFull">
                       <div className="weeklyCards">
-                        {weekGroups.map((g) => (
-                          <div key={dayKey(g.date)} className="weeklyDayGroup">
-                            <div className="dayTitle">{formatDayHeading(g.date)}</div>
+                        {weekGroups.map((g) => {
+                          const dk = dayKey(g.date);
+                          const isPastDay = startOfDay(g.date).getTime() < startOfToday().getTime();
+                          const dayExpanded = !isPastDay || weeklyPastDayExpandedKeys.has(dk);
+                          return (
+                          <div key={dk} className="weeklyDayGroup">
+                            {isPastDay ? (
+                              <button
+                                type="button"
+                                className="dayTitle weeklyDayPastToggle"
+                                aria-expanded={dayExpanded}
+                                onClick={() => {
+                                  setWeeklyPastDayExpandedKeys((prev) => {
+                                    const next = new Set(prev);
+                                    if (next.has(dk)) next.delete(dk);
+                                    else next.add(dk);
+                                    return next;
+                                  });
+                                }}
+                              >
+                                <span>{formatDayHeading(g.date)}</span>
+                                <span className="weeklyDayPastToggle__chev" aria-hidden>
+                                  {dayExpanded ? "▾" : "▸"}
+                                </span>
+                              </button>
+                            ) : (
+                              <div className="dayTitle">{formatDayHeading(g.date)}</div>
+                            )}
 
-                            {g.items.map((e) => {
+                            {dayExpanded
+                              ? g.items.map((e) => {
                               const title = e.title || "Untitled event";
                               const d = safeDateFromEvent(e);
                               const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
@@ -2357,9 +2386,11 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                   </div>
                                 </button>
                               );
-                            })}
+                            })
+                              : null}
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -2708,6 +2739,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
       <div
         className="mobileDetail"
         data-open={mobileDetailOpen ? "true" : "false"}
+        data-spotlight-no-tabs={mobileSpotlightOpen && !selectedEvent ? "true" : "false"}
         aria-hidden={!mobileDetailOpen}
         role="dialog"
         aria-modal={mobileDetailOpen ? "true" : "false"}
@@ -3044,10 +3076,36 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 ) : null}
 
                 <div className="weeklyCards">
-                  {weekGroups.map((g) => (
-                    <div key={dayKey(g.date)} className="weeklyDayGroup">
-                      <div className="weeklyCondensedDayTitle">{formatDayHeading(g.date)}</div>
-                      {g.items.map((e) => {
+                  {weekGroups.map((g) => {
+                    const dk = dayKey(g.date);
+                    const isPastDay = startOfDay(g.date).getTime() < startOfToday().getTime();
+                    const dayExpanded = !isPastDay || weeklyPastDayExpandedKeys.has(dk);
+                    return (
+                    <div key={dk} className="weeklyDayGroup">
+                      {isPastDay ? (
+                        <button
+                          type="button"
+                          className="weeklyCondensedDayTitle weeklyDayPastToggle"
+                          aria-expanded={dayExpanded}
+                          onClick={() => {
+                            setWeeklyPastDayExpandedKeys((prev) => {
+                              const next = new Set(prev);
+                              if (next.has(dk)) next.delete(dk);
+                              else next.add(dk);
+                              return next;
+                            });
+                          }}
+                        >
+                          <span>{formatDayHeading(g.date)}</span>
+                          <span className="weeklyDayPastToggle__chev" aria-hidden>
+                            {dayExpanded ? "▾" : "▸"}
+                          </span>
+                        </button>
+                      ) : (
+                        <div className="weeklyCondensedDayTitle">{formatDayHeading(g.date)}</div>
+                      )}
+                      {dayExpanded
+                        ? g.items.map((e) => {
                         const title = e.title || "Untitled event";
                         const d = safeDateFromEvent(e);
                         const timeLabel = d ? formatTimeShort(d) : "Time TBD";
@@ -3058,6 +3116,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             key={e.id}
                             type="button"
                             className="weeklyCard weeklyCardSelectable"
+                            data-past={eventHasEnded(e) ? "true" : "false"}
                             onClick={() => openSelected(e.uid ?? e.id)}
                           >
                             <div className="weeklyCardMedia">
@@ -3113,9 +3172,11 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             </div>
                           </button>
                         );
-                      })}
+                      })
+                        : null}
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             </div>
