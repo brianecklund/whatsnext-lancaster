@@ -1530,31 +1530,12 @@ a.eventTimeLink:hover{
   margin-top: 16px;
 }
 
-button.weeklyDayPastToggle{
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  border: 0;
-  background: transparent;
-  font: inherit;
-  color: inherit;
-  cursor: pointer;
-  text-align: left;
-  padding: 0;
-}
-
-button.weeklyDayPastToggle:focus-visible{
-  outline: 2px solid var(--accent);
-  outline-offset: 2px;
-}
-
-.weeklyDayPastToggle__chev{
-  flex: 0 0 auto;
-  font-size: 0.85rem;
-  opacity: 0.55;
-  line-height: 1;
+.weeklyEarlierDaysHint{
+  margin: 0 0 10px;
+  font-size: 0.78rem;
+  line-height: 1.45;
+  color: var(--muted);
+  letter-spacing: 0.02em;
 }
 
 /* Mobile condensed weekly overview */
@@ -9837,10 +9818,8 @@ body{
 /* Shell mobile: uniform chrome padding (calendar / directory / updates) — one inset on .leftSticky, flex gap between sections */
 @media (max-width: 980px){
   body[data-layout="shell"] .pageShell{
-    /* Inner vertical spacing between tabs, controls, calendar hub row */
+    /* Inner vertical spacing: uniform above search row, between search and hub, below hub (matches Updates strip) */
     --shellMobileChromeV: 8px;
-    /* Target net gap between search/filter row and two-up hub (see margin rules below) */
-    --shellMobileChromeSearchToHub: 4px;
     /* Horizontal inset matches list column (--panePadX on mobile shell) */
     --shellMobileChromeH: var(--panePadX);
   }
@@ -9929,12 +9908,22 @@ body{
     box-sizing: border-box !important;
   }
 
-  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls + .weeklySpotlightMobile{
-    margin-top: calc(var(--shellMobileChromeSearchToHub) - var(--shellMobileChromeV)) !important;
+  /* Calendar: compress day-jump row so total chrome height aligns with Directory / Updates (search + hub only) */
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .leftControls:has(.calendarToolbar) .dayJumpRail{
+    gap: 4px !important;
+    padding-bottom: 0 !important;
+    margin-bottom: 0 !important;
   }
 
-  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls .searchRow + .weeklySpotlightMobile{
-    margin-top: calc(var(--shellMobileChromeSearchToHub) - var(--shellMobileChromeV)) !important;
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .leftControls:has(.calendarToolbar) .dayJumpBtn{
+    height: 28px !important;
+    min-height: 28px !important;
+    max-height: 28px !important;
+    font-size: 9px !important;
+  }
+
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .leftControls:has(.calendarToolbar) .calendarToolbar{
+    gap: var(--shellMobileChromeV) !important;
   }
 
   /* Match calendar sticky strip: flat surface (directory/updates used splitPageStickySurface shadow / panel tint) */
@@ -10866,6 +10855,12 @@ html[data-theme="night-shift"] .weeklyTitle{
     letter-spacing: 0.06em;
     text-transform: uppercase;
     color: var(--muted);
+  }
+
+  .mobileWeeklyOverviewOpen .weeklyEarlierDaysHint{
+    margin: 8px 0 6px;
+    padding: 0 2px;
+    font-size: 0.72rem;
   }
 
   .mobileWeeklyOverviewOpen .weeklyCard,

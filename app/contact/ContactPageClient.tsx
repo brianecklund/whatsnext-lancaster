@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import MobileContentBackButton from "@/app/components/MobileContentBackButton";
 import { sanitizeInternalReturnPath } from "@/lib/sanitize-internal-path";
@@ -110,6 +111,15 @@ export default function ContactPageClient() {
           <h2 className="calloutTitle">Partnerships</h2>
           <p className="calloutBody">
             Venues, sponsors, or organizations looking to collaborate.
+          </p>
+          <p className="calloutBody" style={{ marginTop: 10, marginBottom: 8 }}>
+            <Link className="calloutLink" href="/partnerships?from=/contact">
+              Partnerships overview
+            </Link>
+            {" · "}
+            <Link className="calloutLink" href="/how-we-partner?from=/contact">
+              How we partner with locals
+            </Link>
           </p>
           <a className="calloutLink" href="mailto:partnerships@whatsnextlancaster.com">
             partnerships@whatsnextlancaster.com

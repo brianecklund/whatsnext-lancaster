@@ -22,6 +22,7 @@ function normalize(v?: string | null) {
 const DIRECTORY_RETURN_FROM = encodeURIComponent("/locations");
 const DIRECTORY_MEMBER_BLOGS_HREF = `/blog?cat=${encodeURIComponent("member blogs")}&from=${DIRECTORY_RETURN_FROM}`;
 const DIRECTORY_CONTACT_HREF = `/contact?from=${DIRECTORY_RETURN_FROM}`;
+const DIRECTORY_PARTNERSHIPS_HREF = `/partnerships?from=${DIRECTORY_RETURN_FROM}`;
 
 function getLetter(value?: string | null) {
   const first = (value || "").trim().charAt(0).toUpperCase();
@@ -656,7 +657,7 @@ export default function LocationsSplitClient({
         <div className="weeklyTitle">Learn More</div>
         <div className="weeklyCount">Read Our Blog</div>
       </Link>
-      <Link href={DIRECTORY_CONTACT_HREF} className="weeklyOverview weeklyOverview--spotlightHalf">
+      <Link href={DIRECTORY_PARTNERSHIPS_HREF} className="weeklyOverview weeklyOverview--spotlightHalf">
         <div className="weeklyTitle">Partnerships</div>
         <div className="weeklyCount">Learn More</div>
       </Link>
@@ -791,7 +792,7 @@ export default function LocationsSplitClient({
                         <div className="weeklySpotlightMobile__label">Learn More</div>
                         <div className="weeklySpotlightMobile__count">Read Our Blog</div>
                       </Link>
-                      <Link href={DIRECTORY_CONTACT_HREF} className="weeklyOverview weeklyOverview--spotlightMobileHalf">
+                      <Link href={DIRECTORY_PARTNERSHIPS_HREF} className="weeklyOverview weeklyOverview--spotlightMobileHalf">
                         <div className="weeklySpotlightMobile__label">Partnerships</div>
                         <div className="weeklySpotlightMobile__count">Learn More</div>
                       </Link>
