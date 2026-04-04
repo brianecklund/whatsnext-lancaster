@@ -1530,12 +1530,29 @@ a.eventTimeLink:hover{
   margin-top: 16px;
 }
 
-.weeklyEarlierDaysHint{
-  margin: 0 0 10px;
-  font-size: 0.78rem;
-  line-height: 1.45;
+.weeklyEarlierThisWeekHeader{
+  margin: 18px 0 10px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: var(--muted);
-  letter-spacing: 0.02em;
+}
+
+.weeklyDayGroup--earlierThisWeek .weeklyCard,
+.weeklyDayGroup[data-weekly-earlier="true"] .weeklyCard{
+  opacity: 0.72;
+}
+
+.weeklyDayEmptyNote{
+  font-size: 0.88rem;
+  padding: 6px 0 10px;
+}
+
+.weeklyDesktopDetailBack{
+  margin-bottom: 2px;
 }
 
 /* Mobile condensed weekly overview */
@@ -9932,13 +9949,14 @@ body{
     background: var(--bg) !important;
   }
 
-  /* Directory: collapsed A–Z toolbar still sat in flex gap — remove phantom space below hub */
+  /* Directory: hide collapsed A–Z toolbar from layout on mobile (removes flex gap below hub) */
   body[data-layout="shell"] .pageShell .paneLeft .directoryLeftControls .directoryToolbar:not(.directoryToolbar--alphabetOpen){
-    margin-top: calc(-1 * var(--shellMobileChromeV)) !important;
+    display: none !important;
   }
 
   body[data-layout="shell"] .pageShell .paneLeft .directoryLeftControls .directoryToolbar.directoryToolbar--alphabetOpen{
-    margin-top: 6px !important;
+    display: block !important;
+    margin-top: var(--shellMobileChromeV) !important;
   }
 }
 
@@ -10857,10 +10875,9 @@ html[data-theme="night-shift"] .weeklyTitle{
     color: var(--muted);
   }
 
-  .mobileWeeklyOverviewOpen .weeklyEarlierDaysHint{
-    margin: 8px 0 6px;
-    padding: 0 2px;
-    font-size: 0.72rem;
+  .mobileWeeklyOverviewOpen .weeklyEarlierThisWeekHeader{
+    margin-top: 14px;
+    padding-top: 12px;
   }
 
   .mobileWeeklyOverviewOpen .weeklyCard,

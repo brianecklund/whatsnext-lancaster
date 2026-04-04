@@ -1020,22 +1020,46 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   }, [selectedWeekBucket, weekCategorySelection]);
   const weekGroups = filteredWeekGroups;
 
-  const weeklyScrollAnchorKey = useMemo(() => {
-    if (!weekGroups.length) return null;
+  type WeekOverviewDayRow = { date: Date; items: EventLite[]; key: string; isPlaceholder?: boolean };
+
+  const orderedWeekOverview = useMemo(() => {
+    const sortAsc = (a: { date: Date }, b: { date: Date }) => startOfDay(a.date).getTime() - startOfDay(b.date).getTime();
+    const groups = [...weekGroups].sort(sortAsc);
+    const bucket = selectedWeekBucket;
+
+    const asRows = (list: typeof groups): WeekOverviewDayRow[] =>
+      list.map((g) => ({ date: g.date, items: g.items, key: dayKey(g.date) }));
+
+    if (!bucket || groups.length === 0) {
+      return { primary: asRows(groups), pastWithHeader: [] as WeekOverviewDayRow[], showEarlierHeader: false };
+    }
+
+    const todayStart = startOfToday().getTime();
     const todayK = dayKey(startOfToday());
-    if (weekGroups.some((g) => dayKey(g.date) === todayK)) return todayK;
-    const t0 = startOfToday().getTime();
-    const nextUp = weekGroups.find((g) => startOfDay(g.date).getTime() >= t0);
-    if (nextUp) return dayKey(nextUp.date);
-    return dayKey(weekGroups[0].date);
-  }, [weekGroups]);
+    const weekStartMs = startOfDay(bucket.start).getTime();
+    const weekEndMs = bucket.end.getTime();
+    const weekContainsToday = todayStart >= weekStartMs && todayStart <= weekEndMs;
 
-  const weeklyHasEarlierDays = useMemo(
-    () => weekGroups.some((g) => startOfDay(g.date).getTime() < startOfToday().getTime()),
-    [weekGroups],
-  );
+    if (!weekContainsToday) {
+      return { primary: asRows(groups), pastWithHeader: [], showEarlierHeader: false };
+    }
 
-  const weeklyDayGroupRefs = useRef<Record<string, HTMLDivElement | null>>({});
+    const fromTodayOn = groups.filter((g) => startOfDay(g.date).getTime() >= todayStart).sort(sortAsc);
+    const beforeToday = groups.filter((g) => startOfDay(g.date).getTime() < todayStart).sort(sortAsc);
+
+    let primary: WeekOverviewDayRow[] = fromTodayOn.map((g) => ({ date: g.date, items: g.items, key: dayKey(g.date) }));
+    const hasTodayRow = primary.some((g) => dayKey(g.date) === todayK);
+    if (!hasTodayRow) {
+      primary = [{ date: startOfToday(), items: [], key: `${todayK}__empty`, isPlaceholder: true }, ...primary];
+    }
+    primary.sort(sortAsc);
+
+    return {
+      primary,
+      pastWithHeader: asRows(beforeToday),
+      showEarlierHeader: beforeToday.length > 0,
+    };
+  }, [weekGroups, selectedWeekBucket]);
 
   const weekAnnouncements = useMemo(() => {
     const start = selectedWeekBucket?.start?.getTime();
@@ -1151,37 +1175,6 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     return byUid || byId || null;
   }, [filteredEvents, selectedDisplayKey]);
 
-  useLayoutEffect(() => {
-    if (!weeklyScrollAnchorKey || weekGroups.length === 0 || filteredWeekEvents.length === 0) return;
-    const el = weeklyDayGroupRefs.current[weeklyScrollAnchorKey];
-    if (!el) return;
-
-    const align = (root: HTMLElement | null) => {
-      if (!root) return;
-      const rr = root.getBoundingClientRect();
-      const er = el.getBoundingClientRect();
-      const top = er.top - rr.top + root.scrollTop - 6;
-      root.scrollTo({ top: Math.max(0, top), behavior: "auto" });
-    };
-
-    if (effectiveIsMobile && mobileSpotlightOpen && selectedWeekBucket && !selectedEvent) {
-      align(mobileDetailScrollRef.current);
-      requestAnimationFrame(() => align(mobileDetailScrollRef.current));
-    } else if (!effectiveIsMobile && selectedWeekBucket && !selectedEvent) {
-      align(paneRightScrollRef.current);
-      requestAnimationFrame(() => align(paneRightScrollRef.current));
-    }
-  }, [
-    weeklyScrollAnchorKey,
-    weekGroups.length,
-    filteredWeekEvents.length,
-    effectiveIsMobile,
-    mobileSpotlightOpen,
-    selectedWeekBucket?.key,
-    selectedEvent,
-    weekCategorySelection,
-  ]);
-
   const otherVenueEvents = useMemo(() => {
     if (!selectedEvent) return [];
     return filterUpcomingEventsForLocation(filteredEvents, {
@@ -1194,6 +1187,13 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   }, [filteredEvents, selectedEvent]);
 
   const otherVenueHeading = (selectedEvent?.locationName ?? "").trim() || "this venue";
+
+  useEffect(() => {
+    if (!effectiveIsMobile || !mobileSpotlightOpen || !selectedWeekBucket) return;
+    const root = mobileDetailScrollRef.current;
+    if (!root) return;
+    root.scrollTo({ top: 0, behavior: "auto" });
+  }, [selectedWeekBucket?.key, effectiveIsMobile, mobileSpotlightOpen]);
 
   useEffect(() => {
     setDesktopListHoverEvent(null);
@@ -1405,6 +1405,13 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
         return d ? formatTimeLabel(d) : "Time TBD";
       })()
     : null;
+
+  const desktopWeeklyDetailBack =
+    showRight &&
+    !!selectedEvent &&
+    (selectedDisplayKey === GOING_NOW_KEY ||
+      selectedDisplayKey === WEEKLY_KEY ||
+      Boolean(selectedDisplayKey?.startsWith("__week__:")));
 
   const newsTickerItems = useMemo(() => {
     const upcoming = [...events]
@@ -2327,25 +2334,17 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     <div className="emptyRight">No events match this weekly overview filter right now.</div>
                   ) : (
                     <div className="weeklyLanding weeklyLanding--desktopFull">
-                      {weeklyHasEarlierDays ? (
-                        <p className="weeklyEarlierDaysHint" role="note">
-                          Earlier days this week are above — scroll up to see listings (past events appear muted).
-                        </p>
-                      ) : null}
                       <div className="weeklyCards">
-                        {weekGroups.map((g) => {
-                          const dk = dayKey(g.date);
-                          return (
-                            <div
-                              key={dk}
-                              className="weeklyDayGroup"
-                              ref={(node) => {
-                                weeklyDayGroupRefs.current[dk] = node;
-                              }}
-                            >
-                              <div className="dayTitle">{formatDayHeading(g.date)}</div>
-
-                              {g.items.map((e) => {
+                        {orderedWeekOverview.primary.map((g) => (
+                          <div
+                            key={g.key}
+                            className={`weeklyDayGroup${g.isPlaceholder ? " weeklyDayGroup--placeholder" : ""}`}
+                          >
+                            <div className="dayTitle">{formatDayHeading(g.date)}</div>
+                            {g.items.length === 0 ? (
+                              <div className="emptyRight muted weeklyDayEmptyNote">No events this day.</div>
+                            ) : (
+                              g.items.map((e) => {
                                 const title = e.title || "Untitled event";
                                 const d = safeDateFromEvent(e);
                                 const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
@@ -2418,10 +2417,94 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                                     </div>
                                   </button>
                                 );
-                              })}
-                            </div>
-                          );
-                        })}
+                              })
+                            )}
+                          </div>
+                        ))}
+                        {orderedWeekOverview.showEarlierHeader ? (
+                          <div className="weeklyEarlierThisWeekHeader" role="presentation">
+                            Earlier this week
+                          </div>
+                        ) : null}
+                        {orderedWeekOverview.pastWithHeader.map((g) => (
+                          <div key={g.key} className="weeklyDayGroup weeklyDayGroup--earlierThisWeek" data-weekly-earlier="true">
+                            <div className="dayTitle">{formatDayHeading(g.date)}</div>
+                            {g.items.map((e) => {
+                              const title = e.title || "Untitled event";
+                              const d = safeDateFromEvent(e);
+                              const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
+                              const img = pickImageUrl(e);
+                              const desc = (pickDescriptionText(e) || e.summary || "").trim();
+
+                              return (
+                                <button
+                                  key={e.id}
+                                  type="button"
+                                  className="weeklyCard weeklyCardSelectable"
+                                  data-past="true"
+                                  onClick={() => openSelected(e.uid ?? e.id)}
+                                >
+                                  <div className="weeklyCardMedia">
+                                    {img ? (
+                                      <div className="media16x9">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                                        <img className="weeklyThumb" src={img} alt="" />
+                                      </div>
+                                    ) : (
+                                      <div className="media16x9 weeklyThumbPlaceholder" aria-hidden />
+                                    )}
+                                  </div>
+
+                                  <div className="weeklyCardContent weeklyCardContentExpanded">
+                                    <div className="weeklyCardTop">
+                                      <div className="weeklyCardTitleCol">
+                                        {e.event_type ? <div className="weeklyCardTag">{e.event_type}</div> : null}
+                                        <div className="weeklyCardTitleWrap">
+                                          <div className="weeklyCardTitle">{title}</div>
+                                          <div className="weeklyCardTime eventListingTime">{timeLabel}</div>
+                                        </div>
+                                      </div>
+
+                                      {e.tickets_url || e.website_url ? (
+                                        <div className="weeklyCardActions weeklyCardActions--listingCorner">
+                                          {e.tickets_url ? (
+                                            <a
+                                              className="weeklyMiniBtn"
+                                              href={e.tickets_url}
+                                              target="_blank"
+                                              rel="noreferrer"
+                                              onClick={(ev) => ev.stopPropagation()}
+                                            >
+                                              Tickets
+                                            </a>
+                                          ) : null}
+                                          {e.website_url ? (
+                                            <a
+                                              className="weeklyMiniBtn"
+                                              href={e.website_url}
+                                              target="_blank"
+                                              rel="noreferrer"
+                                              onClick={(ev) => ev.stopPropagation()}
+                                            >
+                                              Website
+                                            </a>
+                                          ) : null}
+                                        </div>
+                                      ) : null}
+                                    </div>
+
+                                    <div className="weeklyCardMetaRow">
+                                      {e.locationName?.trim() ? (
+                                        <WeeklyOverviewVenueLink e={e} openSelected={openSelected} />
+                                      ) : null}
+                                    </div>
+                                    {desc ? <div className="weeklyCardDesc">{desc.length > 200 ? `${desc.slice(0, 200).trim()}…` : desc}</div> : null}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        ))}
                       </div>
                     </div>
                   )}
@@ -2476,6 +2559,11 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                 </div>
               ) : (
                 <div key={detailFlashKey} className="rightHeader calendarListingDetailReveal">
+                  {desktopWeeklyDetailBack ? (
+                    <div className="mobileListingContentBackWrap weeklyDesktopDetailBack">
+                      <MobileContentBackButton onBack={clearSelected} label="Back" />
+                    </div>
+                  ) : null}
                   <div className="rightDayLabel">{selectedEvent.event_type || "Event"}</div>
 
                   <h1 className="detailTitle">{selectedEvent.title || "Untitled event"}</h1>
@@ -3106,24 +3194,17 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   </WeeklyPreviewRail>
                 ) : null}
 
-                {weeklyHasEarlierDays ? (
-                  <p className="weeklyEarlierDaysHint" role="note">
-                    Earlier days are above — scroll up for past listings (muted).
-                  </p>
-                ) : null}
                 <div className="weeklyCards">
-                  {weekGroups.map((g) => {
-                    const dk = dayKey(g.date);
-                    return (
-                      <div
-                        key={dk}
-                        className="weeklyDayGroup"
-                        ref={(node) => {
-                          weeklyDayGroupRefs.current[dk] = node;
-                        }}
-                      >
-                        <div className="weeklyCondensedDayTitle">{formatDayHeading(g.date)}</div>
-                        {g.items.map((e) => {
+                  {orderedWeekOverview.primary.map((g) => (
+                    <div
+                      key={g.key}
+                      className={`weeklyDayGroup${g.isPlaceholder ? " weeklyDayGroup--placeholder" : ""}`}
+                    >
+                      <div className="weeklyCondensedDayTitle">{formatDayHeading(g.date)}</div>
+                      {g.items.length === 0 ? (
+                        <div className="emptyRight muted weeklyDayEmptyNote">No events this day.</div>
+                      ) : (
+                        g.items.map((e) => {
                           const title = e.title || "Untitled event";
                           const d = safeDateFromEvent(e);
                           const timeLabel = d ? formatTimeShort(d) : "Time TBD";
@@ -3190,10 +3271,88 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                               </div>
                             </button>
                           );
-                        })}
-                      </div>
-                    );
-                  })}
+                        })
+                      )}
+                    </div>
+                  ))}
+                  {orderedWeekOverview.showEarlierHeader ? (
+                    <div className="weeklyEarlierThisWeekHeader" role="presentation">
+                      Earlier this week
+                    </div>
+                  ) : null}
+                  {orderedWeekOverview.pastWithHeader.map((g) => (
+                    <div key={g.key} className="weeklyDayGroup weeklyDayGroup--earlierThisWeek" data-weekly-earlier="true">
+                      <div className="weeklyCondensedDayTitle">{formatDayHeading(g.date)}</div>
+                      {g.items.map((e) => {
+                        const title = e.title || "Untitled event";
+                        const d = safeDateFromEvent(e);
+                        const timeLabel = d ? formatTimeShort(d) : "Time TBD";
+                        const desc = pickDescriptionText(e);
+                        const img = pickImageUrl(e);
+                        return (
+                          <button
+                            key={e.id}
+                            type="button"
+                            className="weeklyCard weeklyCardSelectable"
+                            data-past="true"
+                            onClick={() => openSelected(e.uid ?? e.id)}
+                          >
+                            <div className="weeklyCardMedia">
+                              {img ? (
+                                <div className="media16x9">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img className="weeklyThumb" src={img} alt="" />
+                                </div>
+                              ) : (
+                                <div className="media16x9 weeklyThumbPlaceholder" aria-hidden />
+                              )}
+                            </div>
+                            <div className="weeklyCardContent weeklyCardContentExpanded">
+                              <div className="weeklyCardTop">
+                                <div className="weeklyCardTitleCol">
+                                  {e.event_type ? <div className="weeklyCardTag">{e.event_type}</div> : null}
+                                  <div className="weeklyCardTitleWrap">
+                                    <div className="weeklyCardTitle">{title}</div>
+                                    <div className="weeklyCardTime eventListingTime">{timeLabel}</div>
+                                  </div>
+                                </div>
+                                {e.tickets_url || e.website_url ? (
+                                  <div className="weeklyCardActions weeklyCardActions--listingCorner">
+                                    {e.tickets_url ? (
+                                      <a
+                                        className="weeklyMiniBtn"
+                                        href={e.tickets_url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        onClick={(ev) => ev.stopPropagation()}
+                                      >
+                                        Tickets
+                                      </a>
+                                    ) : null}
+                                    {e.website_url ? (
+                                      <a
+                                        className="weeklyMiniBtn"
+                                        href={e.website_url}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        onClick={(ev) => ev.stopPropagation()}
+                                      >
+                                        Website
+                                      </a>
+                                    ) : null}
+                                  </div>
+                                ) : null}
+                              </div>
+                              <div className="weeklyCardMetaRow">
+                                {e.locationName?.trim() ? <EventListingLocation e={e} /> : null}
+                              </div>
+                              {desc ? <div className="weeklyCardDesc">{desc.length > 180 ? `${desc.slice(0, 180).trim()}…` : desc}</div> : null}
+                            </div>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  ))}
                 </div>
               </div>
             </div>
