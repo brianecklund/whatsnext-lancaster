@@ -9807,14 +9807,13 @@ body{
   }
 }
 
-/* Shell mobile: one horizontal inset on tabs / controls / hub rows; no double padding inside leftControls */
+/* Shell mobile: uniform chrome padding (calendar / directory / updates) — one inset on .leftSticky, flex gap between sections */
 @media (max-width: 980px){
-  /*
-   * Single vertical rhythm for calendar / directory / updates:
-   * gap under tabs → search, search → two-up hub, hub → next block, and padding under sticky chrome.
-   */
   body[data-layout="shell"] .pageShell{
-    --shellMobileChromeV: 6px;
+    /* Inner vertical spacing between tabs, controls, calendar hub row */
+    --shellMobileChromeV: 8px;
+    /* Horizontal inset matches list column (--panePadX on mobile shell) */
+    --shellMobileChromeH: var(--panePadX);
   }
 
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky{
@@ -9822,19 +9821,36 @@ body{
     margin-right: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: var(--shellMobileChromeV) !important;
+    /* Uniform outer padding: same top/bottom value, sides = list inset */
+    padding-top: var(--shellMobileChromeV) !important;
+    padding-bottom: var(--shellMobileChromeV) !important;
+    padding-left: var(--shellMobileChromeH) !important;
+    padding-right: var(--shellMobileChromeH) !important;
+  }
+
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .tabs,
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls,
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .weeklySpotlightMobile,
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .mobileControlsToggle.mobileControlsToggle--text{
     padding-left: 0 !important;
     padding-right: 0 !important;
-    /* Slightly tighter above segmented tabs than prior 6px */
-    padding-top: 4px !important;
-    padding-bottom: var(--shellMobileChromeV) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
     box-sizing: border-box !important;
   }
 
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls{
     margin-top: 0 !important;
-    /* Same as gap below: space from tabs to first control row (search) */
-    padding-top: var(--shellMobileChromeV) !important;
+    padding-top: 0 !important;
     padding-bottom: 0 !important;
+    min-width: 0 !important;
     gap: var(--shellMobileChromeV) !important;
   }
 
@@ -9850,13 +9866,27 @@ body{
     box-sizing: border-box !important;
   }
 
-  /* Calendar: hub is a sibling of leftControls — match directory/updates grid gap */
-  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls + .weeklySpotlightMobile.weeklySpotlightMobile--stickyRow{
-    margin-top: var(--shellMobileChromeV) !important;
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .calendarToolbar{
+    gap: var(--shellMobileChromeV) !important;
+  }
+
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .mobileControlsToggle{
+    margin-top: 0 !important;
     margin-bottom: 0 !important;
   }
 
-  /* Updates/directory: hub sits in leftControls — rely on gap only (no extra margin-top from --updatesHub). */
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .mobileControlsToggle.mobileControlsToggle--text{
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  /* Calendar hub: spacing from flex parent gap only */
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls + .weeklySpotlightMobile.weeklySpotlightMobile--stickyRow{
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+  }
+
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .weeklySpotlightMobile--updatesHub,
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .weeklySpotlightMobile--directoryHub{
     margin-top: 0 !important;
