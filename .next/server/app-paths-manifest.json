@@ -16,9 +16,11 @@
   "/clock/page": "app/clock/page.js",
   "/contact/page": "app/contact/page.js",
   "/donate/page": "app/donate/page.js",
+  "/how-we-partner/page": "app/how-we-partner/page.js",
   "/locations/[uid]/page": "app/locations/[uid]/page.js",
   "/locations/page": "app/locations/page.js",
   "/page": "app/page.js",
+  "/partnerships/page": "app/partnerships/page.js",
   "/spring/page": "app/spring/page.js",
   "/updates/page": "app/updates/page.js"
 }

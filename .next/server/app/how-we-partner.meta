@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/how-we-partner/layout,_N_T_/how-we-partner/page,_N_T_/how-we-partner"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/how-we-partner/__PAGE__",
+    "/how-we-partner",
+    "/_index",
+    "/_head"
+  ]
+}

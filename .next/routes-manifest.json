@@ -142,10 +142,22 @@
       "namedRegex": "^/donate(?:/)?$"
     },
     {
+      "page": "/how-we-partner",
+      "regex": "^/how\\-we\\-partner(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/how\\-we\\-partner(?:/)?$"
+    },
+    {
       "page": "/locations",
       "regex": "^/locations(?:/)?$",
       "routeKeys": {},
       "namedRegex": "^/locations(?:/)?$"
+    },
+    {
+      "page": "/partnerships",
+      "regex": "^/partnerships(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/partnerships(?:/)?$"
     },
     {
       "page": "/spring",

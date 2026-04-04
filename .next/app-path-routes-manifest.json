@@ -16,9 +16,11 @@
   "/clock/page": "/clock",
   "/contact/page": "/contact",
   "/donate/page": "/donate",
+  "/how-we-partner/page": "/how-we-partner",
   "/locations/[uid]/page": "/locations/[uid]",
   "/locations/page": "/locations",
   "/page": "/",
+  "/partnerships/page": "/partnerships",
   "/spring/page": "/spring",
   "/updates/page": "/updates"
 }
