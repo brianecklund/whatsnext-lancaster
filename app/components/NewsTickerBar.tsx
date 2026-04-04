@@ -250,9 +250,7 @@ export default function NewsTickerBar({
           onRequestClose={requestCloseHub}
           introBarText={introText}
           hubLead={hubLead}
-          updates={updates}
           seasonContent={seasonContent}
-          updatesHref={updatesHref}
         />
       </>
     );
@@ -324,9 +322,7 @@ export default function NewsTickerBar({
         onRequestClose={requestCloseHub}
         introBarText={introText}
         hubLead={hubLead}
-        updates={updates}
         seasonContent={seasonContent}
-        updatesHref={updatesHref}
       />
     </>
   );

@@ -2,8 +2,7 @@
 
 import { createPortal } from "react-dom";
 import Link from "next/link";
-import { useEffect, useMemo } from "react";
-import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
+import { useEffect } from "react";
 import type { NewsHubSeasonContent, NewsHubSeasonTile } from "@/lib/news-hub-season";
 
 type Props = {
@@ -12,21 +11,8 @@ type Props = {
   onRequestClose: () => void;
   introBarText: string;
   hubLead: string;
-  updates: UpdateLite[];
   seasonContent: NewsHubSeasonContent;
-  updatesHref?: string;
 };
-
-function tagIconFor(tag: string) {
-  const t = (tag || "").toLowerCase();
-  if (t.includes("opening") || t.includes("launch")) return "✦";
-  if (t.includes("food") || t.includes("drink") || t.includes("menu")) return "◔";
-  if (t.includes("music") || t.includes("show") || t.includes("concert")) return "♪";
-  if (t.includes("art") || t.includes("gallery")) return "✳";
-  if (t.includes("community") || t.includes("market")) return "◎";
-  if (t.includes("alert") || t.includes("psa") || t.includes("notice")) return "!";
-  return "•";
-}
 
 function SeasonTileInner({ tile }: { tile: NewsHubSeasonTile }) {
   return (
@@ -94,21 +80,8 @@ export default function NewsTickerHub({
   onRequestClose,
   introBarText,
   hubLead,
-  updates,
   seasonContent,
-  updatesHref = "/updates",
 }: Props) {
-  const sorted = useMemo(() => {
-    return [...updates].sort((a, b) => {
-      const ap = a.pinned ? 1 : 0;
-      const bp = b.pinned ? 1 : 0;
-      if (ap !== bp) return bp - ap;
-      const ad = a.sortDate || a.date || "";
-      const bd = b.sortDate || b.date || "";
-      return bd.localeCompare(ad);
-    });
-  }, [updates]);
-
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
@@ -150,54 +123,6 @@ export default function NewsTickerHub({
           <p className="newsTickerHubLead">{hubLead}</p>
 
           <SeasonGrid content={seasonContent} onTileNavigate={onRequestClose} />
-
-          <div className="newsTickerHubSectionHead">
-            <h3 className="newsTickerHubSectionTitle">Latest updates</h3>
-            <Link href={updatesHref} className="newsTickerHubAllLink" onClick={onRequestClose}>
-              View all →
-            </Link>
-          </div>
-
-          {sorted.length === 0 ? (
-            <p className="newsTickerHubEmpty muted">No updates posted yet. Check back soon.</p>
-          ) : (
-            <ul className="newsTickerHubList" role="list">
-              {sorted.map((u) => (
-                <li key={u.id} className="newsTickerHubCardWrap">
-                  <Link
-                    href={`${updatesHref}?u=${encodeURIComponent(u.id)}`}
-                    className="newsTickerHubCard newsTickerHubCard--link"
-                    onClick={onRequestClose}
-                  >
-                    <div className="newsTickerHubCardTop">
-                      {u.pinned ? <span className="newsTickerHubPin">Pinned</span> : null}
-                      {u.date ? <span className="newsTickerHubDate">{u.date}</span> : null}
-                    </div>
-                    <div className="newsTickerHubCardTitle">{u.title}</div>
-                    {u.summary ? <p className="newsTickerHubCardSummary">{u.summary}</p> : null}
-                    {u.tags?.length ? (
-                      <div className="newsTickerHubTags">
-                        {u.tags.slice(0, 4).map((t) => (
-                          <span key={t} className="newsTickerHubTag">
-                            <span className="newsTickerHubTagGlyph" aria-hidden>
-                              {tagIconFor(t)}
-                            </span>
-                            {t}
-                          </span>
-                        ))}
-                      </div>
-                    ) : null}
-                    <span className="newsTickerHubReadMore">Read on Updates →</span>
-                  </Link>
-                  {u.link ? (
-                    <a href={u.link} className="newsTickerHubExternal" target="_blank" rel="noreferrer">
-                      {u.linkLabel || "Open link"} →
-                    </a>
-                  ) : null}
-                </li>
-              ))}
-            </ul>
-          )}
         </div>
       </div>
     </div>,

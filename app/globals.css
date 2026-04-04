@@ -9237,10 +9237,15 @@ body{
   }
 
   body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody > .eventRow,
-  body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody .eventRow.directoryListingRow,
-  body[data-layout="shell"] .paneLeft .splitPageListBody .eventRow.updateListRow{
+  body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody .eventRow.directoryListingRow{
     padding-left: 10px !important;
     padding-right: 52px !important;
+  }
+
+  /* Updates list: type orb hidden on mobile — symmetric insets inside splitPageListBody */
+  body[data-layout="shell"] .paneLeft .splitPageListBody .eventRow.updateListRow{
+    padding-left: 16px !important;
+    padding-right: 16px !important;
   }
 
   body[data-layout="shell"] .directoryListWrap .directoryLetterHeading--sticky{
@@ -9906,15 +9911,19 @@ body{
     padding-top: 0 !important;
   }
 
-  /* Calendar hub: spacing from flex parent gap only */
+  /* Pull hub row up so flex gap does not add space above the side-by-side buttons */
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls + .weeklySpotlightMobile.weeklySpotlightMobile--stickyRow{
-    margin-top: 0 !important;
+    margin-top: calc(-1 * var(--shellMobileChromeV)) !important;
     margin-bottom: 0 !important;
+  }
+
+  body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky > .leftControls .searchRow + .weeklySpotlightMobile{
+    margin-top: calc(-1 * var(--shellMobileChromeV)) !important;
   }
 
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .weeklySpotlightMobile--updatesHub,
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .weeklySpotlightMobile--directoryHub{
-    margin-top: 0 !important;
+    margin-top: calc(-1 * var(--shellMobileChromeV)) !important;
   }
 
   body[data-layout="shell"] .pageShell .paneLeft > .scroll > .leftSticky .weeklyOverview--spotlightMobileHalf{
@@ -12808,7 +12817,7 @@ body[data-layout="content"] .simplePage{
   .weeklySpotlightPair .weeklyOverview--spotlightHalf,
   .updatesDesktopHubRow--inScroll .weeklyOverview--spotlightHalf,
   .directoryDesktopHubRow--inScroll .weeklyOverview--spotlightHalf{
-    padding: 12px 10px !important;
+    padding: 12px 12px 12px 20px !important;
     align-items: flex-start !important;
   }
 }
