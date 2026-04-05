@@ -476,13 +476,12 @@ export default function UpdatesSplitClient({
       current={resolvedSection === "calendar" ? "calendar" : resolvedSection === "directory" ? "directory" : "updates"}
       onNavigateSection={onNavigateSection}
       hideDefaultIntro={isMobile && mobileDetailOpen}
+      pageShellClassName="pageShell--listingPairReveal"
       topBar={!(isMobile && mobileDetailOpen) ? (
         <NewsTickerBar
           className={isMobile ? undefined : "newsBar--shellDesktop"}
           introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
           items={newsTickerItems}
-          updates={safeUpdates}
-          updatesHref={basePath}
           seasonLandingHref="/spring"
           seasonContent={newsHubSeason}
           mobileExploreOnly={isMobile}
@@ -490,7 +489,11 @@ export default function UpdatesSplitClient({
         />
       ) : undefined}
       mobileOverlay={
-        <div className="mobileDetail" data-open={mobileDetailOpen ? "true" : "false"} aria-hidden={!mobileDetailOpen}>
+        <div
+          className="mobileDetail mobileDetail--updatesListing"
+          data-open={mobileDetailOpen ? "true" : "false"}
+          aria-hidden={!mobileDetailOpen}
+        >
           <div className="scroll mobileListingContentScroll" style={{ paddingBottom: 96 }}>
             {selectedMobile ? (
               <>

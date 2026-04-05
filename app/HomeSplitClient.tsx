@@ -1563,8 +1563,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
         className="newsBar--shellDesktop"
         introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
         items={newsTickerItems}
-        updates={updates}
-        updatesHref="/updates"
         seasonLandingHref="/spring"
         seasonContent={newsHubSeason}
         mobileExploreOnly={effectiveIsMobile && resolvedSection === "calendar"}

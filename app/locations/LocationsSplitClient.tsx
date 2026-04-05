@@ -673,13 +673,12 @@ export default function LocationsSplitClient({
       current={resolvedSection === "calendar" ? "calendar" : resolvedSection === "updates" ? "updates" : "directory"}
       onNavigateSection={onNavigateSection}
       hideDefaultIntro={effectiveIsMobile && mobileDetailOpen}
+      pageShellClassName="pageShell--listingPairReveal"
       topBar={!(effectiveIsMobile && mobileDetailOpen) ? (
         <NewsTickerBar
           className={effectiveIsMobile ? undefined : "newsBar--shellDesktop"}
           introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
           items={newsTickerItems}
-          updates={updates}
-          updatesHref="/updates"
           seasonLandingHref="/spring"
           seasonContent={newsHubSeason}
           mobileExploreOnly={effectiveIsMobile}

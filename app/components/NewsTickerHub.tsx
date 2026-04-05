@@ -5,15 +5,6 @@ import Link from "next/link";
 import { useEffect } from "react";
 import type { NewsHubSeasonContent, NewsHubSeasonTile } from "@/lib/news-hub-season";
 
-/** Subset of update fields for the explore hub list (avoids importing the heavy updates client here). */
-export type NewsHubUpdatePreview = {
-  id: string;
-  title: string;
-  pinned?: boolean | null;
-  date?: string | null;
-  summary?: string | null;
-};
-
 type Props = {
   open: boolean;
   closing: boolean;
@@ -21,8 +12,6 @@ type Props = {
   introBarText: string;
   hubLead: string;
   seasonContent: NewsHubSeasonContent;
-  updates?: NewsHubUpdatePreview[];
-  updatesHref?: string;
 };
 
 function SeasonTileInner({ tile }: { tile: NewsHubSeasonTile }) {
@@ -85,57 +74,6 @@ function SeasonGrid({
   );
 }
 
-function HubUpdatesBlock({
-  updates,
-  updatesHref,
-  onTileNavigate,
-}: {
-  updates: NewsHubUpdatePreview[];
-  updatesHref: string;
-  onTileNavigate: () => void;
-}) {
-  const top = updates.slice(0, 4);
-  const base = updatesHref.replace(/\/$/, "");
-
-  return (
-    <section className="newsTickerHubUpdatesBlock">
-      <div className="newsTickerHubSectionHead">
-        <h3 className="newsTickerHubSectionTitle">Latest updates</h3>
-        <Link href={updatesHref} className="newsTickerHubAllLink" onClick={onTileNavigate}>
-          View all
-        </Link>
-      </div>
-      {top.length === 0 ? (
-        <p className="newsTickerHubEmpty">No updates yet — check back soon.</p>
-      ) : (
-        <ul className="newsTickerHubList">
-          {top.map((u) => (
-            <li key={u.id} className="newsTickerHubCardWrap">
-              <Link
-                href={`${base}?u=${encodeURIComponent(u.id)}`}
-                className="newsTickerHubCard newsTickerHubCard--link"
-                onClick={onTileNavigate}
-              >
-                <div className="newsTickerHubCardInner">
-                  <div className="wnlPlaceholderThumb" aria-hidden />
-                  <div className="newsTickerHubCardBody">
-                    <div className="newsTickerHubCardTop">
-                      {u.pinned ? <span className="newsTickerHubPin">Pinned</span> : null}
-                      {u.date ? <span>{u.date}</span> : null}
-                    </div>
-                    <div className="newsTickerHubCardTitle">{u.title}</div>
-                    {u.summary ? <p className="newsTickerHubCardSummary">{u.summary}</p> : null}
-                  </div>
-                </div>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      )}
-    </section>
-  );
-}
-
 export default function NewsTickerHub({
   open,
   closing,
@@ -143,8 +81,6 @@ export default function NewsTickerHub({
   introBarText,
   hubLead,
   seasonContent,
-  updates = [],
-  updatesHref = "/updates",
 }: Props) {
   useEffect(() => {
     if (!open) return;
@@ -187,8 +123,6 @@ export default function NewsTickerHub({
           <p className="newsTickerHubLead">{hubLead}</p>
 
           <SeasonGrid content={seasonContent} onTileNavigate={onRequestClose} />
-
-          <HubUpdatesBlock updates={updates} updatesHref={updatesHref} onTileNavigate={onRequestClose} />
         </div>
       </div>
     </div>,

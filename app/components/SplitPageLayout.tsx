@@ -19,6 +19,8 @@ type Props = {
   onNavigateSection?: (section: PageKey) => void;
   topBar?: ReactNode;
   hideDefaultIntro?: boolean;
+  /** Extra classes on the shell root (e.g. page-load timing tweaks for directory/updates). */
+  pageShellClassName?: string;
 };
 
 export default function SplitPageLayout({
@@ -33,6 +35,7 @@ export default function SplitPageLayout({
   onNavigateSection,
   topBar,
   hideDefaultIntro = false,
+  pageShellClassName = "",
 }: Props) {
   const router = useRouter();
 
@@ -56,7 +59,7 @@ export default function SplitPageLayout({
 
   return (
     <div
-      className="pageShell"
+      className={["pageShell", pageShellClassName].filter(Boolean).join(" ")}
       style={style}
       data-mobile-detail-open={isMobile && mobileDetailOpen ? "true" : "false"}
     >

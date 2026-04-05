@@ -39,7 +39,7 @@ export default function PageRevealRoot({ children }: { children: ReactNode }) {
 
     revealTimer = window.setTimeout(() => {
       setContentReady(true);
-    }, 80);
+    }, 48);
 
     return () => {
       if (revealTimer != null) window.clearTimeout(revealTimer);
