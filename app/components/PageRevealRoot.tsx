@@ -34,21 +34,14 @@ export default function PageRevealRoot({ children }: { children: ReactNode }) {
     }
 
     setContentReady(false);
-    let raf2 = 0;
+    setHeaderReady(true);
     let revealTimer: number | undefined;
 
-    const raf1 = window.requestAnimationFrame(() => {
-      raf2 = window.requestAnimationFrame(() => {
-        setHeaderReady(true);
-        revealTimer = window.setTimeout(() => {
-          setContentReady(true);
-        }, 320);
-      });
-    });
+    revealTimer = window.setTimeout(() => {
+      setContentReady(true);
+    }, 80);
 
     return () => {
-      window.cancelAnimationFrame(raf1);
-      window.cancelAnimationFrame(raf2);
       if (revealTimer != null) window.clearTimeout(revealTimer);
     };
   }, [pathname]);

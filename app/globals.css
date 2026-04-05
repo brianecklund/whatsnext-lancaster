@@ -2026,13 +2026,17 @@ a.weeklyOverview{
     align-items: flex-start !important;
     justify-content: flex-start !important;
     text-align: left !important;
-    gap: 6px !important;
+    gap: 2px !important;
   }
 
   .weeklySpotlightPair .weeklyOverview--spotlightHalf .weeklyTitle,
   .weeklySpotlightPair .weeklyOverview--spotlightHalf .weeklyCount{
     text-align: left !important;
     width: 100%;
+  }
+
+  .weeklySpotlightPair .weeklyOverview--spotlightHalf .weeklyTitle{
+    margin-bottom: 0 !important;
   }
 }
 
@@ -2096,7 +2100,7 @@ a.weeklyOverview{
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
-    gap: 8px;
+    gap: 2px;
     box-sizing: border-box;
   }
 
@@ -4450,6 +4454,34 @@ a:hover{
   .leftControls .searchRow.calendarSearchRowMobile .viewBtn[data-active="true"] .btnIconImg{
     filter: brightness(0) invert(1) !important;
     opacity: 0.95 !important;
+  }
+}
+
+@media (min-width: 981px){
+  .leftControls .searchRow.calendarSearchRow .viewBtn[data-active="true"]{
+    background: color-mix(in srgb, var(--text) 72%, var(--panel) 28%) !important;
+    color: #fff !important;
+    border-color: color-mix(in srgb, var(--text) 55%, var(--border) 45%) !important;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.12) inset;
+  }
+
+  .leftControls .searchRow.calendarSearchRow .viewBtn[data-active="true"] .btnIconImg{
+    filter: brightness(0) invert(1) !important;
+    opacity: 0.95 !important;
+  }
+
+  .leftSticky .searchRow.calendarSearchRow .searchInput:focus,
+  .leftSticky .searchRow.calendarSearchRow .searchInput:focus-visible{
+    outline: none !important;
+    border-color: color-mix(in srgb, var(--border) 55%, #d4d4d4 45%) !important;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--border) 50%, #ddd 50%) inset !important;
+  }
+
+  .leftSticky .directorySearchRowDesktop .searchInput:focus,
+  .leftSticky .directorySearchRowDesktop .searchInput:focus-visible{
+    outline: none !important;
+    border-color: color-mix(in srgb, var(--border) 55%, #d4d4d4 45%) !important;
+    box-shadow: 0 0 0 1px color-mix(in srgb, var(--border) 50%, #ddd 50%) inset !important;
   }
 }
 
@@ -12026,24 +12058,15 @@ body[data-layout="content"] .simplePage{
   min-height: 0;
 }
 
-.wnlPageRevealRoot .siteHeader,
-.wnlPageRevealRoot .pageShell,
-.wnlPageRevealRoot .shellSwap,
-.wnlPageRevealRoot .shellSwap__panel,
-.wnlPageRevealRoot main.contentPage,
-.wnlPageRevealRoot .simplePage{
-  will-change: opacity, transform;
-}
-
 .wnlPageRevealRoot .siteHeader{
   transition:
-    opacity 1200ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1200ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 1650ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 1650ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--headerReady) .siteHeader{
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(10px);
 }
 
 .wnlPageRevealRoot--headerReady .siteHeader{
@@ -12057,8 +12080,8 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot main.contentPage,
 .wnlPageRevealRoot .simplePage{
   transition:
-    opacity 1500ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1500ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 2200ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 2200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .pageShell,
@@ -12067,7 +12090,7 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) main.contentPage,
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .simplePage{
   opacity: 0;
-  transform: translateY(36px);
+  transform: translateY(12px);
 }
 
 .wnlPageRevealRoot--contentReady .pageShell,
@@ -12085,8 +12108,8 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot main.contentPage > *,
 .wnlPageRevealRoot .simplePage > *{
   transition:
-    opacity 1680ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1680ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 2100ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 2100ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .split > *,
@@ -12094,7 +12117,7 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) main.contentPage > *,
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .simplePage > *{
   opacity: 0;
-  transform: translateY(26px);
+  transform: translateY(12px);
 }
 
 .wnlPageRevealRoot--contentReady .split > *,
@@ -12154,14 +12177,14 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot .springHubHero > *,
 .wnlPageRevealRoot .springHubGrid > *{
   transition:
-    opacity 1520ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1520ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 2000ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 2000ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .springHubHero > *,
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .springHubGrid > *{
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(10px);
 }
 
 .wnlPageRevealRoot--contentReady .springHubHero > *,
@@ -12187,19 +12210,19 @@ body[data-layout="content"] .simplePage{
    split delay (230ms) so inner blocks line up with the column reveal. Remounting the block (e.g. back from an event)
    still runs the animation because --contentReady is already true on first paint. */
 @keyframes wnlWeeklyOverviewBlockIn{
-  from{ opacity: 0; transform: translateY(24px); }
+  from{ opacity: 0; transform: translateY(10px); }
   to{ opacity: 1; transform: translateY(0); }
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .weeklyOverviewLanding > *{
   opacity: 0;
-  transform: translateY(24px);
+  transform: translateY(10px);
   animation: none;
 }
 
 .wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *{
   opacity: 0;
-  animation: wnlWeeklyOverviewBlockIn 1680ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: wnlWeeklyOverviewBlockIn 2100ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
 .wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(1){ animation-delay: calc(280ms + 200ms); }
@@ -12215,10 +12238,10 @@ body[data-layout="content"] .simplePage{
 /* Optional blocks: wrap with <RevealSection /> */
 .wnl-reveal{
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(10px);
   transition:
-    opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 2000ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 2000ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .wnl-reveal--visible{
@@ -13075,7 +13098,12 @@ body[data-layout="content"] .simplePage{
     padding: 12px 12px 12px 20px !important;
     align-items: flex-start !important;
     flex-direction: column !important;
-    gap: 6px !important;
+    gap: 2px !important;
+  }
+
+  .updatesDesktopHubRow--inScroll .weeklyOverview--spotlightHalf .weeklyTitle,
+  .directoryDesktopHubRow--inScroll .weeklyOverview--spotlightHalf .weeklyTitle{
+    margin-bottom: 0 !important;
   }
 }
 
