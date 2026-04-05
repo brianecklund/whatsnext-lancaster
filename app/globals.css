@@ -12077,8 +12077,8 @@ body[data-layout="content"] .simplePage{
 
 .wnlPageRevealRoot .siteHeader{
   transition:
-    opacity 1380ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 1380ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity 1180ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 1180ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--headerReady) .siteHeader{
@@ -12097,8 +12097,8 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot main.contentPage,
 .wnlPageRevealRoot .simplePage{
   transition:
-    opacity 1820ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 1820ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity 1580ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 1580ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .pageShell,
@@ -12125,8 +12125,8 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot main.contentPage > *,
 .wnlPageRevealRoot .simplePage > *{
   transition:
-    opacity 1680ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 1680ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity 1450ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 1450ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .split > *,
@@ -12148,54 +12148,54 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot--contentReady .split > *:nth-child(1),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(1),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(1),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(1){ transition-delay: 200ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(1){ transition-delay: 170ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(2),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(2),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(2),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(2){ transition-delay: 380ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(2){ transition-delay: 330ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(3),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(3),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(3),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(3){ transition-delay: 560ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(3){ transition-delay: 490ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(4),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(4),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(4),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(4){ transition-delay: 740ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(4){ transition-delay: 650ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(5),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(5),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(5),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(5){ transition-delay: 920ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(5){ transition-delay: 810ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(6),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(6),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(6),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(6){ transition-delay: 1100ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(6){ transition-delay: 970ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(7),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(7),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(7),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(7){ transition-delay: 1280ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(7){ transition-delay: 1130ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(8),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(8),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(8),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(8){ transition-delay: 1460ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(8){ transition-delay: 1290ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(n+9),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(n+9),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(n+9),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(n+9){ transition-delay: 1640ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(n+9){ transition-delay: 1450ms; }
 
 /* Spring hub + similar pages: second-level top-down cascade inside hero + grid */
 .wnlPageRevealRoot .springHubHero > *,
 .wnlPageRevealRoot .springHubGrid > *{
   transition:
-    opacity 1680ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 1680ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity 1450ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 1450ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .springHubHero > *,
@@ -12210,17 +12210,17 @@ body[data-layout="content"] .simplePage{
   transform: translateY(0);
 }
 
-.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(1){ transition-delay: 400ms; }
-.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(2){ transition-delay: 520ms; }
-.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(3){ transition-delay: 640ms; }
-.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(n+4){ transition-delay: 760ms; }
+.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(1){ transition-delay: 340ms; }
+.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(2){ transition-delay: 450ms; }
+.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(3){ transition-delay: 560ms; }
+.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(n+4){ transition-delay: 670ms; }
 
-.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(1){ transition-delay: 620ms; }
-.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(2){ transition-delay: 760ms; }
-.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(3){ transition-delay: 900ms; }
-.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(4){ transition-delay: 1040ms; }
-.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(5){ transition-delay: 1180ms; }
-.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(n+6){ transition-delay: 1320ms; }
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(1){ transition-delay: 540ms; }
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(2){ transition-delay: 670ms; }
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(3){ transition-delay: 800ms; }
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(4){ transition-delay: 920ms; }
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(5){ transition-delay: 1050ms; }
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(n+6){ transition-delay: 1180ms; }
 
 /* Weekly overview (right column): same stagger rhythm as main.contentPage, but starts only when --contentReady flips
    (otherwise animations run while pageShell is invisible and finish before you see them). Delays add the right-pane
@@ -12239,26 +12239,26 @@ body[data-layout="content"] .simplePage{
 
 .wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *{
   opacity: 0;
-  animation: wnlWeeklyOverviewBlockIn 1760ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+  animation: wnlWeeklyOverviewBlockIn 1520ms cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(1){ animation-delay: calc(280ms + 200ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(2){ animation-delay: calc(280ms + 380ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(3){ animation-delay: calc(280ms + 560ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(4){ animation-delay: calc(280ms + 740ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(5){ animation-delay: calc(280ms + 920ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(6){ animation-delay: calc(280ms + 1100ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(7){ animation-delay: calc(280ms + 1280ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(8){ animation-delay: calc(280ms + 1460ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(n+9){ animation-delay: calc(280ms + 1640ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(1){ animation-delay: calc(240ms + 170ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(2){ animation-delay: calc(240ms + 330ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(3){ animation-delay: calc(240ms + 490ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(4){ animation-delay: calc(240ms + 650ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(5){ animation-delay: calc(240ms + 810ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(6){ animation-delay: calc(240ms + 970ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(7){ animation-delay: calc(240ms + 1130ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(8){ animation-delay: calc(240ms + 1290ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(n+9){ animation-delay: calc(240ms + 1450ms); }
 
 /* Optional blocks: wrap with <RevealSection /> */
 .wnl-reveal{
   opacity: 0;
   transform: translateY(10px);
   transition:
-    opacity 1680ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-    transform 1680ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    opacity 1450ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    transform 1450ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .wnl-reveal--visible{
@@ -13515,8 +13515,8 @@ body[data-layout="content"] main.contentPage.clockPage{
     opacity: 1;
     transform: translateY(0);
     transition:
-      opacity 1680ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
-      transform 1680ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+      opacity 1450ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
+      transform 1450ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 }
 

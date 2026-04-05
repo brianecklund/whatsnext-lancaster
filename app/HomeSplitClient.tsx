@@ -497,18 +497,20 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
 
   const effectiveIsMobile = mounted ? isMobile : false;
 
-  const prevMobileViewRef = useRef<string | null>(null);
+  const prevCalendarViewRef = useRef<string | null>(null);
   useEffect(() => {
-    if (!effectiveIsMobile) {
-      prevMobileViewRef.current = view;
+    if (resolvedSection !== "calendar") {
+      prevCalendarViewRef.current = view;
       return;
     }
-    const prev = prevMobileViewRef.current;
-    if (prev !== null && prev !== view && (view === "month" || view === "clock")) {
+    const prev = prevCalendarViewRef.current;
+    if (prev !== null && prev !== view) {
       listRef.current?.scrollTo({ top: 0, behavior: "auto" });
+      paneRightScrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
+      mobileDetailScrollRef.current?.scrollTo({ top: 0, behavior: "auto" });
     }
-    prevMobileViewRef.current = view;
-  }, [view, effectiveIsMobile]);
+    prevCalendarViewRef.current = view;
+  }, [view, resolvedSection]);
 
   const selectedDisplayKey =
     selectedKey ?? (!effectiveIsMobile && (viewMode === "list" || isClockView) ? WEEKLY_KEY : null);
