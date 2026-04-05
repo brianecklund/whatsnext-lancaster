@@ -875,7 +875,7 @@ a.eventTimeLink:hover{
   overflow: visible;
 }
 
-.brandStarburst{
+.brandScrollArrow{
   flex: 0 0 auto;
   display: flex;
   align-items: center;
@@ -883,9 +883,26 @@ a.eventTimeLink:hover{
   overflow: visible;
 }
 
-.brandStarburst__svg{
+.brandScrollArrow__svg{
   display: block;
   overflow: visible;
+}
+
+.brand--mobileSplit{
+  text-decoration: none;
+  color: inherit;
+}
+
+.brand--mobileSplit .brandText{
+  color: inherit;
+  text-decoration: none;
+  min-width: 0;
+}
+
+.brandMark{
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
 }
 
 .brandText{
@@ -2191,10 +2208,37 @@ a.weeklyOverview{
   border-radius: 9px;
   cursor: pointer;
   display:flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
   color: var(--text);
   transition: background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
+}
+
+.eventRow__col{
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: stretch;
+}
+
+.eventRowThumb{
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  overflow: hidden;
+  align-self: flex-start;
+  margin-top: 1px;
+}
+
+.eventRowThumb img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 @media (hover: hover) and (pointer: fine){
   .eventRow:hover{ background: var(--hover); transform: translateX(4px); }
@@ -5220,9 +5264,24 @@ textarea,
 
 .eventRow.directoryListingRow{
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
   gap: 8px 10px;
   align-items: center;
+}
+
+.directoryListingRow__thumb{
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.directoryListingRow__thumb img{
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 .eventRow.directoryListingRow[role="button"]{
@@ -7929,6 +7988,28 @@ html[data-route-switching="true"] .routeFrame{
   box-shadow: var(--shadowSoft);
 }
 
+/* Shared list / card image placeholders (radial highlight from center) */
+.wnlPlaceholderThumb{
+  flex-shrink: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 10px;
+  box-sizing: border-box;
+  border: 1px solid var(--border);
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      color-mix(in srgb, var(--accent) 38%, var(--panel) 62%) 0%,
+      color-mix(in srgb, var(--muted) 24%, var(--panel) 76%) 72%
+    );
+}
+
+.wnlPlaceholderThumb--banner{
+  width: 100%;
+  height: 132px;
+  border-radius: 11px;
+}
+
 .contentWideCard{
   margin-top: 20px;
 }
@@ -8162,7 +8243,7 @@ html[data-route-switching="true"] .routeFrame{
     text-underline-offset: 2px;
   }
 
-  .brandStarburst__svg{
+  .brandScrollArrow__svg{
     width: 26px;
     height: 26px;
   }
@@ -12000,13 +12081,13 @@ body[data-layout="content"] .simplePage{
 
 .wnlPageRevealRoot .siteHeader{
   transition:
-    opacity 980ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 980ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 1200ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--headerReady) .siteHeader{
   opacity: 0;
-  transform: translateY(14px);
+  transform: translateY(20px);
 }
 
 .wnlPageRevealRoot--headerReady .siteHeader{
@@ -12020,8 +12101,8 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot main.contentPage,
 .wnlPageRevealRoot .simplePage{
   transition:
-    opacity 1100ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1100ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 1500ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1500ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .pageShell,
@@ -12030,7 +12111,7 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) main.contentPage,
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .simplePage{
   opacity: 0;
-  transform: translateY(22px);
+  transform: translateY(36px);
 }
 
 .wnlPageRevealRoot--contentReady .pageShell,
@@ -12048,8 +12129,8 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot main.contentPage > *,
 .wnlPageRevealRoot .simplePage > *{
   transition:
-    opacity 1000ms cubic-bezier(0.22, 1, 0.36, 1),
-    transform 1000ms cubic-bezier(0.22, 1, 0.36, 1);
+    opacity 1680ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1680ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .split > *,
@@ -12057,7 +12138,7 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) main.contentPage > *,
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .simplePage > *{
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(26px);
 }
 
 .wnlPageRevealRoot--contentReady .split > *,
@@ -12071,77 +12152,109 @@ body[data-layout="content"] .simplePage{
 .wnlPageRevealRoot--contentReady .split > *:nth-child(1),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(1),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(1),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(1){ transition-delay: 140ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(1){ transition-delay: 200ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(2),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(2),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(2),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(2){ transition-delay: 230ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(2){ transition-delay: 380ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(3),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(3),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(3),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(3){ transition-delay: 320ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(3){ transition-delay: 560ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(4),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(4),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(4),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(4){ transition-delay: 410ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(4){ transition-delay: 740ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(5),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(5),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(5),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(5){ transition-delay: 500ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(5){ transition-delay: 920ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(6),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(6),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(6),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(6){ transition-delay: 590ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(6){ transition-delay: 1100ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(7),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(7),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(7),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(7){ transition-delay: 680ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(7){ transition-delay: 1280ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(8),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(8),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(8),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(8){ transition-delay: 770ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(8){ transition-delay: 1460ms; }
 
 .wnlPageRevealRoot--contentReady .split > *:nth-child(n+9),
 .wnlPageRevealRoot--contentReady .contentPage > *:nth-child(n+9),
 .wnlPageRevealRoot--contentReady main.contentPage > *:nth-child(n+9),
-.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(n+9){ transition-delay: 860ms; }
+.wnlPageRevealRoot--contentReady .simplePage > *:nth-child(n+9){ transition-delay: 1640ms; }
+
+/* Spring hub + similar pages: second-level top-down cascade inside hero + grid */
+.wnlPageRevealRoot .springHubHero > *,
+.wnlPageRevealRoot .springHubGrid > *{
+  transition:
+    opacity 1520ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 1520ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .springHubHero > *,
+.wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .springHubGrid > *{
+  opacity: 0;
+  transform: translateY(18px);
+}
+
+.wnlPageRevealRoot--contentReady .springHubHero > *,
+.wnlPageRevealRoot--contentReady .springHubGrid > *{
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(1){ transition-delay: 400ms; }
+.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(2){ transition-delay: 520ms; }
+.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(3){ transition-delay: 640ms; }
+.wnlPageRevealRoot--contentReady .springHubHero > *:nth-child(n+4){ transition-delay: 760ms; }
+
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(1){ transition-delay: 620ms; }
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(2){ transition-delay: 760ms; }
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(3){ transition-delay: 900ms; }
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(4){ transition-delay: 1040ms; }
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(5){ transition-delay: 1180ms; }
+.wnlPageRevealRoot--contentReady .springHubGrid > *:nth-child(n+6){ transition-delay: 1320ms; }
 
 /* Weekly overview (right column): same stagger rhythm as main.contentPage, but starts only when --contentReady flips
    (otherwise animations run while pageShell is invisible and finish before you see them). Delays add the right-pane
    split delay (230ms) so inner blocks line up with the column reveal. Remounting the block (e.g. back from an event)
    still runs the animation because --contentReady is already true on first paint. */
 @keyframes wnlWeeklyOverviewBlockIn{
-  from{ opacity: 0; transform: translateY(18px); }
+  from{ opacity: 0; transform: translateY(24px); }
   to{ opacity: 1; transform: translateY(0); }
 }
 
 .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) .weeklyOverviewLanding > *{
   opacity: 0;
-  transform: translateY(18px);
+  transform: translateY(24px);
   animation: none;
 }
 
 .wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *{
   opacity: 0;
-  animation: wnlWeeklyOverviewBlockIn 1000ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: wnlWeeklyOverviewBlockIn 1680ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(1){ animation-delay: calc(230ms + 140ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(2){ animation-delay: calc(230ms + 230ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(3){ animation-delay: calc(230ms + 320ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(4){ animation-delay: calc(230ms + 410ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(5){ animation-delay: calc(230ms + 500ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(6){ animation-delay: calc(230ms + 590ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(7){ animation-delay: calc(230ms + 680ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(8){ animation-delay: calc(230ms + 770ms); }
-.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(n+9){ animation-delay: calc(230ms + 860ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(1){ animation-delay: calc(280ms + 200ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(2){ animation-delay: calc(280ms + 380ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(3){ animation-delay: calc(280ms + 560ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(4){ animation-delay: calc(280ms + 740ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(5){ animation-delay: calc(280ms + 920ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(6){ animation-delay: calc(280ms + 1100ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(7){ animation-delay: calc(280ms + 1280ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(8){ animation-delay: calc(280ms + 1460ms); }
+.wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *:nth-child(n+9){ animation-delay: calc(280ms + 1640ms); }
 
 /* Optional blocks: wrap with <RevealSection /> */
 .wnl-reveal{
@@ -12168,6 +12281,8 @@ body[data-layout="content"] .simplePage{
   .wnlPageRevealRoot .contentPage > *,
   .wnlPageRevealRoot main.contentPage > *,
   .wnlPageRevealRoot .simplePage > *,
+  .wnlPageRevealRoot .springHubHero > *,
+  .wnlPageRevealRoot .springHubGrid > *,
   .wnlPageRevealRoot--contentReady .weeklyOverviewLanding > *,
   .wnl-reveal{
     opacity: 1 !important;
@@ -12671,7 +12786,11 @@ body[data-layout="content"] .simplePage{
 }
 
 .newsTickerHubSeasonTileBg--placeholder{
-  background: linear-gradient(135deg, color-mix(in srgb, var(--panel) 70%, var(--accent) 30%), var(--panel));
+  background: radial-gradient(
+    circle at 50% 50%,
+    color-mix(in srgb, var(--accent) 42%, var(--panel) 58%) 0%,
+    color-mix(in srgb, var(--muted) 22%, var(--panel) 78%) 100%
+  );
 }
 
 .newsTickerHubSeasonTileScrim{
@@ -12705,6 +12824,23 @@ body[data-layout="content"] .simplePage{
   color: var(--accent);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+.newsTickerHubUpdatesBlock{
+  margin-top: 28px;
+  padding-top: 22px;
+  border-top: 1px solid color-mix(in srgb, var(--border) 85%, transparent);
+}
+
+.newsTickerHubCardInner{
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.newsTickerHubCardBody{
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
 .newsTickerHubSectionHead{
@@ -12902,6 +13038,21 @@ body[data-layout="content"] .simplePage{
 
 .springHubHero{
   margin-bottom: 24px;
+}
+
+.springHubCard{
+  padding-top: 0;
+  overflow: hidden;
+}
+
+.springHubCard__media{
+  width: calc(100% + 44px);
+  max-width: none;
+  margin: 0 -22px 16px -22px;
+  border-radius: 11px 11px 0 0;
+  border-left: none;
+  border-right: none;
+  border-top: none;
 }
 
 .springHubBack{
@@ -13166,11 +13317,18 @@ body[data-layout="content"] .simplePage{
 .updateListRow{
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 6px;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 12px;
   text-align: left;
   padding-right: 52px;
+}
+
+.updateListRow__thumb{
+  flex: 0 0 48px;
+  width: 48px;
+  height: 48px;
+  margin-top: 2px;
 }
 
 @media (max-width: 980px){

@@ -42,7 +42,7 @@ export default function PageRevealRoot({ children }: { children: ReactNode }) {
         setHeaderReady(true);
         revealTimer = window.setTimeout(() => {
           setContentReady(true);
-        }, 140);
+        }, 320);
       });
     });
 

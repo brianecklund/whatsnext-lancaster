@@ -251,6 +251,8 @@ export default function NewsTickerBar({
           introBarText={introText}
           hubLead={hubLead}
           seasonContent={seasonContent}
+          updates={updates}
+          updatesHref={updatesHref}
         />
       </>
     );
@@ -323,6 +325,8 @@ export default function NewsTickerBar({
         introBarText={introText}
         hubLead={hubLead}
         seasonContent={seasonContent}
+        updates={updates}
+        updatesHref={updatesHref}
       />
     </>
   );

@@ -437,6 +437,7 @@ export default function UpdatesSplitClient({
           onClick={() => setSelected(u.id)}
           type="button"
         >
+          <span className="updateListRow__thumb wnlPlaceholderThumb" aria-hidden />
           <span className="updateListRow__main">
             <span className="eventRowTitle">{u.title}</span>
             <span className="eventRowMeta updateRowMeta">

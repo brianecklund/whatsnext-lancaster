@@ -1,11 +1,11 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import BrandStarburst from "@/app/components/BrandStarburst";
+import BrandScrollArrow from "@/app/components/BrandScrollArrow";
 import { SegmentIconCalendar, SegmentIconDirectory, SegmentIconUpdates } from "@/app/components/segmentNavIcons";
 import { TopNavIconAbout, TopNavIconBlog, TopNavIconContact, TopNavIconDonate } from "@/app/components/topNavMenuIcons";
 import { DEFAULT_THEME, THEME_PALETTES, THEME_PREVIEW_COLORS, normalizeThemeKey, type ThemeKey } from "./theme-palettes";
@@ -305,7 +305,7 @@ export default function SiteHeader() {
     };
   }, [clearMenuCloseTimer, clearSettingsCloseTimer]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const mq = window.matchMedia("(min-width: 981px)");
     const sync = () => setDesktop(mq.matches);
     sync();
@@ -405,15 +405,29 @@ export default function SiteHeader() {
 
   return (
     <header className="siteHeader">
-      <Link className="brand" href="/" aria-label="What’s Next Lancaster">
-        <BrandStarburst />
-        <span className="brandText">
-          <span className="brandFull">What’s Next Lancaster</span>
-          <span className="brandShort" aria-hidden>
-            What’s Next
+      {desktop ? (
+        <Link className="brand" href="/" aria-label="What’s Next Lancaster">
+          <BrandScrollArrow />
+          <span className="brandText">
+            <span className="brandFull">What’s Next Lancaster</span>
+            <span className="brandShort" aria-hidden>
+              What’s Next
+            </span>
           </span>
-        </span>
-      </Link>
+        </Link>
+      ) : (
+        <div className="brand brand--mobileSplit">
+          <span className="brandMark" aria-hidden>
+            <BrandScrollArrow />
+          </span>
+          <Link className="brandText" href="/" aria-label="What’s Next Lancaster — Calendar home">
+            <span className="brandFull">What’s Next Lancaster</span>
+            <span className="brandShort" aria-hidden>
+              What’s Next
+            </span>
+          </Link>
+        </div>
+      )}
 
       <nav className="topNav" aria-label="Primary">
         {DESKTOP_LINKS.map((l) => (

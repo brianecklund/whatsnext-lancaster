@@ -20,7 +20,8 @@ export default function SpringHubPage() {
       </header>
 
       <section className="contentGridTwo springHubGrid">
-        <div className="contentCard">
+        <div className="contentCard springHubCard">
+          <div className="springHubCard__media wnlPlaceholderThumb wnlPlaceholderThumb--banner" aria-hidden />
           <h2 className="contentCardTitle">Suggestions</h2>
           <p style={{ color: "var(--muted)", lineHeight: 1.65, margin: 0 }}>
             We’re curating patios, markets, walks, and small venues that shine in spring. Use the live{" "}
@@ -35,7 +36,8 @@ export default function SpringHubPage() {
             ahead.
           </p>
         </div>
-        <div className="contentCard">
+        <div className="contentCard springHubCard">
+          <div className="springHubCard__media wnlPlaceholderThumb wnlPlaceholderThumb--banner" aria-hidden />
           <h2 className="contentCardTitle">Reviews &amp; notes</h2>
           <p style={{ color: "var(--muted)", lineHeight: 1.65, margin: 0 }}>
             Short takes on openings and experiences will live here with links into the directory. Want something featured?{" "}
@@ -43,7 +45,8 @@ export default function SpringHubPage() {
             .
           </p>
         </div>
-        <div className="contentCard">
+        <div className="contentCard springHubCard">
+          <div className="springHubCard__media wnlPlaceholderThumb wnlPlaceholderThumb--banner" aria-hidden />
           <h2 className="contentCardTitle">Updates</h2>
           <p style={{ color: "var(--muted)", lineHeight: 1.65, margin: 0 }}>
             PSAs, menu changes, and quick hits live under{" "}

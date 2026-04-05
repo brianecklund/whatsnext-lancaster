@@ -1953,6 +1953,8 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     const d = safeDateFromEvent(e);
                     const timeLabel = d ? formatTimeLabel(d) : "Time TBD";
 
+                    const rowImg = pickImageUrl(e);
+
                     return (
                       <button
                         key={e.id}
@@ -1968,40 +1970,49 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         }}
                         type="button"
                       >
-                        {eventEndedEarlierToday(e, g.date) ? (
-                          <span className="eventEndedTag">ENDED</span>
-                        ) : null}
-                        <div className="eventRowTitle">{title}</div>
-                        <div className="eventRowMeta">
-                          <span className="eventListingTime">{timeLabel}</span>
-                          {e.event_type ? (
-                            effectiveIsMobile ? (
-                              <span className="eventRowTypePill">{e.event_type}</span>
-                            ) : (
-                              <>
-                                <span className="dot">•</span>
-                                <span className="eventListingType">{e.event_type}</span>
-                              </>
-                            )
+                        {rowImg ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <span className="eventRowThumb">
+                            <img src={rowImg} alt="" />
+                          </span>
+                        ) : (
+                          <span className="eventRowThumb wnlPlaceholderThumb" aria-hidden />
+                        )}
+                        <span className="eventRow__col">
+                          {eventEndedEarlierToday(e, g.date) ? (
+                            <span className="eventEndedTag">ENDED</span>
                           ) : null}
-                        </div>
-                        {e.locationName?.trim() ? (
-                          <div className="eventRowLocation">
-                            <EventListingLocation e={e} />
+                          <div className="eventRowTitle">{title}</div>
+                          <div className="eventRowMeta">
+                            <span className="eventListingTime">{timeLabel}</span>
+                            {e.event_type ? (
+                              effectiveIsMobile ? (
+                                <span className="eventRowTypePill">{e.event_type}</span>
+                              ) : (
+                                <>
+                                  <span className="dot">•</span>
+                                  <span className="eventListingType">{e.event_type}</span>
+                                </>
+                              )
+                            ) : null}
                           </div>
-                        ) : null}
-                        {(() => {
-                          const raw =
-                            (e.summary ?? "") || (pickDescriptionText(e) ?? "");
-                          const s = (raw || "").trim();
-                          if (!s) return null;
-                          return (
-                            <div className="eventRowDesc">
-                              {s.length > 180 ? `${s.slice(0, 180).trim()}…` : s}
+                          {e.locationName?.trim() ? (
+                            <div className="eventRowLocation">
+                              <EventListingLocation e={e} />
                             </div>
-                          );
-                        })()}
-
+                          ) : null}
+                          {(() => {
+                            const raw =
+                              (e.summary ?? "") || (pickDescriptionText(e) ?? "");
+                            const s = (raw || "").trim();
+                            if (!s) return null;
+                            return (
+                              <div className="eventRowDesc">
+                                {s.length > 180 ? `${s.slice(0, 180).trim()}…` : s}
+                              </div>
+                            );
+                          })()}
+                        </span>
                       </button>
                     );
                   })}
