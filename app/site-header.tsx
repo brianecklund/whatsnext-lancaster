@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import BrandScrollArrow from "@/app/components/BrandScrollArrow";
+import BrandScrollSmiley from "@/app/components/BrandScrollSmiley";
 import { SegmentIconCalendar, SegmentIconDirectory, SegmentIconUpdates } from "@/app/components/segmentNavIcons";
 import { TopNavIconAbout, TopNavIconBlog, TopNavIconContact, TopNavIconDonate } from "@/app/components/topNavMenuIcons";
 import { DEFAULT_THEME, THEME_PALETTES, THEME_PREVIEW_COLORS, normalizeThemeKey, type ThemeKey } from "./theme-palettes";
@@ -407,7 +407,7 @@ export default function SiteHeader() {
     <header className="siteHeader">
       {desktop ? (
         <Link className="brand" href="/" aria-label="What’s Next Lancaster">
-          <BrandScrollArrow />
+          <BrandScrollSmiley />
           <span className="brandText">
             <span className="brandFull">What’s Next Lancaster</span>
             <span className="brandShort" aria-hidden>
@@ -418,7 +418,7 @@ export default function SiteHeader() {
       ) : (
         <div className="brand brand--mobileSplit">
           <span className="brandMark" aria-hidden>
-            <BrandScrollArrow />
+            <BrandScrollSmiley />
           </span>
           <Link className="brandText" href="/" aria-label="What’s Next Lancaster — Calendar home">
             <span className="brandFull">What’s Next Lancaster</span>

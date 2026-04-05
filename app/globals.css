@@ -1892,10 +1892,10 @@ a.eventTimeLink:hover{
   color: var(--muted);
   font-weight: 700;
   letter-spacing: -0.01em;
-  transition: color 180ms ease, opacity 180ms ease, transform 180ms ease;
+  transition: color 45ms ease, opacity 180ms ease, transform 180ms ease;
 }
 
-.segmentedControl__button[data-active="true"],
+/* Match label color to the sliding pill immediately; `data-active` follows the route and lags navigation. */
 .segmentedControl__button[data-visual-active="true"]{
   color: #fff;
 }
@@ -2208,37 +2208,10 @@ a.weeklyOverview{
   border-radius: 9px;
   cursor: pointer;
   display:flex;
-  flex-direction: row;
-  align-items: flex-start;
-  gap: 12px;
-  color: var(--text);
-  transition: background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
-}
-
-.eventRow__col{
-  flex: 1 1 auto;
-  min-width: 0;
-  display: flex;
   flex-direction: column;
   gap: 4px;
-  align-items: stretch;
-}
-
-.eventRowThumb{
-  flex: 0 0 48px;
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  overflow: hidden;
-  align-self: flex-start;
-  margin-top: 1px;
-}
-
-.eventRowThumb img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  color: var(--text);
+  transition: background-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 @media (hover: hover) and (pointer: fine){
   .eventRow:hover{ background: var(--hover); transform: translateX(4px); }
@@ -5264,24 +5237,9 @@ textarea,
 
 .eventRow.directoryListingRow{
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) auto;
   gap: 8px 10px;
   align-items: center;
-}
-
-.directoryListingRow__thumb{
-  width: 48px;
-  height: 48px;
-  border-radius: 10px;
-  overflow: hidden;
-  flex-shrink: 0;
-}
-
-.directoryListingRow__thumb img{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
 }
 
 .eventRow.directoryListingRow[role="button"]{
@@ -10740,7 +10698,6 @@ html[data-theme="paper-ink"]{
   }
 }
 
-html[data-theme="night-shift"] .segmentedControl__button[data-active="true"],
 html[data-theme="night-shift"] .segmentedControl__button[data-visual-active="true"],
 html[data-theme="night-shift"] .dayJumpBtn,
 html[data-theme="night-shift"] .dayJumpBtn[data-active="true"],
@@ -10885,7 +10842,6 @@ html[data-theme="paper-ink"]{
   display: none !important;
 }
 
-html[data-theme="night-shift"] .segmentedControl__button[data-active="true"],
 html[data-theme="night-shift"] .segmentedControl__button[data-visual-active="true"],
 html[data-theme="night-shift"] .dayJumpBtn,
 html[data-theme="night-shift"] .dayJumpBtn[data-active="true"],

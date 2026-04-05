@@ -122,14 +122,6 @@ function DirectoryListingRow({
         }
       }}
     >
-      {l.coverImageUrl ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <span className="directoryListingRow__thumb">
-          <img src={l.coverImageUrl} alt="" />
-        </span>
-      ) : (
-        <span className="directoryListingRow__thumb wnlPlaceholderThumb" aria-hidden />
-      )}
       <div className="directoryListingRow__main">
         <span className="eventRowTitle">{l.name ?? "Untitled listing"}</span>
         {l.category ? <span className="directoryListingRow__category">{l.category}</span> : null}
