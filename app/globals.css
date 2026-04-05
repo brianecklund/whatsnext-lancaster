@@ -1363,20 +1363,41 @@ a.eventTimeLink:hover{
 
 .topNav .navLinkText{
   font-weight: var(--fw-medium);
+  flex: 1 1 auto;
+  min-width: 0;
 }
 
-.topNav .navLinkIcon{
+.topNav .navLinkLeadingIcon{
   width: 18px;
   height: 18px;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: color-mix(in srgb, var(--accent) 88%, var(--text) 12%);
 }
 
-.topNav .navLinkIcon svg{
+.topNav .navLinkLeadingIcon svg{
   width: 18px;
   height: 18px;
-  display:block;
+  display: block;
+  transition: transform 180ms ease;
+}
+
+.topNav .navLinkCaret{
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  margin-left: 4px;
+}
+
+.topNav .navLinkCaret svg{
+  width: 18px;
+  height: 18px;
+  display: block;
   transition: transform 180ms ease;
 }
 
@@ -1387,7 +1408,10 @@ a.eventTimeLink:hover{
     box-shadow: 0 10px 28px rgba(0,0,0,0.10);
     transform: translateY(-1px);
   }
-  .topNav .navLink:hover .navLinkIcon svg{
+  .topNav .navLink:hover .navLinkLeadingIcon svg{
+    transform: translateX(-2px) rotate(-6deg) scale(1.06);
+  }
+  .topNav .navLink:hover .navLinkCaret svg{
     transform: translateX(3px) rotate(-8deg) scale(1.05);
   }
 }
@@ -1396,8 +1420,8 @@ a.eventTimeLink:hover{
   transform: translateY(0) scale(0.98);
 }
 
-.topNav .navLink:active .navLinkIcon svg{
-  animation: navIconPop 240ms ease;
+.topNav .navLink:active .navLinkLeadingIcon svg{
+  animation: navLeadingIconPop 240ms ease;
 }
 
 .topNav .navLink[data-active="true"]{
@@ -1406,9 +1430,9 @@ a.eventTimeLink:hover{
   box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.22) inset;
 }
 
-@keyframes navIconPop{
+@keyframes navLeadingIconPop{
   0%{ transform: translateX(0) rotate(0) scale(1); }
-  45%{ transform: translateX(4px) rotate(-12deg) scale(1.12); }
+  45%{ transform: translateX(-4px) rotate(10deg) scale(1.12); }
   100%{ transform: translateX(0) rotate(0) scale(1); }
 }
 
@@ -1849,50 +1873,9 @@ a.eventTimeLink:hover{
   transition: color 180ms ease, opacity 180ms ease, transform 180ms ease;
 }
 
-.segmentedControl__inner{
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  min-width: 0;
-}
-
-.segmentedControl__icon{
-  flex: 0 0 auto;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.92;
-}
-
-.segmentedControl__icon svg{
-  display: block;
-}
-
-.segmentedControl__label{
-  min-width: 0;
-}
-
 .segmentedControl__button[data-active="true"],
 .segmentedControl__button[data-visual-active="true"]{
   color: #fff;
-}
-
-.segmentedControl__button[data-icon-flash="true"] .segmentedControl__icon{
-  animation: segmentedNavIconPop 420ms cubic-bezier(.22, 1, .36, 1);
-}
-
-@keyframes segmentedNavIconPop{
-  0%{ transform: scale(1) rotate(0deg); }
-  35%{ transform: scale(1.14) rotate(-14deg); }
-  70%{ transform: scale(0.92) rotate(8deg); }
-  100%{ transform: scale(1) rotate(0deg); }
-}
-
-@media (prefers-reduced-motion: reduce){
-  .segmentedControl__button[data-icon-flash="true"] .segmentedControl__icon{
-    animation: none;
-  }
 }
 
 @media (hover: hover) and (pointer: fine){
@@ -2018,7 +2001,7 @@ a.weeklyOverview{
   .weeklySpotlightPair .weeklyOverview--spotlightHalf{
     display: flex !important;
     flex-direction: row !important;
-    align-items: center !important;
+    align-items: stretch !important;
     justify-content: flex-start !important;
     text-align: left !important;
     gap: 12px !important;
@@ -2033,22 +2016,30 @@ a.weeklyOverview{
 
 .hubSpotlightIcon{
   flex: 0 0 auto;
-  display: inline-flex;
+  align-self: stretch;
+  display: flex;
   align-items: center;
   justify-content: center;
+  min-height: 0;
   color: color-mix(in srgb, var(--accent) 90%, var(--text) 10%);
 }
 
-.hubSpotlightIcon svg{
+.hubSpotlightGlyphSvg{
   display: block;
+  width: auto;
+  height: 100%;
+  max-height: 3.75rem;
+  min-height: 2.25rem;
 }
 
 .hubSpotlightCopy{
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
   min-width: 0;
   flex: 1 1 auto;
+  min-height: 0;
 }
 
 .weeklyOverview--spotlightHalf[data-hub-pulse="true"] .hubSpotlightIcon,
@@ -2127,7 +2118,7 @@ a.weeklyOverview{
     text-align: left;
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
     justify-content: flex-start;
     gap: 8px;
     box-sizing: border-box;
@@ -5048,7 +5039,38 @@ a:hover{
 }
 .mobileMenuSheet{ min-height: 100dvh; padding-top: max(16px, env(safe-area-inset-top)); }
 .mobileMenuList{ gap: 14px; }
-.mobileMenuActionText{ display:block; }
+
+.mobileMenuAction.mobileSheetAction{
+  justify-content: flex-start;
+}
+
+.mobileMenuActionLead{
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
+}
+
+.mobileMenuActionIcon{
+  flex: 0 0 auto;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--accent) 88%, var(--muted) 12%);
+}
+
+.mobileMenuActionIcon svg{
+  width: 22px;
+  height: 22px;
+  display: block;
+}
+
+.mobileMenuActionText{
+  display: block;
+  min-width: 0;
+}
 
 .mobileMenuSheet .mobileSheetHeader{
   justify-content: flex-start;
@@ -9055,6 +9077,8 @@ body,
 
   .searchInput{
     min-width: 0;
+    /* iOS: avoid auto-zoom on focus when computed size would fall below 16px */
+    font-size: 16px !important;
   }
 
   .viewBtn,
@@ -11190,7 +11214,8 @@ html[data-theme="night-shift"] .weeklyTitle{
   .weeklyItem:hover,
   .card:hover,
   .topNav .navLink:hover,
-  .topNav .navLink:hover .navLinkIcon svg,
+  .topNav .navLink:hover .navLinkLeadingIcon svg,
+  .topNav .navLink:hover .navLinkCaret svg,
   :where(button, .tabBtn, .filterBtn, .clearBtn, .viewBtn, .monthNavBtn, .weeklyMiniBtn, .ctaBtn, .backBtn, .filterOverlayClose, .filterOverlayClear):hover,
   :where(.weeklyCardSelectable, .weekSummaryCard, .weekSummaryMiniCard, .aboutCard, .calloutCard):hover{
     transform: none !important;
@@ -12947,7 +12972,7 @@ body[data-layout="content"] .simplePage{
   .updatesDesktopHubRow--inScroll .weeklyOverview--spotlightHalf,
   .directoryDesktopHubRow--inScroll .weeklyOverview--spotlightHalf{
     padding: 12px 12px 12px 20px !important;
-    align-items: center !important;
+    align-items: stretch !important;
     flex-direction: row !important;
     gap: 12px !important;
   }

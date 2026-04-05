@@ -25,15 +25,7 @@ import type { EventLite as LibEventLite } from "@/lib/types";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import SegmentedControl from "@/app/components/SegmentedControl";
-import {
-  HubIconGoingNow,
-  HubIconWeekly,
-  SegmentIconCalendar,
-  SegmentIconChevronLeft,
-  SegmentIconChevronRight,
-  SegmentIconDirectory,
-  SegmentIconUpdates,
-} from "@/app/components/segmentNavIcons";
+import { HubIconGoingNow, HubIconWeekly } from "@/app/components/segmentNavIcons";
 import { hubSpotlightPulse } from "@/lib/hubSpotlightPulse";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -1368,6 +1360,13 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
       if (pullRefreshingRef.current || mobileDetailOpen || filterOpen) return;
       if (listEl.scrollTop > 0) return;
       if (event.touches.length !== 1) return;
+      const t = event.target;
+      if (
+        t instanceof Element &&
+        t.closest("button, a, input, textarea, select, label, [role='button'], [role='tab']")
+      ) {
+        return;
+      }
       startY = event.touches[0].clientY;
       active = true;
     };
@@ -1616,27 +1615,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ariaLabel="Primary navigation"
                   currentKey={resolvedSection}
                   items={[
-                    {
-                      key: "calendar",
-                      label: "Calendar",
-                      icon: <SegmentIconCalendar />,
-                      href: onNavigateSection ? undefined : "/",
-                      onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined,
-                    },
-                    {
-                      key: "directory",
-                      label: "Directory",
-                      icon: <SegmentIconDirectory />,
-                      href: onNavigateSection ? undefined : "/locations",
-                      onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined,
-                    },
-                    {
-                      key: "updates",
-                      label: "Updates",
-                      icon: <SegmentIconUpdates />,
-                      href: onNavigateSection ? undefined : "/updates",
-                      onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined,
-                    },
+                    { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
+                    { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
+                    { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
                   ]}
                 />
 
@@ -2744,7 +2725,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     {
                       key: "previous",
                       label: "Prev.",
-                      icon: <SegmentIconChevronLeft />,
                       onClick: () => {
                         if (!previousEventKey) return;
                         setMobileDetailVisualKey("previous");
@@ -2756,7 +2736,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     {
                       key: "cal",
                       label: "Cal.",
-                      icon: <SegmentIconCalendar />,
                       onClick: () => {
                         exitMobileEventDetailToCalendarList();
                       },
@@ -2764,7 +2743,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     {
                       key: "next",
                       label: "Next",
-                      icon: <SegmentIconChevronRight />,
                       onClick: () => {
                         if (!nextEventKey) return;
                         setMobileDetailVisualKey("next");
@@ -2783,9 +2761,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ariaLabel="Primary navigation"
                   currentKey={resolvedSection}
                   items={[
-                    { key: "calendar", label: "Calendar", icon: <SegmentIconCalendar />, href: "/" },
-                    { key: "directory", label: "Directory", icon: <SegmentIconDirectory />, href: "/locations" },
-                    { key: "updates", label: "Updates", icon: <SegmentIconUpdates />, href: "/updates" },
+                    { key: "calendar", label: "Calendar", href: "/" },
+                    { key: "directory", label: "Directory", href: "/locations" },
+                    { key: "updates", label: "Updates", href: "/updates" },
                   ]}
                 />
               </div>

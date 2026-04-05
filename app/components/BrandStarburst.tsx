@@ -2,8 +2,11 @@
 
 import { useEffect, useId, useRef } from "react";
 
+const DROPLET_D =
+  "M12 3.6c1.35 0 2.45 1.05 2.45 2.35 0 1.55-1.1 3.65-2.45 5.85-1.35-2.2-2.45-4.3-2.45-5.85 0-1.3 1.1-2.35 2.45-2.35z";
+
 /**
- * Starburst beside the site title: gradient fill, spin driven by scroll velocity with inertia.
+ * Symmetrical droplet cluster beside the site title: gradient fill, spin + hue from scroll velocity.
  */
 export default function BrandStarburst() {
   const gid = useId().replace(/:/g, "");
@@ -15,6 +18,9 @@ export default function BrandStarburst() {
   const rotationRef = useRef(0);
   const scrollTopRef = useRef(new WeakMap<Element, number>());
   const rafRef = useRef(0);
+
+  const dropletAngles = [0, 45, 90, 135, 180, 225, 270, 315];
+  const innerAngles = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5];
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -66,21 +72,29 @@ export default function BrandStarburst() {
     };
   }, []);
 
+  const gradId = `brand-droplets-${gid}`;
+
   return (
     <span className="brandStarburst" aria-hidden>
-      <svg width="30" height="30" viewBox="0 0 24 24" className="brandStarburst__svg">
+      <svg width="32" height="32" viewBox="0 0 24 24" className="brandStarburst__svg">
         <defs>
-          <linearGradient id={`brand-burst-${gid}`} x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop ref={stop0Ref} offset="0%" stopColor="hsl(265 78% 52%)" />
             <stop ref={stop1Ref} offset="48%" stopColor="hsl(38 82% 58%)" />
             <stop ref={stop2Ref} offset="100%" stopColor="hsl(168 70% 48%)" />
           </linearGradient>
         </defs>
         <g ref={groupRef} transform="rotate(0 12 12)">
-          <path
-            fill={`url(#brand-burst-${gid})`}
-            d="M12 0.85l1.35 5.55 5.35-2.95-2.05 5.75 6.05 0.85-6 2.35 2.35 5.75-5.55-2.35L12 23.15l-1.35-5.55-5.35 2.95 2.05-5.75-6.05-0.85 6-2.35-2.35-5.75 5.55 2.35z"
-          />
+          {dropletAngles.map((deg) => (
+            <g key={`o-${deg}`} transform={`rotate(${deg} 12 12) translate(0 -6.2)`}>
+              <path d={DROPLET_D} fill={`url(#${gradId})`} />
+            </g>
+          ))}
+          {innerAngles.map((deg) => (
+            <g key={`i-${deg}`} transform={`rotate(${deg} 12 12) translate(0 -3.35) scale(0.58)`}>
+              <path d={DROPLET_D} fill={`url(#${gradId})`} opacity={0.88} />
+            </g>
+          ))}
         </g>
       </svg>
     </span>

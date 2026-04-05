@@ -4,7 +4,6 @@ import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import SegmentedControl from "@/app/components/SegmentedControl";
-import { SegmentIconCalendar, SegmentIconDirectory, SegmentIconUpdates } from "@/app/components/segmentNavIcons";
 
 type PageKey = "calendar" | "directory" | "updates";
 
@@ -74,27 +73,9 @@ export default function SplitPageLayout({
             ariaLabel="Primary navigation"
             currentKey={current}
             items={[
-              {
-                key: "calendar",
-                label: "Calendar",
-                icon: <SegmentIconCalendar />,
-                href: onNavigateSection ? undefined : "/",
-                onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined,
-              },
-              {
-                key: "directory",
-                label: "Directory",
-                icon: <SegmentIconDirectory />,
-                href: onNavigateSection ? undefined : "/locations",
-                onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined,
-              },
-              {
-                key: "updates",
-                label: "Updates",
-                icon: <SegmentIconUpdates />,
-                href: onNavigateSection ? undefined : "/updates",
-                onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined,
-              },
+              { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
+              { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
+              { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
             ]}
           />
         </div>

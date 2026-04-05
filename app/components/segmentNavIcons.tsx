@@ -69,11 +69,11 @@ export function SegmentIconChevronRight(): ReactNode {
   );
 }
 
-const hubSvg = { ...svgProps, width: 20, height: 20 };
+const hubClass = "hubSpotlightGlyphSvg";
 
 export function HubIconWeekly(): ReactNode {
   return (
-    <svg {...hubSvg}>
+    <svg className={hubClass} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
       <path
         d="M7 3v3M17 3v3M4 9h16M6 5h12a2 2 0 012 2v11H6a2 2 0 01-2-2V7a2 2 0 012-2z"
         stroke="currentColor"
@@ -87,7 +87,7 @@ export function HubIconWeekly(): ReactNode {
 
 export function HubIconGoingNow(): ReactNode {
   return (
-    <svg {...hubSvg}>
+    <svg className={hubClass} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
       <path
         d="M13 2L3 14h7l-1 8 11-13h-7l0-7z"
         stroke="currentColor"
@@ -101,7 +101,7 @@ export function HubIconGoingNow(): ReactNode {
 
 export function HubIconBlog(): ReactNode {
   return (
-    <svg {...hubSvg}>
+    <svg className={hubClass} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
       <path
         d="M4 6.5A2.5 2.5 0 016.5 4H18v14a2 2 0 01-2 2H6.5A2.5 2.5 0 014 17.5v-11z"
         stroke="currentColor"
@@ -116,7 +116,7 @@ export function HubIconBlog(): ReactNode {
 
 export function HubIconPartners(): ReactNode {
   return (
-    <svg {...hubSvg}>
+    <svg className={hubClass} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
       <path
         d="M10 13a5 5 0 007.07 0l1.41-1.41a5 5 0 000-7.07 5 5 0 00-7.07 0M14 11a5 5 0 00-7.07 0l-1.41 1.41a5 5 0 000 7.07 5 5 0 007.07 0"
         stroke="currentColor"
@@ -130,7 +130,7 @@ export function HubIconPartners(): ReactNode {
 
 export function HubIconSeason(): ReactNode {
   return (
-    <svg {...hubSvg}>
+    <svg className={hubClass} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden>
       <path
         d="M12 3v4M12 17v4M5.6 5.6l2.9 2.9M15.5 15.5l2.9 2.9M3 12h4M17 12h4M5.6 18.4l2.9-2.9M15.5 8.5l2.9-2.9"
         stroke="currentColor"

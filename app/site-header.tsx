@@ -1,11 +1,13 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import BrandStarburst from "@/app/components/BrandStarburst";
+import { SegmentIconCalendar, SegmentIconDirectory, SegmentIconUpdates } from "@/app/components/segmentNavIcons";
+import { TopNavIconAbout, TopNavIconBlog, TopNavIconContact, TopNavIconDonate } from "@/app/components/topNavMenuIcons";
 import { DEFAULT_THEME, THEME_PALETTES, THEME_PREVIEW_COLORS, normalizeThemeKey, type ThemeKey } from "./theme-palettes";
 import {
   TEXT_SCALE_OPTIONS,
@@ -17,21 +19,21 @@ import {
   type TextScaleKey,
 } from "@/lib/site-preferences";
 
-const DESKTOP_LINKS = [
-  { href: "/blog", label: "Blog" },
-  { href: "/donate", label: "Donate" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
+const DESKTOP_LINKS: Array<{ href: string; label: string; Icon: () => ReactNode }> = [
+  { href: "/blog", label: "Blog", Icon: TopNavIconBlog },
+  { href: "/donate", label: "Donate", Icon: TopNavIconDonate },
+  { href: "/about", label: "About", Icon: TopNavIconAbout },
+  { href: "/contact", label: "Contact", Icon: TopNavIconContact },
 ];
 
-const MOBILE_LINKS = [
-  { href: "/", label: "Calendar" },
-  { href: "/locations", label: "Directory" },
-  { href: "/updates", label: "Updates" },
-  { href: "/blog", label: "Blog" },
-  { href: "/donate", label: "Donate" },
-  { href: "/about", label: "About" },
-  { href: "/contact", label: "Contact" },
+const MOBILE_MENU_LINKS: Array<{ href: string; label: string; Icon: () => ReactNode }> = [
+  { href: "/", label: "Calendar", Icon: SegmentIconCalendar },
+  { href: "/locations", label: "Directory", Icon: SegmentIconDirectory },
+  { href: "/updates", label: "Updates", Icon: SegmentIconUpdates },
+  { href: "/blog", label: "Blog", Icon: TopNavIconBlog },
+  { href: "/donate", label: "Donate", Icon: TopNavIconDonate },
+  { href: "/about", label: "About", Icon: TopNavIconAbout },
+  { href: "/contact", label: "Contact", Icon: TopNavIconContact },
 ];
 
 const SHEET_CLOSE_MS = 320;
@@ -422,8 +424,11 @@ export default function SiteHeader() {
             data-active={pathname === l.href ? "true" : "false"}
             onClick={() => setOpen(false)}
           >
+            <span className="navLinkLeadingIcon" aria-hidden>
+              <l.Icon />
+            </span>
             <span className="navLinkText">{l.label}</span>
-            <span className="navLinkIcon" aria-hidden>
+            <span className="navLinkCaret" aria-hidden>
               <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path
                   d="M9 18l6-6-6-6"
@@ -517,7 +522,7 @@ export default function SiteHeader() {
                 </div>
 
                 <nav className="mobileSheetList mobileMenuList" aria-label="Mobile primary">
-                  {MOBILE_LINKS.map((l, idx) => (
+                  {MOBILE_MENU_LINKS.map((l, idx) => (
                     <Link
                       key={l.href}
                       className="mobileSheetAction mobileMenuAction"
@@ -526,7 +531,12 @@ export default function SiteHeader() {
                       style={{ ["--menuIndex" as string]: idx } as CSSProperties}
                       onClick={() => closeMenu()}
                     >
-                      <span className="mobileMenuActionText">{l.label}</span>
+                      <span className="mobileMenuActionLead">
+                        <span className="mobileMenuActionIcon" aria-hidden>
+                          <l.Icon />
+                        </span>
+                        <span className="mobileMenuActionText">{l.label}</span>
+                      </span>
                     </Link>
                   ))}
                 </nav>

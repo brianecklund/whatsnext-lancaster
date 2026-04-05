@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import NewsTickerBar from "@/app/components/NewsTickerBar";
 import SegmentedControl from "@/app/components/SegmentedControl";
-import { HubIconSeason, HubIconWeekly, SegmentIconCalendar, SegmentIconDirectory, SegmentIconUpdates } from "@/app/components/segmentNavIcons";
+import { HubIconSeason, HubIconWeekly } from "@/app/components/segmentNavIcons";
 import { hubSpotlightPulse } from "@/lib/hubSpotlightPulse";
 import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
@@ -319,27 +319,9 @@ export default function UpdatesSplitClient({
         ariaLabel="Primary navigation"
         currentKey={resolvedSection}
         items={[
-          {
-            key: "calendar",
-            label: "Calendar",
-            icon: <SegmentIconCalendar />,
-            href: onNavigateSection ? undefined : "/",
-            onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined,
-          },
-          {
-            key: "directory",
-            label: "Directory",
-            icon: <SegmentIconDirectory />,
-            href: onNavigateSection ? undefined : "/locations",
-            onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined,
-          },
-          {
-            key: "updates",
-            label: "Updates",
-            icon: <SegmentIconUpdates />,
-            href: onNavigateSection ? undefined : "/updates",
-            onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined,
-          },
+          { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
+          { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
+          { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
         ]}
       />
 
