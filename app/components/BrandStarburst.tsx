@@ -1,12 +1,20 @@
 "use client";
 
-import { useEffect, useId, useRef } from "react";
+import { useEffect, useId, useMemo, useRef } from "react";
 
 const DROPLET_D =
   "M12 3.6c1.35 0 2.45 1.05 2.45 2.35 0 1.55-1.1 3.65-2.45 5.85-1.35-2.2-2.45-4.3-2.45-5.85 0-1.3 1.1-2.35 2.45-2.35z";
 
+type RingSpec = { count: number; offset: number; ty: number; scale: number; opacity?: number };
+
+function ringTransforms(spec: RingSpec): string[] {
+  const { count, offset, ty, scale } = spec;
+  const step = 360 / count;
+  return Array.from({ length: count }, (_, i) => `rotate(${i * step + offset} 12 12) translate(0 ${ty}) scale(${scale})`);
+}
+
 /**
- * Symmetrical droplet cluster beside the site title: gradient fill, spin + hue from scroll velocity.
+ * Dense symmetrical droplet cluster beside the site title: gradient fill, faster spin + hue from scroll velocity.
  */
 export default function BrandStarburst() {
   const gid = useId().replace(/:/g, "");
@@ -19,8 +27,27 @@ export default function BrandStarburst() {
   const scrollTopRef = useRef(new WeakMap<Element, number>());
   const rafRef = useRef(0);
 
-  const dropletAngles = [0, 45, 90, 135, 180, 225, 270, 315];
-  const innerAngles = [22.5, 67.5, 112.5, 157.5, 202.5, 247.5, 292.5, 337.5];
+  const rings = useMemo(
+    () => [
+      { count: 14, offset: 0, ty: -6.25, scale: 1, opacity: 1 },
+      { count: 14, offset: 180 / 14, ty: -5.35, scale: 0.78, opacity: 0.97 },
+      { count: 14, offset: 0, ty: -4.45, scale: 0.58, opacity: 0.94 },
+      { count: 12, offset: 15, ty: -3.5, scale: 0.44, opacity: 0.9 },
+      { count: 10, offset: 18, ty: -2.55, scale: 0.32, opacity: 0.86 },
+    ] as RingSpec[],
+    [],
+  );
+
+  const dropletItems = useMemo(() => {
+    const out: { key: string; transform: string; opacity: number }[] = [];
+    rings.forEach((spec, ri) => {
+      const op = spec.opacity ?? 1;
+      ringTransforms(spec).forEach((transform, i) => {
+        out.push({ key: `r${ri}-${i}`, transform, opacity: op });
+      });
+    });
+    return out;
+  }, [rings]);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
@@ -35,17 +62,17 @@ export default function BrandStarburst() {
       scrollTopRef.current.set(el, st);
       if (prev === undefined) return;
       const delta = st - prev;
-      velocityRef.current += delta * 0.0024;
+      velocityRef.current += delta * 0.0054;
     };
 
     const onWheel = (e: WheelEvent) => {
-      velocityRef.current += e.deltaY * 0.00135;
+      velocityRef.current += e.deltaY * 0.0036;
     };
 
     const tick = () => {
       const v = velocityRef.current;
       rotationRef.current += v;
-      velocityRef.current *= 0.935;
+      velocityRef.current *= 0.942;
 
       const rot = rotationRef.current;
       const g = groupRef.current;
@@ -76,7 +103,7 @@ export default function BrandStarburst() {
 
   return (
     <span className="brandStarburst" aria-hidden>
-      <svg width="32" height="32" viewBox="0 0 24 24" className="brandStarburst__svg">
+      <svg width="34" height="34" viewBox="0 0 24 24" className="brandStarburst__svg">
         <defs>
           <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop ref={stop0Ref} offset="0%" stopColor="hsl(265 78% 52%)" />
@@ -85,16 +112,13 @@ export default function BrandStarburst() {
           </linearGradient>
         </defs>
         <g ref={groupRef} transform="rotate(0 12 12)">
-          {dropletAngles.map((deg) => (
-            <g key={`o-${deg}`} transform={`rotate(${deg} 12 12) translate(0 -6.2)`}>
-              <path d={DROPLET_D} fill={`url(#${gradId})`} />
-            </g>
-          ))}
-          {innerAngles.map((deg) => (
-            <g key={`i-${deg}`} transform={`rotate(${deg} 12 12) translate(0 -3.35) scale(0.58)`}>
-              <path d={DROPLET_D} fill={`url(#${gradId})`} opacity={0.88} />
-            </g>
-          ))}
+          <g transform="translate(12 12) scale(0.88) translate(-12 -12)">
+            {dropletItems.map((item) => (
+              <g key={item.key} transform={item.transform}>
+                <path d={DROPLET_D} fill={`url(#${gradId})`} opacity={item.opacity} />
+              </g>
+            ))}
+          </g>
         </g>
       </svg>
     </span>

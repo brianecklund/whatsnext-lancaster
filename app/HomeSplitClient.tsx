@@ -25,8 +25,6 @@ import type { EventLite as LibEventLite } from "@/lib/types";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import SegmentedControl from "@/app/components/SegmentedControl";
-import { HubIconGoingNow, HubIconWeekly } from "@/app/components/segmentNavIcons";
-import { hubSpotlightPulse } from "@/lib/hubSpotlightPulse";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
@@ -1790,41 +1788,29 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         type="button"
                         className="weeklyOverview weeklyOverview--spotlightMobileHalf"
                         data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
-                        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
                         onClick={() => openWeek(WEEKLY_KEY)}
                       >
-                        <span className="hubSpotlightIcon">
-                          <HubIconWeekly />
-                        </span>
-                        <span className="hubSpotlightCopy">
-                          <div className="weeklySpotlightMobile__label">This week</div>
-                          <div className="weeklySpotlightMobile__count">
-                            {(() => {
-                              const n = defaultWeekBucket?.events.length ?? 0;
-                              return `${n} ${n === 1 ? "event" : "events"}`;
-                            })()}
-                          </div>
-                        </span>
+                        <div className="weeklySpotlightMobile__label">This week</div>
+                        <div className="weeklySpotlightMobile__count">
+                          {(() => {
+                            const n = defaultWeekBucket?.events.length ?? 0;
+                            return `${n} ${n === 1 ? "event" : "events"}`;
+                          })()}
+                        </div>
                       </button>
                       <button
                         type="button"
                         className="weeklyOverview weeklyOverview--spotlightMobileHalf"
                         data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
-                        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
                         onClick={() => openWeek(GOING_NOW_KEY)}
                       >
-                        <span className="hubSpotlightIcon">
-                          <HubIconGoingNow />
-                        </span>
-                        <span className="hubSpotlightCopy">
-                          <div className="weeklySpotlightMobile__label">Happening now</div>
-                          <div className="weeklySpotlightMobile__count">
-                            {(() => {
-                              const n = liveEventsNow.length;
-                              return `${n} ${n === 1 ? "event" : "events"}`;
-                            })()}
-                          </div>
-                        </span>
+                        <div className="weeklySpotlightMobile__label">Happening now</div>
+                        <div className="weeklySpotlightMobile__count">
+                          {(() => {
+                            const n = liveEventsNow.length;
+                            return `${n} ${n === 1 ? "event" : "events"}`;
+                          })()}
+                        </div>
                       </button>
                     </div>
                   </div>
@@ -1920,35 +1906,23 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         type="button"
                         className="weeklyOverview weeklyOverview--spotlightHalf"
                         data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
-                        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
                         onClick={() => openWeek(WEEKLY_KEY)}
                       >
-                        <span className="hubSpotlightIcon">
-                          <HubIconWeekly />
-                        </span>
-                        <span className="hubSpotlightCopy">
-                          <div className="weeklyTitle">Weekly Overview</div>
-                          <div className="weeklyCount">
-                            {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left this week
-                          </div>
-                        </span>
+                        <div className="weeklyTitle">Weekly Overview</div>
+                        <div className="weeklyCount">
+                          {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left this week
+                        </div>
                       </button>
                       <button
                         type="button"
                         className="weeklyOverview weeklyOverview--spotlightHalf"
                         data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
-                        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
                         onClick={() => openWeek(GOING_NOW_KEY)}
                       >
-                        <span className="hubSpotlightIcon">
-                          <HubIconGoingNow />
-                        </span>
-                        <span className="hubSpotlightCopy">
-                          <div className="weeklyTitle">Going on now</div>
-                          <div className="weeklyCount">
-                            {liveEventsNow.length} event{liveEventsNow.length === 1 ? "" : "s"} happening now
-                          </div>
-                        </span>
+                        <div className="weeklyTitle">Going on now</div>
+                        <div className="weeklyCount">
+                          {liveEventsNow.length} event{liveEventsNow.length === 1 ? "" : "s"} happening now
+                        </div>
                       </button>
                     </div>
                   ) : null}
