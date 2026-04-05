@@ -80,8 +80,10 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
 
     const reduceMotion =
       typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    const exitBeforeSwapMs = reduceMotion ? 0 : 780;
-    const enterHoldMs = reduceMotion ? 0 : 1200;
+    const fromSlow = currentRendered === "directory" || currentRendered === "updates";
+    const toSlow = urlSection === "directory" || urlSection === "updates";
+    const exitBeforeSwapMs = reduceMotion ? 0 : fromSlow ? 1000 : 780;
+    const enterHoldMs = reduceMotion ? 0 : toSlow ? 1980 : 1200;
 
     cancelListingBootRef.current?.();
 
@@ -130,6 +132,10 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
 
     cancelListingBootRef.current = cancel;
 
+    const path = typeof window !== "undefined" ? window.location.pathname || "" : "";
+    const slowBoot = path.startsWith("/locations") || path.startsWith("/updates");
+    const bootSettleMs = slowBoot ? 1750 : 1200;
+
     raf1 = requestAnimationFrame(() => {
       raf2 = requestAnimationFrame(() => {
         if (cancelled) return;
@@ -137,7 +143,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
         settle = window.setTimeout(() => {
           settle = undefined;
           if (!cancelled) setShellSwitchPhase((p) => (p === "entering" ? "idle" : p));
-        }, 1200);
+        }, bootSettleMs);
       });
     });
 
@@ -258,6 +264,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
       className={`shellSwap homeShell${introActive ? " shellIntro--active" : ""}`}
       data-transitioning={isTransitioning ? "true" : "false"}
       data-shell-switch={shellSwitchPhase}
+      data-listing-pace={renderedSection === "directory" || renderedSection === "updates" ? "slow" : "normal"}
     >
       <div key={renderedSection} className="shellSwap__panel">
         {renderedSection === "calendar" ? (

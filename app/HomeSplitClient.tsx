@@ -25,6 +25,16 @@ import type { EventLite as LibEventLite } from "@/lib/types";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import SegmentedControl from "@/app/components/SegmentedControl";
+import {
+  HubIconGoingNow,
+  HubIconWeekly,
+  SegmentIconCalendar,
+  SegmentIconChevronLeft,
+  SegmentIconChevronRight,
+  SegmentIconDirectory,
+  SegmentIconUpdates,
+} from "@/app/components/segmentNavIcons";
+import { hubSpotlightPulse } from "@/lib/hubSpotlightPulse";
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { UpdateLite } from "@/app/updates/UpdatesSplitClient";
@@ -496,6 +506,19 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
   const [mobileOverlayOffset, setMobileOverlayOffset] = useState(0);
 
   const effectiveIsMobile = mounted ? isMobile : false;
+
+  const prevMobileViewRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (!effectiveIsMobile) {
+      prevMobileViewRef.current = view;
+      return;
+    }
+    const prev = prevMobileViewRef.current;
+    if (prev !== null && prev !== view && (view === "month" || view === "clock")) {
+      listRef.current?.scrollTo({ top: 0, behavior: "auto" });
+    }
+    prevMobileViewRef.current = view;
+  }, [view, effectiveIsMobile]);
 
   const selectedDisplayKey =
     selectedKey ?? (!effectiveIsMobile && (viewMode === "list" || isClockView) ? WEEKLY_KEY : null);
@@ -1593,9 +1616,27 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ariaLabel="Primary navigation"
                   currentKey={resolvedSection}
                   items={[
-                    { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
-                    { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
-                    { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
+                    {
+                      key: "calendar",
+                      label: "Calendar",
+                      icon: <SegmentIconCalendar />,
+                      href: onNavigateSection ? undefined : "/",
+                      onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined,
+                    },
+                    {
+                      key: "directory",
+                      label: "Directory",
+                      icon: <SegmentIconDirectory />,
+                      href: onNavigateSection ? undefined : "/locations",
+                      onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined,
+                    },
+                    {
+                      key: "updates",
+                      label: "Updates",
+                      icon: <SegmentIconUpdates />,
+                      href: onNavigateSection ? undefined : "/updates",
+                      onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined,
+                    },
                   ]}
                 />
 
@@ -1768,29 +1809,41 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         type="button"
                         className="weeklyOverview weeklyOverview--spotlightMobileHalf"
                         data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
+                        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
                         onClick={() => openWeek(WEEKLY_KEY)}
                       >
-                        <div className="weeklySpotlightMobile__label">This week</div>
-                        <div className="weeklySpotlightMobile__count">
-                          {(() => {
-                            const n = defaultWeekBucket?.events.length ?? 0;
-                            return `${n} ${n === 1 ? "event" : "events"}`;
-                          })()}
-                        </div>
+                        <span className="hubSpotlightIcon">
+                          <HubIconWeekly />
+                        </span>
+                        <span className="hubSpotlightCopy">
+                          <div className="weeklySpotlightMobile__label">This week</div>
+                          <div className="weeklySpotlightMobile__count">
+                            {(() => {
+                              const n = defaultWeekBucket?.events.length ?? 0;
+                              return `${n} ${n === 1 ? "event" : "events"}`;
+                            })()}
+                          </div>
+                        </span>
                       </button>
                       <button
                         type="button"
                         className="weeklyOverview weeklyOverview--spotlightMobileHalf"
                         data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
+                        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
                         onClick={() => openWeek(GOING_NOW_KEY)}
                       >
-                        <div className="weeklySpotlightMobile__label">Happening now</div>
-                        <div className="weeklySpotlightMobile__count">
-                          {(() => {
-                            const n = liveEventsNow.length;
-                            return `${n} ${n === 1 ? "event" : "events"}`;
-                          })()}
-                        </div>
+                        <span className="hubSpotlightIcon">
+                          <HubIconGoingNow />
+                        </span>
+                        <span className="hubSpotlightCopy">
+                          <div className="weeklySpotlightMobile__label">Happening now</div>
+                          <div className="weeklySpotlightMobile__count">
+                            {(() => {
+                              const n = liveEventsNow.length;
+                              return `${n} ${n === 1 ? "event" : "events"}`;
+                            })()}
+                          </div>
+                        </span>
                       </button>
                     </div>
                   </div>
@@ -1886,23 +1939,35 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         type="button"
                         className="weeklyOverview weeklyOverview--spotlightHalf"
                         data-active={selectedDisplayKey === WEEKLY_KEY ? "true" : "false"}
+                        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
                         onClick={() => openWeek(WEEKLY_KEY)}
                       >
-                        <div className="weeklyTitle">Weekly Overview</div>
-                        <div className="weeklyCount">
-                          {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left this week
-                        </div>
+                        <span className="hubSpotlightIcon">
+                          <HubIconWeekly />
+                        </span>
+                        <span className="hubSpotlightCopy">
+                          <div className="weeklyTitle">Weekly Overview</div>
+                          <div className="weeklyCount">
+                            {defaultWeekBucket?.events.length ?? 0} event{(defaultWeekBucket?.events.length ?? 0) === 1 ? "" : "s"} left this week
+                          </div>
+                        </span>
                       </button>
                       <button
                         type="button"
                         className="weeklyOverview weeklyOverview--spotlightHalf"
                         data-active={selectedDisplayKey === GOING_NOW_KEY ? "true" : "false"}
+                        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
                         onClick={() => openWeek(GOING_NOW_KEY)}
                       >
-                        <div className="weeklyTitle">Going on now</div>
-                        <div className="weeklyCount">
-                          {liveEventsNow.length} event{liveEventsNow.length === 1 ? "" : "s"} happening now
-                        </div>
+                        <span className="hubSpotlightIcon">
+                          <HubIconGoingNow />
+                        </span>
+                        <span className="hubSpotlightCopy">
+                          <div className="weeklyTitle">Going on now</div>
+                          <div className="weeklyCount">
+                            {liveEventsNow.length} event{liveEventsNow.length === 1 ? "" : "s"} happening now
+                          </div>
+                        </span>
                       </button>
                     </div>
                   ) : null}
@@ -2190,8 +2255,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   {liveEventsNow.length === 0 ? (
                     <div className="emptyRight">Nothing scheduled as happening right now.</div>
                   ) : (
-                    desktopHoverSplit(
-                      <div className="goingNowRightList" role="list">
+                    <div className="goingNowRightList" role="list">
                       {liveEventsNow.map((e) => {
                         const key = e.uid ?? e.id;
                         const title = e.title || "Untitled event";
@@ -2205,7 +2269,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                             data-past={eventHasEnded(e) ? "true" : "false"}
                             onClick={() => openSelected(String(key))}
                             role="listitem"
-                            {...desktopListingHoverHandlers(e)}
                           >
                             <div className="dayRightTop">
                               <div className="dayRightTitle">{title}</div>
@@ -2221,7 +2284,6 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                         );
                       })}
                     </div>
-                    )
                   )}
                   </div>
                 </div>
@@ -2682,6 +2744,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     {
                       key: "previous",
                       label: "Prev.",
+                      icon: <SegmentIconChevronLeft />,
                       onClick: () => {
                         if (!previousEventKey) return;
                         setMobileDetailVisualKey("previous");
@@ -2693,6 +2756,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     {
                       key: "cal",
                       label: "Cal.",
+                      icon: <SegmentIconCalendar />,
                       onClick: () => {
                         exitMobileEventDetailToCalendarList();
                       },
@@ -2700,6 +2764,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                     {
                       key: "next",
                       label: "Next",
+                      icon: <SegmentIconChevronRight />,
                       onClick: () => {
                         if (!nextEventKey) return;
                         setMobileDetailVisualKey("next");
@@ -2718,9 +2783,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ariaLabel="Primary navigation"
                   currentKey={resolvedSection}
                   items={[
-                    { key: "calendar", label: "Calendar", href: "/" },
-                    { key: "directory", label: "Directory", href: "/locations" },
-                    { key: "updates", label: "Updates", href: "/updates" },
+                    { key: "calendar", label: "Calendar", icon: <SegmentIconCalendar />, href: "/" },
+                    { key: "directory", label: "Directory", icon: <SegmentIconDirectory />, href: "/locations" },
+                    { key: "updates", label: "Updates", icon: <SegmentIconUpdates />, href: "/updates" },
                   ]}
                 />
               </div>

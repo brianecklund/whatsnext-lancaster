@@ -863,12 +863,28 @@ a.eventTimeLink:hover{
 .brand{
   display:inline-flex;
   align-items:center;
+  gap: 10px;
   min-width: 0;
   flex: 1 1 auto;
   font-weight: var(--fw-medium);
   font-size: var(--fs-hero);
   letter-spacing: -0.02em;
   line-height: 1;
+}
+
+.brandStarburst{
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.brandStarburst__svg{
+  display: block;
+}
+
+.brandText{
+  min-width: 0;
 }
 
 .brandFull{ display:inline; }
@@ -1833,9 +1849,50 @@ a.eventTimeLink:hover{
   transition: color 180ms ease, opacity 180ms ease, transform 180ms ease;
 }
 
+.segmentedControl__inner{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+}
+
+.segmentedControl__icon{
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0.92;
+}
+
+.segmentedControl__icon svg{
+  display: block;
+}
+
+.segmentedControl__label{
+  min-width: 0;
+}
+
 .segmentedControl__button[data-active="true"],
 .segmentedControl__button[data-visual-active="true"]{
   color: #fff;
+}
+
+.segmentedControl__button[data-icon-flash="true"] .segmentedControl__icon{
+  animation: segmentedNavIconPop 420ms cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes segmentedNavIconPop{
+  0%{ transform: scale(1) rotate(0deg); }
+  35%{ transform: scale(1.14) rotate(-14deg); }
+  70%{ transform: scale(0.92) rotate(8deg); }
+  100%{ transform: scale(1) rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .segmentedControl__button[data-icon-flash="true"] .segmentedControl__icon{
+    animation: none;
+  }
 }
 
 @media (hover: hover) and (pointer: fine){
@@ -1960,16 +2017,55 @@ a.weeklyOverview{
 @media (min-width: 981px){
   .weeklySpotlightPair .weeklyOverview--spotlightHalf{
     display: flex !important;
-    flex-direction: column !important;
-    align-items: flex-start !important;
+    flex-direction: row !important;
+    align-items: center !important;
     justify-content: flex-start !important;
     text-align: left !important;
+    gap: 12px !important;
   }
 
   .weeklySpotlightPair .weeklyOverview--spotlightHalf .weeklyTitle,
   .weeklySpotlightPair .weeklyOverview--spotlightHalf .weeklyCount{
     text-align: left !important;
     width: 100%;
+  }
+}
+
+.hubSpotlightIcon{
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: color-mix(in srgb, var(--accent) 90%, var(--text) 10%);
+}
+
+.hubSpotlightIcon svg{
+  display: block;
+}
+
+.hubSpotlightCopy{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.weeklyOverview--spotlightHalf[data-hub-pulse="true"] .hubSpotlightIcon,
+.weeklyOverview--spotlightMobileHalf[data-hub-pulse="true"] .hubSpotlightIcon{
+  animation: hubSpotlightIconPop 420ms cubic-bezier(.22, 1, .36, 1);
+}
+
+@keyframes hubSpotlightIconPop{
+  0%{ transform: scale(1) rotate(0deg); }
+  40%{ transform: scale(1.12) rotate(-10deg); }
+  100%{ transform: scale(1) rotate(0deg); }
+}
+
+@media (prefers-reduced-motion: reduce){
+  .weeklyOverview--spotlightHalf[data-hub-pulse="true"] .hubSpotlightIcon,
+  .weeklyOverview--spotlightMobileHalf[data-hub-pulse="true"] .hubSpotlightIcon{
+    animation: none;
   }
 }
 
@@ -2030,10 +2126,10 @@ a.weeklyOverview{
     border-radius: 10px !important;
     text-align: left;
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    justify-content: center;
-    gap: 4px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 8px;
     box-sizing: border-box;
   }
 
@@ -7706,9 +7802,42 @@ html[data-route-switching="true"] .routeFrame{
   100%{ opacity: 1; transform: translateY(0); }
 }
 
+.shellSwap[data-listing-pace="slow"][data-shell-switch="exiting"] [data-switch-item="true"]{
+  animation: shellContentFadeOutSlow 600ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  animation-delay: calc(min(var(--switch-index, 0), 24) * 42ms);
+  will-change: opacity, transform;
+}
+
+.shellSwap[data-listing-pace="slow"][data-shell-switch="entering"] [data-switch-item="true"]{
+  opacity: 0;
+  transform: translateY(20px);
+  animation: shellContentCascadeSlow 1360ms cubic-bezier(.22, 1, .36, 1) forwards;
+  animation-delay: calc(min(var(--switch-index, 0), 24) * 68ms);
+  will-change: opacity, transform;
+}
+
+@keyframes shellContentFadeOutSlow{
+  0%{ opacity: 1; transform: translateY(0); }
+  100%{ opacity: 0; transform: translateY(16px); }
+}
+
+@keyframes shellContentCascadeSlow{
+  0%{ opacity: 0; transform: translateY(20px); }
+  100%{ opacity: 1; transform: translateY(0); }
+}
+
 @media (prefers-reduced-motion: reduce){
   .shellSwap[data-shell-switch="exiting"] [data-switch-item="true"],
   .shellSwap[data-shell-switch="entering"] [data-switch-item="true"]{
+    animation: none !important;
+    animation-delay: 0s !important;
+    opacity: 1 !important;
+    transform: none !important;
+    pointer-events: auto;
+  }
+
+  .shellSwap[data-listing-pace="slow"][data-shell-switch="exiting"] [data-switch-item="true"],
+  .shellSwap[data-listing-pace="slow"][data-shell-switch="entering"] [data-switch-item="true"]{
     animation: none !important;
     animation-delay: 0s !important;
     opacity: 1 !important;
@@ -12818,7 +12947,9 @@ body[data-layout="content"] .simplePage{
   .updatesDesktopHubRow--inScroll .weeklyOverview--spotlightHalf,
   .directoryDesktopHubRow--inScroll .weeklyOverview--spotlightHalf{
     padding: 12px 12px 12px 20px !important;
-    align-items: flex-start !important;
+    align-items: center !important;
+    flex-direction: row !important;
+    gap: 12px !important;
   }
 }
 

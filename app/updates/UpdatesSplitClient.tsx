@@ -4,6 +4,8 @@ import { useEffect, useMemo, useState } from "react";
 import MediaBlocks from "@/app/components/MediaBlocks";
 import NewsTickerBar from "@/app/components/NewsTickerBar";
 import SegmentedControl from "@/app/components/SegmentedControl";
+import { HubIconSeason, HubIconWeekly, SegmentIconCalendar, SegmentIconDirectory, SegmentIconUpdates } from "@/app/components/segmentNavIcons";
+import { hubSpotlightPulse } from "@/lib/hubSpotlightPulse";
 import ToolbarIcon from "@/app/components/ToolbarIcon";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
@@ -317,9 +319,27 @@ export default function UpdatesSplitClient({
         ariaLabel="Primary navigation"
         currentKey={resolvedSection}
         items={[
-          { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
-          { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
-          { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
+          {
+            key: "calendar",
+            label: "Calendar",
+            icon: <SegmentIconCalendar />,
+            href: onNavigateSection ? undefined : "/",
+            onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined,
+          },
+          {
+            key: "directory",
+            label: "Directory",
+            icon: <SegmentIconDirectory />,
+            href: onNavigateSection ? undefined : "/locations",
+            onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined,
+          },
+          {
+            key: "updates",
+            label: "Updates",
+            icon: <SegmentIconUpdates />,
+            href: onNavigateSection ? undefined : "/updates",
+            onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined,
+          },
         ]}
       />
 
@@ -354,18 +374,36 @@ export default function UpdatesSplitClient({
             </div>
             <div className="weeklySpotlightMobile weeklySpotlightMobile--stickyRow weeklySpotlightMobile--updatesHub fadeInItem">
               <div className="weeklySpotlightMobile__row">
-                <Link href="/spring" className="weeklyOverview weeklyOverview--spotlightMobileHalf">
-                  <div className="weeklySpotlightMobile__label weeklySpotlightMobile__label--seasonCaps">This season</div>
-                  <div className="weeklySpotlightMobile__count">Spring Guide</div>
+                <Link
+                  href="/spring"
+                  className="weeklyOverview weeklyOverview--spotlightMobileHalf"
+                  onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
+                >
+                  <span className="hubSpotlightIcon">
+                    <HubIconSeason />
+                  </span>
+                  <span className="hubSpotlightCopy">
+                    <div className="weeklySpotlightMobile__label weeklySpotlightMobile__label--seasonCaps">This season</div>
+                    <div className="weeklySpotlightMobile__count">Spring Guide</div>
+                  </span>
                 </Link>
-                <Link href="/?event=__weekly__&fromShell=updates" className="weeklyOverview weeklyOverview--spotlightMobileHalf">
-                  <div className="weeklySpotlightMobile__label">This week</div>
-                  <div className="weeklySpotlightMobile__count">
-                    {(() => {
-                      const n = thisWeekEventCount;
-                      return `${n} ${n === 1 ? "event" : "events"}`;
-                    })()}
-                  </div>
+                <Link
+                  href="/?event=__weekly__&fromShell=updates"
+                  className="weeklyOverview weeklyOverview--spotlightMobileHalf"
+                  onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
+                >
+                  <span className="hubSpotlightIcon">
+                    <HubIconWeekly />
+                  </span>
+                  <span className="hubSpotlightCopy">
+                    <div className="weeklySpotlightMobile__label">This week</div>
+                    <div className="weeklySpotlightMobile__count">
+                      {(() => {
+                        const n = thisWeekEventCount;
+                        return `${n} ${n === 1 ? "event" : "events"}`;
+                      })()}
+                    </div>
+                  </span>
                 </Link>
               </div>
             </div>
@@ -409,15 +447,29 @@ export default function UpdatesSplitClient({
 
   const updatesDesktopHubRow = !isMobile ? (
     <div className="weeklySpotlightPair fadeInItem updatesDesktopHubRow updatesDesktopHubRow--inScroll">
-      <Link href="/spring" className="weeklyOverview weeklyOverview--spotlightHalf">
-        <div className="weeklyTitle weeklyTitle--seasonCaps">This season</div>
-        <div className="weeklyCount">Spring Guide</div>
+      <Link href="/spring" className="weeklyOverview weeklyOverview--spotlightHalf" onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}>
+        <span className="hubSpotlightIcon">
+          <HubIconSeason />
+        </span>
+        <span className="hubSpotlightCopy">
+          <div className="weeklyTitle weeklyTitle--seasonCaps">This season</div>
+          <div className="weeklyCount">Spring Guide</div>
+        </span>
       </Link>
-      <Link href="/?event=__weekly__&fromShell=updates" className="weeklyOverview weeklyOverview--spotlightHalf">
-        <div className="weeklyTitle">Weekly Overview</div>
-        <div className="weeklyCount">
-          {thisWeekEventCount} event{thisWeekEventCount === 1 ? "" : "s"} this week
-        </div>
+      <Link
+        href="/?event=__weekly__&fromShell=updates"
+        className="weeklyOverview weeklyOverview--spotlightHalf"
+        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
+      >
+        <span className="hubSpotlightIcon">
+          <HubIconWeekly />
+        </span>
+        <span className="hubSpotlightCopy">
+          <div className="weeklyTitle">Weekly Overview</div>
+          <div className="weeklyCount">
+            {thisWeekEventCount} event{thisWeekEventCount === 1 ? "" : "s"} this week
+          </div>
+        </span>
       </Link>
     </div>
   ) : null;

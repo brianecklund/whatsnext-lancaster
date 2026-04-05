@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 import ToolbarIcon from "@/app/components/ToolbarIcon";
 import NewsTickerBar from "@/app/components/NewsTickerBar";
 import SegmentedControl from "@/app/components/SegmentedControl";
+import { HubIconBlog, HubIconPartners, SegmentIconCalendar, SegmentIconDirectory, SegmentIconUpdates } from "@/app/components/segmentNavIcons";
+import { hubSpotlightPulse } from "@/lib/hubSpotlightPulse";
 import { useBodyScrollLock } from "@/app/hooks/useBodyScrollLock";
 import { useSmoothWheel } from "@/app/components/useSmoothWheel";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
@@ -653,13 +655,31 @@ export default function LocationsSplitClient({
 
   const directoryDesktopHubRow = !effectiveIsMobile ? (
     <div className="weeklySpotlightPair fadeInItem directoryDesktopHubRow--inScroll">
-      <Link href={DIRECTORY_MEMBER_BLOGS_HREF} className="weeklyOverview weeklyOverview--spotlightHalf">
-        <div className="weeklyTitle">Learn More</div>
-        <div className="weeklyCount">Read Our Blog</div>
+      <Link
+        href={DIRECTORY_MEMBER_BLOGS_HREF}
+        className="weeklyOverview weeklyOverview--spotlightHalf"
+        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
+      >
+        <span className="hubSpotlightIcon">
+          <HubIconBlog />
+        </span>
+        <span className="hubSpotlightCopy">
+          <div className="weeklyTitle">Learn More</div>
+          <div className="weeklyCount">Read Our Blog</div>
+        </span>
       </Link>
-      <Link href={DIRECTORY_PARTNERSHIPS_HREF} className="weeklyOverview weeklyOverview--spotlightHalf">
-        <div className="weeklyTitle">Partnerships</div>
-        <div className="weeklyCount">Learn More</div>
+      <Link
+        href={DIRECTORY_PARTNERSHIPS_HREF}
+        className="weeklyOverview weeklyOverview--spotlightHalf"
+        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
+      >
+        <span className="hubSpotlightIcon">
+          <HubIconPartners />
+        </span>
+        <span className="hubSpotlightCopy">
+          <div className="weeklyTitle">Partnerships</div>
+          <div className="weeklyCount">Learn More</div>
+        </span>
       </Link>
     </div>
   ) : null;
@@ -715,9 +735,27 @@ export default function LocationsSplitClient({
                 ariaLabel="Primary navigation"
                 currentKey={resolvedSection}
                 items={[
-                  { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
-                  { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
-                  { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
+                  {
+                    key: "calendar",
+                    label: "Calendar",
+                    icon: <SegmentIconCalendar />,
+                    href: onNavigateSection ? undefined : "/",
+                    onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined,
+                  },
+                  {
+                    key: "directory",
+                    label: "Directory",
+                    icon: <SegmentIconDirectory />,
+                    href: onNavigateSection ? undefined : "/locations",
+                    onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined,
+                  },
+                  {
+                    key: "updates",
+                    label: "Updates",
+                    icon: <SegmentIconUpdates />,
+                    href: onNavigateSection ? undefined : "/updates",
+                    onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined,
+                  },
                 ]}
               />
 
@@ -788,13 +826,31 @@ export default function LocationsSplitClient({
                 {effectiveIsMobile ? (
                   <div className="weeklySpotlightMobile weeklySpotlightMobile--stickyRow weeklySpotlightMobile--directoryHub fadeInItem">
                     <div className="weeklySpotlightMobile__row">
-                      <Link href={DIRECTORY_MEMBER_BLOGS_HREF} className="weeklyOverview weeklyOverview--spotlightMobileHalf">
-                        <div className="weeklySpotlightMobile__label">Learn More</div>
-                        <div className="weeklySpotlightMobile__count">Read Our Blog</div>
+                      <Link
+                        href={DIRECTORY_MEMBER_BLOGS_HREF}
+                        className="weeklyOverview weeklyOverview--spotlightMobileHalf"
+                        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
+                      >
+                        <span className="hubSpotlightIcon">
+                          <HubIconBlog />
+                        </span>
+                        <span className="hubSpotlightCopy">
+                          <div className="weeklySpotlightMobile__label">Learn More</div>
+                          <div className="weeklySpotlightMobile__count">Read Our Blog</div>
+                        </span>
                       </Link>
-                      <Link href={DIRECTORY_PARTNERSHIPS_HREF} className="weeklyOverview weeklyOverview--spotlightMobileHalf">
-                        <div className="weeklySpotlightMobile__label">Partnerships</div>
-                        <div className="weeklySpotlightMobile__count">Learn More</div>
+                      <Link
+                        href={DIRECTORY_PARTNERSHIPS_HREF}
+                        className="weeklyOverview weeklyOverview--spotlightMobileHalf"
+                        onPointerDown={(e) => hubSpotlightPulse(e.currentTarget)}
+                      >
+                        <span className="hubSpotlightIcon">
+                          <HubIconPartners />
+                        </span>
+                        <span className="hubSpotlightCopy">
+                          <div className="weeklySpotlightMobile__label">Partnerships</div>
+                          <div className="weeklySpotlightMobile__count">Learn More</div>
+                        </span>
                       </Link>
                     </div>
                   </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
 
 type Item = {
@@ -9,6 +9,7 @@ type Item = {
   href?: string;
   onClick?: () => void;
   disabled?: boolean;
+  icon?: ReactNode;
 };
 
 type Props = {
@@ -40,6 +41,8 @@ export default function SegmentedControl({
   const timeoutRef = useRef<number | null>(null);
   const resetRef = useRef<number | null>(null);
   const rootRef = useRef<HTMLDivElement | null>(null);
+  const [iconFlashKey, setIconFlashKey] = useState<string | null>(null);
+  const iconFlashTimerRef = useRef<number | null>(null);
 
   const effectiveVisualKey = visualKeyOverride ?? visualKey;
   const effectivePending = pendingOverride ?? isPending;
@@ -73,8 +76,18 @@ export default function SegmentedControl({
     return () => {
       if (timeoutRef.current) window.clearTimeout(timeoutRef.current);
       if (resetRef.current) window.clearTimeout(resetRef.current);
+      if (iconFlashTimerRef.current) window.clearTimeout(iconFlashTimerRef.current);
     };
   }, []);
+
+  function flashSegmentIcon(key: string) {
+    if (iconFlashTimerRef.current) window.clearTimeout(iconFlashTimerRef.current);
+    setIconFlashKey(key);
+    iconFlashTimerRef.current = window.setTimeout(() => {
+      iconFlashTimerRef.current = null;
+      setIconFlashKey(null);
+    }, 420);
+  }
 
   const activeIndex = useMemo(() => {
     const idx = items.findIndex((item) => item.key === effectiveVisualKey);
@@ -91,6 +104,7 @@ export default function SegmentedControl({
 
     if (isSameRoute) return;
 
+    flashSegmentIcon(item.key);
     setVisualKey(item.key);
     setIsPending(true);
     try { window.sessionStorage.setItem("wnl-segmented-pending", item.key); } catch {}
@@ -150,11 +164,15 @@ export default function SegmentedControl({
             aria-selected={isActive}
             data-active={isActive ? "true" : "false"}
             data-visual-active={isVisualActive ? "true" : "false"}
+            data-icon-flash={iconFlashKey === item.key ? "true" : "false"}
             className="segmentedControl__button"
             onClick={() => handleSelect(item)}
             disabled={item.disabled}
           >
-            <span className="segmentedControl__label">{item.label}</span>
+            <span className="segmentedControl__inner">
+              {item.icon ? <span className="segmentedControl__icon">{item.icon}</span> : null}
+              <span className="segmentedControl__label">{item.label}</span>
+            </span>
           </button>
         );
       })}

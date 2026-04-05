@@ -5,6 +5,7 @@ import { createPortal } from "react-dom";
 import type { CSSProperties } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import BrandStarburst from "@/app/components/BrandStarburst";
 import { DEFAULT_THEME, THEME_PALETTES, THEME_PREVIEW_COLORS, normalizeThemeKey, type ThemeKey } from "./theme-palettes";
 import {
   TEXT_SCALE_OPTIONS,
@@ -403,9 +404,12 @@ export default function SiteHeader() {
   return (
     <header className="siteHeader">
       <Link className="brand" href="/" aria-label="What’s Next Lancaster">
-        <span className="brandFull">What’s Next Lancaster</span>
-        <span className="brandShort" aria-hidden>
-          What’s Next
+        <BrandStarburst />
+        <span className="brandText">
+          <span className="brandFull">What’s Next Lancaster</span>
+          <span className="brandShort" aria-hidden>
+            What’s Next
+          </span>
         </span>
       </Link>
 
