@@ -202,7 +202,7 @@ export default function UpdatesSplitClient({
         if (!any) return false;
       }
       if (!nq) return true;
-      const hay = norm([u.title, ...(u.tags || []), u.body || ""].join(" "));
+      const hay = norm([u.title, u.summary || "", ...(u.tags || []), u.body || ""].join(" "));
       return hay.includes(nq);
     });
   }, [safeUpdates, q, selectedTagNormSet]);
@@ -444,7 +444,6 @@ export default function UpdatesSplitClient({
               {u.pinned ? <span className="updateDateBadge">Pinned</span> : null}
               {u.date ? <span className="updateDateBadge">{u.date}</span> : null}
             </span>
-            {u.summary ? <span className="eventRowMeta">{u.summary}</span> : null}
             {u.tags?.length ? (
               <span className="tagRow" aria-label="Update tags">
                 {u.tags.slice(0, 3).map((t) => (

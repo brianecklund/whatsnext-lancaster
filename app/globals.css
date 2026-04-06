@@ -4492,13 +4492,13 @@ a:hover{
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--border) 50%, #ddd 50%) inset !important;
   }
 
-  /* Directory + updates: bring the right pane in sooner (calendar feels snappier when the bar sits outside pageShell). */
+  /* Directory + updates: right pane follows the list quickly (small offset so order stays readable). */
   .wnlPageRevealRoot--contentReady .pageShell--listingPairReveal .split > .paneLeft{
-    transition-delay: 180ms !important;
+    transition-delay: 60ms !important;
   }
 
   .wnlPageRevealRoot--contentReady .pageShell--listingPairReveal .split > .paneRight{
-    transition-delay: 220ms !important;
+    transition-delay: 75ms !important;
   }
 }
 
@@ -7812,6 +7812,25 @@ html[data-route-switching="true"] .routeFrame{
   .filterOverlayPanel--pane{
     padding: 16px;
   }
+
+  .filterOverlayPanel--pane .typePill{
+    height: 32px;
+    line-height: 32px;
+    padding: 0 10px;
+    font-size: 0.78rem;
+  }
+
+  .splitPageListBody .updateListRow .updateTagChip{
+    padding: 4px 8px;
+    font-size: 0.72rem;
+    gap: 4px;
+  }
+
+  .splitPageListBody .updateListRow .updateTagChip .tagGlyph{
+    width: 0.95rem;
+    height: 0.95rem;
+    font-size: 0.6rem;
+  }
 }
 
 .shellSwap{
@@ -9477,6 +9496,19 @@ body{
     padding-right: 52px !important;
   }
 
+  /* Directory: full-width row, phone + website actions sit on the right edge of the content area */
+  body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody > .eventRow.directoryListingRow{
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  body[data-layout="shell"] .paneLeft > .scroll .splitPageListBody .directoryListingRow__actions{
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
   /* Updates list: type orb hidden on mobile — symmetric insets inside splitPageListBody */
   body[data-layout="shell"] .paneLeft .splitPageListBody .eventRow.updateListRow{
     padding-left: 16px !important;
@@ -11126,7 +11158,7 @@ html[data-theme="night-shift"] .weeklyTitle{
   .mobileGoingNowOpen .weeklyCard{
     grid-template-columns: 76px minmax(0, 1fr);
     gap: 8px;
-    padding: 8px 10px;
+    padding: 14px 14px;
     border-radius: 10px;
     align-items: start;
   }
@@ -13517,6 +13549,27 @@ body[data-layout="content"] main.contentPage.clockPage{
     transition:
       opacity 1450ms cubic-bezier(0.25, 0.46, 0.45, 0.94),
       transform 1450ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* Blog / donate / about: softer ease + gentler offset on load */
+  body[data-layout="content"] .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) main.contentPage.blogPage,
+  body[data-layout="content"] .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) main.contentPage.donatePage,
+  body[data-layout="content"] .wnlPageRevealRoot:not(.wnlPageRevealRoot--contentReady) main.contentPage.aboutPage{
+    transform: translateY(8px);
+  }
+
+  body[data-layout="content"] .wnlPageRevealRoot--contentReady main.contentPage.blogPage,
+  body[data-layout="content"] .wnlPageRevealRoot--contentReady main.contentPage.donatePage,
+  body[data-layout="content"] .wnlPageRevealRoot--contentReady main.contentPage.aboutPage{
+    transition:
+      opacity 1680ms cubic-bezier(0.22, 1, 0.36, 1),
+      transform 1680ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  body[data-layout="content"] .wnlPageRevealRoot--contentReady main.contentPage.blogPage > *,
+  body[data-layout="content"] .wnlPageRevealRoot--contentReady main.contentPage.donatePage > *,
+  body[data-layout="content"] .wnlPageRevealRoot--contentReady main.contentPage.aboutPage > *{
+    transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1) !important;
   }
 }
 
