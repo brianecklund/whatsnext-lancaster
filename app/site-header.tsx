@@ -18,22 +18,23 @@ import {
   applyTheme,
   type TextScaleKey,
 } from "@/lib/site-preferences";
+import { siteCopy } from "@/lib/site-copy";
 
 const DESKTOP_LINKS: Array<{ href: string; label: string; Icon: () => ReactNode }> = [
-  { href: "/blog", label: "Blog", Icon: TopNavIconBlog },
-  { href: "/donate", label: "Donate", Icon: TopNavIconDonate },
-  { href: "/about", label: "About", Icon: TopNavIconAbout },
-  { href: "/contact", label: "Contact", Icon: TopNavIconContact },
+  { href: "/blog", label: siteCopy.nav.blog, Icon: TopNavIconBlog },
+  { href: "/donate", label: siteCopy.nav.donate, Icon: TopNavIconDonate },
+  { href: "/about", label: siteCopy.nav.about, Icon: TopNavIconAbout },
+  { href: "/contact", label: siteCopy.nav.contact, Icon: TopNavIconContact },
 ];
 
 const MOBILE_MENU_LINKS: Array<{ href: string; label: string; Icon: () => ReactNode }> = [
-  { href: "/", label: "Calendar", Icon: SegmentIconCalendar },
-  { href: "/locations", label: "Directory", Icon: SegmentIconDirectory },
-  { href: "/updates", label: "Updates", Icon: SegmentIconUpdates },
-  { href: "/blog", label: "Blog", Icon: TopNavIconBlog },
-  { href: "/donate", label: "Donate", Icon: TopNavIconDonate },
-  { href: "/about", label: "About", Icon: TopNavIconAbout },
-  { href: "/contact", label: "Contact", Icon: TopNavIconContact },
+  { href: "/", label: siteCopy.nav.calendar, Icon: SegmentIconCalendar },
+  { href: "/locations", label: siteCopy.nav.directory, Icon: SegmentIconDirectory },
+  { href: "/updates", label: siteCopy.nav.updates, Icon: SegmentIconUpdates },
+  { href: "/blog", label: siteCopy.nav.blog, Icon: TopNavIconBlog },
+  { href: "/donate", label: siteCopy.nav.donate, Icon: TopNavIconDonate },
+  { href: "/about", label: siteCopy.nav.about, Icon: TopNavIconAbout },
+  { href: "/contact", label: siteCopy.nav.contact, Icon: TopNavIconContact },
 ];
 
 const SHEET_CLOSE_MS = 320;
@@ -406,12 +407,12 @@ export default function SiteHeader() {
   return (
     <header className="siteHeader">
       {desktop ? (
-        <Link className="brand" href="/" aria-label="What’s Next Lancaster">
+        <Link className="brand" href="/" aria-label={siteCopy.brandAriaLabel}>
           <BrandScrollSmiley />
           <span className="brandText">
-            <span className="brandFull">What’s Next Lancaster</span>
+            <span className="brandFull">{siteCopy.brandFull}</span>
             <span className="brandShort" aria-hidden>
-              What’s Next
+              {siteCopy.brandShort}
             </span>
           </span>
         </Link>
@@ -420,10 +421,10 @@ export default function SiteHeader() {
           <span className="brandMark" aria-hidden>
             <BrandScrollSmiley />
           </span>
-          <Link className="brandText" href="/" aria-label="What’s Next Lancaster — Calendar home">
-            <span className="brandFull">What’s Next Lancaster</span>
+          <Link className="brandText" href="/" aria-label={siteCopy.brandMobileCalendarAriaLabel}>
+            <span className="brandFull">{siteCopy.brandFull}</span>
             <span className="brandShort" aria-hidden>
-              What’s Next
+              {siteCopy.brandShort}
             </span>
           </Link>
         </div>

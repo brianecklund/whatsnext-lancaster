@@ -1,11 +1,11 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
+import { siteCopy, withSiteTitle } from "@/lib/site-copy";
 import HowWePartnerPageClient from "./HowWePartnerPageClient";
 
 export const metadata: Metadata = {
-  title: "How we partner | What’s Next Lancaster",
-  description:
-    "How What’s Next Lancaster partners with local businesses and organizations to grow reach, audiences, and community collaboration in Lancaster, PA.",
+  title: withSiteTitle("How we partner"),
+  description: siteCopy.pages.howWePartnerMetaDescription,
 };
 
 export default function HowWePartnerPage() {

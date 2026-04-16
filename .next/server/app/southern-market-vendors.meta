@@ -1,0 +1,15 @@
+{
+  "headers": {
+    "x-nextjs-stale-time": "300",
+    "x-nextjs-prerender": "1",
+    "x-next-cache-tags": "_N_T_/layout,_N_T_/southern-market-vendors/layout,_N_T_/southern-market-vendors/page,_N_T_/southern-market-vendors"
+  },
+  "segmentPaths": [
+    "/_tree",
+    "/_full",
+    "/southern-market-vendors/__PAGE__",
+    "/southern-market-vendors",
+    "/_index",
+    "/_head"
+  ]
+}

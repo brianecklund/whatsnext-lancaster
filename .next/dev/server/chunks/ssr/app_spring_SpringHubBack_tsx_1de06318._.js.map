@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 4, "column": 0}, "map": {"version":3,"sources":["file:///Users/brianecklund/Documents/Projects/whatsnext-lancaster/app/spring/SpringHubBack.tsx"],"sourcesContent":["\"use client\";\n\nimport { useRouter } from \"next/navigation\";\n\nexport default function SpringHubBack() {\n  const router = useRouter();\n\n  return (\n    <div className=\"springHubBackBar\">\n      <button\n        type=\"button\"\n        className=\"springHubBackBtn\"\n        onClick={() => {\n          if (typeof window !== \"undefined\" && window.history.length > 1) {\n            router.back();\n            return;\n          }\n          router.push(\"/\");\n        }}\n      >\n        ← Back\n      </button>\n    </div>\n  );\n}\n"],"names":[],"mappings":";;;;;AAEA;AAFA;;;AAIe,SAAS;IACtB,MAAM,SAAS,IAAA,+IAAS;IAExB,qBACE,8OAAC;QAAI,WAAU;kBACb,cAAA,8OAAC;YACC,MAAK;YACL,WAAU;YACV,SAAS;gBACP,IAAI,kDAAkB,eAAe,OAAO,OAAO,CAAC,MAAM,GAAG;;gBAI7D,OAAO,IAAI,CAAC;YACd;sBACD;;;;;;;;;;;AAKP"}}]
+}

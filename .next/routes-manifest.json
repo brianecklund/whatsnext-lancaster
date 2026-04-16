@@ -160,6 +160,12 @@
       "namedRegex": "^/partnerships(?:/)?$"
     },
     {
+      "page": "/southern-market-vendors",
+      "regex": "^/southern\\-market\\-vendors(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/southern\\-market\\-vendors(?:/)?$"
+    },
+    {
       "page": "/spring",
       "regex": "^/spring(?:/)?$",
       "routeKeys": {},

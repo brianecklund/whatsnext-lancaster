@@ -1,8 +1,9 @@
 import Link from "next/link";
+import { siteCopy, withSiteTitle } from "@/lib/site-copy";
 import SpringHubBack from "./SpringHubBack";
 
 export const metadata = {
-  title: "Spring hub | What’s Next Lancaster",
+  title: withSiteTitle("Spring hub"),
   description: "Seasonal picks, upcoming events, reviews, and updates for spring in Lancaster, PA.",
 };
 
@@ -57,7 +58,7 @@ export default function SpringHubPage() {
       </section>
 
       <p className="springHubBack">
-        <Link href="/">← Calendar home</Link>
+        <Link href="/">← {siteCopy.nav.calendar} home</Link>
       </p>
     </main>
   );

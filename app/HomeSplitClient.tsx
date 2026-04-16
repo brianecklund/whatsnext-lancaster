@@ -15,6 +15,7 @@ import {
   startOfToday,
 } from "@/lib/calendar";
 import { filterUpcomingEventsForLocation } from "@/lib/location-upcoming-events";
+import { siteCopy } from "@/lib/site-copy";
 
 import { createPortal } from "react-dom";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState, type CSSProperties, type ReactNode } from "react";
@@ -1563,7 +1564,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
     {!(effectiveIsMobile && mobileDetailOpen) ? (
       <NewsTickerBar
         className="newsBar--shellDesktop"
-        introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
+        introText={siteCopy.calendarTickerIntro}
         items={newsTickerItems}
         seasonLandingHref="/spring"
         seasonContent={newsHubSeason}
@@ -1613,9 +1614,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ariaLabel="Primary navigation"
                   currentKey={resolvedSection}
                   items={[
-                    { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
-                    { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
-                    { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
+                    { key: "calendar", label: siteCopy.nav.calendar, href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
+                    { key: "directory", label: siteCopy.nav.directory, href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
+                    { key: "updates", label: siteCopy.nav.updates, href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
                   ]}
                 />
 
@@ -1700,9 +1701,15 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                           setParam("view", viewMode === "month" ? "list" : "month");
                         }}
                       >
-                        <ToolbarIcon src="/icons/calendar-alt.svg" alt="Calendar view" />
+                        <ToolbarIcon src="/icons/calendar-alt.svg" alt={`${siteCopy.nav.calendar} view`} />
                         {effectiveIsMobile ? (
-                          <span>{viewMode === "clock" ? "Calendar" : viewMode === "month" ? "List" : "Calendar"}</span>
+                          <span>
+                            {viewMode === "clock"
+                              ? siteCopy.nav.calendar
+                              : viewMode === "month"
+                                ? "List"
+                                : siteCopy.nav.calendar}
+                          </span>
                         ) : null}
                       </button>
                       <button
@@ -2047,7 +2054,7 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                       <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
                     </div>
 
-                    <div className="monthGrid" role="grid" aria-label="Calendar month view">
+                    <div className="monthGrid" role="grid" aria-label={`${siteCopy.nav.calendar} month view`}>
                       {monthGrid.cells.map((c, i) => {
                         if (!c.ymd) return <div key={`e-${i}`} className="monthCell empty" />;
                         const dayNum = Number(c.ymd.split("-")[2]);
@@ -2734,9 +2741,9 @@ useBodyScrollLock(filterOpen || mobileDetailOpen);
                   ariaLabel="Primary navigation"
                   currentKey={resolvedSection}
                   items={[
-                    { key: "calendar", label: "Calendar", href: "/" },
-                    { key: "directory", label: "Directory", href: "/locations" },
-                    { key: "updates", label: "Updates", href: "/updates" },
+                    { key: "calendar", label: siteCopy.nav.calendar, href: "/" },
+                    { key: "directory", label: siteCopy.nav.directory, href: "/locations" },
+                    { key: "updates", label: siteCopy.nav.updates, href: "/updates" },
                   ]}
                 />
               </div>

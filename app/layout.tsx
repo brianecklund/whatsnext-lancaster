@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import "./globals.css";
 import type { Metadata, Viewport } from "next";
+import { siteCopy } from "@/lib/site-copy";
 import ContentLayoutScrollMomentum from "./components/ContentLayoutScrollMomentum";
 import PageRevealRoot from "./components/PageRevealRoot";
 import SiteHeader from "./site-header";
@@ -8,10 +9,7 @@ import ThemeBoot from "./ThemeBoot";
 import SitePreferencesBoot from "./components/SitePreferencesBoot";
 import SiteFooterBar from "./components/SiteFooterBar";
 
-export const metadata: Metadata = {
-  title: "What's Next Lancaster",
-  description: "Events, places, and updates happening around Lancaster.",
-};
+export const metadata: Metadata = siteCopy.metadata;
 
 export const viewport: Viewport = {
   width: "device-width",

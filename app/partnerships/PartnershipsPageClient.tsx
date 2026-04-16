@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import MobileContentBackButton from "@/app/components/MobileContentBackButton";
 import { sanitizeInternalReturnPath } from "@/lib/sanitize-internal-path";
+import { siteCopy } from "@/lib/site-copy";
 
 export default function PartnershipsPageClient() {
   const router = useRouter();
@@ -30,9 +31,9 @@ export default function PartnershipsPageClient() {
 
       <header className="contentHero">
         <p className="contentEyebrow">Partnerships</p>
-        <h1 className="contentHeroTitle">Partner with What’s Next Lancaster</h1>
+        <h1 className="contentHeroTitle">{siteCopy.pages.partnershipsHeroTitle}</h1>
         <p className="contentHeroLead">
-          We collaborate with venues, sponsors, and community organizations to highlight what’s happening in Lancaster and help people discover local experiences.
+          {siteCopy.pages.partnershipsHeroLead}
         </p>
       </header>
 

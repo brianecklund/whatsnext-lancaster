@@ -1,3 +1,5 @@
+import { siteCopy } from "@/lib/site-copy";
+
 export default function DonatePage() {
   return (
     <main className="contentPage donatePage">
@@ -5,7 +7,7 @@ export default function DonatePage() {
         <p className="contentEyebrow">Support local discovery</p>
         <h1 className="contentHeroTitle">Support Our Mission</h1>
         <p className="contentHeroLead">
-          Help keep What’s Next Lancaster free, current, and community-driven. Contributions help cover site upkeep, event curation, venue research, and the tools needed to keep the calendar, directory, and updates fresh.
+          {siteCopy.pages.donateLead}
         </p>
       </section>
 

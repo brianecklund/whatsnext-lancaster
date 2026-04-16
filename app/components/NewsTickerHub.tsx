@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useEffect } from "react";
 import type { NewsHubSeasonContent, NewsHubSeasonTile } from "@/lib/news-hub-season";
+import { siteCopy } from "@/lib/site-copy";
 
 type Props = {
   open: boolean;
@@ -107,11 +108,11 @@ export default function NewsTickerHub({
       className={`newsTickerHubOverlay${closing ? " newsTickerHubOverlay--closing" : ""}`}
       role="dialog"
       aria-modal="true"
-      aria-label="What’s Next Lancaster highlights"
+      aria-label={siteCopy.hubPanel.overlayAriaLabel}
     >
       <button type="button" className="newsTickerHubBackdrop" aria-label="Close" onClick={onRequestClose} />
       <div className="newsTickerHubPanel" onClick={(e) => e.stopPropagation()}>
-        <button type="button" className="newsTickerHubHeader" onClick={onRequestClose} aria-label="Close What’s happening in Lancaster">
+        <button type="button" className="newsTickerHubHeader" onClick={onRequestClose} aria-label={siteCopy.hubPanel.closeHeaderAria}>
           <p className="newsTickerHubHeaderKicker">{introBarText}</p>
           <span className="newsTickerHubClose" aria-hidden>
             ✕
@@ -119,7 +120,7 @@ export default function NewsTickerHub({
         </button>
 
         <div className="newsTickerHubScroll">
-          <h2 className="newsTickerHubTitle">What’s happening in Lancaster</h2>
+          <h2 className="newsTickerHubTitle">{siteCopy.hubPanel.title}</h2>
           <p className="newsTickerHubLead">{hubLead}</p>
 
           <SeasonGrid content={seasonContent} onTileNavigate={onRequestClose} />

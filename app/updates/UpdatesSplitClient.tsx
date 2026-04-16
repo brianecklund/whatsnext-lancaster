@@ -18,6 +18,7 @@ import {
 import Link from "next/link";
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
+import { siteCopy } from "@/lib/site-copy";
 
 export type UpdateLite = {
   id: string;
@@ -317,9 +318,9 @@ export default function UpdatesSplitClient({
         ariaLabel="Primary navigation"
         currentKey={resolvedSection}
         items={[
-          { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
-          { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
-          { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
+          { key: "calendar", label: siteCopy.nav.calendar, href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
+          { key: "directory", label: siteCopy.nav.directory, href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
+          { key: "updates", label: siteCopy.nav.updates, href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
         ]}
       />
 
@@ -468,7 +469,7 @@ export default function UpdatesSplitClient({
 
   return (
     <SplitPageLayout
-      tagline="Updates, openings, menu changes, PSAs, and quick announcements."
+      tagline={siteCopy.splitTaglines.updates}
       taglineHidden={taglineHidden}
       isMobile={isMobile}
       mobileDetailOpen={mobileDetailOpen}
@@ -479,7 +480,7 @@ export default function UpdatesSplitClient({
       topBar={!(isMobile && mobileDetailOpen) ? (
         <NewsTickerBar
           className={isMobile ? undefined : "newsBar--shellDesktop"}
-          introText="A calendar of events, specials, and pop-ups in Lancaster, PA."
+          introText={siteCopy.calendarTickerIntro}
           items={newsTickerItems}
           seasonLandingHref="/spring"
           seasonContent={newsHubSeason}

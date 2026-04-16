@@ -1,3 +1,5 @@
+import { siteCopy } from "@/lib/site-copy";
+
 export default function AboutPage() {
   return (
     <main className="contentPage aboutPage">
@@ -5,7 +7,7 @@ export default function AboutPage() {
         <p className="contentEyebrow">About the project</p>
         <h1 className="contentHeroTitle">A more useful way to find what’s happening in Lancaster.</h1>
         <p className="contentHeroLead">
-          What’s Next Lancaster brings together events, places, and community updates in one clear experience so people can browse quickly and discover more of the city.
+          {siteCopy.pages.aboutHeroLead}
         </p>
       </section>
 

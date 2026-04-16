@@ -4,6 +4,7 @@ import type { CSSProperties, ReactNode } from "react";
 import { useMemo } from "react";
 import { useRouter } from "next/navigation";
 import SegmentedControl from "@/app/components/SegmentedControl";
+import { siteCopy } from "@/lib/site-copy";
 
 type PageKey = "calendar" | "directory" | "updates";
 
@@ -41,9 +42,9 @@ export default function SplitPageLayout({
 
   const items = useMemo(
     () => [
-      { key: "calendar" as const, label: "Calendar", href: "/" },
-      { key: "directory" as const, label: "Directory", href: "/locations" },
-      { key: "updates" as const, label: "Updates", href: "/updates" },
+      { key: "calendar" as const, label: siteCopy.nav.calendar, href: "/" },
+      { key: "directory" as const, label: siteCopy.nav.directory, href: "/locations" },
+      { key: "updates" as const, label: siteCopy.nav.updates, href: "/updates" },
     ],
     [],
   );
@@ -76,9 +77,9 @@ export default function SplitPageLayout({
             ariaLabel="Primary navigation"
             currentKey={current}
             items={[
-              { key: "calendar", label: "Calendar", href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
-              { key: "directory", label: "Directory", href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
-              { key: "updates", label: "Updates", href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
+              { key: "calendar", label: siteCopy.nav.calendar, href: onNavigateSection ? undefined : "/", onClick: onNavigateSection ? () => onNavigateSection("calendar") : undefined },
+              { key: "directory", label: siteCopy.nav.directory, href: onNavigateSection ? undefined : "/locations", onClick: onNavigateSection ? () => onNavigateSection("directory") : undefined },
+              { key: "updates", label: siteCopy.nav.updates, href: onNavigateSection ? undefined : "/updates", onClick: onNavigateSection ? () => onNavigateSection("updates") : undefined },
             ]}
           />
         </div>

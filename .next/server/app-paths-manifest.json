@@ -21,6 +21,7 @@
   "/locations/page": "app/locations/page.js",
   "/page": "app/page.js",
   "/partnerships/page": "app/partnerships/page.js",
+  "/southern-market-vendors/page": "app/southern-market-vendors/page.js",
   "/spring/page": "app/spring/page.js",
   "/updates/page": "app/updates/page.js"
 }

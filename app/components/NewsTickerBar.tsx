@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import NewsTickerHub from "@/app/components/NewsTickerHub";
 import type { NewsHubSeasonContent } from "@/lib/news-hub-season";
+import { siteCopy } from "@/lib/site-copy";
 
 type NewsTickerItem = {
   id?: string;
@@ -21,19 +22,16 @@ function tickerItemLine(item: NewsTickerItem): string {
     .trim();
   if (text.length > 0) return text;
   const label = stripInvisible(item.label ?? "").trim();
-  if (label) return `${label}: see Updates for details.`;
+  if (label) return `${label}: see ${siteCopy.nav.updates} for details.`;
   return "Community update.";
 }
 
 const HUB_CLOSE_MS = 340;
 
-const DEFAULT_HUB_LEAD =
-  "What’s Next Lancaster brings together a shared events calendar, a directory of places, and short community updates so you can see what’s on, where to go, and what just changed—whether you’re planning a night out or keeping up with openings and specials.";
-
 export default function NewsTickerBar({
   introText,
   items,
-  hubLead = DEFAULT_HUB_LEAD,
+  hubLead = siteCopy.hubLeadDefault,
   seasonLandingHref = "/spring",
   seasonContent,
   className = "",
@@ -223,14 +221,14 @@ export default function NewsTickerBar({
   if (mobileExploreOnly) {
     return (
       <>
-        <section className={["newsBar", "newsBar--exploreOnly", className].filter(Boolean).join(" ")} aria-label="Explore What’s Next">
+        <section className={["newsBar", "newsBar--exploreOnly", className].filter(Boolean).join(" ")} aria-label={siteCopy.explore.sectionAriaLabel}>
           <button
             type="button"
             className="newsBar__exploreOnlyBtn"
             onClick={hubOpen ? requestCloseHub : openHub}
             aria-haspopup="dialog"
             aria-expanded={hubOpen}
-            aria-label={hubOpen ? "Close explore panel" : "Explore What’s Next"}
+            aria-label={hubOpen ? siteCopy.explore.toggleOpenAria : siteCopy.explore.toggleClosedAria}
           >
             <span className="newsBar__exploreOnlyLabel">Explore</span>
             <span className="newsBar__exploreOnlyChev" aria-hidden>
@@ -255,7 +253,7 @@ export default function NewsTickerBar({
     <>
       <section
         className={["newsBar", desktopIntroExplore ? "newsBar--desktopExplore" : "", className].filter(Boolean).join(" ")}
-        aria-label="Latest updates — open full list"
+        aria-label={siteCopy.newsBar.desktopStripAriaLabel}
       >
         <button
           type="button"
@@ -263,7 +261,7 @@ export default function NewsTickerBar({
           onClick={toggleHubFromBar}
           aria-haspopup="dialog"
           aria-expanded={hubOpen}
-          aria-label={hubOpen ? "Close latest updates panel" : undefined}
+          aria-label={hubOpen ? siteCopy.newsBar.desktopClosePanelAria : undefined}
         >
           <span className="newsBar__introRow">
             <span className="newsBar__intro">{introText}</span>
