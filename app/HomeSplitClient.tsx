@@ -704,6 +704,8 @@ export default function HomeSplitClient({ events, updates = [], newsHubSeason, c
     const nq = norm(q);
 
     return events.filter((e) => {
+      // Past events should not appear anywhere in listings (list / month / weekly / detail rails).
+      if (eventHasEnded(e)) return false;
       const hay = norm(
         [
           e.title ?? "",

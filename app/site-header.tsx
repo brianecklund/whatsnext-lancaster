@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import BrandScrollSmiley from "@/app/components/BrandScrollSmiley";
 import { SegmentIconCalendar, SegmentIconDirectory, SegmentIconUpdates } from "@/app/components/segmentNavIcons";
-import { TopNavIconAbout, TopNavIconBlog, TopNavIconContact, TopNavIconDonate } from "@/app/components/topNavMenuIcons";
+import { TopNavIconAbout, TopNavIconBlog, TopNavIconContact, TopNavIconDonate, TopNavIconMockup } from "@/app/components/topNavMenuIcons";
 import { DEFAULT_THEME, THEME_PALETTES, THEME_PREVIEW_COLORS, normalizeThemeKey, type ThemeKey } from "./theme-palettes";
 import {
   TEXT_SCALE_OPTIONS,
@@ -22,6 +22,7 @@ import { siteCopy } from "@/lib/site-copy";
 
 const DESKTOP_LINKS: Array<{ href: string; label: string; Icon: () => ReactNode }> = [
   { href: "/blog", label: siteCopy.nav.blog, Icon: TopNavIconBlog },
+  { href: "/mockup", label: "Mockup", Icon: TopNavIconMockup },
   { href: "/donate", label: siteCopy.nav.donate, Icon: TopNavIconDonate },
   { href: "/about", label: siteCopy.nav.about, Icon: TopNavIconAbout },
   { href: "/contact", label: siteCopy.nav.contact, Icon: TopNavIconContact },

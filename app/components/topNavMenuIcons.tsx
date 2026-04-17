@@ -47,3 +47,13 @@ export function TopNavIconContact(): ReactNode {
     </svg>
   );
 }
+
+export function TopNavIconMockup(): ReactNode {
+  return (
+    <svg {...strokeIcon}>
+      <rect x="7" y="2.8" width="10" height="18.4" rx="2.2" />
+      <path d="M11 5.6h2" />
+      <path d="M12 18.7h.01" />
+    </svg>
+  );
+}

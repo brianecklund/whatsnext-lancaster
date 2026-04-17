@@ -1,4 +1,11 @@
 {
+  "/about/page": "app/about/page.js",
+  "/api/places/details/route": "app/api/places/details/route.js",
+  "/api/places/photo/route": "app/api/places/photo/route.js",
+  "/blog/page": "app/blog/page.js",
+  "/contact/page": "app/contact/page.js",
+  "/donate/page": "app/donate/page.js",
+  "/locations/page": "app/locations/page.js",
   "/page": "app/page.js",
-  "/southern-market-vendors/page": "app/southern-market-vendors/page.js"
+  "/updates/page": "app/updates/page.js"
 }

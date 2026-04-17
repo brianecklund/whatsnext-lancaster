@@ -154,6 +154,12 @@
       "namedRegex": "^/locations(?:/)?$"
     },
     {
+      "page": "/mockup",
+      "regex": "^/mockup(?:/)?$",
+      "routeKeys": {},
+      "namedRegex": "^/mockup(?:/)?$"
+    },
+    {
       "page": "/partnerships",
       "regex": "^/partnerships(?:/)?$",
       "routeKeys": {},
