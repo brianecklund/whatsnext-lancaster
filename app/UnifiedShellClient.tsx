@@ -80,10 +80,9 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
 
     const reduceMotion =
       typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
-    const fromSlow = currentRendered === "directory" || currentRendered === "updates";
-    const toSlow = urlSection === "directory" || urlSection === "updates";
-    const exitBeforeSwapMs = reduceMotion ? 0 : fromSlow ? 1000 : 780;
-    const enterHoldMs = reduceMotion ? 0 : toSlow ? 1980 : 1200;
+    // Keep listing transition cadence consistent across Calendar / Directory / Updates.
+    const exitBeforeSwapMs = reduceMotion ? 0 : 780;
+    const enterHoldMs = reduceMotion ? 0 : 1200;
 
     cancelListingBootRef.current?.();
 
@@ -264,7 +263,7 @@ export default function UnifiedShellClient({ initialSection, events, locations, 
       className={`shellSwap homeShell${introActive ? " shellIntro--active" : ""}`}
       data-transitioning={isTransitioning ? "true" : "false"}
       data-shell-switch={shellSwitchPhase}
-      data-listing-pace={renderedSection === "directory" || renderedSection === "updates" ? "slow" : "normal"}
+      data-listing-pace="normal"
     >
       <div key={renderedSection} className="shellSwap__panel">
         {renderedSection === "calendar" ? (

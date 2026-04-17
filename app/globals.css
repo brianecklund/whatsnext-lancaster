@@ -842,7 +842,7 @@ img, video, iframe{ max-width:100%; }
 
 .mockupPhone{
   position: relative;
-  width: min(420px, 92vw);
+  width: min(372px, 86vw);
   aspect-ratio: 390 / 844;
   border-radius: 44px;
   background: #0b0d12;
@@ -877,6 +877,31 @@ img, video, iframe{ max-width:100%; }
   border: 0;
   border-radius: 32px;
   background: var(--bg);
+}
+
+.mockupPhone__viewport{
+  width: 100%;
+  height: 100%;
+  border-radius: 32px;
+  overflow: hidden;
+  background: var(--bg);
+  display: grid;
+  grid-template-rows: var(--mockupChromeTop, 64px) 1fr var(--mockupChromeBottom, 78px);
+}
+
+.mockupPhone__chromeTop,
+.mockupPhone__chromeBottom{
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.0));
+}
+
+.mockupPhone__chromeBottom{
+  background:
+    linear-gradient(0deg, rgba(255,255,255,0.08), rgba(255,255,255,0.0));
+}
+
+.mockupPhone__viewport > .mockupPhone__iframe{
+  border-radius: 0;
 }
 
 a{ color: inherit; text-decoration: none; }
@@ -4546,13 +4571,13 @@ a:hover{
     box-shadow: 0 0 0 1px color-mix(in srgb, var(--border) 50%, #ddd 50%) inset !important;
   }
 
-  /* Directory + updates: right pane follows the list quickly (small offset so order stays readable). */
+  /* Directory + Updates: match Calendar split-pane fade timing. */
   .wnlPageRevealRoot--contentReady .pageShell--listingPairReveal .split > .paneLeft{
-    transition-delay: 60ms !important;
+    transition-delay: 170ms !important;
   }
 
   .wnlPageRevealRoot--contentReady .pageShell--listingPairReveal .split > .paneRight{
-    transition-delay: 75ms !important;
+    transition-delay: 330ms !important;
   }
 }
 

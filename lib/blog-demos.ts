@@ -288,6 +288,62 @@ export const BLOG_DEMOS: BlogDemoDetail[] = [
       },
     ],
   },
+  {
+    lite: {
+      id: "demo-first-friday-notes",
+      uid: "first-friday-notes-april",
+      title: "First Friday notes: three rooms that reward a slower lap",
+      excerpt: "Short lines early, better conversations late, and one back room that’s the whole point.",
+      category: "Arts & Culture",
+      date: "2026-04-05",
+      imageUrl: img(77),
+      layout: "article",
+      featured: true,
+    },
+    sections: [
+      { id: "route", label: "A route that avoids bottlenecks" },
+      { id: "standouts", label: "Standouts" },
+      { id: "practical", label: "Practical notes" },
+    ],
+    blocks: [
+      { kind: "p", text: "First Friday can turn into a sidewalk shuffle if you follow the main drag at peak time. The trick is to treat it like a loop: side street first, square last, then back out when the crowds drift toward dinner reservations." },
+      { kind: "h2", id: "route", text: "A route that avoids bottlenecks" },
+      { kind: "ul", items: ["Start at the smaller rooms right at 6:00—doors are calm for the first 30 minutes.", "Skip the loudest opening reception until after 8, when the room finally has space to breathe.", "If you’re going with friends, pick one meeting point after the second stop. Phone service gets spotty in the densest blocks."] },
+      { kind: "h2", id: "standouts", text: "Standouts" },
+      { kind: "p", text: "Look for the show that’s mostly photographs with restrained captions. It’s the rare kind of work that actually gets better the longer you stay with it." },
+      { kind: "pullquote", text: "The best rooms aren’t always the busiest—sometimes they’re the ones with just enough quiet to hear yourself think." },
+      { kind: "h2", id: "practical", text: "Practical notes" },
+      { kind: "ul", items: ["Wear shoes you can stand in for an hour without noticing.", "If you’re driving, park a few blocks out and walk in; the last two turns are the slowest.", "If you want to talk to artists, show up in the last hour—people are less rushed, questions get better."] },
+    ],
+  },
+  {
+    lite: {
+      id: "demo-film-club",
+      uid: "small-room-film-club-guide",
+      title: "A small-room film club guide for people who hate big theaters",
+      excerpt: "Short run times, good sound, and the kind of post-show conversation that doesn’t feel like homework.",
+      category: "Arts & Culture",
+      date: "2026-04-12",
+      imageUrl: img(88),
+      layout: "article",
+      featured: false,
+    },
+    sections: [
+      { id: "before", label: "Before you go" },
+      { id: "during", label: "During" },
+      { id: "after", label: "After" },
+    ],
+    blocks: [
+      { kind: "p", text: "If you only ever see movies in megaplexes, a small-room screening can feel like a different medium. Less spectacle, more attention. Here’s how to enjoy it without turning it into a personality test." },
+      { kind: "h2", id: "before", text: "Before you go" },
+      { kind: "ul", items: ["Arrive early if you care about sightlines; the best seats are the ones you don’t have to adjust in.", "If the event says “doors,” take it literally—start times are often aspirational.", "Bring a layer. The room is either too warm or a little too cold, never in between."] },
+      { kind: "h2", id: "during", text: "During" },
+      { kind: "p", text: "Put your phone away. Not out of purity—out of practicality. Small rooms make tiny screens feel huge. Let the movie do its work." },
+      { kind: "h2", id: "after", text: "After" },
+      { kind: "pullquote", text: "The best part of a small screening is the way the room exhales together when the credits roll." },
+      { kind: "p", text: "If there’s a Q&A, listen for the first two questions, then ask the one you actually care about. Good rooms reward honest curiosity more than cleverness." },
+    ],
+  },
 ];
 
 export function listDemoBlogLites(): BlogPostLite[] {
