@@ -842,7 +842,7 @@ img, video, iframe{ max-width:100%; }
 
 .mockupPhone{
   position: relative;
-  width: min(372px, 86vw);
+  width: min(410px, 90vw);
   aspect-ratio: 390 / 844;
   border-radius: 44px;
   background: #0b0d12;
@@ -886,7 +886,7 @@ img, video, iframe{ max-width:100%; }
   overflow: hidden;
   background: var(--bg);
   display: grid;
-  grid-template-rows: var(--mockupChromeTop, 64px) 1fr var(--mockupChromeBottom, 78px);
+  grid-template-rows: var(--mockupChromeTop, 46px) 1fr var(--mockupChromeBottom, 56px);
 }
 
 .mockupPhone__chromeTop,
@@ -902,6 +902,58 @@ img, video, iframe{ max-width:100%; }
 
 .mockupPhone__viewport > .mockupPhone__iframe{
   border-radius: 0;
+}
+
+/* Match “real phone” content scale inside iframe. */
+.mockupPhone{
+  --mockupScale: 0.94;
+}
+
+.mockupPhone__viewport > .mockupPhone__iframe{
+  width: calc(100% / var(--mockupScale));
+  height: calc(100% / var(--mockupScale));
+  transform: scale(var(--mockupScale));
+  transform-origin: top left;
+}
+
+@media (max-width: 520px){
+  .mockupPhone{
+    --mockupScale: 0.92;
+  }
+}
+
+/* Mobile directory rows: ensure full-width card + actions top-right. */
+@media (max-width: 980px){
+  .eventRow.directoryListingRow{
+    width: 100%;
+    box-sizing: border-box;
+    position: relative;
+  }
+
+  .eventRow.directoryListingRow .directoryListingRow__actions{
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    margin-left: 0 !important;
+    align-self: auto;
+  }
+
+  .eventRow.directoryListingRow .directoryListingRow__main{
+    padding-right: 74px; /* room for action buttons */
+  }
+}
+
+/* Mobile list headers should span full width (no right-side gap). */
+@media (max-width: 980px){
+  body[data-layout="shell"] .paneLeft .dayBlock .dayTitle.dayTitle--sticky{
+    width: calc(100% + (var(--panePadX) * 2));
+    box-sizing: border-box;
+  }
+
+  body[data-layout="shell"] .directoryListWrap .directoryLetterHeading--sticky{
+    width: calc(100% + (var(--panePadX) * 2));
+    box-sizing: border-box;
+  }
 }
 
 a{ color: inherit; text-decoration: none; }
