@@ -13,7 +13,7 @@ __turbopack_context__.s([
     ()=>withSiteTitle
 ]);
 function getSiteVariant() {
-    const raw = (("TURBOPACK compile-time value", "demo") ?? "").trim().toLowerCase();
+    const raw = (process.env.NEXT_PUBLIC_SITE_VARIANT ?? "").trim().toLowerCase();
     return raw === "demo" ? "demo" : "default";
 }
 const isDemoSite = getSiteVariant() === "demo";

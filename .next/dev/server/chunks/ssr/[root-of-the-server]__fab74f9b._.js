@@ -2558,11 +2558,571 @@ const followingWeekEvents = [
         location_page_uid: null
     }
 ];
+/** Additional seeded calendar: May 3 through Jun 7 (more density + variety). */ const mayThroughEarlyJuneEvents = [
+    {
+        id: 'test-event-68',
+        key: 'test-event-68',
+        uid: 'test-event-68',
+        title: 'Sunday Studio Drop-In',
+        summary: 'Open hours for sketching and low-stakes making.',
+        description: 'A relaxed studio block: bring a sketchbook or just wander and look.',
+        descriptionText: 'A relaxed studio block: bring a sketchbook or just wander and look.',
+        start_datetime: buildIso('2026-05-03', '13:00'),
+        end_datetime: buildIso('2026-05-03', '16:00'),
+        event_type: 'Arts & culture',
+        status: 'Scheduled',
+        locationName: 'Penn Square Studio',
+        address: '8 Penn Sq, Lancaster, PA 17603',
+        locationUrl: '/locations/test-penn-square-studio',
+        website_url: 'https://example.com/penn-square-studio/studio-drop-in',
+        tickets_url: null,
+        image_url: img('studio-drop-in-may'),
+        imageUrl: img('studio-drop-in-may'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'penn-square-studio',
+            'may-june'
+        ],
+        venue_external_id: 'test-featured-3',
+        location_page_uid: 'test-penn-square-studio'
+    },
+    {
+        id: 'test-event-69',
+        key: 'test-event-69',
+        uid: 'test-event-69',
+        title: 'Warehouse Listening Session',
+        summary: 'Ambient set + projected visuals in a dark room.',
+        description: 'Short set, big sound—more listening than party.',
+        descriptionText: 'Short set, big sound—more listening than party.',
+        start_datetime: buildIso('2026-05-07', '20:00'),
+        end_datetime: buildIso('2026-05-07', '22:00'),
+        event_type: 'Live music',
+        status: 'Scheduled',
+        locationName: 'Harbor Hall',
+        address: '112 Water St, Lancaster, PA 17603',
+        locationUrl: '/locations/test-harbor-hall',
+        website_url: 'https://example.com/harbor-hall/warehouse-listening-session',
+        tickets_url: 'https://example.com/harbor-hall/warehouse-listening-session/tickets',
+        image_url: img('warehouse-listening-session'),
+        imageUrl: img('warehouse-listening-session'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'harbor-hall',
+            'may-june'
+        ],
+        venue_external_id: 'test-featured-1',
+        location_page_uid: 'test-harbor-hall'
+    },
+    {
+        id: 'test-event-70',
+        key: 'test-event-70',
+        uid: 'test-event-70',
+        title: 'Print Swap Saturday',
+        summary: 'Trade zines, posters, and small editions.',
+        description: 'Bring a stack, leave with a stack. Friendly table rules, no gatekeeping.',
+        descriptionText: 'Bring a stack, leave with a stack. Friendly table rules, no gatekeeping.',
+        start_datetime: buildIso('2026-05-09', '12:00'),
+        end_datetime: buildIso('2026-05-09', '15:00'),
+        event_type: 'Arts & culture',
+        status: 'Scheduled',
+        locationName: 'Penn Square Studio',
+        address: '8 Penn Sq, Lancaster, PA 17603',
+        locationUrl: '/locations/test-penn-square-studio',
+        website_url: 'https://example.com/penn-square-studio/print-swap-saturday',
+        tickets_url: null,
+        image_url: img('print-swap-saturday-may'),
+        imageUrl: img('print-swap-saturday-may'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'penn-square-studio',
+            'may-june'
+        ],
+        venue_external_id: 'test-featured-3',
+        location_page_uid: 'test-penn-square-studio'
+    },
+    {
+        id: 'test-event-71',
+        key: 'test-event-71',
+        uid: 'test-event-71',
+        title: 'Chef Counter: spring noodles night',
+        summary: 'Late seating, limited bowls, fast service.',
+        description: 'A rotating noodles night built for a quick, satisfying dinner.',
+        descriptionText: 'A rotating noodles night built for a quick, satisfying dinner.',
+        start_datetime: buildIso('2026-05-14', '18:00'),
+        end_datetime: buildIso('2026-05-14', '21:00'),
+        event_type: 'Food & drink',
+        status: 'Scheduled',
+        locationName: 'Fig Lane Market',
+        address: '27 Fig Ln, Lancaster, PA 17602',
+        locationUrl: '/locations/test-fig-lane-market',
+        website_url: 'https://example.com/fig-lane-market/spring-noodles-night',
+        tickets_url: null,
+        image_url: img('spring-noodles-night'),
+        imageUrl: img('spring-noodles-night'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'fig-lane-market',
+            'may-june'
+        ],
+        venue_external_id: 'test-featured-2',
+        location_page_uid: 'test-fig-lane-market'
+    },
+    {
+        id: 'test-event-72',
+        key: 'test-event-72',
+        uid: 'test-event-72',
+        title: 'Small-room screening: shorts night',
+        summary: 'Experimental shorts + a short post-show discussion.',
+        description: 'A tight program with real sound and a room that actually watches.',
+        descriptionText: 'A tight program with real sound and a room that actually watches.',
+        start_datetime: buildIso('2026-05-16', '19:30'),
+        end_datetime: buildIso('2026-05-16', '21:30'),
+        event_type: 'Film screening',
+        status: 'Scheduled',
+        locationName: 'Penn Square Studio',
+        address: '8 Penn Sq, Lancaster, PA 17603',
+        locationUrl: '/locations/test-penn-square-studio',
+        website_url: 'https://example.com/penn-square-studio/shorts-night',
+        tickets_url: 'https://example.com/penn-square-studio/shorts-night/tickets',
+        image_url: img('shorts-night-may'),
+        imageUrl: img('shorts-night-may'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'penn-square-studio',
+            'may-june'
+        ],
+        venue_external_id: 'test-featured-3',
+        location_page_uid: 'test-penn-square-studio'
+    },
+    {
+        id: 'test-event-73',
+        key: 'test-event-73',
+        uid: 'test-event-73',
+        title: 'Sunday courtyard brunch set',
+        summary: 'Outdoor brunch service + mellow vinyl.',
+        description: 'A slower Sunday morning with coffee and a light DJ set.',
+        descriptionText: 'A slower Sunday morning with coffee and a light DJ set.',
+        start_datetime: buildIso('2026-05-17', '10:00'),
+        end_datetime: buildIso('2026-05-17', '13:00'),
+        event_type: 'Food & drink',
+        status: 'Scheduled',
+        locationName: 'Fig Lane Market',
+        address: '27 Fig Ln, Lancaster, PA 17602',
+        locationUrl: '/locations/test-fig-lane-market',
+        website_url: 'https://example.com/fig-lane-market/courtyard-brunch-may',
+        tickets_url: null,
+        image_url: img('courtyard-brunch-may'),
+        imageUrl: img('courtyard-brunch-may'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'fig-lane-market',
+            'may-june'
+        ],
+        venue_external_id: 'test-featured-2',
+        location_page_uid: 'test-fig-lane-market'
+    },
+    {
+        id: 'test-event-74',
+        key: 'test-event-74',
+        uid: 'test-event-74',
+        title: 'Open mic (no heckling, good sound)',
+        summary: 'Sign-ups at the door. Two songs or ten minutes.',
+        description: 'A respectful room with decent monitors and quick changeovers.',
+        descriptionText: 'A respectful room with decent monitors and quick changeovers.',
+        start_datetime: buildIso('2026-05-20', '19:00'),
+        end_datetime: buildIso('2026-05-20', '22:00'),
+        event_type: 'Live music',
+        status: 'Scheduled',
+        locationName: 'Harbor Hall',
+        address: '112 Water St, Lancaster, PA 17603',
+        locationUrl: '/locations/test-harbor-hall',
+        website_url: 'https://example.com/harbor-hall/open-mic-may',
+        tickets_url: null,
+        image_url: img('open-mic-may'),
+        imageUrl: img('open-mic-may'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'harbor-hall',
+            'may-june'
+        ],
+        venue_external_id: 'test-featured-1',
+        location_page_uid: 'test-harbor-hall'
+    },
+    {
+        id: 'test-event-75',
+        key: 'test-event-75',
+        uid: 'test-event-75',
+        title: 'First Friday: corridor galleries late hours',
+        summary: 'Extended hours + a small back-room installation.',
+        description: 'Start early, end late—best viewing happens after the peak crowd.',
+        descriptionText: 'Start early, end late—best viewing happens after the peak crowd.',
+        start_datetime: buildIso('2026-06-05', '18:00'),
+        end_datetime: buildIso('2026-06-05', '21:00'),
+        event_type: 'Art gallery',
+        status: 'Scheduled',
+        locationName: 'Penn Square Studio',
+        address: '8 Penn Sq, Lancaster, PA 17603',
+        locationUrl: '/locations/test-penn-square-studio',
+        website_url: 'https://example.com/penn-square-studio/first-friday-june',
+        tickets_url: null,
+        image_url: img('first-friday-june'),
+        imageUrl: img('first-friday-june'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'penn-square-studio',
+            'may-june',
+            'First Friday'
+        ],
+        venue_external_id: 'test-featured-3',
+        location_page_uid: 'test-penn-square-studio'
+    },
+    {
+        id: 'test-event-76',
+        key: 'test-event-76',
+        uid: 'test-event-76',
+        title: 'Park movie night: bring a blanket',
+        summary: 'Outdoor screening with snacks and a short pre-roll set.',
+        description: 'A simple outdoor movie night—good vibes, early start, wrap by 10.',
+        descriptionText: 'A simple outdoor movie night—good vibes, early start, wrap by 10.',
+        start_datetime: buildIso('2026-06-06', '20:15'),
+        end_datetime: buildIso('2026-06-06', '22:30'),
+        event_type: 'Outdoor screening',
+        status: 'Scheduled',
+        locationName: 'Buchanan Park',
+        address: '901 Buchanan Ave, Lancaster, PA 17603',
+        website_url: 'https://example.com/park-movie-night-june',
+        tickets_url: null,
+        image_url: img('park-movie-night-june'),
+        imageUrl: img('park-movie-night-june'),
+        tags: [
+            TEST_DATA_TAG,
+            'general-test',
+            'may-june'
+        ],
+        venue_external_id: null,
+        location_page_uid: null
+    }
+];
+/** Extra seeded calendar: Jun 8 through Jul 12 (more volume for browsing). */ const midJuneThroughMidJulyEvents = [
+    {
+        id: 'test-event-77',
+        key: 'test-event-77',
+        uid: 'test-event-77',
+        title: 'Monday maker lab (drop-in)',
+        summary: 'Open tables, supplies on hand, gentle facilitation.',
+        description: 'A recurring drop-in for small projects—bring something you’ve been stuck on.',
+        descriptionText: 'A recurring drop-in for small projects—bring something you’ve been stuck on.',
+        start_datetime: buildIso('2026-06-08', '18:00'),
+        end_datetime: buildIso('2026-06-08', '20:30'),
+        event_type: 'Workshop',
+        status: 'Scheduled',
+        locationName: 'Penn Square Studio',
+        address: '8 Penn Sq, Lancaster, PA 17603',
+        locationUrl: '/locations/test-penn-square-studio',
+        website_url: 'https://example.com/penn-square-studio/monday-maker-lab',
+        tickets_url: null,
+        image_url: img('monday-maker-lab-june'),
+        imageUrl: img('monday-maker-lab-june'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'penn-square-studio',
+            'jun-jul'
+        ],
+        venue_external_id: 'test-featured-3',
+        location_page_uid: 'test-penn-square-studio'
+    },
+    {
+        id: 'test-event-78',
+        key: 'test-event-78',
+        uid: 'test-event-78',
+        title: 'Tuesday tape swap + listening bar',
+        summary: 'Bring cassettes (or just show up to listen).',
+        description: 'Low-key exchange night. A small table for trades and a corner for listening.',
+        descriptionText: 'Low-key exchange night. A small table for trades and a corner for listening.',
+        start_datetime: buildIso('2026-06-09', '19:00'),
+        end_datetime: buildIso('2026-06-09', '21:00'),
+        event_type: 'Music social',
+        status: 'Scheduled',
+        locationName: 'Harbor Hall',
+        address: '112 Water St, Lancaster, PA 17603',
+        locationUrl: '/locations/test-harbor-hall',
+        website_url: 'https://example.com/harbor-hall/tuesday-tape-swap-june',
+        tickets_url: null,
+        image_url: img('tuesday-tape-swap-june'),
+        imageUrl: img('tuesday-tape-swap-june'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'harbor-hall',
+            'jun-jul'
+        ],
+        venue_external_id: 'test-featured-1',
+        location_page_uid: 'test-harbor-hall'
+    },
+    {
+        id: 'test-event-79',
+        key: 'test-event-79',
+        uid: 'test-event-79',
+        title: 'Summer tasting flight (market edition)',
+        summary: 'A self-guided “three stalls, one drink” mini crawl.',
+        description: 'Pick up a card at the door and make a loop through three vendors.',
+        descriptionText: 'Pick up a card at the door and make a loop through three vendors.',
+        start_datetime: buildIso('2026-06-11', '17:30'),
+        end_datetime: buildIso('2026-06-11', '20:30'),
+        event_type: 'Food & drink',
+        status: 'Scheduled',
+        locationName: 'Fig Lane Market',
+        address: '27 Fig Ln, Lancaster, PA 17602',
+        locationUrl: '/locations/test-fig-lane-market',
+        website_url: 'https://example.com/fig-lane-market/summer-tasting-flight',
+        tickets_url: null,
+        image_url: img('summer-tasting-flight-june'),
+        imageUrl: img('summer-tasting-flight-june'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'fig-lane-market',
+            'jun-jul'
+        ],
+        venue_external_id: 'test-featured-2',
+        location_page_uid: 'test-fig-lane-market'
+    },
+    {
+        id: 'test-event-80',
+        key: 'test-event-80',
+        uid: 'test-event-80',
+        title: 'Outdoor screening: shorts + Q&A',
+        summary: 'A tight program; bring a chair if you have one.',
+        description: 'Short films outdoors with a quick conversation after.',
+        descriptionText: 'Short films outdoors with a quick conversation after.',
+        start_datetime: buildIso('2026-06-12', '20:30'),
+        end_datetime: buildIso('2026-06-12', '22:30'),
+        event_type: 'Outdoor screening',
+        status: 'Scheduled',
+        locationName: 'Warehouse Yard',
+        address: '320 N Mulberry St, Lancaster, PA 17603',
+        website_url: 'https://example.com/warehouse-yard/outdoor-shorts-june',
+        tickets_url: null,
+        image_url: img('outdoor-shorts-june'),
+        imageUrl: img('outdoor-shorts-june'),
+        tags: [
+            TEST_DATA_TAG,
+            'general-test',
+            'jun-jul'
+        ],
+        venue_external_id: null,
+        location_page_uid: null
+    },
+    {
+        id: 'test-event-81',
+        key: 'test-event-81',
+        uid: 'test-event-81',
+        title: 'Saturday gallery circuit (summer hours)',
+        summary: 'A slow walk + a cool room.',
+        description: 'A summer-hours circuit for people who want to look, not rush.',
+        descriptionText: 'A summer-hours circuit for people who want to look, not rush.',
+        start_datetime: buildIso('2026-06-13', '13:00'),
+        end_datetime: buildIso('2026-06-13', '16:00'),
+        event_type: 'Art gallery',
+        status: 'Scheduled',
+        locationName: 'Penn Square Studio',
+        address: '8 Penn Sq, Lancaster, PA 17603',
+        locationUrl: '/locations/test-penn-square-studio',
+        website_url: 'https://example.com/penn-square-studio/summer-gallery-circuit',
+        tickets_url: null,
+        image_url: img('summer-gallery-circuit-june'),
+        imageUrl: img('summer-gallery-circuit-june'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'penn-square-studio',
+            'jun-jul'
+        ],
+        venue_external_id: 'test-featured-3',
+        location_page_uid: 'test-penn-square-studio'
+    },
+    {
+        id: 'test-event-82',
+        key: 'test-event-82',
+        uid: 'test-event-82',
+        title: 'Late set: disco edits + visuals',
+        summary: 'Dancefloor energy without the chaos.',
+        description: 'A late-night set built for a good groove and decent sound.',
+        descriptionText: 'A late-night set built for a good groove and decent sound.',
+        start_datetime: buildIso('2026-06-18', '21:30'),
+        end_datetime: buildIso('2026-06-18', '23:59'),
+        event_type: 'DJ set',
+        status: 'Scheduled',
+        locationName: 'Harbor Hall',
+        address: '112 Water St, Lancaster, PA 17603',
+        locationUrl: '/locations/test-harbor-hall',
+        website_url: 'https://example.com/harbor-hall/disco-edits-june',
+        tickets_url: 'https://example.com/harbor-hall/disco-edits-june/tickets',
+        image_url: img('disco-edits-june'),
+        imageUrl: img('disco-edits-june'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'harbor-hall',
+            'jun-jul'
+        ],
+        venue_external_id: 'test-featured-1',
+        location_page_uid: 'test-harbor-hall'
+    },
+    {
+        id: 'test-event-83',
+        key: 'test-event-83',
+        uid: 'test-event-83',
+        title: 'Zine fold workshop (30-minute version)',
+        summary: 'Fast, simple, surprisingly satisfying.',
+        description: 'Make a mini zine, print a few copies, leave with something tangible.',
+        descriptionText: 'Make a mini zine, print a few copies, leave with something tangible.',
+        start_datetime: buildIso('2026-06-20', '11:00'),
+        end_datetime: buildIso('2026-06-20', '12:30'),
+        event_type: 'Workshop',
+        status: 'Scheduled',
+        locationName: 'Penn Square Studio',
+        address: '8 Penn Sq, Lancaster, PA 17603',
+        locationUrl: '/locations/test-penn-square-studio',
+        website_url: 'https://example.com/penn-square-studio/zine-fold-june',
+        tickets_url: null,
+        image_url: img('zine-fold-june'),
+        imageUrl: img('zine-fold-june'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'penn-square-studio',
+            'jun-jul'
+        ],
+        venue_external_id: 'test-featured-3',
+        location_page_uid: 'test-penn-square-studio'
+    },
+    {
+        id: 'test-event-84',
+        key: 'test-event-84',
+        uid: 'test-event-84',
+        title: 'Sunday sauce club (summer edition)',
+        summary: 'Family-style dinner with rotating hosts.',
+        description: 'A communal table with a simple menu and a long linger.',
+        descriptionText: 'A communal table with a simple menu and a long linger.',
+        start_datetime: buildIso('2026-06-21', '17:30'),
+        end_datetime: buildIso('2026-06-21', '19:30'),
+        event_type: 'Food & drink',
+        status: 'Scheduled',
+        locationName: 'Fig Lane Market',
+        address: '27 Fig Ln, Lancaster, PA 17602',
+        locationUrl: '/locations/test-fig-lane-market',
+        website_url: 'https://example.com/fig-lane-market/sauce-club-june',
+        tickets_url: null,
+        image_url: img('sauce-club-june'),
+        imageUrl: img('sauce-club-june'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'fig-lane-market',
+            'jun-jul'
+        ],
+        venue_external_id: 'test-featured-2',
+        location_page_uid: 'test-fig-lane-market'
+    },
+    {
+        id: 'test-event-85',
+        key: 'test-event-85',
+        uid: 'test-event-85',
+        title: 'Community porch show',
+        summary: 'Short acoustic set, tip jar, neighbors welcome.',
+        description: 'A small, friendly set outside—bring a folding chair.',
+        descriptionText: 'A small, friendly set outside—bring a folding chair.',
+        start_datetime: buildIso('2026-06-27', '18:00'),
+        end_datetime: buildIso('2026-06-27', '19:30'),
+        event_type: 'Live music',
+        status: 'Scheduled',
+        locationName: 'Queen Street Commons',
+        address: '100 S Queen St, Lancaster, PA 17603',
+        website_url: 'https://example.com/porch-show-june',
+        tickets_url: null,
+        image_url: img('porch-show-june'),
+        imageUrl: img('porch-show-june'),
+        tags: [
+            TEST_DATA_TAG,
+            'general-test',
+            'jun-jul'
+        ],
+        venue_external_id: null,
+        location_page_uid: null
+    },
+    {
+        id: 'test-event-86',
+        key: 'test-event-86',
+        uid: 'test-event-86',
+        title: 'First Friday preview: “Night Windows”',
+        summary: 'A small show that looks best after dark.',
+        description: 'Photographs + neon sculpture in a room that rewards patience.',
+        descriptionText: 'Photographs + neon sculpture in a room that rewards patience.',
+        start_datetime: buildIso('2026-07-03', '18:00'),
+        end_datetime: buildIso('2026-07-03', '21:00'),
+        event_type: 'Arts & culture',
+        status: 'Scheduled',
+        locationName: 'Penn Square Studio',
+        address: '8 Penn Sq, Lancaster, PA 17603',
+        locationUrl: '/locations/test-penn-square-studio',
+        website_url: 'https://example.com/penn-square-studio/night-windows',
+        tickets_url: null,
+        image_url: img('night-windows-july'),
+        imageUrl: img('night-windows-july'),
+        tags: [
+            TEST_DATA_TAG,
+            'featured-partner',
+            'penn-square-studio',
+            'jun-jul',
+            'First Friday'
+        ],
+        venue_external_id: 'test-featured-3',
+        location_page_uid: 'test-penn-square-studio'
+    },
+    {
+        id: 'test-event-87',
+        key: 'test-event-87',
+        uid: 'test-event-87',
+        title: 'Sunday market stretch (summer)',
+        summary: 'Extra vendor rows + cold drinks.',
+        description: 'A longer market with more tables and more shade.',
+        descriptionText: 'A longer market with more tables and more shade.',
+        start_datetime: buildIso('2026-07-12', '15:00'),
+        end_datetime: buildIso('2026-07-12', '19:00'),
+        event_type: 'Community market',
+        status: 'Scheduled',
+        locationName: 'Warehouse Yard',
+        address: '320 N Mulberry St, Lancaster, PA 17603',
+        website_url: 'https://example.com/summer-market-stretch-july',
+        tickets_url: null,
+        image_url: img('summer-market-stretch-july'),
+        imageUrl: img('summer-market-stretch-july'),
+        tags: [
+            TEST_DATA_TAG,
+            'general-test',
+            'jun-jul'
+        ],
+        venue_external_id: null,
+        location_page_uid: null
+    }
+];
 const testEvents = [
     ...featuredPartnerEvents,
     ...extraWeekEvents,
     ...followingWeekEvents,
-    ...lateAprilThroughEarlyMayEvents
+    ...lateAprilThroughEarlyMayEvents,
+    ...mayThroughEarlyJuneEvents,
+    ...midJuneThroughMidJulyEvents
 ];
 const testUpdates = [
     {
@@ -2583,76 +3143,76 @@ const testUpdates = [
     {
         id: 'test-update-menu-1',
         kind: 'menu',
-        title: 'Spring cocktail list at The Exchange',
-        summary: 'New spritzes, zero-proof options, and a short list of bar snacks through April.',
+        title: 'Weekend gallery crawl: what to see (and what to skip)',
+        summary: 'Three quick stops, one surprise room, and a closing-night detail you’ll want on your calendar.',
         date: 'Mar 26, 2026',
         sortDate: '2026-03-26',
         tags: [
-            'cocktails',
-            'seasonal menu',
-            'downtown'
+            'arts & culture',
+            'galleries',
+            'First Friday'
         ],
-        body: 'The bar team rolled out a spring-forward list: two spritz builds, a clarified milk punch, and three spirit-free drinks. Pair with the small-plate menu until the board rotates again in May.',
+        body: 'If you’re doing the Arts & Culture loop, start early: the smaller rooms feel best before the sidewalk crowds settle in. One show is heavy on photography (worth a slow lap), another is mostly wall text (skim unless you’re obsessed), and there’s a tiny back-room installation that’s the actual reason to go.',
         link: 'https://example.com',
-        linkLabel: 'View sample menu'
+        linkLabel: 'Read the short list'
     },
     {
         id: 'test-update-community-1',
         kind: 'community',
-        title: 'Neighborhood clean-up: Saturday 9am',
-        summary: 'Meet at Reservoir Park; gloves and bags provided.',
+        title: 'Community darkroom hours: walk-ins welcome',
+        summary: 'A low-pressure open lab night for film folks—bring negatives or just curiosity.',
         date: 'Mar 24, 2026',
         sortDate: '2026-03-24',
         tags: [
-            'volunteer',
-            'parks',
-            'community'
+            'arts & culture',
+            'community',
+            'photography'
         ],
-        body: 'All ages welcome. Wear sturdy shoes. Coffee donated by a local roaster while supplies last. RSVP optional—just show up.'
+        body: 'No class format—just a shared room, a few enlargers, and someone who can help if you’ve forgotten which dial does what. If you’re new, come for the first hour; if you’re experienced, come later and trade tips.'
     },
     {
         id: 'test-update-notice-1',
         kind: 'notice',
-        title: 'Water main work on Orange Street',
-        summary: 'Lane shift Tuesday–Thursday; expect brief delays.',
+        title: 'Heads up: showtime + seating change for tonight’s screening',
+        summary: 'Doors are earlier, and the back row is now reserved for accessibility seating.',
         date: 'Mar 23, 2026',
         sortDate: '2026-03-23',
         tags: [
-            'construction',
-            'traffic',
-            'notice'
+            'notice',
+            'arts & culture',
+            'film'
         ],
-        body: 'Municipal crews will be working between King and Walnut. Sidewalks stay open where marked. Thank you for patience around the work zone.'
+        body: 'If you were planning to slide in last-minute, don’t—this room fills fast when the weather’s bad. Arrive early if you want a good sightline; staff will help route folks to the updated accessible section.'
     },
     {
         id: 'test-update-opening-1',
         kind: 'opening',
-        title: 'Now open: Little River Books',
-        summary: 'Independent shop with local authors up front, kids’ nook in back.',
+        title: 'Now open: a tiny listening room + record counter',
+        summary: 'Half shop, half “sit and actually listen”—with a shelf of local releases up front.',
         date: 'Mar 22, 2026',
         sortDate: '2026-03-22',
         tags: [
-            'retail',
             'opening',
-            'books'
+            'arts & culture',
+            'music'
         ],
-        body: 'Soft opening hours this week; grand opening weekend TBA. Follow for story time schedule and guest readings.',
+        body: 'Soft-open hours all week. The best part is the listening corner: a couple stools, a clean system, and zero pressure to buy. Expect in-store sets once they’re settled.',
         link: 'https://example.com',
         linkLabel: 'Shop Instagram'
     },
     {
         id: 'test-update-event-1',
         kind: 'event',
-        title: 'Jazz in the courtyard — Friday 7pm',
-        summary: 'Quartet from Philly; free, bring a blanket.',
+        title: 'Artist talk + walkthrough — Friday 7pm',
+        summary: 'A short talk, then a slow lap through the work (with time for questions).',
         date: 'Mar 21, 2026',
         sortDate: '2026-03-21',
         tags: [
-            'live music',
-            'outdoor',
-            'family-friendly'
+            'arts & culture',
+            'talk',
+            'gallery night'
         ],
-        body: 'Weather backup is the lobby one floor down. No tickets required; capacity is first-come. Vendors on-site for drinks only.'
+        body: 'No tickets required; capacity is first-come. If you care about the Q&A, arrive a little early—people tend to float in right at start and the room gets noisy fast.'
     },
     {
         id: 'test-update-urgent-1',
@@ -2670,55 +3230,100 @@ const testUpdates = [
     {
         id: 'test-update-psa-1',
         kind: 'psa',
-        title: 'PSA: First Friday parking',
-        summary: 'Use the garage on Duke — first hour free after 5pm.',
+        title: 'PSA: First Friday crowd flow',
+        summary: 'If you hate bottlenecks, start on the side streets and work toward the square.',
         date: 'Mar 20, 2026',
         sortDate: '2026-03-20',
         tags: [
             'PSA',
-            'parking',
-            'First Friday'
+            'First Friday',
+            'arts & culture'
         ],
-        body: 'Street spots fill quickly. The garage has plenty of room this month; take the elevator up to walk the galleries.'
+        body: 'The “main drag” galleries will be shoulder-to-shoulder from 7–8:30. If you want actual viewing time, hit smaller rooms first, then swing back when the line outside has thinned.'
     },
     {
         id: 'test-update-general-1',
         kind: 'general',
-        title: 'Welcome to the spring updates feed',
-        summary: 'A mix of openings, menus, PSAs, and community notes in one place.',
+        title: 'Arts & culture watchlist: what’s on this week',
+        summary: 'A fast scan of shows, screenings, and small-room performances worth leaving the house for.',
         date: 'Mar 19, 2026',
         sortDate: '2026-03-19',
         tags: [
-            'overview',
-            'Lancaster'
+            'arts & culture',
+            'Lancaster',
+            'weekly'
         ],
-        body: 'We group updates by type so you can scan quickly. Pinned items stay at the top; filter chips map to topics you care about.'
+        body: 'Think of this feed as the “good to know” layer: openings, closing nights, one-off talks, plus the kind of small details that make a plan smoother (doors, seating, what’s sold out).'
     },
     {
         id: 'test-update-infer-1',
-        title: 'Brunch service expands to Sundays',
-        summary: 'Same menu as Saturday, reservations recommended.',
+        title: 'Closing weekend: small print show adds Sunday hours',
+        summary: 'Same work on the walls, but extra time to actually look without the Friday crowd.',
         date: 'Mar 18, 2026',
         sortDate: '2026-03-18',
         tags: [
-            'brunch',
-            'reservations',
+            'gallery',
+            'prints',
             'weekend'
         ],
-        body: 'Kitchen opens at 10. Walk-ins welcome at the bar counter only.'
+        body: 'If you missed it on opening night, Sunday is the move. The room is quieter, and the work reads differently when you aren’t shoulder-checking for space.'
     },
     {
         id: 'test-update-infer-2',
-        title: 'Street fair this weekend on Mulberry',
-        summary: 'Vendors, food trucks, and a kids’ craft tent.',
+        title: 'Pop-up performance: ambient set + projected visuals',
+        summary: 'Short set, dark room, big sound—bring a jacket.',
         date: 'Mar 17, 2026',
         sortDate: '2026-03-17',
         tags: [
-            'street fair',
-            'family',
-            'vendors'
+            'music',
+            'arts & culture',
+            'pop-up'
         ],
-        body: 'Rain date is the following Sunday. Dogs on leash welcome in the outer aisles.'
+        body: 'This one is more “listening” than “party.” Expect a small crowd, moody lighting, and visuals that make your phone camera useless (in a good way).'
+    },
+    {
+        id: 'test-update-arts-2',
+        kind: 'event',
+        title: 'First Friday tip: late is better than early',
+        summary: 'If you want actual viewing time, show up after 8 (trust me).',
+        date: 'Apr 28, 2026',
+        sortDate: '2026-04-28',
+        tags: [
+            'arts & culture',
+            'First Friday',
+            'tips'
+        ],
+        body: 'The first hour is a social scene; the last hour is for looking. If you care about the work, go late, do one slow lap, then leave before it turns into sidewalk gridlock.'
+    },
+    {
+        id: 'test-update-food-2',
+        kind: 'menu',
+        title: 'Market lunch move: one stall, one side, don’t overthink it',
+        summary: 'A reminder that “too many options” is a real problem.',
+        date: 'Apr 30, 2026',
+        sortDate: '2026-04-30',
+        tags: [
+            'food & drink',
+            'quick picks',
+            'market'
+        ],
+        body: 'Pick one main and one side and call it. The best lunches here aren’t the biggest—they’re the ones you can eat without a committee meeting first.'
+    },
+    {
+        id: 'test-update-blog-1',
+        kind: 'general',
+        title: 'New on the blog: small-room film club guide',
+        summary: 'How to do screenings without turning it into homework.',
+        date: 'May 1, 2026',
+        sortDate: '2026-05-01',
+        tags: [
+            'blog',
+            'arts & culture',
+            'film'
+        ],
+        body: 'If you’ve been curious about the smaller screenings around town, we wrote a quick guide: when to arrive, where to sit, and how to enjoy the room without overperforming your taste.',
+        link: '/blog/small-room-film-club-guide',
+        linkLabel: 'Read the guide'
     }
 ];
 function getTestPartnerPage(uid) {

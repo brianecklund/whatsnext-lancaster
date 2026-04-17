@@ -788,6 +788,122 @@ img, video, iframe {
   width: 100% !important;
 }
 
+.mockupPage {
+  min-height: calc(100dvh - var(--headerH, 72px));
+  padding: 28px var(--gutter);
+  place-items: center;
+  display: grid;
+}
+
+.mockupInner {
+  place-items: center;
+  width: 100%;
+  display: grid;
+}
+
+.mockupPhone {
+  aspect-ratio: 390 / 844;
+  background: #0b0d12;
+  border-radius: 44px;
+  width: min(410px, 90vw);
+  padding: 14px;
+  position: relative;
+  box-shadow: 0 20px 60px #00000059, 0 8px 22px #00000040;
+}
+
+.mockupPhone__frame {
+  pointer-events: none;
+  border-radius: 44px;
+  position: absolute;
+  inset: 0;
+}
+
+.mockupPhone__notch {
+  background: #0b0d12;
+  border-radius: 0 0 20px 20px;
+  width: 150px;
+  height: 28px;
+  position: absolute;
+  top: 12px;
+  left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 6px 18px #00000038;
+}
+
+.mockupPhone__iframe {
+  background: var(--bg);
+  border: 0;
+  border-radius: 32px;
+  width: 100%;
+  height: 100%;
+}
+
+.mockupPhone__viewport {
+  background: var(--bg);
+  grid-template-rows: var(--mockupChromeTop, 46px) 1fr var(--mockupChromeBottom, 56px);
+  border-radius: 32px;
+  width: 100%;
+  height: 100%;
+  display: grid;
+  overflow: hidden;
+}
+
+.mockupPhone__chromeTop, .mockupPhone__chromeBottom {
+  background: linear-gradient(#ffffff14, #fff0);
+}
+
+.mockupPhone__chromeBottom {
+  background: linear-gradient(0deg, #ffffff14, #fff0);
+}
+
+.mockupPhone__viewport > .mockupPhone__iframe {
+  border-radius: 0;
+}
+
+.mockupPhone {
+  --mockupScale: .94;
+}
+
+.mockupPhone__viewport > .mockupPhone__iframe {
+  width: calc(100% / var(--mockupScale));
+  height: calc(100% / var(--mockupScale));
+  transform: scale(var(--mockupScale));
+  transform-origin: 0 0;
+  max-width: none;
+  display: block;
+}
+
+@media (max-width: 520px) {
+  .mockupPhone {
+    --mockupScale: .92;
+  }
+}
+
+@media (max-width: 980px) {
+  .eventRow.directoryListingRow {
+    box-sizing: border-box;
+    width: 100%;
+    position: relative;
+  }
+
+  .eventRow.directoryListingRow .directoryListingRow__actions {
+    align-self: auto;
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    margin-left: 0 !important;
+  }
+
+  .eventRow.directoryListingRow .directoryListingRow__main {
+    padding-right: 74px;
+  }
+
+  body[data-layout="shell"] .paneLeft .dayBlock .dayTitle.dayTitle--sticky, body[data-layout="shell"] .directoryListWrap .directoryLetterHeading--sticky {
+    width: calc(100% + (var(--panePadX) * 2));
+    box-sizing: border-box;
+  }
+}
+
 a {
   color: inherit;
   text-decoration: none;
@@ -2184,6 +2300,8 @@ a.weeklyOverview {
   padding-right: var(--panePadX);
   background: var(--bg);
   box-shadow: 0 1px 0 var(--border);
+  width: calc(100% + (var(--panePadX) * 2));
+  box-sizing: border-box;
   margin-top: -4px;
   margin-bottom: 10px;
   padding-top: 10px;
@@ -4857,11 +4975,11 @@ a:hover {
   }
 
   .wnlPageRevealRoot--contentReady .pageShell--listingPairReveal .split > .paneLeft {
-    transition-delay: 60ms !important;
+    transition-delay: .17s !important;
   }
 
   .wnlPageRevealRoot--contentReady .pageShell--listingPairReveal .split > .paneRight {
-    transition-delay: 75ms !important;
+    transition-delay: .33s !important;
   }
 }
 
@@ -5905,6 +6023,8 @@ body, button, input, select, textarea, .brand, .serifTitle, .detailTitle, .weekl
     padding-right: var(--panePadX);
     background: var(--bg);
     box-shadow: 0 1px 0 var(--border);
+    width: calc(100% + (var(--panePadX) * 2));
+    box-sizing: border-box;
     margin-top: -4px;
     margin-bottom: 10px;
     padding-top: 10px;
@@ -5923,6 +6043,8 @@ body, button, input, select, textarea, .brand, .serifTitle, .detailTitle, .weekl
     padding-right: var(--mobileListPadX, 12px);
     background: var(--bg);
     box-shadow: 0 1px 0 var(--border);
+    width: calc(100% + (var(--mobileListPadX, 12px) * 2));
+    box-sizing: border-box;
     margin-top: -4px;
     margin-bottom: 10px;
     padding-top: 10px;

@@ -914,6 +914,8 @@ img, video, iframe{ max-width:100%; }
   height: calc(100% / var(--mockupScale));
   transform: scale(var(--mockupScale));
   transform-origin: top left;
+  max-width: none;
+  display: block;
 }
 
 @media (max-width: 520px){
@@ -2307,6 +2309,8 @@ a.weeklyOverview{
   margin-bottom: 10px;
   background: var(--bg);
   box-shadow: 0 1px 0 var(--border);
+  width: calc(100% + (var(--panePadX) * 2));
+  box-sizing: border-box;
 }
 
 @media (max-width: 980px){
@@ -5716,6 +5720,8 @@ textarea,
     margin-bottom: 10px;
     background: var(--bg);
     box-shadow: 0 1px 0 var(--border);
+    width: calc(100% + (var(--panePadX) * 2));
+    box-sizing: border-box;
   }
 }
 
@@ -5734,6 +5740,8 @@ textarea,
     margin-bottom: 10px;
     background: var(--bg);
     box-shadow: 0 1px 0 var(--border);
+    width: calc(100% + (var(--mobileListPadX, 12px) * 2));
+    box-sizing: border-box;
   }
 }
 

@@ -511,7 +511,9 @@ __turbopack_context__.s([
     "TopNavIconContact",
     ()=>TopNavIconContact,
     "TopNavIconDonate",
-    ()=>TopNavIconDonate
+    ()=>TopNavIconDonate,
+    "TopNavIconMockup",
+    ()=>TopNavIconMockup
 ]);
 var __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__ = __turbopack_context__.i("[project]/node_modules/next/dist/server/route-modules/app-page/vendored/ssr/react-jsx-dev-runtime.js [app-ssr] (ecmascript)");
 ;
@@ -617,6 +619,42 @@ function TopNavIconContact() {
     }, void 0, true, {
         fileName: "[project]/app/components/topNavMenuIcons.tsx",
         lineNumber: 44,
+        columnNumber: 5
+    }, this);
+}
+function TopNavIconMockup() {
+    return /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("svg", {
+        ...strokeIcon,
+        children: [
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("rect", {
+                x: "7",
+                y: "2.8",
+                width: "10",
+                height: "18.4",
+                rx: "2.2"
+            }, void 0, false, {
+                fileName: "[project]/app/components/topNavMenuIcons.tsx",
+                lineNumber: 54,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M11 5.6h2"
+            }, void 0, false, {
+                fileName: "[project]/app/components/topNavMenuIcons.tsx",
+                lineNumber: 55,
+                columnNumber: 7
+            }, this),
+            /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("path", {
+                d: "M12 18.7h.01"
+            }, void 0, false, {
+                fileName: "[project]/app/components/topNavMenuIcons.tsx",
+                lineNumber: 56,
+                columnNumber: 7
+            }, this)
+        ]
+    }, void 0, true, {
+        fileName: "[project]/app/components/topNavMenuIcons.tsx",
+        lineNumber: 53,
         columnNumber: 5
     }, this);
 }
@@ -848,7 +886,7 @@ __turbopack_context__.s([
     ()=>withSiteTitle
 ]);
 function getSiteVariant() {
-    const raw = (("TURBOPACK compile-time value", "demo") ?? "").trim().toLowerCase();
+    const raw = (process.env.NEXT_PUBLIC_SITE_VARIANT ?? "").trim().toLowerCase();
     return raw === "demo" ? "demo" : "default";
 }
 const isDemoSite = getSiteVariant() === "demo";
@@ -996,6 +1034,11 @@ const DESKTOP_LINKS = [
         Icon: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$topNavMenuIcons$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["TopNavIconBlog"]
     },
     {
+        href: "/mockup",
+        label: "Mockup",
+        Icon: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$topNavMenuIcons$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["TopNavIconMockup"]
+    },
+    {
         href: "/donate",
         label: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$site$2d$copy$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["siteCopy"].nav.donate,
         Icon: __TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$topNavMenuIcons$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["TopNavIconDonate"]
@@ -1070,7 +1113,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                 children: "Palette"
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 93,
+                                lineNumber: 94,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1078,7 +1121,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                 children: currentThemeLabel
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 94,
+                                lineNumber: 95,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1087,13 +1130,13 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                 children: paletteOpen ? "▾" : "▸"
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 95,
+                                lineNumber: 96,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 86,
+                        lineNumber: 87,
                         columnNumber: 9
                     }, this),
                     paletteOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1112,7 +1155,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                         children: theme.name
                                     }, void 0, false, {
                                         fileName: "[project]/app/site-header.tsx",
-                                        lineNumber: 111,
+                                        lineNumber: 112,
                                         columnNumber: 19
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1127,7 +1170,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                                 title: "Background"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/site-header.tsx",
-                                                lineNumber: 113,
+                                                lineNumber: 114,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1138,7 +1181,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                                 title: "Text"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/site-header.tsx",
-                                                lineNumber: 114,
+                                                lineNumber: 115,
                                                 columnNumber: 21
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1149,31 +1192,31 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                                 title: "Accent"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/site-header.tsx",
-                                                lineNumber: 115,
+                                                lineNumber: 116,
                                                 columnNumber: 21
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/site-header.tsx",
-                                        lineNumber: 112,
+                                        lineNumber: 113,
                                         columnNumber: 19
                                     }, this)
                                 ]
                             }, theme.key, true, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 104,
+                                lineNumber: 105,
                                 columnNumber: 17
                             }, this);
                         })
                     }, void 0, false, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 100,
+                        lineNumber: 101,
                         columnNumber: 11
                     }, this) : null
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/site-header.tsx",
-                lineNumber: 85,
+                lineNumber: 86,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1192,7 +1235,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                 children: "Typography"
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 132,
+                                lineNumber: 133,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1201,13 +1244,13 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                 children: typeOpen ? "▾" : "▸"
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 133,
+                                lineNumber: 134,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 125,
+                        lineNumber: 126,
                         columnNumber: 9
                     }, this),
                     typeOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["Fragment"], {
@@ -1219,7 +1262,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                     children: "Text size"
                                 }, void 0, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 140,
+                                    lineNumber: 141,
                                     columnNumber: 15
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1235,25 +1278,25 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                             children: opt.label
                                         }, opt.key, false, {
                                             fileName: "[project]/app/site-header.tsx",
-                                            lineNumber: 143,
+                                            lineNumber: 144,
                                             columnNumber: 19
                                         }, this))
                                 }, void 0, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 141,
+                                    lineNumber: 142,
                                     columnNumber: 15
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/site-header.tsx",
-                            lineNumber: 139,
+                            lineNumber: 140,
                             columnNumber: 13
                         }, this)
                     }, void 0, false) : null
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/site-header.tsx",
-                lineNumber: 124,
+                lineNumber: 125,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("section", {
@@ -1272,7 +1315,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                 children: "Accessibility"
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 170,
+                                lineNumber: 171,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1281,7 +1324,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                 children: a11yOnCount === 0 ? "Off" : `${a11yOnCount} on`
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 171,
+                                lineNumber: 172,
                                 columnNumber: 11
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1290,13 +1333,13 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                 children: a11yOpen ? "▾" : "▸"
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 174,
+                                lineNumber: 175,
                                 columnNumber: 11
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 163,
+                        lineNumber: 164,
                         columnNumber: 9
                     }, this),
                     a11yOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1310,7 +1353,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 180,
+                                lineNumber: 181,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -1326,7 +1369,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/app/site-header.tsx",
-                                        lineNumber: 184,
+                                        lineNumber: 185,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1337,19 +1380,19 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                                 children: a11yMotion ? "On" : "Off"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/site-header.tsx",
-                                                lineNumber: 195,
+                                                lineNumber: 196,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/site-header.tsx",
-                                        lineNumber: 193,
+                                        lineNumber: 194,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 183,
+                                lineNumber: 184,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -1365,7 +1408,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/app/site-header.tsx",
-                                        lineNumber: 201,
+                                        lineNumber: 202,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1376,19 +1419,19 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                                 children: a11yFocus ? "On" : "Off"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/site-header.tsx",
-                                                lineNumber: 212,
+                                                lineNumber: 213,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/site-header.tsx",
-                                        lineNumber: 210,
+                                        lineNumber: 211,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 200,
+                                lineNumber: 201,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("label", {
@@ -1404,7 +1447,7 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                         }
                                     }, void 0, false, {
                                         fileName: "[project]/app/site-header.tsx",
-                                        lineNumber: 218,
+                                        lineNumber: 219,
                                         columnNumber: 15
                                     }, this),
                                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1415,37 +1458,37 @@ function SettingsPanel({ currentTheme, currentThemeLabel, onPickTheme, textScale
                                                 children: a11yLinks ? "On" : "Off"
                                             }, void 0, false, {
                                                 fileName: "[project]/app/site-header.tsx",
-                                                lineNumber: 229,
+                                                lineNumber: 230,
                                                 columnNumber: 17
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/site-header.tsx",
-                                        lineNumber: 227,
+                                        lineNumber: 228,
                                         columnNumber: 15
                                     }, this)
                                 ]
                             }, void 0, true, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 217,
+                                lineNumber: 218,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 179,
+                        lineNumber: 180,
                         columnNumber: 11
                     }, this) : null
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/site-header.tsx",
-                lineNumber: 162,
+                lineNumber: 163,
                 columnNumber: 7
             }, this)
         ]
     }, void 0, true, {
         fileName: "[project]/app/site-header.tsx",
-        lineNumber: 84,
+        lineNumber: 85,
         columnNumber: 5
     }, this);
 }
@@ -1626,7 +1669,7 @@ function SiteHeader() {
                 children: [
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$BrandScrollSmiley$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 411,
+                        lineNumber: 412,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1637,7 +1680,7 @@ function SiteHeader() {
                                 children: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$site$2d$copy$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["siteCopy"].brandFull
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 413,
+                                lineNumber: 414,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1646,19 +1689,19 @@ function SiteHeader() {
                                 children: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$site$2d$copy$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["siteCopy"].brandShort
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 414,
+                                lineNumber: 415,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 412,
+                        lineNumber: 413,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/site-header.tsx",
-                lineNumber: 410,
+                lineNumber: 411,
                 columnNumber: 9
             }, this) : /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
                 className: "brand brand--mobileSplit",
@@ -1668,12 +1711,12 @@ function SiteHeader() {
                         "aria-hidden": true,
                         children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$app$2f$components$2f$BrandScrollSmiley$2e$tsx__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {}, void 0, false, {
                             fileName: "[project]/app/site-header.tsx",
-                            lineNumber: 422,
+                            lineNumber: 423,
                             columnNumber: 13
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 421,
+                        lineNumber: 422,
                         columnNumber: 11
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(__TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$client$2f$app$2d$dir$2f$link$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["default"], {
@@ -1686,7 +1729,7 @@ function SiteHeader() {
                                 children: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$site$2d$copy$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["siteCopy"].brandFull
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 425,
+                                lineNumber: 426,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1695,19 +1738,19 @@ function SiteHeader() {
                                 children: __TURBOPACK__imported__module__$5b$project$5d2f$lib$2f$site$2d$copy$2e$ts__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["siteCopy"].brandShort
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 426,
+                                lineNumber: 427,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 424,
+                        lineNumber: 425,
                         columnNumber: 11
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/site-header.tsx",
-                lineNumber: 420,
+                lineNumber: 421,
                 columnNumber: 9
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
@@ -1724,12 +1767,12 @@ function SiteHeader() {
                                 "aria-hidden": true,
                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(l.Icon, {}, void 0, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 443,
+                                    lineNumber: 444,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 442,
+                                lineNumber: 443,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1737,7 +1780,7 @@ function SiteHeader() {
                                 children: l.label
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 445,
+                                lineNumber: 446,
                                 columnNumber: 13
                             }, this),
                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1755,28 +1798,28 @@ function SiteHeader() {
                                         strokeLinejoin: "round"
                                     }, void 0, false, {
                                         fileName: "[project]/app/site-header.tsx",
-                                        lineNumber: 448,
+                                        lineNumber: 449,
                                         columnNumber: 17
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 447,
+                                    lineNumber: 448,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 446,
+                                lineNumber: 447,
                                 columnNumber: 13
                             }, this)
                         ]
                     }, l.href, true, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 435,
+                        lineNumber: 436,
                         columnNumber: 11
                     }, this))
             }, void 0, false, {
                 fileName: "[project]/app/site-header.tsx",
-                lineNumber: 433,
+                lineNumber: 434,
                 columnNumber: 7
             }, this),
             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1816,17 +1859,17 @@ function SiteHeader() {
                                         height: 22
                                     }, void 0, false, {
                                         fileName: "[project]/app/site-header.tsx",
-                                        lineNumber: 485,
+                                        lineNumber: 486,
                                         columnNumber: 15
                                     }, this)
                                 }, void 0, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 483,
+                                    lineNumber: 484,
                                     columnNumber: 13
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 463,
+                                lineNumber: 464,
                                 columnNumber: 11
                             }, this),
                             desktop && settingsOpen ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1838,18 +1881,18 @@ function SiteHeader() {
                                     ...settingsPanelProps
                                 }, void 0, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 491,
+                                    lineNumber: 492,
                                     columnNumber: 15
                                 }, this)
                             }, void 0, false, {
                                 fileName: "[project]/app/site-header.tsx",
-                                lineNumber: 490,
+                                lineNumber: 491,
                                 columnNumber: 13
                             }, this) : null
                         ]
                     }, void 0, true, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 462,
+                        lineNumber: 463,
                         columnNumber: 9
                     }, this),
                     /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1876,11 +1919,6 @@ function SiteHeader() {
                             children: [
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {}, void 0, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 516,
-                                    columnNumber: 13
-                                }, this),
-                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {}, void 0, false, {
-                                    fileName: "[project]/app/site-header.tsx",
                                     lineNumber: 517,
                                     columnNumber: 13
                                 }, this),
@@ -1888,22 +1926,27 @@ function SiteHeader() {
                                     fileName: "[project]/app/site-header.tsx",
                                     lineNumber: 518,
                                     columnNumber: 13
+                                }, this),
+                                /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {}, void 0, false, {
+                                    fileName: "[project]/app/site-header.tsx",
+                                    lineNumber: 519,
+                                    columnNumber: 13
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/site-header.tsx",
-                            lineNumber: 515,
+                            lineNumber: 516,
                             columnNumber: 11
                         }, this)
                     }, void 0, false, {
                         fileName: "[project]/app/site-header.tsx",
-                        lineNumber: 496,
+                        lineNumber: 497,
                         columnNumber: 9
                     }, this)
                 ]
             }, void 0, true, {
                 fileName: "[project]/app/site-header.tsx",
-                lineNumber: 461,
+                lineNumber: 462,
                 columnNumber: 7
             }, this),
             open && typeof document !== "undefined" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$dom$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createPortal"])(/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -1923,7 +1966,7 @@ function SiteHeader() {
                                     children: "Menu"
                                 }, void 0, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 533,
+                                    lineNumber: 534,
                                     columnNumber: 19
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -1934,13 +1977,13 @@ function SiteHeader() {
                                     children: "✕"
                                 }, void 0, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 534,
+                                    lineNumber: 535,
                                     columnNumber: 19
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/site-header.tsx",
-                            lineNumber: 532,
+                            lineNumber: 533,
                             columnNumber: 17
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("nav", {
@@ -1962,12 +2005,12 @@ function SiteHeader() {
                                                 "aria-hidden": true,
                                                 children: /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(l.Icon, {}, void 0, false, {
                                                     fileName: "[project]/app/site-header.tsx",
-                                                    lineNumber: 551,
+                                                    lineNumber: 552,
                                                     columnNumber: 27
                                                 }, this)
                                             }, void 0, false, {
                                                 fileName: "[project]/app/site-header.tsx",
-                                                lineNumber: 550,
+                                                lineNumber: 551,
                                                 columnNumber: 25
                                             }, this),
                                             /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("span", {
@@ -1975,34 +2018,34 @@ function SiteHeader() {
                                                 children: l.label
                                             }, void 0, false, {
                                                 fileName: "[project]/app/site-header.tsx",
-                                                lineNumber: 553,
+                                                lineNumber: 554,
                                                 columnNumber: 25
                                             }, this)
                                         ]
                                     }, void 0, true, {
                                         fileName: "[project]/app/site-header.tsx",
-                                        lineNumber: 549,
+                                        lineNumber: 550,
                                         columnNumber: 23
                                     }, this)
                                 }, l.href, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 541,
+                                    lineNumber: 542,
                                     columnNumber: 21
                                 }, this))
                         }, void 0, false, {
                             fileName: "[project]/app/site-header.tsx",
-                            lineNumber: 539,
+                            lineNumber: 540,
                             columnNumber: 17
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/site-header.tsx",
-                    lineNumber: 531,
+                    lineNumber: 532,
                     columnNumber: 15
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/site-header.tsx",
-                lineNumber: 525,
+                lineNumber: 526,
                 columnNumber: 13
             }, this), document.body) : null,
             !desktop && settingsOpen && typeof document !== "undefined" ? /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$dom$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["createPortal"])(/*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("div", {
@@ -2023,7 +2066,7 @@ function SiteHeader() {
                                     children: "Settings"
                                 }, void 0, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 575,
+                                    lineNumber: 576,
                                     columnNumber: 19
                                 }, this),
                                 /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])("button", {
@@ -2034,37 +2077,37 @@ function SiteHeader() {
                                     children: "✕"
                                 }, void 0, false, {
                                     fileName: "[project]/app/site-header.tsx",
-                                    lineNumber: 576,
+                                    lineNumber: 577,
                                     columnNumber: 19
                                 }, this)
                             ]
                         }, void 0, true, {
                             fileName: "[project]/app/site-header.tsx",
-                            lineNumber: 574,
+                            lineNumber: 575,
                             columnNumber: 17
                         }, this),
                         /*#__PURE__*/ (0, __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f$next$2f$dist$2f$server$2f$route$2d$modules$2f$app$2d$page$2f$vendored$2f$ssr$2f$react$2d$jsx$2d$dev$2d$runtime$2e$js__$5b$app$2d$ssr$5d$__$28$ecmascript$29$__["jsxDEV"])(SettingsPanel, {
                             ...settingsPanelProps
                         }, void 0, false, {
                             fileName: "[project]/app/site-header.tsx",
-                            lineNumber: 581,
+                            lineNumber: 582,
                             columnNumber: 17
                         }, this)
                     ]
                 }, void 0, true, {
                     fileName: "[project]/app/site-header.tsx",
-                    lineNumber: 573,
+                    lineNumber: 574,
                     columnNumber: 15
                 }, this)
             }, void 0, false, {
                 fileName: "[project]/app/site-header.tsx",
-                lineNumber: 566,
+                lineNumber: 567,
                 columnNumber: 13
             }, this), document.body) : null
         ]
     }, void 0, true, {
         fileName: "[project]/app/site-header.tsx",
-        lineNumber: 408,
+        lineNumber: 409,
         columnNumber: 5
     }, this);
 }
